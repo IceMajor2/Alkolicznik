@@ -30,4 +30,19 @@ public class Beer {
     public void setName(@Nonnull String name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+
+        if(!(obj instanceof Beer)) {
+            return false;
+        }
+
+        Beer compare = (Beer) obj;
+
+        return compare.getId() == this.getId() && compare.getName().equals(this.getName());
+    }
 }
