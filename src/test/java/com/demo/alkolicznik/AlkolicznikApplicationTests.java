@@ -41,7 +41,7 @@ class AlkolicznikApplicationTests {
 
 	@Test
 	public void getBeerFromApi() {
-		ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beers/1", Beer.class);
+		ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beer/1", Beer.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
