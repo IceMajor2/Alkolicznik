@@ -14,6 +14,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import javax.sql.DataSource;
 
+import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -49,6 +50,27 @@ class AlkolicznikApplicationTests {
 		Beer expected = jdbcTemplate.queryForObject("SELECT * FROM beers WHERE beers.id = 1", mapToBeer());
 
 		assertThat(beer).isEqualTo(expected);
+	}
+
+	@Test
+	public void getCreatedBeerFromApi() {
+		// Create new Beer and post it to database.
+		// ID is set to null in constructor, because it will be generated.
+		Beer beer = new Beer(null, "Lech");
+		URI newBeerLocation = restTemplate.postForLocation("/api/beers", beer);
+		Long id = beer.getId();
+	//	System.out.println(newBeerLocation);
+
+		// Fetch just-created entity from database through controller.
+		ResponseEntity<Beer> getResponse = restTemplate.getForEntity(newBeerLocation, Beer.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Beer actual = getResponse.getBody();
+		assertThat(actual).isEqualTo(beer);
+
+		// Additionally: fetch the beer directly from database.
+		Beer dbBeer = jdbcTemplate.queryForObject("SELECT * FROM beers WHERE beers.id = ?", mapToBeer(), id);
+
+		assertThat(dbBeer).isEqualTo(beer);
 	}
 
 	private RowMapper<Beer> mapToBeer() {
