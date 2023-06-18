@@ -23,6 +23,7 @@ dependencies {
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.postgresql:postgresql'
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'	// required for TestRestTemplate to disable redirects
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
