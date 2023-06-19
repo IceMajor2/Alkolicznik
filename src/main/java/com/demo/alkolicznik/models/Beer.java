@@ -3,8 +3,10 @@ package com.demo.alkolicznik.models;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
-@Table(name = "beers")
+@Table(name = "beer")
 public class Beer {
 
     @Id
@@ -13,6 +15,9 @@ public class Beer {
 
     @Nonnull
     private String name;
+
+    @OneToMany(mappedBy = "beer")
+    private Set<BeerPrice> prices;
 
     public Beer(String name) {
         this.id = id;
@@ -27,6 +32,14 @@ public class Beer {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<BeerPrice> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(Set<BeerPrice> prices) {
+        this.prices = prices;
     }
 
     @Nonnull

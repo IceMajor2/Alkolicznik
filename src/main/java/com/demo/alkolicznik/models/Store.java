@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.Set;
 
-@Table(name = "stores")
+@Table(name = "stors")
 @Entity
 public class Store {
 
@@ -12,6 +12,22 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany
-    private Set<Beer> beers;
+    @OneToMany(mappedBy = "store")
+    private Set<BeerPrice> prices;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<BeerPrice> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(Set<BeerPrice> prices) {
+        this.prices = prices;
+    }
 }
