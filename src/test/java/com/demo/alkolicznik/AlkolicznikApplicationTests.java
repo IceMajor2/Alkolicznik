@@ -72,6 +72,12 @@ class AlkolicznikApplicationTests {
         assertThat(dbBeer).isEqualTo(savedBear);
     }
 
+    @Test
+    public void getNonExistingBeerShouldReturn404() {
+        ResponseEntity<Beer> getResponse = restTemplate.getForEntity("/api/beer/9999", Beer.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
     private RowMapper<Beer> mapToBeer() {
         return new RowMapper<Beer>() {
             @Override
