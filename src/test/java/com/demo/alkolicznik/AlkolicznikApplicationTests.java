@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.test.context.jdbc.Sql;
 
 import javax.sql.DataSource;
 
@@ -21,75 +22,65 @@ import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql({"/dbs/beer-schema.sql", "/dbs/beer-data.sql"})
 class AlkolicznikApplicationTests {
 
-	@Autowired
-	private TestRestTemplate restTemplate;
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-	private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-	@BeforeEach
-	public void setUp() throws Exception {
-		this.jdbcTemplate = new JdbcTemplate(createTestDataSource());
-	}
+    @Test
+    public void anyoneCanAccessIndexPage() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/", String.class);
 
-	@Test
-	public void anyoneCanAccessIndexPage() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-	}
+    @Test
+    public void getBeerFromApi() {
+        ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beer/1", Beer.class);
 
-	@Test
-	public void getBeerFromApi() {
-		ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beer/1", Beer.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Beer beer = response.getBody();
+        Beer expected = jdbcTemplate.queryForObject("SELECT * FROM beers WHERE beers.id = 1", mapToBeer());
 
-		Beer beer = response.getBody();
-		Beer expected = jdbcTemplate.queryForObject("SELECT * FROM beers WHERE beers.id = 1", mapToBeer());
+        assertThat(beer).isEqualTo(expected);
+    }
 
-		assertThat(beer).isEqualTo(expected);
-	}
+    @Test
+    public void getCreatedBeerFromApi() {
+        // Create new Beer and post it to database.
+        Beer beer = new Beer("Lech");
+        ResponseEntity<Beer> postResponse = restTemplate.postForEntity("/api/beer", beer, Beer.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        Beer savedBear = postResponse.getBody();
+        URI location = postResponse.getHeaders().getLocation();
 
-	@Test
-	public void getCreatedBeerFromApi() {
-		// Create new Beer and post it to database.
-		// ID is set to null in constructor, because it will be generated.
-		Beer beer = new Beer(null, "Lech");
-		URI newBeerLocation = restTemplate.postForLocation("/api/beers", beer);
-		Long id = beer.getId();
-	//	System.out.println(newBeerLocation);
+        // Fetch just-created entity from database through controller.
+        ResponseEntity<Beer> getResponse = restTemplate.getForEntity(location, Beer.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Beer actual = getResponse.getBody();
+        assertThat(actual).isEqualTo(savedBear);
 
-		// Fetch just-created entity from database through controller.
-		ResponseEntity<Beer> getResponse = restTemplate.getForEntity(newBeerLocation, Beer.class);
-		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-		Beer actual = getResponse.getBody();
-		assertThat(actual).isEqualTo(beer);
+        // Additionally: fetch the beer directly from database.
+		String sql = "SELECT * FROM beers WHERE beers.id = ?";
+        Beer dbBeer = jdbcTemplate.queryForObject(sql, mapToBeer(), savedBear.getId());
 
-		// Additionally: fetch the beer directly from database.
-		Beer dbBeer = jdbcTemplate.queryForObject("SELECT * FROM beers WHERE beers.id = ?", mapToBeer(), id);
+        assertThat(dbBeer).isEqualTo(savedBear);
+    }
 
-		assertThat(dbBeer).isEqualTo(beer);
-	}
-
-	private RowMapper<Beer> mapToBeer() {
-		return new RowMapper<Beer>() {
-			@Override
-			public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Beer beer = new Beer();
-				beer.setId(rs.getLong("id"));
-				beer.setName(rs.getString("name"));
-				return beer;
-			}
-		};
-	}
-
-	private DataSource createTestDataSource() {
-		return new EmbeddedDatabaseBuilder()
-				.setName("beers")
-				.addScript("/dbs/beer-schema.sql")
-				.addScript("/dbs/beer-data.sql")
-				.build();
-	}
+    private RowMapper<Beer> mapToBeer() {
+        return new RowMapper<Beer>() {
+            @Override
+            public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Beer beer = new Beer();
+                beer.setId(rs.getLong("id"));
+                beer.setName(rs.getString("name"));
+                return beer;
+            }
+        };
+    }
 }
