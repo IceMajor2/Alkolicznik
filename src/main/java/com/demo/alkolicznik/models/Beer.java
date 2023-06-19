@@ -14,6 +14,13 @@ public class Beer {
     @Nonnull
     private String name;
 
+    public Beer(String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Beer() {}
+
     public Long getId() {
         return id;
     }
@@ -44,5 +51,10 @@ public class Beer {
         Beer compare = (Beer) obj;
 
         return compare.getId() == this.getId() && compare.getName().equals(this.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "%s (ID: %d)".formatted(this.name, this.id);
     }
 }
