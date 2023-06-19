@@ -1,16 +1,20 @@
 package com.demo.alkolicznik.models;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 
 import java.util.Set;
 
-@Table(name = "stors")
+@Table(name = "store")
 @Entity
 public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Nonnull
+    private String name;
 
     @OneToMany(mappedBy = "store")
     private Set<BeerPrice> prices;
@@ -29,5 +33,14 @@ public class Store {
 
     public void setPrices(Set<BeerPrice> prices) {
         this.prices = prices;
+    }
+
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nonnull String name) {
+        this.name = name;
     }
 }
