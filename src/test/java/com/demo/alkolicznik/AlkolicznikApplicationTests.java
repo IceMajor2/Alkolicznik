@@ -1,7 +1,6 @@
 package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.test.context.jdbc.Sql;
-
-import javax.sql.DataSource;
 
 import java.net.URI;
 import java.sql.ResultSet;
@@ -32,14 +28,14 @@ class AlkolicznikApplicationTests {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    public void anyoneCanAccessIndexPage() {
+    public void anyoneCanAccessIndexPageTest() {
         ResponseEntity<String> response = restTemplate.getForEntity("/", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    public void getBeerFromApi() {
+    public void getBeerFromApiTest() {
         ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beer/1", Beer.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -51,7 +47,7 @@ class AlkolicznikApplicationTests {
     }
 
     @Test
-    public void getCreatedBeerFromApi() {
+    public void getCreatedBeerFromApiTest() {
         // Create new Beer and post it to database.
         Beer beer = new Beer("Lech");
         ResponseEntity<Beer> postResponse = restTemplate.postForEntity("/api/beer", beer, Beer.class);
@@ -73,7 +69,7 @@ class AlkolicznikApplicationTests {
     }
 
     @Test
-    public void getNonExistingBeerShouldReturn404() {
+    public void getNonExistingBeerShouldReturn404Test() {
         ResponseEntity<Beer> getResponse = restTemplate.getForEntity("/api/beer/9999", Beer.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
