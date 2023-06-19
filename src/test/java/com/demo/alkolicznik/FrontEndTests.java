@@ -17,7 +17,15 @@ public class FrontEndTests {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void welcomePageContainsSearchBeerReference() {
+    public void welcomePageTitleTest() {
+        Document page = getHtml("/");
+        String pageTitle = page.title();
+
+        assertThat(pageTitle).isEqualTo("Alkolicznik");
+    }
+
+    @Test
+    public void welcomePageContainsSearchBeerReferenceTest() {
         Document page = getHtml("/");
         // Link to "/search_beer" should be
         // the first link in the welcome page
