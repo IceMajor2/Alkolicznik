@@ -24,6 +24,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'// required for TestRestTemplate to disable redirects
 	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.jsoup:jsoup:1.16.1'
 	testImplementation 'org.hsqldb:hsqldb:2.7.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
