@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 
@@ -7,6 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "beer")
+@JsonPropertyOrder({"id", "name"})
 public class Beer {
 
     @Id
@@ -17,6 +20,7 @@ public class Beer {
     private String name;
 
     @OneToMany(mappedBy = "beer")
+    @JsonIgnore
     private Set<BeerPrice> prices;
 
     public Beer(String name) {
