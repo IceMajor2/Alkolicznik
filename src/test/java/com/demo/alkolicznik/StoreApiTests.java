@@ -2,6 +2,8 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,5 +143,31 @@ public class StoreApiTests {
                 .postForEntity("/api/store", store, Store.class);
 
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @DirtiesContext
+    /**
+     * {@code POST /api/store} - check response elements of 201 OK response.
+     */
+    public void createStoreResponseBodyOKTest() throws JSONException {
+        Store store = new Store("Zoltek");
+        ResponseEntity<String> postResponse = restTemplate
+                .postForEntity("/api/store", store, String.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        JSONObject jsonObject = TestUtils.getJsonObject(postResponse.getBody());
+        String nameResponse = jsonObject.getString("name");
+        Long nameId = jsonObject.getLong("id");
+        int lengthResponse = jsonObject.length();
+
+        assertThat(nameResponse).isEqualTo("Zoltek");
+        assertThat(nameId).isEqualTo(7L);
+        assertThat(lengthResponse)
+                .withFailMessage("Amount of key-value pairs do not match." +
+                        "\nExpected: %d" +
+                        "\nActual: %d",
+                        2, lengthResponse)
+                .isEqualTo(2);
     }
 }

@@ -2,16 +2,20 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import com.google.gson.Gson;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Configuration
+@Component
 public class TestUtils {
 
     private static JdbcTemplate jdbcTemplate;
@@ -55,5 +59,37 @@ public class TestUtils {
                 return beer;
             }
         };
+    }
+
+    /**
+     * Convert {@code ResponseEntity<T>} body to {@code JSONObject}.
+     *
+     * @param response with non-null body
+     * @return body of {@code ResponseEntity<T>} as {@code JSONObject}
+     */
+    public static <T> JSONObject getJsonObject(ResponseEntity<T> response) {
+        String jsonInString = new Gson().toJson(response.getBody());
+        try {
+            JSONObject jsonObject = new JSONObject(jsonInString);
+            return jsonObject;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Convert JSON in {@code String} to {@code JSONObject}.
+     * @param json JSON string
+     * @return {@code JSONObject}
+     */
+    public static JSONObject getJsonObject(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
