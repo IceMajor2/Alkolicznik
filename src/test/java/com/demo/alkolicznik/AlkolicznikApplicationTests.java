@@ -191,6 +191,16 @@ class AlkolicznikApplicationTests {
                 .postForEntity("/api/store", store, Store.class);
 
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        store = new Store();
+        postResponse = restTemplate.postForEntity("/api/store", store, Store.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        store = new Store("   \t ");
+        postResponse = restTemplate.postForEntity("/api/store", store, Store.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     /**
