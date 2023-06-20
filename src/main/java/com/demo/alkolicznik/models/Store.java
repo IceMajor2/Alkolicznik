@@ -43,4 +43,24 @@ public class Store {
     public void setName(@Nonnull String name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+
+        if(!(obj instanceof Store)) {
+            return false;
+        }
+
+        Store compare = (Store) obj;
+
+        return compare.getId() == this.getId() && compare.getName().equals(this.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "%s (ID: %d)".formatted(this.name, this.id);
+    }
 }
