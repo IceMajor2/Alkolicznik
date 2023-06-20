@@ -2,6 +2,8 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,5 +107,31 @@ public class BeerApiTests {
     public void getNonExistingBeerShouldReturn404Test() {
         ResponseEntity<Beer> getResponse = restTemplate.getForEntity("/api/beer/9999", Beer.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DirtiesContext
+    /**
+     * {@code POST /api/beer} - check body of 201 OK response.
+     */
+    public void createBeerResponseBodyOKTest() throws JSONException {
+        Beer beer = new Beer("Okocim");
+        ResponseEntity<String> postResponse = restTemplate
+                .postForEntity("/api/beer", beer, String.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        JSONObject jsonObject = TestUtils.getJsonObject(postResponse.getBody());
+        String nameResponse = jsonObject.getString("name");
+        Long nameId = jsonObject.getLong("id");
+        int lengthResponse = jsonObject.length();
+
+        assertThat(nameResponse).isEqualTo("Okocim");
+        assertThat(nameId).isEqualTo(7L);
+        assertThat(lengthResponse)
+                .withFailMessage("Amount of key-value pairs do not match." +
+                                "\nExpected: %d" +
+                                "\nActual: %d",
+                        2, lengthResponse)
+                .isEqualTo(2);
     }
 }
