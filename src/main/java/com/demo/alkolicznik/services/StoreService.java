@@ -21,6 +21,9 @@ public class StoreService {
     }
 
     public Store add(Store store) {
+        if(storeRepository.existsByName(store.getName())) {
+            return null;
+        }
         return storeRepository.save(store);
     }
 

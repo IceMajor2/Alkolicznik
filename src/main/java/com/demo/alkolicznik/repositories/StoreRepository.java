@@ -17,4 +17,6 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
     Set<BeerPrice> findPricesById(Long id);
 
     List<Store> findAll();
+
+    boolean existsByName(String name);
 }

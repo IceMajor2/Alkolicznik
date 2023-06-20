@@ -2,6 +2,7 @@ package com.demo.alkolicznik.models;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.Set;
 
@@ -13,7 +14,8 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Nonnull
+    @NotBlank
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "store")

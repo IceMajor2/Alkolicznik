@@ -39,7 +39,12 @@ public class StoreController {
 
     @PostMapping("/store")
     public ResponseEntity<Store> addStore(@RequestBody @Valid Store store) {
+        System.out.println(store);
         Store saved = storeService.add(store);
+        System.out.println(saved);
+        if(saved == null) {
+            return ResponseEntity.badRequest().build();
+        }
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
