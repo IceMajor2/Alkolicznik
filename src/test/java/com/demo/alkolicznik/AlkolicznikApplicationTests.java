@@ -147,11 +147,11 @@ class AlkolicznikApplicationTests {
     }
 
     /**
-     * {@code POST /api/store}. Valid creation should
-     * return saved {@code Store} and {@code HTTP_CREATED}.
+     * {@code POST /api/store} - valid creation should
+     * return saved {@code Store} and {@code 201 CREATED}.
      * <br>
-     * {@code GET /api/store/{id}}. Previously acquired URI from
-     * post response should return {@code Store} and {@code HTTP_OK}.
+     * {@code GET /api/store/{id}} - previously acquired URI from
+     * post response should return {@code Store} and {@code 200 OK}.
      */
     @Test
     @DirtiesContext
@@ -178,6 +178,32 @@ class AlkolicznikApplicationTests {
         Store storeDb = jdbcTemplate.queryForObject(sql, mapToStore(), savedStore.getId());
 
         assertThat(storeDb).isEqualTo(savedStore);
+    }
+
+    /**
+     * {@code POST /api/store} with empty name should return {@code 400 Bad Request}.
+     */
+    @Test
+    @DirtiesContext
+    public void addUnnamedStoreShouldReturn400Test() {
+        Store store = new Store("");
+        ResponseEntity<Store> postResponse = restTemplate
+                .postForEntity("/api/store", store, Store.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * {@code POST /api/store} with already existing store should return {@code 400 Bad Request}.
+     */
+    @Test
+    @DirtiesContext
+    public void addAlreadyExistingStoreShouldReturn400Test() {
+        Store store = new Store("Biedronka");
+        ResponseEntity<Store> postResponse = restTemplate
+                .postForEntity("/api/store", store, Store.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private List<Store> getStores() {
