@@ -97,7 +97,7 @@ class AlkolicznikApplicationTests {
      */
     @Test
     @DirtiesContext
-    public void getCreatedBeerTest() {
+    public void createAndGetBeerTest() {
         // Create new Beer and post it to database.
         Beer beer = new Beer("Lech");
         ResponseEntity<Beer> postResponse = restTemplate.postForEntity("/api/beer", beer, Beer.class);
@@ -108,6 +108,7 @@ class AlkolicznikApplicationTests {
         // Fetch just-created entity from database through controller.
         ResponseEntity<Beer> getResponse = restTemplate.getForEntity(location, Beer.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
         Beer actual = getResponse.getBody();
         assertThat(actual).isEqualTo(savedBear);
 
@@ -143,6 +144,39 @@ class AlkolicznikApplicationTests {
 
         List<Store> actualStores = getResponse.getBody();
         assertThat(actualStores).isEqualTo(this.getStores());
+    }
+
+    /**
+     * {@code POST /api/store}. Valid creation should
+     * return saved {@code Store} and {@code HTTP_CREATED}.
+     * <br>
+     * {@code GET /api/store/{id}}. Previously acquired URI from
+     * post response should return {@code Store} and {@code HTTP_OK}.
+     */
+    @Test
+    @DirtiesContext
+    public void createAndGetStoreTest() {
+        // Create new Store and post it to database.
+        Store store = new Store("Primo");
+        ResponseEntity<Store> postResponse = restTemplate
+                .postForEntity("/api/store", store, Store.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        URI location = postResponse.getHeaders().getLocation();
+        Store savedStore = postResponse.getBody();
+
+        // Fetch just-created object from database.
+        ResponseEntity<Store> getResponse = restTemplate
+                .getForEntity(location, Store.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Store actual = getResponse.getBody();
+        assertThat(actual).isEqualTo(savedStore);
+
+        // Additionally: fetch the store directly from database.
+        String sql = "SELECT * FROM store WHERE store.id = ?";
+        Beer dbBeer = jdbcTemplate.queryForObject(sql, mapToBeer(), savedStore.getId());
+
+        assertThat(dbBeer).isEqualTo(savedStore);
     }
 
     private List<Store> getStores() {

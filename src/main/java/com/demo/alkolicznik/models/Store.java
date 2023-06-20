@@ -19,6 +19,12 @@ public class Store {
     @OneToMany(mappedBy = "store")
     private Set<BeerPrice> prices;
 
+    public Store() {}
+
+    public Store(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
