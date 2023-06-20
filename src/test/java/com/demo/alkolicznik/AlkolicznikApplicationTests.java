@@ -167,6 +167,7 @@ class AlkolicznikApplicationTests {
         // Fetch just-created object from database.
         ResponseEntity<Store> getResponse = restTemplate
                 .getForEntity(location, Store.class);
+        System.out.println(location);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Store actual = getResponse.getBody();
@@ -174,9 +175,9 @@ class AlkolicznikApplicationTests {
 
         // Additionally: fetch the store directly from database.
         String sql = "SELECT * FROM store WHERE store.id = ?";
-        Beer dbBeer = jdbcTemplate.queryForObject(sql, mapToBeer(), savedStore.getId());
+        Store storeDb = jdbcTemplate.queryForObject(sql, mapToStore(), savedStore.getId());
 
-        assertThat(dbBeer).isEqualTo(savedStore);
+        assertThat(storeDb).isEqualTo(savedStore);
     }
 
     private List<Store> getStores() {
