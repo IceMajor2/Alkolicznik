@@ -3,7 +3,7 @@ package com.demo.alkolicznik.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public class BeerPriceDTO {
+public class BeerPriceRequestDTO {
 
     @NotBlank
     private String beer;

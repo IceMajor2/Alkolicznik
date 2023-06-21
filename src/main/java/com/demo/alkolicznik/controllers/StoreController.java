@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.controllers;
 
-import com.demo.alkolicznik.dto.BeerPriceDTO;
+import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.services.StoreService;
@@ -51,8 +52,10 @@ public class StoreController {
     }
 
     @PostMapping("/store/{id}/beer")
-    public ResponseEntity addBeer(@PathVariable Long id, @RequestBody @Valid BeerPriceDTO beerPriceDTO) {
-        BeerPrice beerPrice = storeService.addBeer(id, beerPriceDTO);
-        return ResponseEntity.ok().body(beerPrice);
+    public ResponseEntity<BeerPriceResponseDTO> addBeer(
+            @PathVariable Long id,
+            @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
+        BeerPriceResponseDTO beerPriceResponse = storeService.addBeer(id, beerPriceRequestDTO);
+        return ResponseEntity.ok().body(beerPriceResponse);
     }
 }

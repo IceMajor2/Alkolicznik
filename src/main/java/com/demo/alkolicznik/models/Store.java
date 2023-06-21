@@ -84,11 +84,9 @@ public class Store {
     }
 
     public void addBeer(Beer beer, double price) {
-        System.out.println(Arrays.toString(this.prices.toArray()));
         BeerPrice beerPrice = new BeerPrice(this, beer, price);
         this.prices.add(beerPrice);
         beer.getPrices().add(beerPrice);
-        System.out.println(Arrays.toString(this.prices.toArray()));
     }
 
     public void removeBeer(Beer beer) {

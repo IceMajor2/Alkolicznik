@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.services;
 
-import com.demo.alkolicznik.dto.BeerPriceDTO;
+import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -42,16 +43,16 @@ public class StoreService {
         return optStore.get();
     }
 
-    public BeerPrice addBeer(Long storeId, BeerPriceDTO beerPriceDTO) {
+    public BeerPriceResponseDTO addBeer(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).get();
-        String beerName = beerPriceDTO.getBeer();
+        String beerName = beerPriceRequestDTO.getBeer();
         Beer beer = beerRepository.findByName(beerName).get();
         // Pass beer with price to store and save changes.
-        double price = beerPriceDTO.getPrice();
+        double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);
         storeRepository.save(store);
-        // Return saved BeerPrice.
-        return store.getBeer(beerName).get();
+        // Convert to and return BeerPriceResponseDTO.
+        return new BeerPriceResponseDTO(store.getBeer(beerName).get());
     }
 }
