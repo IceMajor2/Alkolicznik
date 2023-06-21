@@ -27,6 +27,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 	implementation 'org.jsoup:jsoup:1.16.1'
 	implementation 'com.google.code.gson:gson:2.10.1'
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1' // required for TestRestTemplate to disable redirects
