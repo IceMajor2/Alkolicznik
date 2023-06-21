@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.controllers;
 
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.services.BeerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
+@RequestMapping("/api")
 public class BeerController {
 
     private BeerService beerService;
@@ -20,10 +20,10 @@ public class BeerController {
 
     /**
      * Fetch beer from database.
-     * @param id beer id
+     * @param id beer id passed in path
      * @return Beer object wrapped in ResponseEntity class
      */
-    @GetMapping("/api/beer/{id}")
+    @GetMapping("/beer/{id}")
     public ResponseEntity<Beer> getBeer(@PathVariable Long id) {
         Beer beer = beerService.get(id);
         if(beer == null) {
@@ -37,9 +37,9 @@ public class BeerController {
      * @param beer Beer body
      * @return updated by database Beer object wrapped in ResponseEntity class
      */
-    @PostMapping("/api/beer")
-    public ResponseEntity<Beer> addBear(@RequestBody Beer beer) {
-        Beer saved = beerService.save(beer);
+    @PostMapping("/beer")
+    public ResponseEntity<Beer> addBeer(@RequestBody Beer beer) {
+        Beer saved = beerService.add(beer);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

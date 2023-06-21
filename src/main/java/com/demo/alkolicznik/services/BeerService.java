@@ -15,15 +15,15 @@ public class BeerService {
         this.beerRepository = beerRepository;
     }
 
-    public Beer get(Long id) {
-        Optional<Beer> optBeer = beerRepository.findById(id);
+    public Beer get(Long beerId) {
+        Optional<Beer> optBeer = beerRepository.findById(beerId);
         if(optBeer.isEmpty()) {
             return null;
         }
         return optBeer.get();
     }
 
-    public Beer save(Beer beer) {
+    public Beer add(Beer beer) {
         return beerRepository.save(beer);
     }
 }
