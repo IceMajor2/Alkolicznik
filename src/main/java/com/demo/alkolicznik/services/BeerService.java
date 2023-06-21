@@ -4,6 +4,7 @@ import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +22,10 @@ public class BeerService {
             return null;
         }
         return optBeer.get();
+    }
+
+    public List<Beer> getBeers() {
+        return beerRepository.findAll();
     }
 
     public Beer add(Beer beer) {

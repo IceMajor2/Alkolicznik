@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -46,5 +47,11 @@ public class BeerController {
                 .buildAndExpand(beer.getId())
                 .toUri();
         return ResponseEntity.created(location).body(saved);
+    }
+
+    @GetMapping("/beer")
+    public ResponseEntity<List<Beer>> getBeers() {
+        List<Beer> beers = beerService.getBeers();
+        return ResponseEntity.ok(beers);
     }
 }
