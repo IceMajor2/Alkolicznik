@@ -26,7 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/data_sql/schema.sql", "/data_sql/beer-data.sql", "/data_sql/store-data.sql"})
+@Sql({"/data_sql/schema.sql", "/data_sql/beer-data.sql", "/data_sql/store-data.sql", "/data_sql/store_equipment-data.sql"})
 public class StoreApiTests {
 
     @Autowired
@@ -170,10 +170,10 @@ public class StoreApiTests {
     public void addValidBeerToStoreTest() throws JSONException {
         BeerPriceRequestDTO beerPriceRequestDTO = new BeerPriceRequestDTO();
         beerPriceRequestDTO.setBeer("Tyskie");
-        beerPriceRequestDTO.setPrice(3.19);
+        beerPriceRequestDTO.setPrice(3.29);
 
         ResponseEntity<String> response = restTemplate
-                .postForEntity("/api/store/2/beer", beerPriceRequestDTO, String.class);
+                .postForEntity("/api/store/4/beer", beerPriceRequestDTO, String.class);
 
         JSONObject jsonObject = TestUtils.getJsonObject(response.getBody());
         Long storeId = jsonObject.getLong("store_id");
@@ -182,11 +182,11 @@ public class StoreApiTests {
         String beerName = jsonObject.getString("beer_name");
         double price = jsonObject.getDouble("price");
 
-        assertThat(storeId).isEqualTo(2L);
-        assertThat(storeName).isEqualTo("Biedronka");
+        assertThat(storeId).isEqualTo(4L);
+        assertThat(storeName).isEqualTo("ABC");
         assertThat(beerId).isEqualTo(3L);
         assertThat(beerName).isEqualTo("Tyskie");
-        assertThat(price).isEqualTo(3.19);
+        assertThat(price).isEqualTo(3.29);
     }
 
     /**

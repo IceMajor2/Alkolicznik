@@ -1,0 +1,9 @@
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (2, 3, 4.99);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (1, 6, 4.19);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (1, 4, 3.79);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (3, 2, 3.59);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (6, 1, 6.09);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (4, 2, 2.69);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (5, 5, 8.99);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (3, 3, 3.79);
+INSERT INTO beer_price (beer_id, store_id, price) VALUES (1, 2, 3.69);
