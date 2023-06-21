@@ -14,6 +14,14 @@ public class BeerPriceKey implements Serializable {
     @Column(name = "store_id")
     private Long storeId;
 
+    public BeerPriceKey() {
+    }
+
+    public BeerPriceKey(Long beerId, Long storeId) {
+        this.beerId = beerId;
+        this.storeId = storeId;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

@@ -1,5 +1,6 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.dto.BeerPriceDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.json.JSONException;
@@ -96,7 +97,6 @@ public class StoreApiTests {
         // Fetch just-created object from database.
         ResponseEntity<Store> getResponse = restTemplate
                 .getForEntity(location, Store.class);
-        System.out.println(location);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Store actual = getResponse.getBody();
@@ -148,7 +148,7 @@ public class StoreApiTests {
     @Test
     @DirtiesContext
     /**
-     * {@code POST /api/store} - check response elements of 201 OK response.
+     * {@code POST /api/store} - check body of 201 OK response.
      */
     public void createStoreResponseBodyOKTest() throws JSONException {
         Store store = new Store("Zoltek");
@@ -169,5 +169,29 @@ public class StoreApiTests {
                         "\nActual: %d",
                         2, lengthResponse)
                 .isEqualTo(2);
+    }
+
+    @Test
+    @DirtiesContext
+    public void addValidBeerToStoreTest() throws JSONException {
+        BeerPriceDTO beerPriceDTO = new BeerPriceDTO();
+        beerPriceDTO.setBeer("Tyskie");
+        beerPriceDTO.setPrice(3.19);
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/api/store/2/beer", beerPriceDTO, String.class);
+
+        JSONObject jsonObject = TestUtils.getJsonObject(response.getBody());
+        Long storeId = jsonObject.getLong("store_id");
+        String storeName = jsonObject.getString("store");
+        Long beerId = jsonObject.getLong("beer_id");
+        String beerName = jsonObject.getString("beer");
+        double price = jsonObject.getDouble("price");
+
+        assertThat(storeId).isEqualTo(2L);
+        assertThat(storeName).isEqualTo("Biedronka");
+        assertThat(beerId).isEqualTo(3L);
+        assertThat(beerName).isEqualTo("Tyskie");
+        assertThat(price).isEqualTo(3.19);
     }
 }

@@ -92,4 +92,16 @@ public class TestUtils {
             return null;
         }
     }
+
+    public static Beer fetchBeer(Long id) {
+        String sql = "SELECT * FROM beer WHERE beer.id = ?";
+        Beer beer = jdbcTemplate.queryForObject(sql, mapToBeer(), id);
+        return beer;
+    }
+
+    public static Store fetchStore(Long id) {
+        String sql = "SELECT * FROM store WHERE store.id = ?";
+        Store store = jdbcTemplate.queryForObject(sql, mapToStore(), id);
+        return store;
+    }
 }
