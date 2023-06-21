@@ -39,17 +39,10 @@ public class StoreApiTests {
 
     private List<Store> stores;
 
-    private static boolean initialized = false;
-    // @BeforeAll does not work because it is executed
-    // even before @Sql annotation
     @BeforeEach
     public void setUp() {
-        if(initialized) {
-            return;
-        }
         this.stores = TestUtils.getStores();
         this.beers = TestUtils.getBeers();
-        initialized = true;
     }
 
     /**
@@ -166,8 +159,8 @@ public class StoreApiTests {
         assertThat(nameId).isEqualTo(7L);
         assertThat(lengthResponse)
                 .withFailMessage("Amount of key-value pairs do not match." +
-                        "\nExpected: %d" +
-                        "\nActual: %d",
+                                "\nExpected: %d" +
+                                "\nActual: %d",
                         2, lengthResponse)
                 .isEqualTo(2);
     }
@@ -202,9 +195,20 @@ public class StoreApiTests {
                 .getForEntity("/api/beer", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        // Compare actual and expected beer names.
         JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
-        assertThat(beerNames).containsExactly(this.beers.stream().map(Beer::getName).toList());
+        String[] beerNamesDb = TestUtils.convertNamesToArray(
+                this.beers.stream().map(Beer::getName).toList());
+        assertThat(beerNames).containsExactly(beerNamesDb);
+
+        // Compare actual and expected beer ids.
         JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
-        assertThat(beerIDs).containsExactly(this.beers.stream().map(Beer::getId).toList());
+        List<Long> longBeerIDs = this.beers.stream().map(Beer::getId).toList();
+        List<Integer> intBeerIDs = TestUtils.convertLongListToIntList(longBeerIDs);
+        Integer[] beerIDsDb = TestUtils.convertIdsToArray(intBeerIDs);
+        assertThat(beerIDs).containsExactly(beerIDsDb);
+
+        int length = TestUtils.getLength(response.getBody());
+        assertThat(length).isEqualTo(6);
     }
 }

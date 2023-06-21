@@ -84,6 +84,11 @@ public class TestUtils {
         return values;
     }
 
+    public static int getLength(String json) {
+        DocumentContext documentContext = JsonPath.parse(json);
+        return documentContext.read("$.length()");
+    }
+
     public static Beer fetchBeer(Long id) {
         String sql = "SELECT * FROM beer WHERE beer.id = ?";
         Beer beer = jdbcTemplate.queryForObject(sql, mapToBeer(), id);
@@ -94,5 +99,39 @@ public class TestUtils {
         String sql = "SELECT * FROM store WHERE store.id = ?";
         Store store = jdbcTemplate.queryForObject(sql, mapToStore(), id);
         return store;
+    }
+
+    /**
+     * Convert list of integers (presumably field {@code id} of an entity
+     * into an array of integers.
+     *
+     * @param ids list of integers
+     * @return array of integers
+     */
+    public static Integer[] convertIdsToArray(List<Integer> ids) {
+        return ids.toArray(new Integer[0]);
+    }
+
+    /**
+     * Convert list of longs to list of integers.
+     *
+     * @param list list of longs
+     * @return list of integers
+     */
+    public static List<Integer> convertLongListToIntList(List<Long> list) {
+        return list.stream()
+                .map(num -> (Integer) num.intValue())
+                .toList();
+    }
+
+    /**
+     * Convert list of strings (presumably field {@code name} of an entity
+     * into an array of strings.
+     *
+     * @param names list of strings
+     * @return array of strings
+     */
+    public static String[] convertNamesToArray(List<String> names) {
+        return names.toArray(new String[0]);
     }
 }
