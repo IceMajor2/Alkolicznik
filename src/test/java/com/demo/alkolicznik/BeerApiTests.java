@@ -2,6 +2,7 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,18 +35,12 @@ public class BeerApiTests {
 
     private List<Beer> beers;
 
-    private static boolean initialized = false;
-
     // @BeforeAll does not work because it is executed
     // even before @Sql annotation
     @BeforeEach
     public void setUp() {
-        if (initialized) {
-            return;
-        }
         this.stores = TestUtils.getStores();
         this.beers = TestUtils.getBeers();
-        initialized = true;
     }
 
     /**
@@ -109,11 +104,11 @@ public class BeerApiTests {
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * {@code POST /api/beer} - check body of 200 OK response.
+     */
     @Test
     @DirtiesContext
-    /**
-     * {@code POST /api/beer} - check body of 201 OK response.
-     */
     public void createBeerResponseBodyOKTest() throws JSONException {
         Beer beer = new Beer("Okocim");
         ResponseEntity<String> postResponse = restTemplate
@@ -133,5 +128,31 @@ public class BeerApiTests {
                                 "\nActual: %d",
                         2, lengthResponse)
                 .isEqualTo(2);
+    }
+
+    /**
+     * {@code GET /api/beer} - request should return an array of all beers in database.
+     */
+    @Test
+    public void getAllBeersTest() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/api/beer", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Compare actual and expected beer names.
+        JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
+        String[] beerNamesDb = TestUtils.convertNamesToArray(
+                this.beers.stream().map(Beer::getName).toList());
+        assertThat(beerNames).containsExactly((Object[]) beerNamesDb);
+
+        // Compare actual and expected beer ids.
+        JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
+        List<Long> longBeerIDs = this.beers.stream().map(Beer::getId).toList();
+        List<Integer> intBeerIDs = TestUtils.convertLongListToIntList(longBeerIDs);
+        Integer[] beerIDsDb = TestUtils.convertIdsToArray(intBeerIDs);
+        assertThat(beerIDs).containsExactly((Object[]) beerIDsDb);
+
+        int length = TestUtils.getLength(response.getBody());
+        assertThat(length).isEqualTo(6);
     }
 }
