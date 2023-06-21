@@ -3,6 +3,7 @@ package com.demo.alkolicznik;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -193,5 +194,17 @@ public class StoreApiTests {
         assertThat(beerId).isEqualTo(3L);
         assertThat(beerName).isEqualTo("Tyskie");
         assertThat(price).isEqualTo(3.19);
+    }
+
+    @Test
+    public void getAllBeersTest() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/api/beer", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
+        assertThat(beerNames).containsExactly(this.beers.stream().map(Beer::getName).toList());
+        JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
+        assertThat(beerIDs).containsExactly(this.beers.stream().map(Beer::getId).toList());
     }
 }

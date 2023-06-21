@@ -2,11 +2,12 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
-import com.google.gson.Gson;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -62,24 +63,8 @@ public class TestUtils {
     }
 
     /**
-     * Convert {@code ResponseEntity<T>} body to {@code JSONObject}.
-     *
-     * @param response with non-null body
-     * @return body of {@code ResponseEntity<T>} as {@code JSONObject}
-     */
-    public static <T> JSONObject getJsonObject(ResponseEntity<T> response) {
-        String jsonInString = new Gson().toJson(response.getBody());
-        try {
-            JSONObject jsonObject = new JSONObject(jsonInString);
-            return jsonObject;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Convert JSON in {@code String} to {@code JSONObject}.
+     *
      * @param json JSON string
      * @return {@code JSONObject}
      */
@@ -91,6 +76,12 @@ public class TestUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static JSONArray getValues(String json, String key) {
+        DocumentContext documentContext = JsonPath.parse(json);
+        JSONArray values = documentContext.read("$..%s".formatted(key));
+        return values;
     }
 
     public static Beer fetchBeer(Long id) {
