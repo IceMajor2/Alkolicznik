@@ -26,18 +26,6 @@ public class TestUtils {
         TestUtils.jdbcTemplate = jdbcTemplate;
     }
 
-    public static List<Store> getStores() {
-        String sql = "SELECT * FROM store";
-        List<Store> initializedStores = jdbcTemplate.query(sql, mapToStore());
-        return initializedStores;
-    }
-
-    public static List<Beer> getBeers() {
-        String sql = "SELECT * FROM beer";
-        List<Beer> initializedBeers = jdbcTemplate.query(sql, mapToBeer());
-        return initializedBeers;
-    }
-
     public static RowMapper<Store> mapToStore() {
         return new RowMapper<Store>() {
             @Override
