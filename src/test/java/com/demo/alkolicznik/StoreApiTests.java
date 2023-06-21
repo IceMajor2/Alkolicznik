@@ -188,4 +188,30 @@ public class StoreApiTests {
         assertThat(beerName).isEqualTo("Tyskie");
         assertThat(price).isEqualTo(3.19);
     }
+
+    /**
+     * {@code GET /api/store} - request should return an array of all stores in database.
+     */
+    @Test
+    public void getAllStoresTest() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/api/store", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Compare actual and expected store names.
+        JSONArray storeNames = TestUtils.getValues(response.getBody(), "name");
+        String[] storeNamesDb = TestUtils.convertNamesToArray(
+                this.stores.stream().map(Store::getName).toList());
+        assertThat(storeNames).containsExactly((Object[]) storeNamesDb);
+
+        // Compare actual and expected store ids.
+        JSONArray storeIDs = TestUtils.getValues(response.getBody(), "id");
+        List<Long> longStoreIDs = this.stores.stream().map(Store::getId).toList();
+        List<Integer> intStoreIDs = TestUtils.convertLongListToIntList(longStoreIDs);
+        Integer[] storeIDsDb = TestUtils.convertIdsToArray(intStoreIDs);
+        assertThat(storeIDs).containsExactly((Object[]) storeIDsDb);
+
+        int length = TestUtils.getLength(response.getBody());
+        assertThat(length).isEqualTo(6);
+    }
 }
