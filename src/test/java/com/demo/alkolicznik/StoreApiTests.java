@@ -1,6 +1,6 @@
 package com.demo.alkolicznik;
 
-import com.demo.alkolicznik.dto.BeerPriceDTO;
+import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.json.JSONException;
@@ -174,18 +174,18 @@ public class StoreApiTests {
     @Test
     @DirtiesContext
     public void addValidBeerToStoreTest() throws JSONException {
-        BeerPriceDTO beerPriceDTO = new BeerPriceDTO();
-        beerPriceDTO.setBeer("Tyskie");
-        beerPriceDTO.setPrice(3.19);
+        BeerPriceRequestDTO beerPriceRequestDTO = new BeerPriceRequestDTO();
+        beerPriceRequestDTO.setBeer("Tyskie");
+        beerPriceRequestDTO.setPrice(3.19);
 
         ResponseEntity<String> response = restTemplate
-                .postForEntity("/api/store/2/beer", beerPriceDTO, String.class);
+                .postForEntity("/api/store/2/beer", beerPriceRequestDTO, String.class);
 
         JSONObject jsonObject = TestUtils.getJsonObject(response.getBody());
         Long storeId = jsonObject.getLong("store_id");
-        String storeName = jsonObject.getString("store");
+        String storeName = jsonObject.getString("store_name");
         Long beerId = jsonObject.getLong("beer_id");
-        String beerName = jsonObject.getString("beer");
+        String beerName = jsonObject.getString("beer_name");
         double price = jsonObject.getDouble("price");
 
         assertThat(storeId).isEqualTo(2L);
