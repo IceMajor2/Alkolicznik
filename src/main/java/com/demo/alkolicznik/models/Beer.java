@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 
-import java.util.Set;
+import java.util.*;
 
-@Entity
+@Entity(name = "Beer")
 @Table(name = "beer")
 @JsonPropertyOrder({"id", "name"})
 public class Beer {
@@ -19,16 +19,18 @@ public class Beer {
     @Nonnull
     private String name;
 
-    @OneToMany(mappedBy = "beer")
+    @OneToMany(mappedBy = "beer",
+            cascade = CascadeType.MERGE,
+            orphanRemoval = true)
     @JsonIgnore
-    private Set<BeerPrice> prices;
+    private Set<BeerPrice> prices = new HashSet<>();
 
     public Beer(String name) {
-        this.id = id;
         this.name = name;
     }
 
-    public Beer() {}
+    public Beer() {
+    }
 
     public Long getId() {
         return id;
@@ -36,14 +38,6 @@ public class Beer {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Set<BeerPrice> getPrices() {
-        return prices;
-    }
-
-    public void setPrices(Set<BeerPrice> prices) {
-        this.prices = prices;
     }
 
     @Nonnull
@@ -55,19 +49,32 @@ public class Beer {
         this.name = name;
     }
 
+    public Set<BeerPrice> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(Set<BeerPrice> prices) {
+        this.prices = prices;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
 
-        if(!(obj instanceof Beer)) {
+        if (!(obj instanceof Beer)) {
             return false;
         }
 
         Beer compare = (Beer) obj;
 
-        return compare.getId() == this.getId() && compare.getName().equals(this.getName());
+        return Objects.equals(this.name, compare.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override

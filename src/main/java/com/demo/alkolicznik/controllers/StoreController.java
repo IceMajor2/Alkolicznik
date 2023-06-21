@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.controllers;
 
-import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.dto.BeerPriceDTO;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.services.StoreService;
@@ -11,7 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -39,9 +38,7 @@ public class StoreController {
 
     @PostMapping("/store")
     public ResponseEntity<Store> addStore(@RequestBody @Valid Store store) {
-        System.out.println(store);
         Store saved = storeService.add(store);
-        System.out.println(saved);
         if(saved == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -51,5 +48,11 @@ public class StoreController {
                 .buildAndExpand(store.getId())
                 .toUri();
         return ResponseEntity.created(location).body(saved);
+    }
+
+    @PostMapping("/store/{id}/beer")
+    public ResponseEntity addBeer(@PathVariable Long id, @RequestBody @Valid BeerPriceDTO beerPriceDTO) {
+        BeerPrice beerPrice = storeService.addBeer(id, beerPriceDTO);
+        return ResponseEntity.ok().body(beerPrice);
     }
 }

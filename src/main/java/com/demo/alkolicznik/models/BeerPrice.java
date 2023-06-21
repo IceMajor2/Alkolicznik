@@ -1,30 +1,45 @@
 package com.demo.alkolicznik.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-@Entity
+import java.util.Objects;
+
+@Entity(name = "BeerPrice")
+@Table(name = "beer_price")
 public class BeerPrice {
 
     @EmbeddedId
-    BeerPriceKey id;
+    private BeerPriceId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("storeId")
-    @JoinColumn(name = "store_id")
+    @JsonIgnore
     private Store store;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("beerId")
-    @JoinColumn(name = "beer_id")
+    @JsonIgnore
     private Beer beer;
 
+    @Column(name = "price")
     private double price;
 
-    public BeerPriceKey getId() {
+    private BeerPrice() {
+    }
+
+    public BeerPrice(Store store, Beer beer, double price) {
+        this.store = store;
+        this.beer = beer;
+        this.price = price;
+        this.id = new BeerPriceId(beer.getId(), store.getId());
+    }
+
+    public BeerPriceId getId() {
         return id;
     }
 
-    public void setId(BeerPriceKey id) {
+    public void setId(BeerPriceId id) {
         this.id = id;
     }
 
@@ -50,5 +65,24 @@ public class BeerPrice {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BeerPrice beerPrice = (BeerPrice) o;
+        return Objects.equals(store, beerPrice.store)
+                && Objects.equals(beer, beerPrice.beer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(store, beer);
+    }
+
+    @Override
+    public String toString() {
+        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getName(), this.price);
     }
 }

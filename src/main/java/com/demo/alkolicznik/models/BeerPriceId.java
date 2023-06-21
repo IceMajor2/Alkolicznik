@@ -4,9 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
-public class BeerPriceKey implements Serializable {
+public class BeerPriceId implements Serializable {
 
     @Column(name = "beer_id")
     private Long beerId;
@@ -14,10 +15,10 @@ public class BeerPriceKey implements Serializable {
     @Column(name = "store_id")
     private Long storeId;
 
-    public BeerPriceKey() {
+    private BeerPriceId() {
     }
 
-    public BeerPriceKey(Long beerId, Long storeId) {
+    public BeerPriceId(Long beerId, Long storeId) {
         this.beerId = beerId;
         this.storeId = storeId;
     }
@@ -33,15 +34,15 @@ public class BeerPriceKey implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this) {
+        if (obj == this) {
             return true;
         }
-        if(!(obj instanceof BeerPriceKey)) {
+        if (!(obj instanceof BeerPriceId)) {
             return false;
         }
-        BeerPriceKey compareObj = (BeerPriceKey) obj;
-        return compareObj.beerId == this.beerId &&
-                compareObj.storeId == this.storeId;
+        BeerPriceId compareObj = (BeerPriceId) obj;
+        return Objects.equals(this.beerId, compareObj.beerId) &&
+                Objects.equals(this.storeId, compareObj.storeId);
     }
 
     public Long getBeerId() {

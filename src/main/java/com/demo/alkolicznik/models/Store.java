@@ -6,10 +6,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.Set;
+import java.util.*;
 
 @Table(name = "store")
-@Entity
+@Entity(name = "Store")
 @JsonPropertyOrder({"id", "name"})
 public class Store {
 
@@ -18,14 +18,16 @@ public class Store {
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "store")
+    @OneToMany(mappedBy = "store",
+            cascade = CascadeType.MERGE,
+            orphanRemoval = true)
     @JsonIgnore
-    private Set<BeerPrice> prices;
+    private Set<BeerPrice> prices = new HashSet<>();
 
-    public Store() {}
+    public Store() {
+    }
 
     public Store(String name) {
         this.name = name;
@@ -58,21 +60,58 @@ public class Store {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
 
-        if(!(obj instanceof Store)) {
+        if (!(obj instanceof Store)) {
             return false;
         }
 
         Store compare = (Store) obj;
 
-        return compare.getId() == this.getId() && compare.getName().equals(this.getName());
+        return compare.getName().equals(this.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
     @Override
     public String toString() {
         return "%s (ID: %d)".formatted(this.name, this.id);
+    }
+
+    public void addBeer(Beer beer, double price) {
+        System.out.println(Arrays.toString(this.prices.toArray()));
+        BeerPrice beerPrice = new BeerPrice(this, beer, price);
+        this.prices.add(beerPrice);
+        beer.getPrices().add(beerPrice);
+        System.out.println(Arrays.toString(this.prices.toArray()));
+    }
+
+    public void removeBeer(Beer beer) {
+        for (Iterator<BeerPrice> iterator = prices.iterator();
+             iterator.hasNext(); ) {
+            BeerPrice beerPrice = iterator.next();
+
+            if (beerPrice.getStore().equals(this) &&
+                    beerPrice.getBeer().equals(beer)) {
+                iterator.remove();
+                beerPrice.getBeer().getPrices().remove(beerPrice);
+                beerPrice.setStore(null);
+                beerPrice.setBeer(null);
+            }
+        }
+    }
+
+    public Optional<BeerPrice> getBeer(String beerName) {
+        for (BeerPrice beer : prices) {
+            if (beer.getBeer().getName().equals(beerName)) {
+                return Optional.of(beer);
+            }
+        }
+        return Optional.empty();
     }
 }
