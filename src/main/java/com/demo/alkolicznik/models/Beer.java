@@ -1,10 +1,13 @@
 package com.demo.alkolicznik.models;
 
+import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -22,6 +25,7 @@ public class Beer {
     private String brand;
     private String type;
     @Positive
+    @Value("0.5") // does not work?!
     private Double volume;
 
     @OneToMany(mappedBy = "beer",
@@ -96,9 +100,10 @@ public class Beer {
         this.volume = volume;
     }
 
+    @JsonProperty("name")
     public String getFullname() {
         StringBuilder sb = new StringBuilder(this.brand);
-        if(!this.type.isEmpty()) {
+        if(this.type != null) {
             sb.append(" ");
             sb.append(this.type);
         }
@@ -120,9 +125,8 @@ public class Beer {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("");
-        sb.append(this.brand);
-        if(!this.type.isEmpty()) {
+        StringBuilder sb = new StringBuilder(this.brand);
+        if(this.type != null) {
             sb.append(" ");
             sb.append(this.type);
         }

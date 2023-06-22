@@ -44,7 +44,9 @@ public class TestUtils {
             public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Beer beer = new Beer();
                 beer.setId(rs.getLong("id"));
-                beer.setName(rs.getString("name"));
+                beer.setBrand(rs.getString("brand"));
+                beer.setType(rs.getString("type"));
+                beer.setVolume(rs.getDouble("volume"));
                 return beer;
             }
         };

@@ -1,5 +1,7 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.dto.BeerRequestDTO;
+import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import net.minidev.json.JSONArray;
@@ -49,12 +51,13 @@ public class BeerApiTests {
      */
     @Test
     public void getBeerTest() {
-        ResponseEntity<Beer> response = restTemplate.getForEntity("/api/beer/1", Beer.class);
+        ResponseEntity<BeerResponseDTO> response = restTemplate.getForEntity("/api/beer/1", BeerResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Beer beer = response.getBody();
-        Beer expected = jdbcTemplate.queryForObject("SELECT * FROM beer WHERE beer.id = 1", TestUtils.mapToBeer());
-
+        BeerResponseDTO beer = response.getBody();
+        BeerResponseDTO expected = new BeerResponseDTO(
+                jdbcTemplate.queryForObject("SELECT * FROM beer WHERE beer.id = 1", TestUtils.mapToBeer())
+        );
         assertThat(beer).isEqualTo(expected);
     }
 
@@ -68,21 +71,24 @@ public class BeerApiTests {
     public void createAndGetBeerTest() {
         // Create new Beer and post it to database.
         Beer beer = new Beer("Lech");
-        ResponseEntity<Beer> postResponse = restTemplate.postForEntity("/api/beer", beer, Beer.class);
+        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
+                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Beer savedBear = postResponse.getBody();
+        BeerResponseDTO savedBear = postResponse.getBody();
         URI location = postResponse.getHeaders().getLocation();
 
         // Fetch just-created entity from database through controller.
-        ResponseEntity<Beer> getResponse = restTemplate.getForEntity(location, Beer.class);
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate.getForEntity(location, BeerResponseDTO.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Beer actual = getResponse.getBody();
+        BeerResponseDTO actual = getResponse.getBody();
         assertThat(actual).isEqualTo(savedBear);
 
         // Additionally: fetch the beer directly from database.
         String sql = "SELECT * FROM beer WHERE beer.id = ?";
-        Beer dbBeer = jdbcTemplate.queryForObject(sql, TestUtils.mapToBeer(), savedBear.getId());
+        BeerResponseDTO dbBeer = new BeerResponseDTO(
+                jdbcTemplate.queryForObject(sql, TestUtils.mapToBeer(), savedBear.getId())
+        );
 
         assertThat(dbBeer).isEqualTo(savedBear);
     }
@@ -111,16 +117,18 @@ public class BeerApiTests {
         JSONObject jsonObject = TestUtils.getJsonObject(postResponse.getBody());
         String nameResponse = jsonObject.getString("name");
         Long nameId = jsonObject.getLong("id");
+        double volume = jsonObject.getDouble("volume");
         int lengthResponse = jsonObject.length();
 
         assertThat(nameResponse).isEqualTo("Okocim");
         assertThat(nameId).isEqualTo(7L);
+        assertThat(volume).isEqualTo(0.5d);
         assertThat(lengthResponse)
                 .withFailMessage("Amount of key-value pairs do not match." +
                                 "\nExpected: %d" +
                                 "\nActual: %d",
-                        2, lengthResponse)
-                .isEqualTo(2);
+                        3, lengthResponse)
+                .isEqualTo(3);
     }
 
     /**
@@ -135,7 +143,7 @@ public class BeerApiTests {
         // Compare actual and expected beer names.
         JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
         String[] beerNamesDb = TestUtils.convertNamesToArray(
-                this.beers.stream().map(Beer::getName).toList());
+                this.beers.stream().map(Beer::getBrand).toList());
         assertThat(beerNames).containsExactly((Object[]) beerNamesDb);
 
         // Compare actual and expected beer ids.

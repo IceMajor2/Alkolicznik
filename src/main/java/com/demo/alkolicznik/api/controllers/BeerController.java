@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.api.controllers;
 
+import com.demo.alkolicznik.dto.BeerRequestDTO;
+import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.api.services.BeerService;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -25,33 +28,39 @@ public class BeerController {
      * @return Beer object wrapped in ResponseEntity class
      */
     @GetMapping("/beer/{id}")
-    public ResponseEntity<Beer> getBeer(@PathVariable Long id) {
+    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id) {
         Beer beer = beerService.get(id);
         if(beer == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(beer);
+        BeerResponseDTO beerDto = new BeerResponseDTO(beer);
+        return ResponseEntity.ok(beerDto);
     }
 
     /**
      * Add new beer to database.
-     * @param beer Beer body
+     *
+     * @param beerRequestDTO Beer body
      * @return updated by database Beer object wrapped in ResponseEntity class
      */
     @PostMapping("/beer")
-    public ResponseEntity<Beer> addBeer(@RequestBody Beer beer) {
-        Beer saved = beerService.add(beer);
+    public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody BeerRequestDTO beerRequestDTO) {
+        Beer saved = beerService.add(beerRequestDTO);
+        BeerResponseDTO savedDto = new BeerResponseDTO(saved);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(beer.getId())
+                .buildAndExpand(saved.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(saved);
+        return ResponseEntity.created(location).body(savedDto);
     }
 
     @GetMapping("/beer")
-    public ResponseEntity<List<Beer>> getBeers() {
+    public ResponseEntity<List<BeerResponseDTO>> getBeers() {
         List<Beer> beers = beerService.getBeers();
-        return ResponseEntity.ok(beers);
+        List<BeerResponseDTO> beersDto = beers.stream()
+                .map(beerService::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(beersDto);
     }
 }
