@@ -1,6 +1,6 @@
-INSERT INTO beer (ID, BRAND) VALUES (1, 'Perla');
-INSERT INTO beer (ID, BRAND) VALUES (2, 'Ksiazece');
-INSERT INTO beer (ID, BRAND) VALUES (3, 'Tyskie');
+INSERT INTO beer (ID, BRAND, TYPE) VALUES (1, 'Perla', 'Chmielowa Pils');
+INSERT INTO beer (ID, BRAND, TYPE) VALUES (2, 'Ksiazece', 'Zlote pszeniczne');
+INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (3, 'Tyskie', 'Gronie', 0.6);
 INSERT INTO beer (ID, BRAND) VALUES (4, 'Zubr');
-INSERT INTO beer (ID, BRAND) VALUES (5, 'Komes');
-INSERT INTO beer (ID, BRAND) VALUES (6, 'Miloslaw');
+INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (5, 'Komes', 'Malinowe', 0.33);
+INSERT INTO beer (ID, BRAND, TYPE) VALUES (6, 'Miloslaw', 'Biale');
