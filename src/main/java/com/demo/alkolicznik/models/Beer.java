@@ -96,6 +96,15 @@ public class Beer {
         this.volume = volume;
     }
 
+    public String getFullname() {
+        StringBuilder sb = new StringBuilder(this.brand);
+        if(!this.type.isEmpty()) {
+            sb.append(" ");
+            sb.append(this.type);
+        }
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
