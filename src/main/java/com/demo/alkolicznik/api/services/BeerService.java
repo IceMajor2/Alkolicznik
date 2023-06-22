@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.services;
+package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.repositories.BeerRepository;

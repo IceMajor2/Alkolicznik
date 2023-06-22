@@ -1,10 +1,9 @@
-package com.demo.alkolicznik.controllers;
+package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
-import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.services.StoreService;
+import com.demo.alkolicznik.api.services.StoreService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

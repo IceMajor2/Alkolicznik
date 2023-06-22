@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.services;
+package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
