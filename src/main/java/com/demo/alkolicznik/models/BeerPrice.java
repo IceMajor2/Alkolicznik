@@ -83,6 +83,6 @@ public class BeerPrice {
 
     @Override
     public String toString() {
-        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getName(), this.price);
+        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getBrand(), this.price);
     }
 }

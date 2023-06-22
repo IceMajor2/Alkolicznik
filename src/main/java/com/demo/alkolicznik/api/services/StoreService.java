@@ -3,7 +3,6 @@ package com.demo.alkolicznik.api.services;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
@@ -47,7 +46,7 @@ public class StoreService {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).get();
         String beerName = beerPriceRequestDTO.getBeer();
-        Beer beer = beerRepository.findByName(beerName).get();
+        Beer beer = beerRepository.findByBrand(beerName).get();
         // Pass beer with price to store and save changes.
         double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);

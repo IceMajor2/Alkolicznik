@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface BeerRepository extends CrudRepository<Beer, Long> {
 
-    Optional<Beer> findByName(String name);
+    Optional<Beer> findByBrand(String brand);
 
     List<Beer> findAll();
 }
