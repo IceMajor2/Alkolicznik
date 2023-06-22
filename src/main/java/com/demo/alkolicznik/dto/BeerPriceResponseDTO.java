@@ -26,7 +26,7 @@ public class BeerPriceResponseDTO {
         this.storeId = beerPrice.getId().getStoreId();
         this.storeName = beerPrice.getStore().getName();
         this.beerId = beerPrice.getId().getBeerId();
-        this.beerName = beerPrice.getBeer().getFullname();
+        this.beerName = beerPrice.getBeer().getFullName();
         this.price = beerPrice.getPrice();
     }
 

@@ -59,7 +59,7 @@ public class BeerController {
     public ResponseEntity<List<BeerResponseDTO>> getBeers() {
         List<Beer> beers = beerService.getBeers();
         List<BeerResponseDTO> beersDto = beers.stream()
-                .map(beerService::convertToDto)
+                .map(beerService::convertToResponseDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(beersDto);
     }

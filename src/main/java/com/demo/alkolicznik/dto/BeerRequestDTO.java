@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.dto;
 
-import com.demo.alkolicznik.models.Beer;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Value;

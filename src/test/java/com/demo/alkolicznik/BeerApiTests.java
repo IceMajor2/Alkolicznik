@@ -1,9 +1,8 @@
 package com.demo.alkolicznik;
 
-import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.Store;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +32,9 @@ public class BeerApiTests {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private List<Store> stores;
-
-    @Autowired
     private List<Beer> beers;
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Launch this test to see whether the
@@ -47,61 +45,106 @@ public class BeerApiTests {
     }
 
     /**
-     * Get loaded at launch (through .sql script) beer.
+     * {@code GET /api/beer/{id}} - get beer OK request.
      */
     @Test
-    public void getBeerTest() {
-        ResponseEntity<BeerResponseDTO> response = restTemplate.getForEntity("/api/beer/1", BeerResponseDTO.class);
+    public void getBeerTest() throws Exception {
+        ResponseEntity<BeerResponseDTO> response = restTemplate
+                .getForEntity("/api/beer/1", BeerResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BeerResponseDTO actual = response.getBody();
 
-        BeerResponseDTO beer = response.getBody();
-        BeerResponseDTO expected = new BeerResponseDTO(
-                jdbcTemplate.queryForObject("SELECT * FROM beer WHERE beer.id = 1", TestUtils.mapToBeer())
-        );
-        assertThat(beer).isEqualTo(expected);
+        BeerResponseDTO expected = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = 1",
+                        TestUtils.mapToBeer());
+        assertThat(actual).isEqualTo(expected);
     }
 
     /**
-     * Creating new beer should return location of the newly
-     * created object within response entity. GET request to
-     * this URI location should return the just-posted beer.
+     * {@code GET /api/beer/{id}} - check acquiring of non-existing beer (id not found).
+     */
+    @Test
+    public void getNonExistingBeerShouldReturn404Test() {
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate.getForEntity("/api/beer/9999", BeerResponseDTO.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * {@code GET /api/beer} - get array of all beers in database test.
+     */
+    @Test
+    public void getAllBeersTest() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/api/beer", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Compare actual and expected beer names.
+        JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
+        String[] beerNamesDb = TestUtils.convertNamesToArray(
+                this.beers.stream().map(Beer::getFullName).toList());
+        assertThat(beerNames).containsExactly((Object[]) beerNamesDb);
+
+        // Compare actual and expected beer ids.
+        JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
+        List<Long> longBeerIDs = this.beers.stream().map(Beer::getId).toList();
+        List<Integer> intBeerIDs = TestUtils.convertLongListToIntList(longBeerIDs);
+        Integer[] beerIDsDb = TestUtils.convertIdsToArray(intBeerIDs);
+        assertThat(beerIDs).containsExactly((Object[]) beerIDsDb);
+
+        int length = TestUtils.getLength(response.getBody());
+        assertThat(length).isEqualTo(6);
+    }
+
+    /**
+     * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
      */
     @Test
     @DirtiesContext
-    public void createAndGetBeerTest() {
+    public void createBeerTest() {
         // Create new Beer and post it to database.
         Beer beer = new Beer("Lech");
         ResponseEntity<BeerResponseDTO> postResponse = restTemplate
                 .postForEntity("/api/beer", beer, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        BeerResponseDTO savedBear = postResponse.getBody();
+        BeerResponseDTO created = postResponse.getBody();
         URI location = postResponse.getHeaders().getLocation();
 
-        // Fetch just-created entity from database through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate.getForEntity(location, BeerResponseDTO.class);
+        // Fetch just-created entity through controller.
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
+                .getForEntity(location, BeerResponseDTO.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BeerResponseDTO fetchController = getResponse.getBody();
 
-        BeerResponseDTO actual = getResponse.getBody();
-        assertThat(actual).isEqualTo(savedBear);
+        assertThat(fetchController).isEqualTo(created);
 
-        // Additionally: fetch the beer directly from database.
-        String sql = "SELECT * FROM beer WHERE beer.id = ?";
-        BeerResponseDTO dbBeer = new BeerResponseDTO(
-                jdbcTemplate.queryForObject(sql, TestUtils.mapToBeer(), savedBear.getId())
-        );
+        // Additionally: fetch created entity directly from database using JDBCTemplate.
+        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
+                        TestUtils.mapToBeer());
 
-        assertThat(dbBeer).isEqualTo(savedBear);
+        assertThat(fetchJdbc).isEqualTo(created);
     }
 
     /**
-     * Should return HTTP 404 (NOT_FOUND) when fetching
-     * non-existent beer object from database.
+     * {@code POST /api/beer} - valid beer with non-default {@code volume} field.
      */
     @Test
-    public void getNonExistingBeerShouldReturn404Test() {
-        ResponseEntity<Beer> getResponse = restTemplate.getForEntity("/api/beer/9999", Beer.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    @DirtiesContext
+    public void createBeerWithCustomVolumeTest() {
+        Beer beer = new Beer("Corona", 0.33);
+        
     }
+
+    /**
+     * {@code POST /api/beer} - valid beer with specified {@code type} field.
+     */
+    //@Test
+    //@DirtiesContext
+
+    /**
+     * {@code POST /api/beer} - valid beer with non-default {@code volume} field and specified {@code type} field.
+     */
+    //@Test
+    //@DirtiesContext
 
     /**
      * {@code POST /api/beer} - check body of 200 OK response.
@@ -132,28 +175,15 @@ public class BeerApiTests {
     }
 
     /**
-     * {@code GET /api/beer} - request should return an array of all beers in database.
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
      */
-    @Test
-    public void getAllBeersTest() {
-        ResponseEntity<String> response = restTemplate
-                .getForEntity("/api/beer", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        // Compare actual and expected beer names.
-        JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
-        String[] beerNamesDb = TestUtils.convertNamesToArray(
-                this.beers.stream().map(Beer::getFullname).toList());
-        assertThat(beerNames).containsExactly((Object[]) beerNamesDb);
-
-        // Compare actual and expected beer ids.
-        JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
-        List<Long> longBeerIDs = this.beers.stream().map(Beer::getId).toList();
-        List<Integer> intBeerIDs = TestUtils.convertLongListToIntList(longBeerIDs);
-        Integer[] beerIDsDb = TestUtils.convertIdsToArray(intBeerIDs);
-        assertThat(beerIDs).containsExactly((Object[]) beerIDsDb);
-
-        int length = TestUtils.getLength(response.getBody());
-        assertThat(length).isEqualTo(6);
-    }
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (no {@code brand} field & empty).
+     */
+    //@Test
+    //public void
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
+     */
 }

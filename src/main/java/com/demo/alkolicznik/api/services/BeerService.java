@@ -31,9 +31,6 @@ public class BeerService {
     }
 
     public Beer add(BeerRequestDTO beerRequestDTO) {
-        if(beerRequestDTO.getVolume() == null) {
-            beerRequestDTO.setVolume(0.5d);
-        }
         Beer beer = new Beer(
                 beerRequestDTO.getBrand(),
                 beerRequestDTO.getVolume());
@@ -43,7 +40,7 @@ public class BeerService {
         return beerRepository.save(beer);
     }
 
-    public BeerResponseDTO convertToDto(Beer beer) {
+    public BeerResponseDTO convertToResponseDto(Beer beer) {
         return new BeerResponseDTO(beer);
     }
 }

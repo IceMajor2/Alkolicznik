@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.models;
 
-import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -101,7 +100,7 @@ public class Beer {
     }
 
     @JsonProperty("name")
-    public String getFullname() {
+    public String getFullName() {
         StringBuilder sb = new StringBuilder(this.brand);
         if(this.type != null) {
             sb.append(" ");
@@ -125,14 +124,16 @@ public class Beer {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(this.brand);
+        StringBuilder sb = new StringBuilder("ID: ").append(this.id).append('\n');
+        sb.append("Full name: ").append(this.getFullName()).append('\n');
+        sb.append("Brand: ").append(this.brand).append('\n');
+        sb.append("Type: ");
         if(this.type != null) {
-            sb.append(" ");
             sb.append(this.type);
+        } else {
+            sb.append("---");
         }
-        sb.append(" (ID: ");
-        sb.append(this.id);
-        sb.append(")");
+        sb.append('\n').append("Volume: ").append(this.volume);
         return sb.toString();
     }
 }

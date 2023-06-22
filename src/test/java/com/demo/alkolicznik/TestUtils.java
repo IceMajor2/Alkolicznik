@@ -1,5 +1,6 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import com.jayway.jsonpath.DocumentContext;
@@ -50,6 +51,16 @@ public class TestUtils {
                 return beer;
             }
         };
+    }
+
+    /**
+     * Converts {@code Beer} original object into a used-by-controller DTO.
+     * @param query SQL-native query
+     * @param beerMapper {@code RowMapper} that maps SQL response into {@code Beer}
+     * @return {@code BeerResponseDTO}
+     */
+    public static BeerResponseDTO convertJdbcQueryToDto(String query, RowMapper<Beer> beerMapper) {
+        return new BeerResponseDTO(jdbcTemplate.queryForObject(query, beerMapper));
     }
 
     /**
