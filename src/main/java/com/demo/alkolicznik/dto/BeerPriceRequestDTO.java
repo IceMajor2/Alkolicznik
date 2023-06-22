@@ -1,22 +1,23 @@
 package com.demo.alkolicznik.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BeerPriceRequestDTO {
 
-    @NotBlank
-    private String beer;
+    @JsonProperty("name")
+    private String fullname;
+    private Double price;
 
-    @PositiveOrZero
-    private double price;
-
-    public String getBeer() {
-        return beer;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setBeer(String beer) {
-        this.beer = beer;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public double getPrice() {

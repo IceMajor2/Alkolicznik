@@ -164,8 +164,8 @@ public class StoreApiTests {
     @DirtiesContext
     public void addValidBeerToStoreTest() throws JSONException {
         BeerPriceRequestDTO beerPriceRequestDTO = new BeerPriceRequestDTO();
-        beerPriceRequestDTO.setBeer("Tyskie");
-        beerPriceRequestDTO.setPrice(3.29);
+        beerPriceRequestDTO.setFullname("Tyskie Gronie");
+        beerPriceRequestDTO.setPrice(3.99);
 
         ResponseEntity<String> response = restTemplate
                 .postForEntity("/api/store/4/beer", beerPriceRequestDTO, String.class);
@@ -180,8 +180,8 @@ public class StoreApiTests {
         assertThat(storeId).isEqualTo(4L);
         assertThat(storeName).isEqualTo("ABC");
         assertThat(beerId).isEqualTo(3L);
-        assertThat(beerName).isEqualTo("Tyskie");
-        assertThat(price).isEqualTo(3.29);
+        assertThat(beerName).isEqualTo("Tyskie Gronie");
+        assertThat(price).isEqualTo(3.99);
     }
 
     /**

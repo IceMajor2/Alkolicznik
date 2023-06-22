@@ -104,9 +104,9 @@ public class Store {
         }
     }
 
-    public Optional<BeerPrice> getBeer(String beerName) {
+    public Optional<BeerPrice> getBeer(String beerFullname) {
         for (BeerPrice beer : prices) {
-            if (beer.getBeer().getBrand().equals(beerName)) {
+            if (beer.getBeer().getFullname().equals(beerFullname)) {
                 return Optional.of(beer);
             }
         }
