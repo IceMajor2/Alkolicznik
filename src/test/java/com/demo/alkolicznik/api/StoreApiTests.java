@@ -197,15 +197,15 @@ public class StoreApiTests {
 
         // Compare actual and expected store names.
         JSONArray storeNames = TestUtils.getValues(response.getBody(), "name");
-        String[] storeNamesDb = TestUtils.convertNamesToArray(
+        String[] storeNamesDb = TestUtils.stringListToArray(
                 this.stores.stream().map(Store::getName).toList());
         assertThat(storeNames).containsExactly((Object[]) storeNamesDb);
 
         // Compare actual and expected store ids.
         JSONArray storeIDs = TestUtils.getValues(response.getBody(), "id");
         List<Long> longStoreIDs = this.stores.stream().map(Store::getId).toList();
-        List<Integer> intStoreIDs = TestUtils.convertLongListToIntList(longStoreIDs);
-        Integer[] storeIDsDb = TestUtils.convertIdsToArray(intStoreIDs);
+        List<Integer> intStoreIDs = TestUtils.longListToIntList(longStoreIDs);
+        Integer[] storeIDsDb = TestUtils.intListToArray(intStoreIDs);
         assertThat(storeIDs).containsExactly((Object[]) storeIDsDb);
 
         int length = TestUtils.getLength(response.getBody());

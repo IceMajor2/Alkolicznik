@@ -82,15 +82,15 @@ public class BeerApiTests {
 
         // Compare actual and expected beer names.
         JSONArray beerNames = TestUtils.getValues(response.getBody(), "name");
-        String[] beerNamesDb = TestUtils.convertNamesToArray(
+        String[] beerNamesDb = TestUtils.stringListToArray(
                 this.beers.stream().map(Beer::getFullName).toList());
         assertThat(beerNames).containsExactly((Object[]) beerNamesDb);
 
         // Compare actual and expected beer ids.
         JSONArray beerIDs = TestUtils.getValues(response.getBody(), "id");
         List<Long> longBeerIDs = this.beers.stream().map(Beer::getId).toList();
-        List<Integer> intBeerIDs = TestUtils.convertLongListToIntList(longBeerIDs);
-        Integer[] beerIDsDb = TestUtils.convertIdsToArray(intBeerIDs);
+        List<Integer> intBeerIDs = TestUtils.longListToIntList(longBeerIDs);
+        Integer[] beerIDsDb = TestUtils.intListToArray(intBeerIDs);
         assertThat(beerIDs).containsExactly((Object[]) beerIDsDb);
 
         int length = TestUtils.getLength(response.getBody());

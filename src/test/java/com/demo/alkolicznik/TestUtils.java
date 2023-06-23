@@ -41,6 +41,11 @@ public class TestUtils {
         TestUtils.restTemplate = restTemplate;
     }
 
+    /** Acquire {@code RowMapper<Store>} that maps
+     *  SQL response into a {@code Store} object.
+     *
+     * @return {@code RowMapper<Store>}
+     */
     public static RowMapper<Store> mapToStore() {
         return new RowMapper<Store>() {
             @Override
@@ -53,6 +58,11 @@ public class TestUtils {
         };
     }
 
+    /** Acquire {@code RowMapper<Beer>} that maps
+     *  SQL response into a {@code Beer} object.
+     *
+     * @return {@code RowMapper<Beer>}
+     */
     public static RowMapper<Beer> mapToBeer() {
         return new RowMapper<Beer>() {
             @Override
@@ -94,61 +104,58 @@ public class TestUtils {
         }
     }
 
+    /**
+     * Get an array of values assigned to a key in JSON body.
+     * @param json JSON string
+     * @param key name of JSON key
+     * @return {@code JSONArray} of key's values
+     */
     public static JSONArray getValues(String json, String key) {
         DocumentContext documentContext = JsonPath.parse(json);
         JSONArray values = documentContext.read("$..%s".formatted(key));
         return values;
     }
 
+    /**
+     * Get count of key-value pairs in JSON body.
+     * @param json JSON string
+     * @return key-value pairs (as {@code int})
+     */
     public static int getLength(String json) {
         DocumentContext documentContext = JsonPath.parse(json);
         return documentContext.read("$.length()");
     }
 
-    public static Beer fetchBeer(Long id) {
-        String sql = "SELECT * FROM beer WHERE beer.id = ?";
-        Beer beer = jdbcTemplate.queryForObject(sql, mapToBeer(), id);
-        return beer;
-    }
-
-    public static Store fetchStore(Long id) {
-        String sql = "SELECT * FROM store WHERE store.id = ?";
-        Store store = jdbcTemplate.queryForObject(sql, mapToStore(), id);
-        return store;
-    }
-
     /**
-     * Convert list of integers (presumably field {@code id} of an entity
-     * into an array of integers.
+     * Convert list of integers into an array of integers.
      *
-     * @param ids list of integers
+     * @param intList list of integers
      * @return array of integers
      */
-    public static Integer[] convertIdsToArray(List<Integer> ids) {
-        return ids.toArray(new Integer[0]);
+    public static Integer[] intListToArray(List<Integer> intList) {
+        return intList.toArray(new Integer[0]);
     }
 
     /**
-     * Convert list of longs to list of integers.
+     * Convert list of {@code Long} values to list of integers.
      *
-     * @param list list of longs
-     * @return list of integers
+     * @param longList {@code List<Long>}
+     * @return {@code List<Integer>}
      */
-    public static List<Integer> convertLongListToIntList(List<Long> list) {
-        return list.stream()
+    public static List<Integer> longListToIntList(List<Long> longList) {
+        return longList.stream()
                 .map(num -> (Integer) num.intValue())
                 .toList();
     }
 
     /**
-     * Convert list of strings (presumably field {@code name} of an entity
-     * into an array of strings.
+     * Convert list of strings into an array of strings.
      *
-     * @param names list of strings
+     * @param stringList list of strings
      * @return array of strings
      */
-    public static String[] convertNamesToArray(List<String> names) {
-        return names.toArray(new String[0]);
+    public static String[] stringListToArray(List<String> stringList) {
+        return stringList.toArray(new String[0]);
     }
 
     public static void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus,
