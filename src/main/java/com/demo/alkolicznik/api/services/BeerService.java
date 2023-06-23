@@ -3,6 +3,7 @@ package com.demo.alkolicznik.api.services;
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.BeerNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class BeerService {
     public Beer get(Long beerId) {
         Optional<Beer> optBeer = beerRepository.findById(beerId);
         if(optBeer.isEmpty()) {
-            return null;
+            throw new BeerNotFoundException(beerId);
         }
         return optBeer.get();
     }

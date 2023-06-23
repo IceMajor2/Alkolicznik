@@ -1,15 +1,17 @@
 package com.demo.alkolicznik.dto;
 
+import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class BeerRequestDTO {
 
-    @NotNull(message = "Beer's brand was not specified")
-    @NotBlank(message = "Beer's brand must not be blank")
+    @NotBlank(message = "Brand was not specified")
     private String brand;
+    @NotBlankIfExists(message = "Type was not specified")
     private String type;
+    @Positive(message = "Volume must be a positive number")
     private Double volume = 0.5;
 
     public String getBrand() {

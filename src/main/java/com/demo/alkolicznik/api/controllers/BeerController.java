@@ -31,9 +31,6 @@ public class BeerController {
     @GetMapping("/beer/{id}")
     public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id) {
         Beer beer = beerService.get(id);
-        if(beer == null) {
-            return ResponseEntity.notFound().build();
-        }
         BeerResponseDTO beerDto = new BeerResponseDTO(beer);
         return ResponseEntity.ok(beerDto);
     }
