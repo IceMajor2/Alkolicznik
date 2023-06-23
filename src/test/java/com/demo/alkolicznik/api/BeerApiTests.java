@@ -208,7 +208,54 @@ public class BeerApiTests {
         request.setBrand("");
 
         TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+    }
 
+    /**
+     * {@code POST /api/beer} - send valid BeerRequestDTO body but of already-existing beer.
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerAlreadyPresentTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Perla");
+        request.setType("Chmielowa Pils");
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+
+        request.setBrand("Tyskie");
+        request.setType("Gronie");
+        request.setVolume(0.6);
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+    }
+
+    /**
+     * {@code POST /api/beer} - send valid BeerRequestDTO body with beer of already-existing
+     * brand and type, but different volume.
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Komes");
+        request.setType("Malinowe");
+
+        BeerResponseDTO expected = new BeerResponseDTO();
+        expected.setId(7L);
+        expected.setVolume(0.5);
+        expected.setFullName("Komes Malinowe");
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+
+        request.setBrand("Perla");
+        request.setType("Chmielowa Pils");
+        request.setVolume(0.33);
+
+        expected.setId(8L);
+        expected.setVolume(0.33);
+        expected.setFullName("Perla Chmielowa Pils");
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
     }
 
     /**
