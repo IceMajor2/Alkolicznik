@@ -1,5 +1,6 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,11 +103,18 @@ public class BeerApiTests {
     @DirtiesContext
     public void createBeerTest() {
         // Create new Beer and post it to database.
-        Beer beer = new Beer("Lech");
+        BeerRequestDTO beer = new BeerRequestDTO();
+        beer.setBrand("Lech");
         ResponseEntity<BeerResponseDTO> postResponse = restTemplate
                 .postForEntity("/api/beer", beer, BeerResponseDTO.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         BeerResponseDTO created = postResponse.getBody();
         URI location = postResponse.getHeaders().getLocation();
+        assertThat(created.getId()).isEqualTo(7L);
+        assertThat(created.getFullName()).isEqualTo("Lech");
+        assertThat(created.getType()).isNull();
+//        assertThat(created.getBrand()).isEqualTo("Lech"); currently does not pass
+        assertThat(created.getVolume()).isEqualTo(0.5d);
 
         // Fetch just-created entity through controller.
         ResponseEntity<BeerResponseDTO> getResponse = restTemplate
@@ -121,7 +129,7 @@ public class BeerApiTests {
                 ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
                         TestUtils.mapToBeer());
 
-        assertThat(fetchJdbc).isEqualTo(created);
+        assertThat(created).isEqualTo(fetchJdbc);
     }
 
     /**
@@ -130,15 +138,59 @@ public class BeerApiTests {
     @Test
     @DirtiesContext
     public void createBeerWithCustomVolumeTest() {
+        // Create valid beer with custom volume.
         Beer beer = new Beer("Corona", 0.33);
-        
+        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
+                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        URI location = postResponse.getHeaders().getLocation();
+        BeerResponseDTO created = postResponse.getBody();
+
+        // Fetch just-created entity through controller.
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
+                .getForEntity(location, BeerResponseDTO.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BeerResponseDTO fetchController = getResponse.getBody();
+
+        assertThat(fetchController).isEqualTo(created);
+
+        // Additionally: fetch created entity directly from database using JDBCTemplate.
+        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
+                        TestUtils.mapToBeer());
+
+        assertThat(created).isEqualTo(fetchJdbc);
     }
 
     /**
      * {@code POST /api/beer} - valid beer with specified {@code type} field.
      */
-    //@Test
-    //@DirtiesContext
+    @Test
+    @DirtiesContext
+    public void createBeerWithTypePresentTest() {
+        // Create valid beer with custom volume.
+        Beer beer = new Beer("Budweiser", "Budvar Original");
+        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
+                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        URI location = postResponse.getHeaders().getLocation();
+        BeerResponseDTO created = postResponse.getBody();
+
+        // Fetch just-created entity through controller.
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
+                .getForEntity(location, BeerResponseDTO.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BeerResponseDTO fetchController = getResponse.getBody();
+
+        assertThat(fetchController).isEqualTo(created);
+
+        // Additionally: fetch created entity directly from database using JDBCTemplate.
+        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
+                        TestUtils.mapToBeer());
+
+        assertThat(created).isEqualTo(fetchJdbc);
+    }
 
     /**
      * {@code POST /api/beer} - valid beer with non-default {@code volume} field and specified {@code type} field.

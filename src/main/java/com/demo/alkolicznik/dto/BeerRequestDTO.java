@@ -11,7 +11,7 @@ public class BeerRequestDTO {
     private String type;
     @Positive
     @Value("0.5")
-    private Double volume;
+    private Double volume = 0.5;
 
     @Nonnull
     public String getBrand() {

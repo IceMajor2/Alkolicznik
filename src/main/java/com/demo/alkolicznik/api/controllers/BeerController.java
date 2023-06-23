@@ -52,7 +52,8 @@ public class BeerController {
                 .path("/{id}")
                 .buildAndExpand(saved.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(savedDto);
+        var resEntity = ResponseEntity.created(location).body(savedDto);
+        return resEntity;
     }
 
     @GetMapping("/beer")
