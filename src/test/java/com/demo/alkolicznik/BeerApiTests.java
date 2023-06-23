@@ -95,6 +95,7 @@ public class BeerApiTests {
         int length = TestUtils.getLength(response.getBody());
         assertThat(length).isEqualTo(6);
     }
+
     /**
      * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
      */
@@ -128,7 +129,7 @@ public class BeerApiTests {
         expected.setId(7L);
 
         TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
-     }
+    }
 
     /**
      * {@code POST /api/beer} - valid beer with specified {@code type} field.
@@ -136,35 +137,78 @@ public class BeerApiTests {
     @Test
     @DirtiesContext
     public void createBeerWithTypePresentTest() {
-        // Create valid beer with custom volume.
-        Beer beer = new Beer("Budweiser", "Budvar Original");
-        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
-                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        URI location = postResponse.getHeaders().getLocation();
-        BeerResponseDTO created = postResponse.getBody();
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Okocim");
+        request.setType("Jasne Okocimskie");
 
-        // Fetch just-created entity through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
-                .getForEntity(location, BeerResponseDTO.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BeerResponseDTO fetchController = getResponse.getBody();
+        BeerResponseDTO expected = new BeerResponseDTO();
+        expected.setFullName("Okocim Jasne Okocimskie");
+        expected.setVolume(0.5);
+        expected.setId(7L);
 
-        assertThat(fetchController).isEqualTo(created);
-
-        // Additionally: fetch created entity directly from database using JDBCTemplate.
-        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
-                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
-                        TestUtils.mapToBeer());
-
-        assertThat(created).isEqualTo(fetchJdbc);
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
     }
 
     /**
      * {@code POST /api/beer} - valid beer with non-default {@code volume} field and specified {@code type} field.
      */
-    //@Test
-    //@DirtiesContext
+    @Test
+    @DirtiesContext
+    public void createBeerWithCustomVolumeAndTypePresentTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Budweiser");
+        request.setType("Budvar Original");
+        request.setVolume(0.33);
+
+        BeerResponseDTO expected = new BeerResponseDTO();
+        expected.setFullName("Budweiser Budvar Original");
+        expected.setVolume(0.33);
+        expected.setId(7L);
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+    }
+
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerWithNegativeVolumeTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Pilsner Urquell");
+        request.setVolume(-1.0);
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST,
+                request, null);
+    }
+
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (no {@code brand} field).
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerWithNoBrandTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setVolume(0.6);
+        request.setType("IPA");
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+    }
+
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (empty {@code brand} field).
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerWithEmptyBrandTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setVolume(0.6);
+        request.setType("IPA");
+        request.setBrand("");
+
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+
+    }
 
     /**
      * {@code POST /api/beer} - check body of 200 OK response.
@@ -193,17 +237,4 @@ public class BeerApiTests {
                         3, lengthResponse)
                 .isEqualTo(3);
     }
-
-    /**
-     * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
-     */
-
-    /**
-     * {@code POST /api/beer} - send invalid BeerRequestDTO body (no {@code brand} field & empty).
-     */
-    //@Test
-    //public void
-    /**
-     * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
-     */
 }

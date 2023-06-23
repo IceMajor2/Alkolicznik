@@ -6,6 +6,7 @@ import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import jakarta.annotation.Nullable;
 import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,7 +69,8 @@ public class TestUtils {
 
     /**
      * Converts {@code Beer} original object into a used-by-controller DTO.
-     * @param query SQL-native query
+     *
+     * @param query      SQL-native query
      * @param beerMapper {@code RowMapper} that maps SQL response into {@code Beer}
      * @return {@code BeerResponseDTO}
      */
@@ -151,10 +153,13 @@ public class TestUtils {
 
     public static void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus,
                                                           BeerRequestDTO request,
-                                                          BeerResponseDTO expectedResponse) {
+                                                          @Nullable BeerResponseDTO expectedResponse) {
         ResponseEntity<BeerResponseDTO> postResponse = restTemplate
                 .postForEntity("/api/beer", request, BeerResponseDTO.class);
         assertThat(postResponse.getStatusCode()).isEqualTo(expectedStatus);
+        if(expectedStatus.is4xxClientError()) {
+            return;
+        }
         BeerResponseDTO created = postResponse.getBody();
         URI location = postResponse.getHeaders().getLocation();
 
@@ -165,7 +170,7 @@ public class TestUtils {
         // Fetch just-created entity through controller.
         ResponseEntity<BeerResponseDTO> getResponse = restTemplate
                 .getForEntity(location, BeerResponseDTO.class);
-        if(expectedStatus.is2xxSuccessful()) {
+        if (expectedStatus.is2xxSuccessful()) {
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         } else {
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

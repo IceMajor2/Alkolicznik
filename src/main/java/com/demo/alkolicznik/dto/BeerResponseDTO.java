@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.dto;
 
 import com.demo.alkolicznik.models.Beer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
