@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.dto;
 
+import com.demo.alkolicznik.models.Beer;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,5 +37,15 @@ public class BeerRequestDTO {
 
     public void setVolume(Double volume) {
         this.volume = volume;
+    }
+
+    public Beer convertToModel() {
+        Beer beer = new Beer();
+        beer.setBrand(this.brand);
+        if(this.type != null) {
+            beer.setType(this.type);
+        }
+        beer.setVolume(this.volume);
+        return beer;
     }
 }

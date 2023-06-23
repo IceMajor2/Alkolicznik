@@ -45,15 +45,19 @@ public class BeerController {
      */
     @PostMapping("/beer")
     public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody BeerRequestDTO beerRequestDTO) {
-        Beer saved = beerService.add(beerRequestDTO);
-        BeerResponseDTO savedDto = new BeerResponseDTO(saved);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(saved.getId())
-                .toUri();
-        var resEntity = ResponseEntity.created(location).body(savedDto);
-        return resEntity;
+        try {
+            Beer saved = beerService.add(beerRequestDTO);
+            BeerResponseDTO savedDto = new BeerResponseDTO(saved);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(saved.getId())
+                    .toUri();
+            var resEntity = ResponseEntity.created(location).body(savedDto);
+            return resEntity;
+        } catch(RuntimeException e) {
+            throw e;
+        }
     }
 
     @GetMapping("/beer")

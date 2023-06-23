@@ -16,4 +16,13 @@ public interface BeerRepository extends CrudRepository<Beer, Long> {
     Optional<Beer> findByFullname(String fullname);
 
     List<Beer> findAll();
+
+    default boolean exists(Beer beer) {
+        String brand = beer.getBrand();
+        String type = beer.getType();
+        Double volume = beer.getVolume();
+        return existsByBrandAndTypeAndVolume(brand, type, volume);
+    }
+
+    boolean existsByBrandAndTypeAndVolume(String brand, String type, Double volume);
 }
