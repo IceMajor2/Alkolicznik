@@ -1,3 +1,3 @@
 - make repositories 'Paging and Sorting'
-- figure out a better way to initialize lists containing database entries into test classes
 - write tests checking DTO objects
+- fix exchange of ResponseEntity between unit tests and controllers (https://stackoverflow.com/questions/76533306/test-receives-different-responseentity/76533498?noredirect=1#comment134947407_76533498)
