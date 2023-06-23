@@ -22,7 +22,6 @@ public class TestConfig {
 
     @Bean
     public List<Store> stores() {
-        System.out.println(jdbcTemplate);
         String sql = "SELECT * FROM store";
         List<Store> initializedStores = jdbcTemplate.query(sql, TestUtils.mapToStore());
         return initializedStores;
