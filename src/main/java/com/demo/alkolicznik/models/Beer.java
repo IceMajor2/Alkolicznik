@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -21,11 +22,8 @@ public class Beer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
     private String brand;
     private String type;
-    @Positive
-    @Value("0.5") // does not work?!
     private Double volume;
 
     @OneToMany(mappedBy = "beer",
@@ -34,24 +32,24 @@ public class Beer {
     @JsonIgnore
     private Set<BeerPrice> prices = new HashSet<>();
 
-    public Beer(@Nonnull String brand) {
+    public Beer(String brand) {
         this.brand = brand;
         this.volume = 0.5;
     }
 
-    public Beer(@Nonnull String brand, String type) {
+    public Beer(String brand, String type) {
         this.brand = brand;
         this.type = type;
         this.volume = 0.5;
     }
 
-    public Beer(@Nonnull String brand, String type, @Positive Double volume) {
+    public Beer(String brand, String type, Double volume) {
         this.brand = brand;
         this.type = type;
         this.volume = volume;
     }
 
-    public Beer(@Nonnull String brand, @Positive Double volume) {
+    public Beer(String brand, Double volume) {
         this.brand = brand;
         this.volume = volume;
     }
@@ -75,12 +73,11 @@ public class Beer {
         this.prices = prices;
     }
 
-    @Nonnull
     public String getBrand() {
         return brand;
     }
 
-    public void setBrand(@Nonnull String brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 

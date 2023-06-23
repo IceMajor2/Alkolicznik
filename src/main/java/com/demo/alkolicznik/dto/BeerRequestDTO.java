@@ -1,25 +1,22 @@
 package com.demo.alkolicznik.dto;
 
 import com.demo.alkolicznik.models.Beer;
-import jakarta.annotation.Nonnull;
-import jakarta.validation.constraints.Positive;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class BeerRequestDTO {
 
-    @Nonnull
+    @NotNull(message = "Beer's brand was not specified")
+    @NotBlank(message = "Beer's brand must not be blank")
     private String brand;
     private String type;
-    @Positive
-    @Value("0.5")
     private Double volume = 0.5;
 
-    @Nonnull
     public String getBrand() {
         return brand;
     }
 
-    public void setBrand(@Nonnull String brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 

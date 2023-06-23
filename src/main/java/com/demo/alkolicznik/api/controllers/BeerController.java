@@ -4,6 +4,7 @@ import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.api.services.BeerService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -44,7 +45,7 @@ public class BeerController {
      * @return updated by database Beer object wrapped in ResponseEntity class
      */
     @PostMapping("/beer")
-    public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody BeerRequestDTO beerRequestDTO) {
+    public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
         try {
             Beer saved = beerService.add(beerRequestDTO);
             BeerResponseDTO savedDto = new BeerResponseDTO(saved);
