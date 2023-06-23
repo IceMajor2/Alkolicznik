@@ -1,5 +1,7 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.api;
 
+import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.TestUtils;
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -17,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.net.URI;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

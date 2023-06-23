@@ -1,5 +1,7 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.api;
 
+import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.TestUtils;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
