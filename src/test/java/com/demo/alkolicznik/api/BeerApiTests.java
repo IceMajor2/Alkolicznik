@@ -250,6 +250,28 @@ public class BeerApiTests {
     }
 
     /**
+     * {@code POST /api/beer} - send valid BeerRequestDTO body but with untrimmed {@code brand} field.
+     * Assert that it is trimmed by accessing at {@code GET /api/beer/{id}}
+     */
+    @Test
+    @DirtiesContext
+    @Disabled
+    public void createBeerWithUntrimmedBrandInRequestTest() {
+
+    }
+
+    /**
+     * {@code POST /api/beer} - send valid BeerRequestDTO body but with untrimmed {@code type} field.
+     * Assert that it is trimmed by accessing at {@code GET /api/beer/{id}}
+     */
+    @Test
+    @DirtiesContext
+    @Disabled
+    public void createBeerWithUntrimmedTypeInRequestTest() {
+
+    }
+
+    /**
      * {@code POST /api/beer} - send invalid BeerRequestDTO body (empty {@code brand} field).
      */
     @Test
