@@ -230,6 +230,26 @@ public class BeerApiTests {
     }
 
     /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body (blank {@code type} field).
+     */
+    @Test
+    @DirtiesContext
+    @Disabled
+    public void createBeerWithPresentButBlankTypeTest() {
+
+    }
+
+    /**
+     * {@code POST /api/beer} - send invalid BeerRequestDTO body ({@code volume} as a word, not numeric value).
+     */
+    @Test
+    @DirtiesContext
+    @Disabled
+    public void createBeerWithVolumeAsStringTest() {
+
+    }
+
+    /**
      * {@code POST /api/beer} - send invalid BeerRequestDTO body (empty {@code brand} field).
      */
     @Test
