@@ -2,7 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.BeerAlreadyExists;
+import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class BeerService {
     public Beer add(BeerRequestDTO beerRequestDTO) {
         Beer beer = beerRequestDTO.convertToModel();
         if(beerRepository.exists(beer)) {
-            throw new BeerAlreadyExists();
+            throw new BeerAlreadyExistsException();
         }
         return beerRepository.save(beer);
     }
