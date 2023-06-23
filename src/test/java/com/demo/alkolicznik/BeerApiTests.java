@@ -95,7 +95,20 @@ public class BeerApiTests {
         int length = TestUtils.getLength(response.getBody());
         assertThat(length).isEqualTo(6);
     }
-
+    /**
+     * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
+     */
+    @Test
+    @DirtiesContext
+    public void createBeerTestTest() {
+        BeerRequestDTO beer = new BeerRequestDTO();
+        beer.setBrand("Lech");
+        BeerResponseDTO expected = new BeerResponseDTO();
+        expected.setId(7L);
+        expected.setFullName("Lech");
+        expected.setVolume(0.5d);
+        this.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, beer, expected);
+    }
     /**
      * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
      */
@@ -120,6 +133,42 @@ public class BeerApiTests {
         ResponseEntity<BeerResponseDTO> getResponse = restTemplate
                 .getForEntity(location, BeerResponseDTO.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BeerResponseDTO fetchController = getResponse.getBody();
+
+        assertThat(fetchController).isEqualTo(created);
+
+        // Additionally: fetch created entity directly from database using JDBCTemplate.
+        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
+                        TestUtils.mapToBeer());
+
+        assertThat(created).isEqualTo(fetchJdbc);
+    }
+
+    private void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus, BeerRequestDTO request, BeerResponseDTO expectedResponse) {
+        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
+                .postForEntity("/api/beer", request, BeerResponseDTO.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(expectedStatus);
+        BeerResponseDTO created = postResponse.getBody();
+        URI location = postResponse.getHeaders().getLocation();
+        assertThat(created.getId()).isEqualTo(expectedResponse.getId());
+        assertThat(created.getFullName()).isEqualTo(expectedResponse.getFullName());
+//        if(expectedResponse.getType() == null) {
+//            assertThat(created.getType()).isNull();
+//        } else {
+//            assertThat(created.getType()).isEqualTo(expectedResponse.getType());
+//        }
+        assertThat(created.getType()).isEqualTo(expectedResponse.getType());
+        assertThat(created.getVolume()).isEqualTo(expectedResponse.getVolume());
+
+        // Fetch just-created entity through controller.
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
+                .getForEntity(location, BeerResponseDTO.class);
+        if(expectedStatus.is2xxSuccessful()) {
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        } else {
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
         BeerResponseDTO fetchController = getResponse.getBody();
 
         assertThat(fetchController).isEqualTo(created);
