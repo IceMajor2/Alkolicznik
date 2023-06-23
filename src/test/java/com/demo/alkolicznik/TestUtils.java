@@ -1,5 +1,6 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
@@ -9,22 +10,34 @@ import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
 public class TestUtils {
 
     private static JdbcTemplate jdbcTemplate;
+    private static TestRestTemplate restTemplate;
 
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         TestUtils.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Autowired
+    public void setRestTemplate(TestRestTemplate restTemplate) {
+        TestUtils.restTemplate = restTemplate;
     }
 
     public static RowMapper<Store> mapToStore() {
@@ -134,5 +147,38 @@ public class TestUtils {
      */
     public static String[] convertNamesToArray(List<String> names) {
         return names.toArray(new String[0]);
+    }
+
+    public static void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus,
+                                                          BeerRequestDTO request,
+                                                          BeerResponseDTO expectedResponse) {
+        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
+                .postForEntity("/api/beer", request, BeerResponseDTO.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(expectedStatus);
+        BeerResponseDTO created = postResponse.getBody();
+        URI location = postResponse.getHeaders().getLocation();
+
+        assertThat(created.getId()).isEqualTo(expectedResponse.getId());
+        assertThat(created.getFullName()).isEqualTo(expectedResponse.getFullName());
+        assertThat(created.getVolume()).isEqualTo(expectedResponse.getVolume());
+
+        // Fetch just-created entity through controller.
+        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
+                .getForEntity(location, BeerResponseDTO.class);
+        if(expectedStatus.is2xxSuccessful()) {
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        } else {
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+        BeerResponseDTO fetchController = getResponse.getBody();
+
+        assertThat(fetchController).isEqualTo(created);
+
+        // Additionally: fetch created entity directly from database using JDBCTemplate.
+        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
+                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
+                        TestUtils.mapToBeer());
+
+        assertThat(created).isEqualTo(fetchJdbc);
     }
 }

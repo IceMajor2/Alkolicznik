@@ -100,85 +100,16 @@ public class BeerApiTests {
      */
     @Test
     @DirtiesContext
-    public void createBeerTestTest() {
-        BeerRequestDTO beer = new BeerRequestDTO();
-        beer.setBrand("Lech");
+    public void createBeerTest() {
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Lech");
+
         BeerResponseDTO expected = new BeerResponseDTO();
         expected.setId(7L);
         expected.setFullName("Lech");
         expected.setVolume(0.5d);
-        this.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, beer, expected);
-    }
-    /**
-     * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
-     */
-    @Test
-    @DirtiesContext
-    public void createBeerTest() {
-        // Create new Beer and post it to database.
-        BeerRequestDTO beer = new BeerRequestDTO();
-        beer.setBrand("Lech");
-        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
-                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        BeerResponseDTO created = postResponse.getBody();
-        URI location = postResponse.getHeaders().getLocation();
-        assertThat(created.getId()).isEqualTo(7L);
-        assertThat(created.getFullName()).isEqualTo("Lech");
-        assertThat(created.getType()).isNull();
-//        assertThat(created.getBrand()).isEqualTo("Lech"); currently does not pass
-        assertThat(created.getVolume()).isEqualTo(0.5d);
 
-        // Fetch just-created entity through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
-                .getForEntity(location, BeerResponseDTO.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BeerResponseDTO fetchController = getResponse.getBody();
-
-        assertThat(fetchController).isEqualTo(created);
-
-        // Additionally: fetch created entity directly from database using JDBCTemplate.
-        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
-                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
-                        TestUtils.mapToBeer());
-
-        assertThat(created).isEqualTo(fetchJdbc);
-    }
-
-    private void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus, BeerRequestDTO request, BeerResponseDTO expectedResponse) {
-        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
-                .postForEntity("/api/beer", request, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(expectedStatus);
-        BeerResponseDTO created = postResponse.getBody();
-        URI location = postResponse.getHeaders().getLocation();
-        assertThat(created.getId()).isEqualTo(expectedResponse.getId());
-        assertThat(created.getFullName()).isEqualTo(expectedResponse.getFullName());
-//        if(expectedResponse.getType() == null) {
-//            assertThat(created.getType()).isNull();
-//        } else {
-//            assertThat(created.getType()).isEqualTo(expectedResponse.getType());
-//        }
-        assertThat(created.getType()).isEqualTo(expectedResponse.getType());
-        assertThat(created.getVolume()).isEqualTo(expectedResponse.getVolume());
-
-        // Fetch just-created entity through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
-                .getForEntity(location, BeerResponseDTO.class);
-        if(expectedStatus.is2xxSuccessful()) {
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        } else {
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        BeerResponseDTO fetchController = getResponse.getBody();
-
-        assertThat(fetchController).isEqualTo(created);
-
-        // Additionally: fetch created entity directly from database using JDBCTemplate.
-        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
-                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
-                        TestUtils.mapToBeer());
-
-        assertThat(created).isEqualTo(fetchJdbc);
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
     }
 
     /**
@@ -187,29 +118,17 @@ public class BeerApiTests {
     @Test
     @DirtiesContext
     public void createBeerWithCustomVolumeTest() {
-        // Create valid beer with custom volume.
-        Beer beer = new Beer("Corona", 0.33);
-        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
-                .postForEntity("/api/beer", beer, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        URI location = postResponse.getHeaders().getLocation();
-        BeerResponseDTO created = postResponse.getBody();
+        BeerRequestDTO request = new BeerRequestDTO();
+        request.setBrand("Lomza");
+        request.setVolume(0.6);
 
-        // Fetch just-created entity through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
-                .getForEntity(location, BeerResponseDTO.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BeerResponseDTO fetchController = getResponse.getBody();
+        BeerResponseDTO expected = new BeerResponseDTO();
+        expected.setFullName("Lomza");
+        expected.setVolume(0.6);
+        expected.setId(7L);
 
-        assertThat(fetchController).isEqualTo(created);
-
-        // Additionally: fetch created entity directly from database using JDBCTemplate.
-        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
-                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
-                        TestUtils.mapToBeer());
-
-        assertThat(created).isEqualTo(fetchJdbc);
-    }
+        TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+     }
 
     /**
      * {@code POST /api/beer} - valid beer with specified {@code type} field.
