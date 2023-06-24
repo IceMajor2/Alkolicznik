@@ -2,6 +2,7 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
+import com.demo.alkolicznik.dto.StoreRequestDTO;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -30,12 +31,17 @@ public class TestUtils {
     }
 
     /**
-     * Create {@code Store}. Used mainly for hardcoding the expected response in tests.
-     * @param id
+     * Create {@code StoreRequestDTO}. Used mainly for hardcoding the expected response in tests.
      * @param name
-     * @return {@code Store}
+     * @return {@code StoreRequestDTO}
      */
-    public static Store createStore(Long id, String name) {
+    public static StoreRequestDTO createStoreRequest(String name) {
+        StoreRequestDTO request = new StoreRequestDTO();
+        request.setName(name);
+        return request;
+    }
+
+    public static Store createStoreResponse(Long id, String name) {
         Store store = new Store();
         store.setId(id);
         store.setName(name);

@@ -1,13 +1,8 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.TestUtils;
-import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
-import net.minidev.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,15 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.net.URI;
 import java.util.List;
 
 import static com.demo.alkolicznik.TestUtils.*;
@@ -65,7 +55,7 @@ public class StoreApiTests {
             String json = getResponse.getBody();
             Store actual = toStore(json);
 
-            Store expected = createStore(3L, "Lidl");
+            Store expected = createStoreResponse(3L, "Lidl");
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -100,8 +90,16 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create and get valid store")
         @DirtiesContext
-        public void createAndGetStoreTest() {
+        public void createStoreTest() {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest("Dwojka"));
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
+            String json = postResponse.getBody();
+            Store actual = toStore(json);
+
+            Store expected = createStoreResponse(7L, "Dwojka");
+            assertThat(actual).isEqualTo(expected);
         }
     }
 

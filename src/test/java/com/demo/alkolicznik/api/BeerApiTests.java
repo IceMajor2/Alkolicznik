@@ -73,7 +73,7 @@ public class BeerApiTests {
         @Test
         @DisplayName("Get all stored beers in array")
         public void getBeerArrayTest() {
-            ResponseEntity<String> getResponse = getRequest("/api/beer");
+            var getResponse = getRequest("/api/beer");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
@@ -93,7 +93,7 @@ public class BeerApiTests {
         @DisplayName("Create and get valid beer: BRAND")
         @DirtiesContext
         public void createBeerTest() {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Lech", null, null));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -104,7 +104,7 @@ public class BeerApiTests {
             assertThat(actual).isEqualTo(expected);
 
             // Fetch the newly-created beer.
-            ResponseEntity<String> getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/{id}", 7L);
 
             json = getResponse.getBody();
             actual = toBeerResponseDTO(json);
@@ -116,7 +116,7 @@ public class BeerApiTests {
         @DisplayName("Create and get valid beer: BRAND, VOLUME")
         @DirtiesContext
         public void createBeerWithCustomVolumeTest() {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Karmi", null, 0.6));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -127,7 +127,7 @@ public class BeerApiTests {
             assertThat(actual).isEqualTo(expected);
 
             // Fetch the newly-created beer.
-            ResponseEntity<String> getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/{id}", 7L);
 
             json = getResponse.getBody();
             actual = toBeerResponseDTO(json);
@@ -139,7 +139,7 @@ public class BeerApiTests {
         @DisplayName("Create and get valid beer: BRAND, TYPE")
         @DirtiesContext
         public void createBeerWithTypePresentTest() {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Ksiazece", "Wisnia", null)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -151,7 +151,7 @@ public class BeerApiTests {
             assertThat(actual).isEqualTo(expected);
 
             // Fetch the newly-created beer.
-            ResponseEntity<String> getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/{id}", 7L);
 
             json = getResponse.getBody();
             actual = toBeerResponseDTO(json);
@@ -163,7 +163,7 @@ public class BeerApiTests {
         @DisplayName("Create and get valid beer: BRAND, TYPE, VOLUME")
         @DirtiesContext
         public void createBeerWithCustomVolumeAndTypePresentTest() {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Zywiec", "Jasne", 0.33)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -175,7 +175,7 @@ public class BeerApiTests {
             assertThat(actual).isEqualTo(expected);
 
             // Fetch the newly-created beer.
-            ResponseEntity<String> getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/{id}", 7L);
 
             json = getResponse.getBody();
             actual = toBeerResponseDTO(json);
@@ -187,7 +187,7 @@ public class BeerApiTests {
         @DisplayName("Create and get valid beer: ALREADY_EXISTS but different VOLUME")
         @DirtiesContext
         public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Perla", "Chmielowa Pils", 0.33)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -199,7 +199,7 @@ public class BeerApiTests {
             assertThat(actual).isEqualTo(expected);
 
             // Fetch the newly-created beer.
-            ResponseEntity<String> getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/{id}", 7L);
 
             json = getResponse.getBody();
             actual = toBeerResponseDTO(json);
@@ -211,7 +211,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: TYPE present but blank")
         @DirtiesContext
         public void createBeerWithPresentButBlankTypeStatusCheckTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Heineken", " ", null));
 
             String jsonResponse = postResponse.getBody();
@@ -226,7 +226,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: VOLUME negative and equal to zero")
         @DirtiesContext
         public void createBeerWithNegativeVolumeTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Pilsner Urquell", null, -0.5)
             );
 
@@ -253,7 +253,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: BRAND null")
         @DirtiesContext
         public void createBeerWithNoBrandTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, "Jasne Okocimskie", null)
             );
 
@@ -269,7 +269,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: BRAND blank")
         @DirtiesContext
         public void createBeerWithBlankBrandTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(" \t \t  \t\t ", "Cerny", null)
             );
 
@@ -296,7 +296,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: TYPE blank")
         @DirtiesContext
         public void createBeerWithBlankType() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Miloslaw", "  \t\t ", 0.6)
             );
 
@@ -323,7 +323,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: ALREADY_EXISTS")
         @DirtiesContext
         public void createBeerAlreadyPresentTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Perla", "Chmielowa Pils", null)
             );
 
@@ -350,7 +350,7 @@ public class BeerApiTests {
         @DisplayName("Create invalid beer: BRAND null, TYPE blank, VOLUME negative")
         @DirtiesContext
         public void createBeerBrandNullTypeBlankVolumeNegativeTest() throws Exception {
-            ResponseEntity<String> postResponse = postRequest("/api/beer",
+            var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, " \t", -15.9)
             );
 
