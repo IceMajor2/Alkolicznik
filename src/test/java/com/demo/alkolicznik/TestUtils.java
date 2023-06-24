@@ -109,6 +109,22 @@ public class TestUtils {
         return response;
     }
 
+    public static List<Store> toStoreList(String json) {
+        JSONArray array = getJsonArray(json);
+
+        List<Store> stores = new ArrayList<>();
+        for(int i = 0; i < array.length(); i++) {
+            try {
+                String storeAsString = array.getString(i);
+                Store store = toStoreModel(storeAsString);
+                stores.add(store);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return stores;
+    }
+
     public static List<BeerResponseDTO> toDTOList(String json) {
         JSONArray array = getJsonArray(json);
 
@@ -185,6 +201,34 @@ public class TestUtils {
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity("/api/beer/{id}", String.class, id);
         return getResponse;
+    }
+
+    public static ResponseEntity<String> getRequest(String url, Long id) {
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(url, String.class, id);
+        return getResponse;
+    }
+
+    public static ResponseEntity<String> getRequest(String url) {
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(url, String.class);
+        return getResponse;
+    }
+
+    public static Store createStore(Long id, String name) {
+        Store store = new Store();
+        store.setId(id);
+        store.setName(name);
+        return store;
+    }
+
+    public static Store toStoreModel(String json) {
+        try {
+            Store dto = mapper.readValue(json, Store.class);
+            return dto;
+        } catch (Exception e) {
+            throw new RuntimeException("Provided JSON does not represent Store object");
+        }
     }
 
     public static ResponseEntity<String> requestAllBeers() {

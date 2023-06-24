@@ -8,6 +8,8 @@ import com.demo.alkolicznik.models.Store;
 import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.net.URI;
 import java.util.List;
 
+import static com.demo.alkolicznik.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,33 +50,60 @@ public class StoreApiTests {
      * ApplicationContext loads correctly.
      */
     @Test
-    public void contextLoads() {
+    void contextLoads() {
     }
 
-    /**
-     * GET '/api/store' should return a list of stores.
-     */
-    @Test
-    public void getStoresTest() {
-        ResponseEntity<List<Store>> getResponse = restTemplate
-                .exchange("/api/store",
-                        HttpMethod.GET,
-                        HttpEntity.EMPTY,
-                        new ParameterizedTypeReference<List<Store>>() {
-                        });
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    @Nested
+    class GetRequests {
 
-        List<Store> actualStores = getResponse.getBody();
-        assertThat(actualStores).isEqualTo(this.stores);
+        @Test
+        @DisplayName("Get store of valid id")
+        public void getStoreTest() {
+            var getResponse = getRequest("/api/store/{id}", 3L);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String json = getResponse.getBody();
+            Store actual = toStoreModel(json);
+
+            Store expected = createStore(3L, "Lidl");
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Error: get store of invalid id")
+        public void getStoreNotExistingTest() throws Exception {
+            var getResponse = getRequest("/api/store/{id}", 9999L);
+
+            String json = getResponse.getBody();
+
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find store of 9999 id", "/api/store/9999");
+        }
+
+        @Test
+        @DisplayName("Get all stores")
+        public void getStoresAllTest() {
+            var getResponse = getRequest("/api/store");
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String json = getResponse.getBody();
+            List<Store> actual = toStoreList(json);
+
+            assertThat(actual).isEqualTo(stores);
+        }
     }
 
-    /**
-     * {@code POST /api/store} - valid creation should
-     * return saved {@code Store} and {@code 201 CREATED}.
-     * <br>
-     * {@code GET /api/store/{id}} - previously acquired URI from
-     * post response should return {@code Store} and {@code 200 OK}.
-     */
+    @Nested
+    class PostRequests {
+        
+    }
+
+    @Nested
+    class BeerPriceRequests {
+
+    }
+
     @Test
     @DirtiesContext
     public void createAndGetStoreTest() {
