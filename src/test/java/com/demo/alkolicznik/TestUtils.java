@@ -12,8 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -22,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,17 +82,6 @@ public class TestUtils {
     }
 
     /**
-     * Converts {@code Beer} original object into a used-by-controller DTO.
-     *
-     * @param query      SQL-native query
-     * @param beerMapper {@code RowMapper} that maps SQL response into {@code Beer}
-     * @return {@code BeerResponseDTO}
-     */
-    public static BeerResponseDTO convertJdbcQueryToDto(String query, RowMapper<Beer> beerMapper) {
-        return new BeerResponseDTO(jdbcTemplate.queryForObject(query, beerMapper));
-    }
-
-    /**
      * Convert JSON in {@code String} to {@code JSONObject}.
      *
      * @param json JSON string
@@ -108,7 +97,19 @@ public class TestUtils {
         }
     }
 
-    public static List<BeerResponseDTO> convertJsonArrayToList(String json) {
+    public static ResponseEntity<String> sendRequest(Map keysValues) {
+        JSONObject jsonObject = new JSONObject(keysValues);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonObject.toString(), headers);
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/api/beer", entity, String.class);
+        return response;
+    }
+
+    public static List<BeerResponseDTO> toDTOList(String json) {
         JSONArray array = getJsonArray(json);
 
         List<BeerResponseDTO> responseDTOs = new ArrayList<>();
@@ -131,7 +132,7 @@ public class TestUtils {
         return dtos;
     }
 
-    public static JSONArray getJsonArray(String json) {
+    private static JSONArray getJsonArray(String json) {
         try {
             JSONArray array = new JSONArray(json);
             return array;
@@ -207,6 +208,20 @@ public class TestUtils {
         }
     }
 
+    public static BeerResponseDTO createBeerResponse(Long id, String name, Double volume) {
+        BeerResponseDTO response = new BeerResponseDTO();
+        if (id != null) {
+            response.setId(id);
+        }
+        if (name != null) {
+            response.setFullName(name);
+        }
+        if (volume != null) {
+            response.setVolume(volume);
+        }
+        return response;
+    }
+
     /**
      * Make {@code POST} request to save beer.
      *
@@ -217,6 +232,14 @@ public class TestUtils {
         ResponseEntity<String> postResponse = restTemplate
                 .postForEntity("/api/beer", request, String.class);
         return postResponse;
+    }
+
+    public static void assertIsError(String actual,
+                                     HttpStatus expectedStatus,
+                                     String expectedMessage,
+                                     String expectedPath) throws Exception {
+        JSONObject object = getJsonObject(actual);
+        assertIsError(object, expectedStatus, expectedMessage, expectedPath);
     }
 
     /**
@@ -230,17 +253,13 @@ public class TestUtils {
     public static void assertIsError(JSONObject actual,
                                      HttpStatus expectedStatus,
                                      String expectedMessage,
-                                     String expectedPath) {
-        try {
-            assertThat(actual.length()).isEqualTo(5);
-            assertThat(actual.getString("timestamp")).isNotNull();
-            assertThat(actual.getInt("status")).isEqualTo(expectedStatus.value());
-            assertThat(actual.getString("message")).isEqualTo(expectedMessage);
-            assertThat(actual.getString("error")).isEqualTo(expectedStatus.getReasonPhrase());
-            assertThat(actual.getString("path")).isEqualTo(expectedPath);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                                     String expectedPath) throws Exception {
+        assertThat(actual.length()).isEqualTo(5);
+        assertThat(actual.getInt("status")).isEqualTo(expectedStatus.value());
+        assertThat(actual.getString("message")).isEqualTo(expectedMessage);
+        assertThat(actual.getString("error")).isEqualTo(expectedStatus.getReasonPhrase());
+        assertThat(actual.getString("path")).isEqualTo(expectedPath);
+        assertThat(actual.getString("timestamp")).isNotNull();
     }
 
     /**

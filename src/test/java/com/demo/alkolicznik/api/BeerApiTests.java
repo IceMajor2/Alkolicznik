@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.demo.alkolicznik.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +54,7 @@ public class BeerApiTests {
         @DisplayName("Get beer of valid id")
         public void getBeerTest() {
             ResponseEntity<String> getResponse = requestBeer(1L);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
             BeerResponseDTO actualDto = toDTO(jsonResponse);
@@ -62,50 +64,25 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Return 200 when valid get beer request")
-        public void getBeerStatusCheckTest() {
-            ResponseEntity<String> getResponse = requestBeer(5L);
-
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        }
-
-        @Test
-        @DisplayName("Return 404 when invalid id on get beer request")
+        @DisplayName("Error: Get beer of invalid id")
         public void getBeerNotExistingStatusCheckTest() throws Exception {
             ResponseEntity<String> getResponse = requestBeer(9999L);
 
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("Get beer of invalid id: check error body")
-        public void getBeerNotExistingErrorBodyTest() throws JSONException {
-            ResponseEntity<String> getResponse = requestBeer(9999L);
-
             String jsonResponse = getResponse.getBody();
-            JSONObject actual = getJsonObject(jsonResponse);
-
-            assertIsError(actual,
+            assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
                     "Unable to find beer of 9999 id",
                     "/api/beer/9999");
         }
 
         @Test
-        @DisplayName("Return 200 on get beer array request")
-        public void getBeerArrayStatusCheckTest() {
-            ResponseEntity<String> getResponse = requestAllBeers();
-
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        }
-
-        @Test
         @DisplayName("Get all stored beers in array")
         public void getBeerArrayTest() {
             ResponseEntity<String> getResponse = requestAllBeers();
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
-            List<BeerResponseDTO> actual = convertJsonArrayToList(jsonResponse);
+            List<BeerResponseDTO> actual = toDTOList(jsonResponse);
 
             List<BeerResponseDTO> expected = listToDTOList(beers);
             assertThat(actual).isEqualTo(expected);
@@ -114,254 +91,280 @@ public class BeerApiTests {
 
     @Nested
     class PostRequests {
+
         @Test
-        @DisplayName("Return 400 when invalid 'type' field on POST request")
-        @DirtiesContext
-        public void createBeerWithPresentButBlankTypeStatusCheckTest() {
-            ResponseEntity<String> postResponse = postBeer(createBeerRequest("Heineken", " ", null));
-
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-
-
-        /**
-         * {@code POST /api/beer} - valid beer with default {@code volume} and empty {@code type} fields.
-         */
-        @Test
+        @DisplayName("Create and get valid beer: BRAND")
         @DirtiesContext
         public void createBeerTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Lech");
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Lech", null, null));
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            BeerResponseDTO expected = new BeerResponseDTO();
-            expected.setId(7L);
-            expected.setFullName("Lech");
-            expected.setVolume(0.5d);
+            String json = postResponse.getBody();
+            BeerResponseDTO actual = toDTO(json);
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+            BeerResponseDTO expected = createBeerResponse(7L, "Lech", 0.5);
+            assertThat(actual).isEqualTo(expected);
+
+            // Fetch the newly-created beer.
+            ResponseEntity<String> getResponse = requestBeer(7L);
+
+            json = getResponse.getBody();
+            actual = toDTO(json);
+
+            assertThat(actual).isEqualTo(expected);
         }
 
-        /**
-         * {@code POST /api/beer} - valid beer with non-default {@code volume} field.
-         */
         @Test
+        @DisplayName("Create and get valid beer: BRAND, VOLUME")
         @DirtiesContext
         public void createBeerWithCustomVolumeTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Lomza");
-            request.setVolume(0.6);
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Karmi", null, 0.6));
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            BeerResponseDTO expected = new BeerResponseDTO();
-            expected.setFullName("Lomza");
-            expected.setVolume(0.6);
-            expected.setId(7L);
+            String json = postResponse.getBody();
+            BeerResponseDTO actual = toDTO(json);
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+            BeerResponseDTO expected = createBeerResponse(7L, "Karmi", 0.6);
+            assertThat(actual).isEqualTo(expected);
+
+            // Fetch the newly-created beer.
+            ResponseEntity<String> getResponse = requestBeer(7L);
+
+            json = getResponse.getBody();
+            actual = toDTO(json);
+
+            assertThat(actual).isEqualTo(expected);
         }
 
-        /**
-         * {@code POST /api/beer} - valid beer with specified {@code type} field.
-         */
         @Test
+        @DisplayName("Create and get valid beer: BRAND, TYPE")
         @DirtiesContext
         public void createBeerWithTypePresentTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Okocim");
-            request.setType("Jasne Okocimskie");
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Ksiazece", "Wisnia", null)
+            );
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            BeerResponseDTO expected = new BeerResponseDTO();
-            expected.setFullName("Okocim Jasne Okocimskie");
-            expected.setVolume(0.5);
-            expected.setId(7L);
+            String json = postResponse.getBody();
+            BeerResponseDTO actual = toDTO(json);
 
-            // TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
+            BeerResponseDTO expected = createBeerResponse(7L, "Ksiazece Wisnia", 0.5);
+            assertThat(actual).isEqualTo(expected);
+
+            // Fetch the newly-created beer.
+            ResponseEntity<String> getResponse = requestBeer(7L);
+
+            json = getResponse.getBody();
+            actual = toDTO(json);
+
+            assertThat(actual).isEqualTo(expected);
         }
 
-        /**
-         * {@code POST /api/beer} - valid beer with non-default {@code volume} field and specified {@code type} field.
-         */
         @Test
+        @DisplayName("Create and get valid beer: BRAND, TYPE, VOLUME")
         @DirtiesContext
         public void createBeerWithCustomVolumeAndTypePresentTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Budweiser");
-            request.setType("Budvar Original");
-            request.setVolume(0.33);
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Zywiec", "Jasne", 0.33)
+            );
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            BeerResponseDTO expected = new BeerResponseDTO();
-            expected.setFullName("Budweiser Budvar Original");
-            expected.setVolume(0.33);
-            expected.setId(7L);
+            String json = postResponse.getBody();
+            BeerResponseDTO actual = toDTO(json);
 
-            // TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
-        }
+            BeerResponseDTO expected = createBeerResponse(7L, "Zywiec Jasne", 0.33);
+            assertThat(actual).isEqualTo(expected);
 
-        /**
-         * {@code POST /api/beer} - send invalid BeerRequestDTO body (negative {@code volume} field).
-         */
-        @Test
-        @DirtiesContext
-        //  @Disabled
-        public void createBeerWithNegativeVolumeTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Pilsner Urquell");
-            request.setVolume(-1.0);
+            // Fetch the newly-created beer.
+            ResponseEntity<String> getResponse = requestBeer(7L);
 
-            // TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST,
-            //         request, null);
+            json = getResponse.getBody();
+            actual = toDTO(json);
+
+            assertThat(actual).isEqualTo(expected);
         }
 
         @Test
-        @DisplayName("Create beer with present but blank 'type' field")
+        @DisplayName("Create and get valid beer: ALREADY_EXISTS but different VOLUME")
         @DirtiesContext
-        public void createBeerWithPresentButBlankTypeTest() {
+        public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Perla", "Chmielowa Pils", 0.33)
+            );
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String json = postResponse.getBody();
+            BeerResponseDTO actual = toDTO(json);
+
+            BeerResponseDTO expected = createBeerResponse(7L, "Perla Chmielowa Pils", 0.33);
+            assertThat(actual).isEqualTo(expected);
+
+            // Fetch the newly-created beer.
+            ResponseEntity<String> getResponse = requestBeer(7L);
+
+            json = getResponse.getBody();
+            actual = toDTO(json);
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Create invalid beer: TYPE present but blank")
+        @DirtiesContext
+        public void createBeerWithPresentButBlankTypeStatusCheckTest() throws Exception {
             ResponseEntity<String> postResponse = postBeer(createBeerRequest("Heineken", " ", null));
 
             String jsonResponse = postResponse.getBody();
-            JSONObject actual = getJsonObject(jsonResponse);
 
-            assertIsError(actual,
+            assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "Type was not specified",
                     "/api/beer");
         }
 
-        /**
-         * {@code POST /api/beer} - send invalid BeerRequestDTO body (no {@code brand} field).
-         */
         @Test
+        @DisplayName("Create invalid beer: VOLUME negative and equal to zero")
         @DirtiesContext
-        //  @Disabled
-        public void createBeerWithNoBrandTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setVolume(0.6);
-            request.setType("IPA");
+        public void createBeerWithNegativeVolumeTest() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Pilsner Urquell", null, -0.5)
+            );
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/beer");
+
+            postResponse = postBeer(
+                    createBeerRequest("Lomza", null, 0d)
+            );
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/beer");
+        }
+
+        @Test
+        @DisplayName("Create invalid beer: BRAND null")
+        @DirtiesContext
+        public void createBeerWithNoBrandTest() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest(null, "Jasne Okocimskie", null)
+            );
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified",
+                    "/api/beer");
         }
 
 
-        /**
-         * {@code POST /api/beer} - send invalid BeerRequestDTO body ({@code volume} as a word, not numeric value).
-         */
         @Test
+        @DisplayName("Create invalid beer: VOLUME as string")
         @DirtiesContext
-        @Disabled
-        public void createBeerWithVolumeAsStringTest() {
+        public void createBeerWithVolumeAsStringTest() throws Exception {
+            ResponseEntity<String> postResponse = sendRequest(
+                    Map.of("brand", "Karpackie",
+                            "volume", "half_liter")
+            );
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/beer");
         }
 
-        /**
-         * {@code POST /api/beer} - send valid BeerRequestDTO body but with untrimmed {@code brand} field.
-         * Assert that it is trimmed by accessing at {@code GET /api/beer/{id}}
-         */
         @Test
+        @DisplayName("Create invalid beer: BRAND blank")
         @DirtiesContext
-        // @Disabled
-        public void createBeerWithUntrimmedBrandInRequestTest() {
+        public void createBeerWithBlankBrandTest() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest(" \t \t  \t\t ", "Cerny", null)
+            );
 
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified",
+                    "/api/beer");
+
+            postResponse = postBeer(
+                    createBeerRequest("", "Cerny", null)
+            );
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified",
+                    "/api/beer");
         }
 
-        /**
-         * {@code POST /api/beer} - send valid BeerRequestDTO body but with untrimmed {@code type} field.
-         * Assert that it is trimmed by accessing at {@code GET /api/beer/{id}}
-         */
         @Test
+        @DisplayName("Create invalid beer: TYPE blank")
         @DirtiesContext
-        @Disabled
-        public void createBeerWithUntrimmedTypeInRequestTest() {
+        public void createBeerWithBlankType() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Miloslaw", "  \t\t ", 0.6)
+            );
 
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Type was not specified",
+                    "/api/beer");
+
+            postResponse = postBeer(
+                    createBeerRequest("Miloslaw", "", null)
+            );
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Type was not specified",
+                    "/api/beer");
         }
 
-        /**
-         * {@code POST /api/beer} - send invalid BeerRequestDTO body (empty {@code brand} field).
-         */
         @Test
+        @DisplayName("Create invalid beer: ALREADY_EXISTS")
         @DirtiesContext
-        // @Disabled
-        public void createBeerWithEmptyBrandTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setVolume(0.6);
-            request.setType("IPA");
-            request.setBrand("");
+        public void createBeerAlreadyPresentTest() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest("Perla", "Chmielowa Pils", null)
+            );
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
-        }
+            String jsonResponse = postResponse.getBody();
 
-        /**
-         * {@code POST /api/beer} - send valid BeerRequestDTO body but of already-existing beer.
-         */
-        @Test
-        @DirtiesContext
-        public void createBeerAlreadyPresentTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Perla");
-            request.setType("Chmielowa Pils");
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer already exists",
+                    "/api/beer");
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
+            postResponse = postBeer(
+                    createBeerRequest("Zubr", null, null)
+            );
 
-            request.setBrand("Tyskie");
-            request.setType("Gronie");
-            request.setVolume(0.6);
+            jsonResponse = postResponse.getBody();
 
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.BAD_REQUEST, request, null);
-        }
-
-        /**
-         * {@code POST /api/beer} - send valid BeerRequestDTO body with beer of already-existing
-         * brand and type, but different volume.
-         */
-        @Test
-        @DirtiesContext
-        public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
-            BeerRequestDTO request = new BeerRequestDTO();
-            request.setBrand("Komes");
-            request.setType("Malinowe");
-
-            BeerResponseDTO expected = new BeerResponseDTO();
-            expected.setId(7L);
-            expected.setVolume(0.5);
-            expected.setFullName("Komes Malinowe");
-
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
-
-            request.setBrand("Perla");
-            request.setType("Chmielowa Pils");
-            request.setVolume(0.33);
-
-            expected.setId(8L);
-            expected.setVolume(0.33);
-            expected.setFullName("Perla Chmielowa Pils");
-
-            //TestUtils.assertCreatedBeerResponseIsCorrect(HttpStatus.CREATED, request, expected);
-        }
-
-        /**
-         * {@code POST /api/beer} - check body of 200 OK response.
-         */
-        @Test
-        @DirtiesContext
-        public void createBeerResponseBodyOKTest() throws JSONException {
-            Beer beer = new Beer("Okocim");
-            ResponseEntity<String> postResponse = restTemplate
-                    .postForEntity("/api/beer", beer, String.class);
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-            JSONObject jsonObject = TestUtils.getJsonObject(postResponse.getBody());
-            String nameResponse = jsonObject.getString("name");
-            Long nameId = jsonObject.getLong("id");
-            double volume = jsonObject.getDouble("volume");
-            int lengthResponse = jsonObject.length();
-
-            assertThat(nameResponse).isEqualTo("Okocim");
-            assertThat(nameId).isEqualTo(7L);
-            assertThat(volume).isEqualTo(0.5d);
-            assertThat(lengthResponse)
-                    .withFailMessage("Amount of key-value pairs do not match." +
-                                    "\nExpected: %d" +
-                                    "\nActual: %d",
-                            3, lengthResponse)
-                    .isEqualTo(3);
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer already exists",
+                    "/api/beer");
         }
     }
 }
