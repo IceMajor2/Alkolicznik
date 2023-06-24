@@ -5,23 +5,17 @@ import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,56 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Component
 public class TestUtils {
 
-    private static JdbcTemplate jdbcTemplate;
     private static TestRestTemplate restTemplate;
     private static ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        TestUtils.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Autowired
     public void setRestTemplate(TestRestTemplate restTemplate) {
         TestUtils.restTemplate = restTemplate;
-    }
-
-    /**
-     * Acquire {@code RowMapper<Store>} that maps
-     * SQL response into a {@code Store} object.
-     *
-     * @return {@code RowMapper<Store>}
-     */
-    public static RowMapper<Store> mapToStore() {
-        return new RowMapper<Store>() {
-            @Override
-            public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Store store = new Store();
-                store.setId(rs.getLong("id"));
-                store.setName(rs.getString("name"));
-                return store;
-            }
-        };
-    }
-
-    /**
-     * Acquire {@code RowMapper<Beer>} that maps
-     * SQL response into a {@code Beer} object.
-     *
-     * @return {@code RowMapper<Beer>}
-     */
-    public static RowMapper<Beer> mapToBeer() {
-        return new RowMapper<Beer>() {
-            @Override
-            public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Beer beer = new Beer();
-                beer.setId(rs.getLong("id"));
-                beer.setBrand(rs.getString("brand"));
-                beer.setType(rs.getString("type"));
-                beer.setVolume(rs.getDouble("volume"));
-                return beer;
-            }
-        };
     }
 
     /**
@@ -95,18 +45,6 @@ public class TestUtils {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static ResponseEntity<String> sendRequest(Map keysValues) {
-        JSONObject jsonObject = new JSONObject(keysValues);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonObject.toString(), headers);
-        ResponseEntity<String> response = restTemplate
-                .postForEntity("/api/beer", entity, String.class);
-        return response;
     }
 
     public static List<Store> toStoreList(String json) {
@@ -156,39 +94,6 @@ public class TestUtils {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Get count of key-value pairs in JSON body.
-     *
-     * @param json JSON string
-     * @return key-value pairs (as {@code int})
-     */
-    public static int getLength(String json) {
-        DocumentContext documentContext = JsonPath.parse(json);
-        return documentContext.read("$.length()");
-    }
-
-    /**
-     * Convert list of integers into an array of integers.
-     *
-     * @param intList list of integers
-     * @return array of integers
-     */
-    public static Integer[] intListToArray(List<Integer> intList) {
-        return intList.toArray(new Integer[0]);
-    }
-
-    /**
-     * Convert list of {@code Long} values to list of integers.
-     *
-     * @param longList {@code List<Long>}
-     * @return {@code List<Integer>}
-     */
-    public static List<Integer> longListToIntList(List<Long> longList) {
-        return longList.stream()
-                .map(num -> (Integer) num.intValue())
-                .toList();
     }
 
     /**
@@ -327,15 +232,5 @@ public class TestUtils {
             request.setVolume(volume);
         }
         return request;
-    }
-
-    /**
-     * Convert list of strings into an array of strings.
-     *
-     * @param stringList list of strings
-     * @return array of strings
-     */
-    public static String[] stringListToArray(List<String> stringList) {
-        return stringList.toArray(new String[0]);
     }
 }
