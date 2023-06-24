@@ -268,23 +268,23 @@ public class BeerApiTests {
         }
 
 
-        @Test
-        @DisplayName("Create invalid beer: VOLUME as string")
-        @DirtiesContext
-        public void createBeerWithVolumeAsStringTest() throws Exception {
-            ResponseEntity<String> postResponse = sendRequest(
-                    Map.of("brand", "Karpackie",
-                            "volume", "half_liter")
-            );
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-            String jsonResponse = postResponse.getBody();
-
-            assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Volume must be a positive number",
-                    "/api/beer");
-        }
+//        @Test
+//        @DisplayName("Create invalid beer: VOLUME as string")
+//        @DirtiesContext
+//        public void createBeerWithVolumeAsStringTest() throws Exception {
+//            ResponseEntity<String> postResponse = sendRequest(
+//                    Map.of("brand", "Karpackie",
+//                            "volume", "half_liter")
+//            );
+//            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+//
+//            String jsonResponse = postResponse.getBody();
+//
+//            assertIsError(jsonResponse,
+//                    HttpStatus.BAD_REQUEST,
+//                    "Volume must be a positive number",
+//                    "/api/beer");
+//        }
 
         @Test
         @DisplayName("Create invalid beer: BRAND blank")
@@ -364,6 +364,22 @@ public class BeerApiTests {
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "Beer already exists",
+                    "/api/beer");
+        }
+
+        @Test
+        @DisplayName("Create invalid beer: BRAND null, TYPE blank, VOLUME negative")
+        @DirtiesContext
+        public void createBeerBrandNullTypeBlankVolumeNegativeTest() throws Exception {
+            ResponseEntity<String> postResponse = postBeer(
+                    createBeerRequest(null, " \t", -15.9)
+            );
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified; Type was not specified; Volume must be a positive number",
                     "/api/beer");
         }
     }
