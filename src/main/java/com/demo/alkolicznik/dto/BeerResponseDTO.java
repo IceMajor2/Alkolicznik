@@ -2,9 +2,11 @@ package com.demo.alkolicznik.dto;
 
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Objects;
 
+@JsonPropertyOrder({"id", "name", "volume"})
 public class BeerResponseDTO {
 
     private Long id;
@@ -18,6 +20,12 @@ public class BeerResponseDTO {
         this.id = beer.getId();
         this.fullName = beer.getFullName();
         this.volume = beer.getVolume();
+    }
+
+    public BeerResponseDTO(Long id, String fullName, double volume) {
+        this.id = id;
+        this.fullName = fullName;
+        this.volume = volume;
     }
 
     public Long getId() {

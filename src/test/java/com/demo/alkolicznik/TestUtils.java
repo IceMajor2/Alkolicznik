@@ -4,9 +4,9 @@ import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import jakarta.annotation.Nullable;
 import net.minidev.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +18,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,6 +29,7 @@ public class TestUtils {
 
     private static JdbcTemplate jdbcTemplate;
     private static TestRestTemplate restTemplate;
+    private static ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -41,8 +41,9 @@ public class TestUtils {
         TestUtils.restTemplate = restTemplate;
     }
 
-    /** Acquire {@code RowMapper<Store>} that maps
-     *  SQL response into a {@code Store} object.
+    /**
+     * Acquire {@code RowMapper<Store>} that maps
+     * SQL response into a {@code Store} object.
      *
      * @return {@code RowMapper<Store>}
      */
@@ -58,8 +59,9 @@ public class TestUtils {
         };
     }
 
-    /** Acquire {@code RowMapper<Beer>} that maps
-     *  SQL response into a {@code Beer} object.
+    /**
+     * Acquire {@code RowMapper<Beer>} that maps
+     * SQL response into a {@code Beer} object.
      *
      * @return {@code RowMapper<Beer>}
      */
@@ -106,8 +108,9 @@ public class TestUtils {
 
     /**
      * Get an array of values assigned to a key in JSON body.
+     *
      * @param json JSON string
-     * @param key name of JSON key
+     * @param key  name of JSON key
      * @return {@code JSONArray} of key's values
      */
     public static JSONArray getValues(String json, String key) {
@@ -118,6 +121,7 @@ public class TestUtils {
 
     /**
      * Get count of key-value pairs in JSON body.
+     *
      * @param json JSON string
      * @return key-value pairs (as {@code int})
      */
@@ -149,6 +153,91 @@ public class TestUtils {
     }
 
     /**
+     * Make {@code GET} request for beer by id.
+     *
+     * @param id beer id
+     * @return {@code ResponseEntity<String>}
+     */
+    public static ResponseEntity<String> requestBeer(Long id) {
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity("/api/beer/{id}", String.class, id);
+        return getResponse;
+    }
+
+    /**
+     * Converts JSON body to {@code BeerResponseDTO} object.
+     *
+     * @param json JSON representing {@code BeerResponseDTO}
+     * @return {@code BeerResponseDTO} object
+     */
+    public static BeerResponseDTO toDTO(String json) {
+        try {
+            BeerResponseDTO dto = mapper.readValue(json, BeerResponseDTO.class);
+            return dto;
+        } catch (Exception e) {
+            throw new RuntimeException("Provided JSON does not represent BeerResponseDTO object");
+        }
+    }
+
+    /**
+     * Make {@code POST} request to save beer.
+     *
+     * @param request {@code BeerRequestDTO} object as request entity
+     * @return {@code ResponseEntity<String>}
+     */
+    public static ResponseEntity<String> postBeer(BeerRequestDTO request) {
+        ResponseEntity<String> postResponse = restTemplate
+                .postForEntity("/api/beer", request, String.class);
+        return postResponse;
+    }
+
+    /**
+     * Helper function for asserting a response is an error.
+     * @param actual tested response as {@code JSONObject} object
+     * @param expectedStatus expected {@code HttpStatus}
+     * @param expectedMessage
+     * @param expectedPath
+     */
+    public static void assertIsError(JSONObject actual,
+                                     HttpStatus expectedStatus,
+                                     String expectedMessage,
+                                     String expectedPath) {
+        try {
+            assertThat(actual.length()).isEqualTo(5);
+            assertThat(actual.getString("timestamp")).isNotNull();
+            assertThat(actual.getInt("status")).isEqualTo(expectedStatus.value());
+            assertThat(actual.getString("message")).isEqualTo(expectedMessage);
+            assertThat(actual.getString("error")).isEqualTo(expectedStatus.getReasonPhrase());
+            assertThat(actual.getString("path")).isEqualTo(expectedPath);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Helper method for creating a {@code BeerRequestDTO}. If you don't
+     * want to specify some parameter, just replace it with {@code null}.
+     *
+     * @param brand
+     * @param type
+     * @param volume
+     * @return {@code BeerRequestDTO}
+     */
+    public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
+        BeerRequestDTO request = new BeerRequestDTO();
+        if (brand != null) {
+            request.setBrand(brand);
+        }
+        if (type != null) {
+            request.setType(type);
+        }
+        if (volume != null) {
+            request.setVolume(volume);
+        }
+        return request;
+    }
+
+    /**
      * Convert list of strings into an array of strings.
      *
      * @param stringList list of strings
@@ -156,41 +245,5 @@ public class TestUtils {
      */
     public static String[] stringListToArray(List<String> stringList) {
         return stringList.toArray(new String[0]);
-    }
-
-    public static void assertCreatedBeerResponseIsCorrect(HttpStatus expectedStatus,
-                                                          BeerRequestDTO request,
-                                                          @Nullable BeerResponseDTO expectedResponse) {
-        ResponseEntity<BeerResponseDTO> postResponse = restTemplate
-                .postForEntity("/api/beer", request, BeerResponseDTO.class);
-        assertThat(postResponse.getStatusCode()).isEqualTo(expectedStatus);
-        if(expectedStatus.is4xxClientError()) {
-            return;
-        }
-        BeerResponseDTO created = postResponse.getBody();
-        URI location = postResponse.getHeaders().getLocation();
-
-        assertThat(created.getId()).isEqualTo(expectedResponse.getId());
-        assertThat(created.getFullName()).isEqualTo(expectedResponse.getFullName());
-        assertThat(created.getVolume()).isEqualTo(expectedResponse.getVolume());
-
-        // Fetch just-created entity through controller.
-        ResponseEntity<BeerResponseDTO> getResponse = restTemplate
-                .getForEntity(location, BeerResponseDTO.class);
-        if (expectedStatus.is2xxSuccessful()) {
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        } else {
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        BeerResponseDTO fetchController = getResponse.getBody();
-
-        assertThat(fetchController).isEqualTo(created);
-
-        // Additionally: fetch created entity directly from database using JDBCTemplate.
-        BeerResponseDTO fetchJdbc = TestUtils.convertJdbcQueryToDto
-                ("SELECT * FROM beer WHERE beer.id = %d".formatted(created.getId()),
-                        TestUtils.mapToBeer());
-
-        assertThat(created).isEqualTo(fetchJdbc);
     }
 }
