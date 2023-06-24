@@ -1,6 +1,7 @@
 - make repositories 'Paging and Sorting'
-- write tests checking DTO objects
-- fix ResponseEntity JSON body acquiring
-        (https://stackoverflow.com/questions/76540641/unit-tests-testresttemplate-get-request-returns-different-responseentity-than-a)
 - add Lombok
 - update docs
+
+** TESTS **
+- update docs
+- make send helper method contain URL as parameter (refactor accordingly)
