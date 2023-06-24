@@ -2,7 +2,6 @@ package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,94 +30,11 @@ public class TestUtils {
     }
 
     /**
-     * Convert JSON in {@code String} to {@code JSONObject}.
-     *
-     * @param json JSON string
-     * @return {@code JSONObject}
+     * Create {@code Store}. Used mainly for hardcoding the expected response in tests.
+     * @param id
+     * @param name
+     * @return {@code Store}
      */
-    public static JSONObject getJsonObject(String json) {
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            return jsonObject;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static List<Store> toStoreList(String json) {
-        JSONArray array = getJsonArray(json);
-
-        List<Store> stores = new ArrayList<>();
-        for(int i = 0; i < array.length(); i++) {
-            try {
-                String storeAsString = array.getString(i);
-                Store store = toStoreModel(storeAsString);
-                stores.add(store);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return stores;
-    }
-
-    public static List<BeerResponseDTO> toDTOList(String json) {
-        JSONArray array = getJsonArray(json);
-
-        List<BeerResponseDTO> responseDTOs = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            try {
-                String beerAsString = array.getString(i);
-                BeerResponseDTO responseDTO = toDTO(beerAsString);
-                responseDTOs.add(responseDTO);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return responseDTOs;
-    }
-
-    public static List<BeerResponseDTO> listToDTOList(List<Beer> beers) {
-        List<BeerResponseDTO> dtos = beers.stream()
-                .map(BeerResponseDTO::new)
-                .collect(Collectors.toList());
-        return dtos;
-    }
-
-    private static JSONArray getJsonArray(String json) {
-        try {
-            JSONArray array = new JSONArray(json);
-            return array;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Make {@code GET} request for beer by id.
-     *
-     * @param id beer id
-     * @return {@code ResponseEntity<String>}
-     */
-    public static ResponseEntity<String> requestBeer(Long id) {
-        ResponseEntity<String> getResponse = restTemplate
-                .getForEntity("/api/beer/{id}", String.class, id);
-        return getResponse;
-    }
-
-    public static ResponseEntity<String> getRequest(String url, Long id) {
-        ResponseEntity<String> getResponse = restTemplate
-                .getForEntity(url, String.class, id);
-        return getResponse;
-    }
-
-    public static ResponseEntity<String> getRequest(String url) {
-        ResponseEntity<String> getResponse = restTemplate
-                .getForEntity(url, String.class);
-        return getResponse;
-    }
-
     public static Store createStore(Long id, String name) {
         Store store = new Store();
         store.setId(id);
@@ -127,37 +42,16 @@ public class TestUtils {
         return store;
     }
 
-    public static Store toStoreModel(String json) {
-        try {
-            Store dto = mapper.readValue(json, Store.class);
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Provided JSON does not represent Store object");
-        }
-    }
-
-    public static ResponseEntity<String> requestAllBeers() {
-        ResponseEntity<String> getResponse = restTemplate
-                .getForEntity("/api/beer", String.class);
-        return getResponse;
-    }
-
     /**
-     * Converts JSON body to {@code BeerResponseDTO} object.
-     *
-     * @param json JSON representing {@code BeerResponseDTO}
-     * @return {@code BeerResponseDTO} object
+     * Create {@code BeerResponseDTO}. Used mainly for hardcoding the expected
+     * response in tests. If you don't want to specify some parameter,
+     * just replace it with {@code null}.
+     * @param id
+     * @param name
+     * @param volume
+     * @return {@code BeerResponseDTO}
      */
-    public static BeerResponseDTO toDTO(String json) {
-        try {
-            BeerResponseDTO dto = mapper.readValue(json, BeerResponseDTO.class);
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Provided JSON does not represent BeerResponseDTO object");
-        }
-    }
-
-    public static BeerResponseDTO createBeerResponse(Long id, String name, Double volume) {
+    public static BeerResponseDTO createBeerResponseDTO(Long id, String name, Double volume) {
         BeerResponseDTO response = new BeerResponseDTO();
         if (id != null) {
             response.setId(id);
@@ -172,17 +66,137 @@ public class TestUtils {
     }
 
     /**
-     * Make {@code POST} request to save beer.
+     * Create {@code BeerRequestDTO}. Used mainly for hardcoding the expected
+     * response in tests. If you don't want to specify some parameter,
+     * just replace it with {@code null}.
      *
-     * @param request {@code BeerRequestDTO} object as request entity
-     * @return {@code ResponseEntity<String>}
+     * @param brand
+     * @param type
+     * @param volume
+     * @return {@code BeerRequestDTO}
      */
-    public static ResponseEntity<String> postBeer(BeerRequestDTO request) {
+    public static BeerRequestDTO createBeerRequestDTO(String brand, String type, Double volume) {
+        BeerRequestDTO request = new BeerRequestDTO();
+        if (brand != null) {
+            request.setBrand(brand);
+        }
+        if (type != null) {
+            request.setType(type);
+        }
+        if (volume != null) {
+            request.setVolume(volume);
+        }
+        return request;
+    }
+
+    /**
+     * Converts JSON array (as {@code String}) representing
+     * {@code Store} to {@code java.util.List}.
+     * @param json JSON array
+     * @return {@code List<Store>}
+     */
+    public static List<Store> toStoreList(String json) {
+        JSONArray array = getJsonArray(json);
+
+        List<Store> stores = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                String storeJson = array.getString(i);
+                Store store = toStore(storeJson);
+                stores.add(store);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return stores;
+    }
+
+    /**
+     * Converts JSON array (as {@code String}) representing
+     * {@code BeerResponseDTO} to {@code java.util.List}.
+     * @param json JSON array
+     * @return {@code List<BeerResponseDTO>}
+     */
+    public static List<BeerResponseDTO> toBeerResponseDTOList(String json) {
+        JSONArray array = getJsonArray(json);
+
+        List<BeerResponseDTO> responseDTOs = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                String beerAsString = array.getString(i);
+                BeerResponseDTO responseDTO = toBeerResponseDTO(beerAsString);
+                responseDTOs.add(responseDTO);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseDTOs;
+    }
+
+    /**
+     * Helper method for sending a {@code HTTP GET}
+     * request through {@code TestRestTemplate}.
+     * @param url url of target request
+     * @param pathVariables url variables
+     * @return {@ResponseEntity<String>}
+     */
+    public static ResponseEntity<String> getRequest(String url, Object... pathVariables) {
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(url, String.class, pathVariables);
+        return getResponse;
+    }
+
+    /**
+     * Helper method for sending a {@code HTTP POST}
+     * request through {@code TestRestTemplate}.
+     * @param url url of target request
+     * @param requestObject object to send to url
+     * @param pathVariables url variables
+     * @return
+     */
+    public static ResponseEntity<String> postRequest(String url, Object requestObject, Object... pathVariables) {
         ResponseEntity<String> postResponse = restTemplate
-                .postForEntity("/api/beer", request, String.class);
+                .postForEntity(url, requestObject, String.class, pathVariables);
         return postResponse;
     }
 
+    /**
+     * Converts JSON to {@code Store} (if possible).
+     * @param json
+     * @return {@code Store}
+     */
+    public static Store toStore(String json) {
+        try {
+            Store dto = mapper.readValue(json, Store.class);
+            return dto;
+        } catch (Exception e) {
+            throw new RuntimeException("Provided JSON does not represent Store object");
+        }
+    }
+
+    /**
+     * Converts JSON to {@code BeerResponseDTO} (if possible).
+     *
+     * @param json
+     * @return {@code BeerResponseDTO}
+     */
+    public static BeerResponseDTO toBeerResponseDTO(String json) {
+        try {
+            BeerResponseDTO dto = mapper.readValue(json, BeerResponseDTO.class);
+            return dto;
+        } catch (Exception e) {
+            throw new RuntimeException("Provided JSON does not represent BeerResponseDTO object");
+        }
+    }
+
+    /**
+     * Helper function for asserting that the response is an error.
+     * @param actual received response as {@code String}
+     * @param expectedStatus
+     * @param expectedMessage
+     * @param expectedPath
+     * @throws Exception
+     */
     public static void assertIsError(String actual,
                                      HttpStatus expectedStatus,
                                      String expectedMessage,
@@ -192,10 +206,10 @@ public class TestUtils {
     }
 
     /**
-     * Helper function for asserting a response is an error.
+     * Helper function for asserting that the response is an error.
      *
-     * @param actual          tested response as {@code JSONObject} object
-     * @param expectedStatus  expected {@code HttpStatus}
+     * @param actual received response as {@code JSONObject}
+     * @param expectedStatus
      * @param expectedMessage
      * @param expectedPath
      */
@@ -211,26 +225,23 @@ public class TestUtils {
         assertThat(actual.getString("timestamp")).isNotNull();
     }
 
-    /**
-     * Helper method for creating a {@code BeerRequestDTO}. If you don't
-     * want to specify some parameter, just replace it with {@code null}.
-     *
-     * @param brand
-     * @param type
-     * @param volume
-     * @return {@code BeerRequestDTO}
-     */
-    public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
-        BeerRequestDTO request = new BeerRequestDTO();
-        if (brand != null) {
-            request.setBrand(brand);
+    private static JSONObject getJsonObject(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
-        if (type != null) {
-            request.setType(type);
+    }
+
+    private static JSONArray getJsonArray(String json) {
+        try {
+            JSONArray array = new JSONArray(json);
+            return array;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
-        if (volume != null) {
-            request.setVolume(volume);
-        }
-        return request;
     }
 }
