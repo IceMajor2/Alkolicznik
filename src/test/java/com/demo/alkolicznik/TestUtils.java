@@ -7,7 +7,7 @@ import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,9 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -106,17 +108,37 @@ public class TestUtils {
         }
     }
 
-    /**
-     * Get an array of values assigned to a key in JSON body.
-     *
-     * @param json JSON string
-     * @param key  name of JSON key
-     * @return {@code JSONArray} of key's values
-     */
-    public static JSONArray getValues(String json, String key) {
-        DocumentContext documentContext = JsonPath.parse(json);
-        JSONArray values = documentContext.read("$..%s".formatted(key));
-        return values;
+    public static List<BeerResponseDTO> convertJsonArrayToList(String json) {
+        JSONArray array = getJsonArray(json);
+
+        List<BeerResponseDTO> responseDTOs = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                String beerAsString = array.getString(i);
+                BeerResponseDTO responseDTO = toDTO(beerAsString);
+                responseDTOs.add(responseDTO);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseDTOs;
+    }
+
+    public static List<BeerResponseDTO> listToDTOList(List<Beer> beers) {
+        List<BeerResponseDTO> dtos = beers.stream()
+                .map(BeerResponseDTO::new)
+                .collect(Collectors.toList());
+        return dtos;
+    }
+
+    public static JSONArray getJsonArray(String json) {
+        try {
+            JSONArray array = new JSONArray(json);
+            return array;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -164,6 +186,12 @@ public class TestUtils {
         return getResponse;
     }
 
+    public static ResponseEntity<String> requestAllBeers() {
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity("/api/beer", String.class);
+        return getResponse;
+    }
+
     /**
      * Converts JSON body to {@code BeerResponseDTO} object.
      *
@@ -193,8 +221,9 @@ public class TestUtils {
 
     /**
      * Helper function for asserting a response is an error.
-     * @param actual tested response as {@code JSONObject} object
-     * @param expectedStatus expected {@code HttpStatus}
+     *
+     * @param actual          tested response as {@code JSONObject} object
+     * @param expectedStatus  expected {@code HttpStatus}
      * @param expectedMessage
      * @param expectedPath
      */

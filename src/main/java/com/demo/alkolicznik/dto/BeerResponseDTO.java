@@ -66,4 +66,9 @@ public class BeerResponseDTO {
     public int hashCode() {
         return Objects.hash(id, fullName, volume);
     }
+
+    @Override
+    public String toString() {
+        return "%s | %.2fl | ID: %d".formatted(this.fullName, this.volume, this.id);
+    }
 }
