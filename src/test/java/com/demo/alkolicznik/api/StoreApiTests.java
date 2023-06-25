@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
@@ -52,11 +53,13 @@ public class StoreApiTests {
             var getResponse = getRequest("/api/store/{id}", 3L);
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            String json = getResponse.getBody();
-            Store actual = toStore(json);
+            String actualJson = getResponse.getBody();
+            Store actual = toModel(actualJson, Store.class);
 
             Store expected = createStoreResponse(3L, "Lidl");
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -95,28 +98,76 @@ public class StoreApiTests {
                     createStoreRequest("Dwojka"));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            Store actual = toStore(json);
+            String actualJson = postResponse.getBody();
+            Store actual = toModel(actualJson, Store.class);
 
             Store expected = createStoreResponse(7L, "Dwojka");
+            String expectedJson = toJsonString(expected);
+
+            assertThat(actualJson).isEqualTo(expectedJson);
             assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Create invalid store: NAME null")
+        @DirtiesContext
+        public void createStoreNameNullTest() throws Exception {
+            var postResponse = postRequest("/api/store", createStoreRequest(null));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: NAME blank & NAME empty")
+        @DirtiesContext
+        public void createStoreNameBlankAndEmptyTest() throws Exception {
+            var postResponse = postRequest("/api/store", createStoreRequest(""));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+
+            postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n"));
+
+            json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: ALREADY_EXISTS")
+        @DirtiesContext
+        public void createStoreThatAlreadyExistsTest() throws Exception {
+            var postResponse = postRequest("/api/store", createStoreRequest("Lidl"));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Store already exists", "/api/store");
         }
     }
 
     @Nested
     class BeerPriceRequests {
 
+        @Test
+        @DisplayName("Valid add beer to store")
+        @DirtiesContext
+        public void addBeerToStoreTest() {
+            var postResponse = postRequest("/api/store/{id}/beer",
+                    createBeerPriceRequest("Perla Chmielowa Pils", 3.69),
+                    2);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(2L, "Biedronka", 1L, "Perla Chmielowa Pils", 3.69);
+            String expectedJson = toJsonString(expected);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
     }
-
-    public void createAndGetStoreTest() {}
-
-    public void addUnnamedStoreShouldReturn400Test() {}
-
-    public void addAlreadyExistingStoreShouldReturn400Test() {}
-
-    public void createStoreResponseBodyOKTest() {}
-
-    public void addValidBeerToStoreTest() {}
-
-    public void getAllStoresTest() {}
 }
