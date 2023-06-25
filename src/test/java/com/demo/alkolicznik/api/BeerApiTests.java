@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -24,12 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
 public class BeerApiTests {
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private List<Beer> beers;
@@ -51,11 +44,13 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 1L);
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            String jsonResponse = getResponse.getBody();
-            BeerResponseDTO actualDto = toBeerResponseDTO(jsonResponse);
+            String actualJson = getResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expectedDto = new BeerResponseDTO(1L, "Perla Chmielowa Pils", 0.5);
-            assertThat(actualDto).isEqualTo(expectedDto);
+            BeerResponseDTO expected = new BeerResponseDTO(1L, "Perla Chmielowa Pils", 0.5);
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -64,6 +59,7 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 9999L);
 
             String jsonResponse = getResponse.getBody();
+
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
                     "Unable to find beer of 9999 id",
@@ -97,19 +93,22 @@ public class BeerApiTests {
                     createBeerRequestDTO("Lech", null, null));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            BeerResponseDTO actual = toBeerResponseDTO(json);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             BeerResponseDTO expected = createBeerResponseDTO(7L, "Lech", 0.5);
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
-            json = getResponse.getBody();
-            actual = toBeerResponseDTO(json);
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -120,19 +119,22 @@ public class BeerApiTests {
                     createBeerRequestDTO("Karmi", null, 0.6));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            BeerResponseDTO actual = toBeerResponseDTO(json);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             BeerResponseDTO expected = createBeerResponseDTO(7L, "Karmi", 0.6);
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
-            json = getResponse.getBody();
-            actual = toBeerResponseDTO(json);
+            actualJson = getResponse.getBody();
+            actual = toBeerResponseDTO(actualJson);
 
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -144,19 +146,22 @@ public class BeerApiTests {
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            BeerResponseDTO actual = toBeerResponseDTO(json);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             BeerResponseDTO expected = createBeerResponseDTO(7L, "Ksiazece Wisnia", 0.5);
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
-            json = getResponse.getBody();
-            actual = toBeerResponseDTO(json);
+            actualJson = getResponse.getBody();
+            actual = toBeerResponseDTO(actualJson);
 
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -168,19 +173,22 @@ public class BeerApiTests {
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            BeerResponseDTO actual = toBeerResponseDTO(json);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             BeerResponseDTO expected = createBeerResponseDTO(7L, "Zywiec Jasne", 0.33);
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
-            json = getResponse.getBody();
-            actual = toBeerResponseDTO(json);
+            actualJson = getResponse.getBody();
+            actual = toBeerResponseDTO(actualJson);
 
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -192,19 +200,22 @@ public class BeerApiTests {
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String json = postResponse.getBody();
-            BeerResponseDTO actual = toBeerResponseDTO(json);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             BeerResponseDTO expected = createBeerResponseDTO(7L, "Perla Chmielowa Pils", 0.33);
+            String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
-            json = getResponse.getBody();
-            actual = toBeerResponseDTO(json);
+            actualJson = getResponse.getBody();
+            actual = toBeerResponseDTO(actualJson);
 
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
