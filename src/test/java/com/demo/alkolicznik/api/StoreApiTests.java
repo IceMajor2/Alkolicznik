@@ -25,15 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StoreApiTests {
 
     @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private List<Beer> beers;
-
-    @Autowired
     private List<Store> stores;
 
     /**
