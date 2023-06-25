@@ -45,7 +45,7 @@ public class StoreService {
     public BeerPriceResponseDTO addBeer(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).get();
-        String beerFullname = beerPriceRequestDTO.getFullname();
+        String beerFullname = beerPriceRequestDTO.getBeerName();
         Beer beer = beerRepository.findByFullname(beerFullname).get();
         // Pass beer with price to store and save changes.
         double price = beerPriceRequestDTO.getPrice();

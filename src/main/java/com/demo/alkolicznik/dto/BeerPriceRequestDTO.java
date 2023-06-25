@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BeerPriceRequestDTO {
 
-    @JsonProperty("name")
-    private String fullname;
+    @JsonProperty("beer_name")
+    private String beerName;
     private Double price;
 
-    public String getFullname() {
-        return fullname;
+    public String getBeerName() {
+        return beerName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setBeerName(String beerName) {
+        this.beerName = beerName;
     }
 
     public void setPrice(Double price) {
@@ -22,9 +22,5 @@ public class BeerPriceRequestDTO {
 
     public double getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 }

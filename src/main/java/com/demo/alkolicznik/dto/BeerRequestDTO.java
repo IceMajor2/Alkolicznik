@@ -44,7 +44,11 @@ public class BeerRequestDTO {
         if(this.type != null) {
             beer.setType(this.type);
         }
-        beer.setVolume(this.volume);
+        if(this.volume == null) {
+            beer.setVolume(0.5);
+        } else {
+            beer.setVolume(volume);
+        }
         return beer;
     }
 }

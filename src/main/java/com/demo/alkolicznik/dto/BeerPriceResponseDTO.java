@@ -20,7 +20,9 @@ public class BeerPriceResponseDTO {
     private String beerName;
 
     @JsonProperty("price")
-    private double price;
+    private Double price;
+
+    public BeerPriceResponseDTO() {}
 
     public BeerPriceResponseDTO(BeerPrice beerPrice) {
         this.storeId = beerPrice.getId().getStoreId();
@@ -62,11 +64,11 @@ public class BeerPriceResponseDTO {
         this.beerName = beerName;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 }
