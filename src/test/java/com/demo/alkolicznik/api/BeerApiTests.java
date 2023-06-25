@@ -131,7 +131,7 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
             actualJson = getResponse.getBody();
-            actual = toBeerResponseDTO(actualJson);
+            actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -158,7 +158,7 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
             actualJson = getResponse.getBody();
-            actual = toBeerResponseDTO(actualJson);
+            actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -185,7 +185,7 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
             actualJson = getResponse.getBody();
-            actual = toBeerResponseDTO(actualJson);
+            actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -212,7 +212,7 @@ public class BeerApiTests {
             var getResponse = getRequest("/api/beer/{id}", 7L);
 
             actualJson = getResponse.getBody();
-            actual = toBeerResponseDTO(actualJson);
+            actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);

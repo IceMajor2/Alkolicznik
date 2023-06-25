@@ -1,9 +1,8 @@
 package com.demo.alkolicznik;
 
-import com.demo.alkolicznik.dto.BeerRequestDTO;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.models.Store;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +31,7 @@ public class TestUtils {
 
     /**
      * Create {@code StoreRequestDTO}. Used mainly for hardcoding the expected response in tests.
+     *
      * @param name
      * @return {@code StoreRequestDTO}
      */
@@ -52,6 +52,7 @@ public class TestUtils {
      * Create {@code BeerResponseDTO}. Used mainly for hardcoding the expected
      * response in tests. If you don't want to specify some parameter,
      * just replace it with {@code null}.
+     *
      * @param id
      * @param name
      * @param volume
@@ -59,15 +60,9 @@ public class TestUtils {
      */
     public static BeerResponseDTO createBeerResponseDTO(Long id, String name, Double volume) {
         BeerResponseDTO response = new BeerResponseDTO();
-        if (id != null) {
-            response.setId(id);
-        }
-        if (name != null) {
-            response.setFullName(name);
-        }
-        if (volume != null) {
-            response.setVolume(volume);
-        }
+        response.setId(id);
+        response.setFullName(name);
+        response.setVolume(volume);
         return response;
     }
 
@@ -83,21 +78,55 @@ public class TestUtils {
      */
     public static BeerRequestDTO createBeerRequestDTO(String brand, String type, Double volume) {
         BeerRequestDTO request = new BeerRequestDTO();
-        if (brand != null) {
-            request.setBrand(brand);
-        }
-        if (type != null) {
-            request.setType(type);
-        }
-        if (volume != null) {
-            request.setVolume(volume);
-        }
+        request.setBrand(brand);
+        request.setType(type);
+        request.setVolume(volume);
         return request;
+    }
+
+    /**
+     * Create {@code BeerPriceRequestDTO}. Used mainly for hardcoding the expected
+     * response in tests. If you don't want to specify some parameter,
+     * just replace it with {@code null}.
+     *
+     * @param beerName
+     * @param price
+     * @return {@code BeerPriceRequestDTO}
+     */
+    public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double price) {
+        BeerPriceRequestDTO request = new BeerPriceRequestDTO();
+        request.setBeerName(beerName);
+        request.setPrice(price);
+        return request;
+    }
+
+    /**
+     * Create {@code BeerPriceResponseDTO}. Used mainly for hardcoding the expected
+     * response in tests. If you don't want to specify some parameter,
+     * just replace it with {@code null}.
+     *
+     * @param storeId
+     * @param storeName
+     * @param beerId
+     * @param beerName
+     * @param price
+     * @return {@code BeerPriceResponseDTO}
+     */
+    public static BeerPriceResponseDTO createBeerPriceResponse(Long storeId, String storeName,
+                                                               Long beerId, String beerName, Double price) {
+        BeerPriceResponseDTO response = new BeerPriceResponseDTO();
+        response.setStoreId(storeId);
+        response.setStoreName(storeName);
+        response.setBeerId(beerId);
+        response.setBeerName(beerName);
+        response.setPrice(price);
+        return response;
     }
 
     /**
      * Converts JSON array (as {@code String}) representing
      * {@code Store} to {@code java.util.List}.
+     *
      * @param json JSON array
      * @return {@code List<Store>}
      */
@@ -108,7 +137,7 @@ public class TestUtils {
         for (int i = 0; i < array.length(); i++) {
             try {
                 String storeJson = array.getString(i);
-                Store store = toStore(storeJson);
+                Store store = toModel(storeJson, Store.class);
                 stores.add(store);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -120,6 +149,7 @@ public class TestUtils {
     /**
      * Converts JSON array (as {@code String}) representing
      * {@code BeerResponseDTO} to {@code java.util.List}.
+     *
      * @param json JSON array
      * @return {@code List<BeerResponseDTO>}
      */
@@ -130,7 +160,7 @@ public class TestUtils {
         for (int i = 0; i < array.length(); i++) {
             try {
                 String beerAsString = array.getString(i);
-                BeerResponseDTO responseDTO = toBeerResponseDTO(beerAsString);
+                BeerResponseDTO responseDTO = toModel(beerAsString, BeerResponseDTO.class);
                 responseDTOs.add(responseDTO);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -140,9 +170,26 @@ public class TestUtils {
     }
 
     /**
+     * Converts a model, object to a JSON string.
+     *
+     * @param model some class object
+     * @return JSON {@code String}
+     */
+    public static String toJsonString(Object model) {
+        try {
+            String modelAsString = mapper.writeValueAsString(model);
+            return modelAsString;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Helper method for sending a {@code HTTP GET}
      * request through {@code TestRestTemplate}.
-     * @param url url of target request
+     *
+     * @param url           url of target request
      * @param pathVariables url variables
      * @return {@ResponseEntity<String>}
      */
@@ -155,7 +202,8 @@ public class TestUtils {
     /**
      * Helper method for sending a {@code HTTP POST}
      * request through {@code TestRestTemplate}.
-     * @param url url of target request
+     *
+     * @param url           url of target request
      * @param requestObject object to send to url
      * @param pathVariables url variables
      * @return
@@ -166,38 +214,20 @@ public class TestUtils {
         return postResponse;
     }
 
-    /**
-     * Converts JSON to {@code Store} (if possible).
-     * @param json
-     * @return {@code Store}
-     */
-    public static Store toStore(String json) {
+    public static <T> T toModel(String json, Class<T> claz) {
         try {
-            Store dto = mapper.readValue(json, Store.class);
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Provided JSON does not represent Store object");
-        }
-    }
-
-    /**
-     * Converts JSON to {@code BeerResponseDTO} (if possible).
-     *
-     * @param json
-     * @return {@code BeerResponseDTO}
-     */
-    public static BeerResponseDTO toBeerResponseDTO(String json) {
-        try {
-            BeerResponseDTO dto = mapper.readValue(json, BeerResponseDTO.class);
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Provided JSON does not represent BeerResponseDTO object");
+            T model = mapper.readValue(json, claz);
+            return model;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     /**
      * Helper function for asserting that the response is an error.
-     * @param actual received response as {@code String}
+     *
+     * @param actual          received response as {@code String}
      * @param expectedStatus
      * @param expectedMessage
      * @param expectedPath
@@ -214,7 +244,7 @@ public class TestUtils {
     /**
      * Helper function for asserting that the response is an error.
      *
-     * @param actual received response as {@code JSONObject}
+     * @param actual          received response as {@code JSONObject}
      * @param expectedStatus
      * @param expectedMessage
      * @param expectedPath
