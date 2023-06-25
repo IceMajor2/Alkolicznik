@@ -16,11 +16,11 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
-public class StoreController {
+public class StoreApiController {
 
     private StoreService storeService;
 
-    public StoreController(StoreService storeService) {
+    public StoreApiController(StoreService storeService) {
         this.storeService = storeService;
     }
 

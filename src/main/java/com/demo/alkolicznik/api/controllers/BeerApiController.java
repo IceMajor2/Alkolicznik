@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-public class BeerController {
+public class BeerApiController {
 
     private BeerService beerService;
 
-    public BeerController(BeerService beerService) {
+    public BeerApiController(BeerService beerService) {
         this.beerService = beerService;
     }
 

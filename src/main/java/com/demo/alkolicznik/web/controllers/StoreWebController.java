@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.controllers;
+package com.demo.alkolicznik.web.controllers;
 
 import com.demo.alkolicznik.api.services.StoreService;
 import org.springframework.stereotype.Controller;
@@ -6,11 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class StoreHtmlController {
+public class StoreWebController {
 
     private StoreService storeService;
 
-    public StoreHtmlController(StoreService storeService) {
+    public StoreWebController(StoreService storeService) {
         this.storeService = storeService;
     }
 
