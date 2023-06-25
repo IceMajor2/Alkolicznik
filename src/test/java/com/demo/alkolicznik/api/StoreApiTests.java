@@ -152,12 +152,10 @@ public class StoreApiTests {
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
-            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(2L, "Biedronka", 1L, "Perla Chmielowa Pils", 3.69);
             String expectedJson = toJsonString(expected);
-
-            assertThat(actual).isEqualTo(expected);
+            
             assertThat(actualJson).isEqualTo(expectedJson);
         }
     }

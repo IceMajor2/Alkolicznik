@@ -55,6 +55,12 @@ public class StoreController {
             @PathVariable Long id,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
         BeerPriceResponseDTO beerPriceResponse = storeService.addBeer(id, beerPriceRequestDTO);
-        return ResponseEntity.ok().body(beerPriceResponse);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(beerPriceResponse.getBeerId())
+                .toUri();
+        System.out.println(location);
+        return ResponseEntity.created(location).body(beerPriceResponse);
     }
 }
