@@ -155,7 +155,7 @@ public class StoreApiTests {
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(2L, "Biedronka", 1L, "Perla Chmielowa Pils", 3.69);
             String expectedJson = toJsonString(expected);
-            
+
             assertThat(actualJson).isEqualTo(expectedJson);
         }
     }

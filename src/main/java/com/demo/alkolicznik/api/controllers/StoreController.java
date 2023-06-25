@@ -2,6 +2,7 @@ package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.api.services.StoreService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -62,5 +64,11 @@ public class StoreController {
                 .toUri();
         System.out.println(location);
         return ResponseEntity.created(location).body(beerPriceResponse);
+    }
+
+    @GetMapping("/store/{id}/beer")
+    public ResponseEntity<Set<BeerPrice>> getBeers(@PathVariable("id") Long storeId) {
+        Set<BeerPrice> beers = storeService.getBeers(storeId);
+        return ResponseEntity.ok(beers);
     }
 }
