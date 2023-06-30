@@ -10,7 +10,9 @@ CREATE TABLE beer (
 
 CREATE TABLE store (
     id BIGINT IDENTITY PRIMARY KEY,
-    name VARCHAR(30) NOT NULL);
+    name VARCHAR(30) NOT NULL,
+    city VARCHAR(30) NOT NULL,
+    street VARCHAR(60) NOT NULL);
 
 CREATE TABLE beer_price (
     beer_id BIGINT NOT NULL,
