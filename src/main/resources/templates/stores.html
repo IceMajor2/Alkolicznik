@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Sklepy</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css"">
 </head>
 <body>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nazwa</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:if="${stores.empty}">
-            <td colspan="2">No stores found</td>
-        </tr>
-        <tr th:each="store : ${stores}">
-            <td><span th:text="${store.name}">Title</span></td>
-            <td><span th:text="${store.id}">ID</span></td>
-        </tr>
-        </tbody>
-    </table>
+    <header>
+        <img class="logo" src="../../../../skeleton/look/logo.png"/>
+        <br>
+        <span>Porównywarka cen piw w twoim otoczeniu!</span>
+    </header>
+    <main>
+        <section>
+            <h2>SKLEP</h2>
+            <select id="select" name="select">
+                <option value="CSS">CSS</option>
+                <option value="Javascript">Javascript</option>
+            </select>
+        </section>
+    </main>
 </body>
 </html>

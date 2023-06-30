@@ -1,0 +1,36 @@
+body {
+    font-family: Arial;
+    background-color:darkblue;
+    padding: 40px;
+}
+
+header, main {
+    background-color:#af8ae4;
+    width: 600px;
+    margin: 0 auto;
+    padding: 10px 60px 20px 60px;
+}
+
+header span {
+    font-family: 'Trebuchet MS';
+    font-size: x-large;
+    margin: auto;
+    display: table;
+}
+
+img {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.button-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    width: 100%;
+    height: 15vh;
+}
