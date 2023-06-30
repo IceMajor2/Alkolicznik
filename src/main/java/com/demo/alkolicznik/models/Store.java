@@ -5,12 +5,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.*;
 
 @Table(name = "store")
 @Entity(name = "Store")
 @JsonPropertyOrder({"id", "name"})
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Store {
 
     @Id
@@ -20,41 +28,19 @@ public class Store {
     @NotBlank
     private String name;
 
+    @NotBlank
+    private String city;
+
+    @NotBlank
+    private String street;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "store",
             cascade = CascadeType.MERGE,
             orphanRemoval = true)
-    @JsonIgnore
     private Set<BeerPrice> prices = new HashSet<>();
 
-    public Store() {
-    }
-
     public Store(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Set<BeerPrice> getPrices() {
-        return prices;
-    }
-
-    public void setPrices(Set<BeerPrice> prices) {
-        this.prices = prices;
-    }
-
-    @Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(@Nonnull String name) {
         this.name = name;
     }
 
