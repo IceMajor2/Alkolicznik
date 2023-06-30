@@ -3,10 +3,18 @@ package com.demo.alkolicznik.dto;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 
 @JsonPropertyOrder({"id", "name", "volume"})
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class BeerResponseDTO {
 
     private Long id;
@@ -14,42 +22,10 @@ public class BeerResponseDTO {
     private String fullName;
     private double volume;
 
-    public BeerResponseDTO() {}
-
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();
         this.fullName = beer.getFullName();
         this.volume = beer.getVolume();
-    }
-
-    public BeerResponseDTO(Long id, String fullName, double volume) {
-        this.id = id;
-        this.fullName = fullName;
-        this.volume = volume;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public double getVolume() {
-        return volume;
-    }
-
-    public void setVolume(double volume) {
-        this.volume = volume;
     }
 
     @Override

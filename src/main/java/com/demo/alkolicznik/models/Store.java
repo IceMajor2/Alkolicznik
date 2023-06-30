@@ -2,20 +2,20 @@ package com.demo.alkolicznik.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
 
 @Table(name = "store")
 @Entity(name = "Store")
 @JsonPropertyOrder({"id", "name"})
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter

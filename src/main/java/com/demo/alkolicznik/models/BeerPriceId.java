@@ -2,11 +2,17 @@ package com.demo.alkolicznik.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@NoArgsConstructor
+@Getter
+@Setter
 public class BeerPriceId implements Serializable {
 
     @Column(name = "beer_id")
@@ -14,9 +20,6 @@ public class BeerPriceId implements Serializable {
 
     @Column(name = "store_id")
     private Long storeId;
-
-    private BeerPriceId() {
-    }
 
     public BeerPriceId(Long beerId, Long storeId) {
         this.beerId = beerId;
@@ -43,21 +46,5 @@ public class BeerPriceId implements Serializable {
         BeerPriceId compareObj = (BeerPriceId) obj;
         return Objects.equals(this.beerId, compareObj.beerId) &&
                 Objects.equals(this.storeId, compareObj.storeId);
-    }
-
-    public Long getBeerId() {
-        return beerId;
-    }
-
-    public void setBeerId(Long beerId) {
-        this.beerId = beerId;
-    }
-
-    public Long getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(Long storeId) {
-        this.storeId = storeId;
     }
 }

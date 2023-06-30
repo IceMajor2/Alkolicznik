@@ -2,11 +2,17 @@ package com.demo.alkolicznik.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 
 @Entity(name = "BeerPrice")
 @Table(name = "beer_price")
+@NoArgsConstructor
+@Getter
+@Setter
 public class BeerPrice {
 
     @EmbeddedId
@@ -25,46 +31,11 @@ public class BeerPrice {
     @Column(name = "price")
     private double price;
 
-    private BeerPrice() {
-    }
-
     public BeerPrice(Store store, Beer beer, double price) {
         this.store = store;
         this.beer = beer;
         this.price = price;
         this.id = new BeerPriceId(beer.getId(), store.getId());
-    }
-
-    public BeerPriceId getId() {
-        return id;
-    }
-
-    public void setId(BeerPriceId id) {
-        this.id = id;
-    }
-
-    public Store getStore() {
-        return store;
-    }
-
-    public void setStore(Store store) {
-        this.store = store;
-    }
-
-    public Beer getBeer() {
-        return beer;
-    }
-
-    public void setBeer(Beer beer) {
-        this.beer = beer;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     @Override

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -12,6 +15,9 @@ import java.util.Set;
 @Entity(name = "Beer")
 @Table(name = "beer")
 @JsonPropertyOrder({"id", "name", "volume"})
+@NoArgsConstructor
+@Getter
+@Setter
 public class Beer {
 
     @Id
@@ -46,49 +52,6 @@ public class Beer {
 
     public Beer(String brand, Double volume) {
         this.brand = brand;
-        this.volume = volume;
-    }
-
-    public Beer() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Set<BeerPrice> getPrices() {
-        return prices;
-    }
-
-    public void setPrices(Set<BeerPrice> prices) {
-        this.prices = prices;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Double getVolume() {
-        return volume;
-    }
-
-    public void setVolume(Double volume) {
         this.volume = volume;
     }
 

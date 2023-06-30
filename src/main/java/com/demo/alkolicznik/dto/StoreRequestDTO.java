@@ -1,17 +1,21 @@
 package com.demo.alkolicznik.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class StoreRequestDTO {
 
     @NotBlank
     private String name;
 
-    public String getName() {
-        return name;
-    }
+    @NotBlank
+    private String city;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @NotBlank
+    private String street;
 }
