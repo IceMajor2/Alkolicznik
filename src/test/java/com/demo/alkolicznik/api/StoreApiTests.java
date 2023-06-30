@@ -2,17 +2,14 @@ package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
-import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -47,7 +44,7 @@ public class StoreApiTests {
             String actualJson = getResponse.getBody();
             Store actual = toModel(actualJson, Store.class);
 
-            Store expected = createStoreResponse(3L, "Lidl");
+            Store expected = createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1");
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -86,13 +83,13 @@ public class StoreApiTests {
         @DirtiesContext
         public void createStoreTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequest("Dwojka"));
+                    createStoreRequest("Dwojka", "Krakow", "ul. Powstancow 9"));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             Store actual = toModel(actualJson, Store.class);
 
-            Store expected = createStoreResponse(7L, "Dwojka");
+            Store expected = createStoreResponse(7L, "Dwojka", "Krakow", "ul. Powstancow 9");
             String expectedJson = toJsonString(expected);
 
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -103,7 +100,7 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: NAME null")
         @DirtiesContext
         public void createStoreNameNullTest() throws Exception {
-            var postResponse = postRequest("/api/store", createStoreRequest(null));
+            var postResponse = postRequest("/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
 
             String json = postResponse.getBody();
 
@@ -114,13 +111,13 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: NAME blank & NAME empty")
         @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() throws Exception {
-            var postResponse = postRequest("/api/store", createStoreRequest(""));
+            var postResponse = postRequest("/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
 
-            postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n"));
+            postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
 
             json = postResponse.getBody();
 
@@ -128,14 +125,89 @@ public class StoreApiTests {
         }
 
         @Test
+        @DisplayName("Create invalid store: CITY null")
+        @DirtiesContext
+        public void createStoreCityNullTest() throws Exception {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest("Lubi", null, "ul. Kwiatkowa 3"));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified", "/api/store");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: CITY blank & empty")
+        @DirtiesContext
+        public void createStoreCityBlankAndEmptyTest() throws Exception {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest("Lubi", "", "ul. Kwiatkowa 3"));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified", "/api/store");
+
+            postResponse = postRequest("/api/store",
+                    createStoreRequest("Lubi", "\t \n", "ul. Brzozowa 31"));
+
+            json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified", "/api/store");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: STREET null")
+        @DirtiesContext
+        public void createStoreStreetNullTest() throws Exception {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest("Primo", "Olsztyn", null));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Street was not specified", "/api/store");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: STREET blank & empty")
+        @DirtiesContext
+        public void createStoreStreetBlankAndEmptyTest() throws Exception {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest("Primo", "Olsztyn", ""));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Street was not specified", "/api/store");
+
+            postResponse = postRequest("/api/store",
+                    createStoreRequest("Primo", "Olsztyn", "\t     "));
+
+            json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Street was not specified", "/api/store");
+        }
+
+        @Test
         @DisplayName("Create invalid store: ALREADY_EXISTS")
         @DirtiesContext
-        public void createStoreThatAlreadyExistsTest() throws Exception {
-            var postResponse = postRequest("/api/store", createStoreRequest("Lidl"));
+        public void createStoreAlreadyExistsTest() throws Exception {
+            var postResponse = postRequest("/api/store", createStoreRequest("Lidl", "Szczecin", "ul. Poranna 32"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Store already exists", "/api/store");
+        }
+
+        @Test
+        @DisplayName("Create invalid store: NAME blank, CITY null, STREET empty")
+        @DirtiesContext
+        public void createStoreNameBlankCityNullStreetEmptyTest() throws Exception {
+            var postResponse = postRequest("/api/store",
+                    createStoreRequest(" \t", null, ""));
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified;" +
+                    " City was not specified; Street was not specified", "/api/store");
         }
     }
 

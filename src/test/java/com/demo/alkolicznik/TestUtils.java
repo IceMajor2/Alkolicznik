@@ -35,16 +35,20 @@ public class TestUtils {
      * @param name
      * @return {@code StoreRequestDTO}
      */
-    public static StoreRequestDTO createStoreRequest(String name) {
+    public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
         request.setName(name);
+        request.setCity(city);
+        request.setStreet(street);
         return request;
     }
 
-    public static Store createStoreResponse(Long id, String name) {
+    public static Store createStoreResponse(Long id, String name, String city, String street) {
         Store store = new Store();
         store.setId(id);
         store.setName(name);
+        store.setCity(city);
+        store.setStreet(street);
         return store;
     }
 
