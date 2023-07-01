@@ -1,38 +1,31 @@
 package com.demo.alkolicznik.dto;
 
+import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@JsonPropertyOrder({"store_id", "store_name", "beer_id", "beer_name", "price"})
+@JsonPropertyOrder({"beer", "price", "store"})
 @NoArgsConstructor
 @Getter
 @Setter
 public class BeerPriceResponseDTO {
 
-    @JsonProperty("store_id")
-    private Long storeId;
-
-    @JsonProperty("store_name")
-    private String storeName;
-
-    @JsonProperty("beer_id")
-    private Long beerId;
-
-    @JsonProperty("beer_name")
-    private String beerName;
-
-    @JsonProperty("price")
-    private Double price;
+    private BeerResponseDTO beer;
+    private StoreResponseDTO store;
+    private double price;
 
     public BeerPriceResponseDTO(BeerPrice beerPrice) {
-        this.storeId = beerPrice.getId().getStoreId();
-        this.storeName = beerPrice.getStore().getName();
-        this.beerId = beerPrice.getId().getBeerId();
-        this.beerName = beerPrice.getBeer().getFullName();
+        this.store = new StoreResponseDTO(beerPrice.getStore());
+        this.beer = new BeerResponseDTO(beerPrice.getBeer());
         this.price = beerPrice.getPrice();
+    }
+
+    @Override
+    public String toString() {
+        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getFullName(), this.price);
     }
 }

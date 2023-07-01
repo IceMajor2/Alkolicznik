@@ -60,7 +60,7 @@ public class StoreApiController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(beerPriceResponse.getBeerId())
+                .buildAndExpand(beerPriceResponse.getBeer().getId())
                 .toUri();
         return ResponseEntity.created(location).body(beerPriceResponse);
     }
