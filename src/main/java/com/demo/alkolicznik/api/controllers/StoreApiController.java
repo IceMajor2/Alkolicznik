@@ -34,8 +34,8 @@ public class StoreApiController {
     }
 
     @GetMapping("/store")
-    public ResponseEntity<List<Store>> getStores() {
-        return ResponseEntity.ok(storeService.getStores());
+    public ResponseEntity<List<Store>> getStores(@RequestParam String city) {
+        return ResponseEntity.ok(storeService.getStores(city));
     }
 
     @PostMapping("/store")
@@ -62,7 +62,6 @@ public class StoreApiController {
                 .path("/{id}")
                 .buildAndExpand(beerPriceResponse.getBeerId())
                 .toUri();
-        System.out.println(location);
         return ResponseEntity.created(location).body(beerPriceResponse);
     }
 

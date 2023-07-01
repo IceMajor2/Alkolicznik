@@ -5,19 +5,23 @@ import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.BeerNotFoundException;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
+import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BeerService {
 
     private BeerRepository beerRepository;
+    private StoreRepository storeRepository;
 
-    public BeerService(BeerRepository beerRepository) {
+    public BeerService(BeerRepository beerRepository, StoreRepository storeRepository) {
         this.beerRepository = beerRepository;
+        this.storeRepository = storeRepository;
     }
 
     public Beer get(Long beerId) {
@@ -26,6 +30,16 @@ public class BeerService {
             throw new BeerNotFoundException(beerId);
         }
         return optBeer.get();
+    }
+
+    public List<BeerPrice> getBeers(String city) {
+        List<Store> cityStores = storeRepository.findAllByCity(city);
+
+        List<BeerPrice> beers = new ArrayList<>();
+        for(Store store : cityStores) {
+            beers.addAll(store.getPrices());
+        }
+        return beers;
     }
 
     public List<Beer> getBeers() {

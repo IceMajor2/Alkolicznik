@@ -17,12 +17,15 @@ import java.util.Set;
 public class StoreService {
 
     private StoreRepository storeRepository;
-
     private BeerRepository beerRepository;
 
     public StoreService(StoreRepository storeRepository, BeerRepository beerRepository) {
         this.storeRepository = storeRepository;
         this.beerRepository = beerRepository;
+    }
+
+    public List<Store> getStores(String city) {
+        return storeRepository.findAllByCity(city);
     }
 
     public List<Store> getStores() {

@@ -9,5 +9,7 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 
     List<Store> findAll();
 
+    List<Store> findAllByCity(String city);
+
     boolean existsByName(String name);
 }
