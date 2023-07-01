@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Table(name = "store")
 @Entity(name = "Store")
-@JsonPropertyOrder({"id", "name"})
+@JsonPropertyOrder({"id", "name", "city", "street"})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -39,10 +39,6 @@ public class Store {
             cascade = CascadeType.MERGE,
             orphanRemoval = true)
     private Set<BeerPrice> prices = new HashSet<>();
-
-    public Store(String name) {
-        this.name = name;
-    }
 
     @Override
     public boolean equals(Object obj) {
