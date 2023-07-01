@@ -26,10 +26,8 @@ public class BeerService {
 
     public Beer get(Long beerId) {
         Optional<Beer> optBeer = beerRepository.findById(beerId);
-        if(optBeer.isEmpty()) {
-            throw new BeerNotFoundException(beerId);
-        }
-        return optBeer.get();
+        Beer beer = optBeer.orElseThrow(() -> new BeerNotFoundException(beerId));
+        return beer;
     }
 
     public List<BeerPrice> getBeers(String city) {

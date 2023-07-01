@@ -4,6 +4,7 @@ import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.StoreRequestDTO;
 import com.demo.alkolicznik.exceptions.StoreAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -44,10 +45,8 @@ public class StoreService {
 
     public Store get(Long id) {
         Optional<Store> optStore = storeRepository.findById(id);
-        if(optStore.isEmpty()) {
-            return null;
-        }
-        return optStore.get();
+        Store store = optStore.orElseThrow(() -> new StoreNotFoundException(id));
+        return store;
     }
 
     public BeerPriceResponseDTO addBeer(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
