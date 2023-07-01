@@ -14,6 +14,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        if (request.getRequestURI().contains("/api/admin")) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        }
     }
 }
