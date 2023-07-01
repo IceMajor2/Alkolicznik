@@ -1,9 +1,13 @@
 package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -11,12 +15,19 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class TestConfig {
 
+    @Autowired
+    private ApplicationContext context;
+
     private static JdbcTemplate jdbcTemplate;
+    private static Map<Long, Beer> beers = new HashMap<>();
+    private static Map<Long, Store> stores = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -27,13 +38,51 @@ public class TestConfig {
     public List<Store> stores() {
         String sql = "SELECT * FROM store";
         List<Store> initializedStores = jdbcTemplate.query(sql, this.mapToStore());
+        for(Store store : initializedStores) {
+            stores.put(store.getId(), store);
+        }
         return initializedStores;
+    }
+
+    @Bean
+    @DependsOn({"stores", "beers"})
+    public List<BeerPrice> beerPrice() {
+        String sql = "SELECT * FROM beer_price";
+        List<BeerPrice> initializedPrices = jdbcTemplate.query(sql, this.mapToBeerPrice());
+        updateStoresWithPrices(initializedPrices);
+        updateBeersWithPrices(initializedPrices);
+        return initializedPrices;
+    }
+
+    private void updateBeersWithPrices(List<BeerPrice> prices) {
+        List<Beer> beers = (List<Beer>) context.getBean("beers");
+        for(Beer beer : beers) {
+            for(BeerPrice price : prices) {
+                if(price.getBeer().equals(beer)) {
+                    beer.getPrices().add(price);
+                }
+            }
+        }
+    }
+
+    private void updateStoresWithPrices(List<BeerPrice> prices) {
+        List<Store> stores = (List<Store>) context.getBean("stores");
+        for(Store store : stores) {
+            for(BeerPrice price : prices) {
+                if(price.getStore().equals(store)) {
+                    store.addBeer(price.getBeer(), price.getPrice());
+                }
+            }
+        }
     }
 
     @Bean
     public List<Beer> beers() {
         String sql = "SELECT * FROM beer";
         List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
+        for(Beer beer : initializedBeers) {
+            beers.put(beer.getId(), beer);
+        }
         return initializedBeers;
     }
 
@@ -72,6 +121,24 @@ public class TestConfig {
                 beer.setType(rs.getString("type"));
                 beer.setVolume(rs.getDouble("volume"));
                 return beer;
+            }
+        };
+    }
+
+    private RowMapper<BeerPrice> mapToBeerPrice() {
+        return new RowMapper<BeerPrice>() {
+            @Override
+            public BeerPrice mapRow(ResultSet rs, int rowNum) throws SQLException {
+                BeerPrice beerPrice = new BeerPrice();
+
+                Beer beer = beers.get(rs.getLong("beer_id"));
+                beerPrice.setBeer(beer);
+
+                Store store = stores.get(rs.getLong("store_id"));
+                beerPrice.setStore(store);
+
+                beerPrice.setPrice(rs.getDouble("price"));
+                return beerPrice;
             }
         };
     }
