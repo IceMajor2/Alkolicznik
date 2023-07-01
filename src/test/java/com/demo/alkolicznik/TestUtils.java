@@ -204,7 +204,7 @@ public class TestUtils {
     }
 
     /**
-     * Helper method for sending a {@code HTTP POST}
+     * Helper method for sending an {@code HTTP POST}
      * request through {@code TestRestTemplate}.
      *
      * @param url           url of target request
@@ -218,6 +218,14 @@ public class TestUtils {
         return postResponse;
     }
 
+    /**
+     * Helper method for sending an {@code HTTP GET}
+     * request through {@code TestRestTemplate} with basic auth.
+     * @param url url of target request
+     * @param username
+     * @param password
+     * @return
+     */
     public static ResponseEntity<String> getRequestWithBasicAuth(String url, String username, String password) {
         ResponseEntity<String> getResponse = restTemplate
                 .withBasicAuth(username, password)
@@ -225,9 +233,15 @@ public class TestUtils {
         return getResponse;
     }
 
-    public static <T> T toModel(String json, Class<T> claz) {
+    /**
+     * Converts JSON string to a desired model (if JSON matches it).
+     * @param json JSON as {@code String}
+     * @param clazz class of model-representing JSON
+     * @return object of provided class
+     */
+    public static <T> T toModel(String json, Class<T> clazz) {
         try {
-            T model = mapper.readValue(json, claz);
+            T model = mapper.readValue(json, clazz);
             return model;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
