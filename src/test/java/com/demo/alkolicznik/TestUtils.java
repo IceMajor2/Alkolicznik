@@ -174,6 +174,22 @@ public class TestUtils {
         return responseDTOs;
     }
 
+    public static List<BeerPriceResponseDTO> toBeerPriceResponseDTOList(String json) {
+        JSONArray array = getJsonArray(json);
+
+        List<BeerPriceResponseDTO> responseDTOs = new ArrayList<>();
+        for(int i = 0; i < array.length(); i++) {
+            try {
+                String beerPriceAsString = array.getString(i);
+                BeerPriceResponseDTO responseDTO = toModel(beerPriceAsString, BeerPriceResponseDTO.class);
+                responseDTOs.add(responseDTO);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseDTOs;
+    }
+
     /**
      * Converts a model, object to a JSON string.
      *
