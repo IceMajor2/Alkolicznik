@@ -55,6 +55,8 @@ public class TestConfig {
                 Store store = new Store();
                 store.setId(rs.getLong("id"));
                 store.setName(rs.getString("name"));
+                store.setCity(rs.getString("city"));
+                store.setStreet(rs.getString("street"));
                 return store;
             }
         };
