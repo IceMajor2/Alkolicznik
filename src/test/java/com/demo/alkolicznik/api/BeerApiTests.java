@@ -93,7 +93,6 @@ public class BeerApiTests {
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
-            System.out.println(jsonResponse);
             List<BeerResponseDTO> actual = toBeerResponseDTOList(jsonResponse);
 
             List<BeerResponseDTO> expected = new ArrayList<>();
