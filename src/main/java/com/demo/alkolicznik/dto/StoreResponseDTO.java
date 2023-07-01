@@ -2,15 +2,13 @@ package com.demo.alkolicznik.dto;
 
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @JsonPropertyOrder({"id", "name", "city", "street"})
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class StoreResponseDTO {
 
     private Long id;
