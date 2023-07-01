@@ -66,7 +66,7 @@ public class Store {
 
     @Override
     public String toString() {
-        return "%s (ID: %d)".formatted(this.name, this.id);
+        return "ID %d. %s, %s (%s)".formatted(this.id, this.name, this.street, this.city);
     }
 
     public void addBeer(Beer beer, double price) {

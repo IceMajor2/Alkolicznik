@@ -67,9 +67,9 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all stored beers in array")
-        public void getBeerArrayTest() {
-            var getResponse = getRequest("/api/beer");
+        @DisplayName("Get all stored beers in array w/ authorization")
+        public void getBeerAllArrayAuthorizedTest() {
+            var getResponse = getRequestWithBasicAuth("/api/beer", "admin", "admin");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
@@ -79,6 +79,16 @@ public class BeerApiTests {
                     .map(BeerResponseDTO::new)
                     .collect(Collectors.toList());
             assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Get all stored beers in array w/o authorization")
+        public void getBeerAllArrayUnauthorizedTest() throws Exception {
+            var getResponse = getRequest("/api/beer");
+
+            String json = getResponse.getBody();
+
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/beer");
         }
     }
 

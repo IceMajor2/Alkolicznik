@@ -218,6 +218,13 @@ public class TestUtils {
         return postResponse;
     }
 
+    public static ResponseEntity<String> getRequestWithBasicAuth(String url, String username, String password) {
+        ResponseEntity<String> getResponse = restTemplate
+                .withBasicAuth(username, password)
+                .getForEntity(url, String.class);
+        return getResponse;
+    }
+
     public static <T> T toModel(String json, Class<T> claz) {
         try {
             T model = mapper.readValue(json, claz);

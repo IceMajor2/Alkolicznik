@@ -24,7 +24,7 @@ public class BeerApiController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id, @RequestParam String city) {
+    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id) {
         Beer beer = beerService.get(id);
         BeerResponseDTO beerDto = new BeerResponseDTO(beer);
         return ResponseEntity.ok(beerDto);

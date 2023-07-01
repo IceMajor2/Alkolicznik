@@ -2,6 +2,8 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.exceptions.StoreAlreadyExistsException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -32,9 +34,10 @@ public class StoreService {
         return storeRepository.findAll();
     }
 
-    public Store add(Store store) {
+    public Store add(StoreRequestDTO storeRequestDTO) {
+        Store store = storeRequestDTO.convertToModel();
         if(storeRepository.existsByName(store.getName())) {
-            return null;
+            throw new StoreAlreadyExistsException();
         }
         return storeRepository.save(store);
     }

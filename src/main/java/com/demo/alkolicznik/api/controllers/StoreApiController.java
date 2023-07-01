@@ -2,6 +2,8 @@ package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.api.services.StoreService;
@@ -39,15 +41,13 @@ public class StoreApiController {
     }
 
     @PostMapping("/store")
-    public ResponseEntity<Store> addStore(@RequestBody @Valid Store store) {
-        Store saved = storeService.add(store);
-        if(saved == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Store> addStore(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
+        Store saved = storeService.add(storeRequestDTO);
+        StoreResponseDTO responseDTO = new StoreResponseDTO(saved);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(store.getId())
+                .buildAndExpand(saved.getId())
                 .toUri();
         return ResponseEntity.created(location).body(saved);
     }
