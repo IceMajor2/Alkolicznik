@@ -39,7 +39,7 @@ public class TestUtils {
      * @param name
      * @return {@code StoreRequestDTO}
      */
-    public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
+    public static StoreRequestDTO createStoreRequestDTO(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
         request.setName(name);
         request.setCity(city);
@@ -47,8 +47,8 @@ public class TestUtils {
         return request;
     }
 
-    public static Store createStoreResponse(Long id, String name, String city, String street) {
-        Store store = new Store();
+    public static StoreResponseDTO createStoreResponseDTO(Long id, String name, String city, String street) {
+        StoreResponseDTO store = new StoreResponseDTO();
         store.setId(id);
         store.setName(name);
         store.setCity(city);
@@ -113,20 +113,17 @@ public class TestUtils {
      * response in tests. If you don't want to specify some parameter,
      * just replace it with {@code null}.
      *
-     * @param storeId
-     * @param storeName
-     * @param beerId
-     * @param beerName
+     * @param beerResponseDTO mapped to DTO {@code Beer} model
+     * @param storeResponseDTO mapped to DTO {@code Store} model
      * @param price
      * @return {@code BeerPriceResponseDTO}
      */
-    public static BeerPriceResponseDTO createBeerPriceResponse(Long storeId, String storeName,
-                                                               Long beerId, String beerName, Double price) {
+    public static BeerPriceResponseDTO createBeerPriceResponse(BeerResponseDTO beerResponseDTO,
+                                                               StoreResponseDTO storeResponseDTO,
+                                                               double price) {
         BeerPriceResponseDTO response = new BeerPriceResponseDTO();
-        response.setStoreId(storeId);
-        response.setStoreName(storeName);
-        response.setBeerId(beerId);
-        response.setBeerName(beerName);
+        response.setBeer(beerResponseDTO);
+        response.setStore(storeResponseDTO);
         response.setPrice(price);
         return response;
     }
