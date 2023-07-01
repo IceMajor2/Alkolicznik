@@ -9,12 +9,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -190,7 +194,7 @@ public class TestUtils {
     }
 
     /**
-     * Helper method for sending a {@code HTTP GET}
+     * Helper method for sending an {@code HTTP GET}
      * request through {@code TestRestTemplate}.
      *
      * @param url           url of target request
@@ -204,13 +208,32 @@ public class TestUtils {
     }
 
     /**
+     * Helper method for sending an {@code HTTP GET}
+     * request through {@code TestRestTemplate} with parameters in URL.
+     * @param url url of target request
+     * @param parameters parameters as {@code Map}
+     * @return {@ResponseEntity<String>}
+     */
+    public static ResponseEntity<String> getRequest(String url, Map<String, String> parameters) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        for (var entry : parameters.entrySet()) {
+            builder.queryParam(entry.getKey(), "{%s}".formatted(entry.getKey()));
+        }
+        String urlTemplate = builder.encode().toUriString();
+
+        ResponseEntity<String> getResponse = restTemplate
+                .exchange(urlTemplate, HttpMethod.GET, HttpEntity.EMPTY, String.class, parameters);
+        return getResponse;
+    }
+
+    /**
      * Helper method for sending an {@code HTTP POST}
      * request through {@code TestRestTemplate}.
      *
      * @param url           url of target request
      * @param requestObject object to send to url
      * @param pathVariables url variables
-     * @return
+     * @return {@ResponseEntity<String>}
      */
     public static ResponseEntity<String> postRequest(String url, Object requestObject, Object... pathVariables) {
         ResponseEntity<String> postResponse = restTemplate
@@ -221,10 +244,11 @@ public class TestUtils {
     /**
      * Helper method for sending an {@code HTTP GET}
      * request through {@code TestRestTemplate} with basic auth.
-     * @param url url of target request
+     *
+     * @param url      url of target request
      * @param username
      * @param password
-     * @return
+     * @return {@ResponseEntity<String>}
      */
     public static ResponseEntity<String> getRequestWithBasicAuth(String url, String username, String password) {
         ResponseEntity<String> getResponse = restTemplate
@@ -235,7 +259,8 @@ public class TestUtils {
 
     /**
      * Converts JSON string to a desired model (if JSON matches it).
-     * @param json JSON as {@code String}
+     *
+     * @param json  JSON as {@code String}
      * @param clazz class of model-representing JSON
      * @return object of provided class
      */
