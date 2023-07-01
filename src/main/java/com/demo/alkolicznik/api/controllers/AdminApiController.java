@@ -27,13 +27,13 @@ public class AdminApiController {
     }
 
     @GetMapping("/store")
-    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Store>> getAllStores() {
         return ResponseEntity.ok(storeService.getStores());
     }
 
     @GetMapping("/beer")
-    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<BeerResponseDTO>> getAllBeers() {
         List<Beer> beers = beerService.getBeers();
         List<BeerResponseDTO> beersDto = beers.stream()

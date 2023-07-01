@@ -8,10 +8,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -69,7 +67,7 @@ public class BeerApiTests {
         @Test
         @DisplayName("Get all stored beers in array w/ authorization")
         public void getBeerAllArrayAuthorizedTest() {
-            var getResponse = getRequestWithBasicAuth("/api/beer", "admin", "admin");
+            var getResponse = getRequestWithBasicAuth("/api/admin/beer", "admin", "admin");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();

@@ -38,7 +38,7 @@ public class TestConfig {
     }
 
     @Bean
-    public DataSource dataSource(){
+    public DataSource dataSource() {
         return
                 (new EmbeddedDatabaseBuilder())
                         .addScript("classpath:data_sql/schema.sql")
