@@ -63,15 +63,25 @@ public class StoreApiTests {
         }
 
         @Test
-        @DisplayName("Get all stores")
-        public void getStoresAllTest() {
-            var getResponse = getRequest("/api/store");
+        @DisplayName("Get all stores w/ authorization")
+        public void getStoresAllAuthorizedTest() {
+            var getResponse = getRequestWithBasicAuth("/api/store", "admin", "admin");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String json = getResponse.getBody();
             List<Store> actual = toStoreList(json);
 
             assertThat(actual).isEqualTo(stores);
+        }
+
+        @Test
+        @DisplayName("Get all stores w/o authorization")
+        public void getStoresAllUnauthorizedTest() throws Exception {
+            var getResponse = getRequest("/api/store");
+
+            String json = getResponse.getBody();
+
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/store");
         }
     }
 
@@ -104,7 +114,7 @@ public class StoreApiTests {
 
             String json = postResponse.getBody();
 
-            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/store");
         }
 
         @Test
@@ -115,13 +125,13 @@ public class StoreApiTests {
 
             String json = postResponse.getBody();
 
-            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/store");
 
             postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
 
             json = postResponse.getBody();
 
-            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/beer");
+            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/store");
         }
 
         @Test
@@ -206,8 +216,8 @@ public class StoreApiTests {
 
             String json = postResponse.getBody();
 
-            assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified;" +
-                    " City was not specified; Street was not specified", "/api/store");
+            assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified;" +
+                    " Name was not specified; Street was not specified", "/api/store");
         }
     }
 
