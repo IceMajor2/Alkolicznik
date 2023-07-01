@@ -3,6 +3,8 @@ package com.demo.alkolicznik.api;
 import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,7 +14,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.demo.alkolicznik.TestUtils.*;
@@ -24,6 +28,9 @@ public class BeerApiTests {
 
     @Autowired
     private List<Beer> beers;
+
+    @Autowired
+    private List<Store> stores;
 
     /**
      * Launch this test to see whether the
@@ -80,7 +87,28 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all stored beers in array w/o authorization")
+        @DisplayName("Get all beers in array of city")
+        public void getBeerFromCityArrayTest() {
+            var getResponse = getRequest("/api/beer", Map.of("city", "Olsztyn"));
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String jsonResponse = getResponse.getBody();
+            System.out.println(jsonResponse);
+            List<BeerResponseDTO> actual = toBeerResponseDTOList(jsonResponse);
+
+            List<BeerResponseDTO> expected = new ArrayList<>();
+            stores.stream()
+                    .filter((store -> store.getCity().equals("Olsztyn")))
+                    .map(Store::getPrices)
+                    .forEach(beerPrices -> beerPrices.stream()
+                            .map(BeerPrice::getBeer)
+                            .map(BeerResponseDTO::new)
+                            .forEach(beerResponseDTO -> expected.add(beerResponseDTO)));
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Get all beers in array w/o authorization")
         public void getBeerAllArrayUnauthorizedTest() throws Exception {
             var getResponse = getRequest("/api/admin/beer");
 
