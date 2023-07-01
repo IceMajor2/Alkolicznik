@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/store")
 public class StoreApiController {
 
     private StoreService storeService;
@@ -26,7 +26,7 @@ public class StoreApiController {
         this.storeService = storeService;
     }
 
-    @GetMapping("/store/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Store> getStore(@PathVariable Long id) {
         Store store = storeService.get(id);
         if(store == null) {
@@ -35,12 +35,12 @@ public class StoreApiController {
         return ResponseEntity.ok(store);
     }
 
-    @GetMapping("/store")
+    @GetMapping
     public ResponseEntity<List<Store>> getStores(@RequestParam String city) {
         return ResponseEntity.ok(storeService.getStores(city));
     }
 
-    @PostMapping("/store")
+    @PostMapping
     public ResponseEntity<Store> addStore(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
         Store saved = storeService.add(storeRequestDTO);
         StoreResponseDTO responseDTO = new StoreResponseDTO(saved);
@@ -52,7 +52,7 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @PostMapping("/store/{id}/beer")
+    @PostMapping("/{id}/beer")
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
             @PathVariable Long id,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
@@ -65,7 +65,7 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(beerPriceResponse);
     }
 
-    @GetMapping("/store/{id}/beer")
+    @GetMapping("/{id}/beer")
     public ResponseEntity<Set<BeerPrice>> getBeers(@PathVariable("id") Long storeId) {
         Set<BeerPrice> beers = storeService.getBeers(storeId);
         return ResponseEntity.ok(beers);
