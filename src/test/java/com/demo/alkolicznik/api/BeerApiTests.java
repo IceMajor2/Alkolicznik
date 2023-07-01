@@ -86,7 +86,7 @@ public class BeerApiTests {
 
             String json = getResponse.getBody();
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/beer");
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
         }
     }
 
@@ -228,7 +228,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: TYPE present but blank")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerWithPresentButBlankTypeStatusCheckTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Heineken", " ", null));
@@ -243,7 +243,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: VOLUME negative and equal to zero")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerWithNegativeVolumeTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Pilsner Urquell", null, -0.5)
@@ -270,7 +270,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND null")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerWithNoBrandTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, "Jasne Okocimskie", null)
@@ -286,7 +286,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND blank")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerWithBlankBrandTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(" \t \t  \t\t ", "Cerny", null)
@@ -313,7 +313,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: TYPE blank")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerWithBlankType() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Miloslaw", "  \t\t ", 0.6)
@@ -340,7 +340,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: ALREADY_EXISTS")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerAlreadyPresentTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Perla", "Chmielowa Pils", null)
@@ -367,7 +367,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND null, TYPE blank, VOLUME negative")
-        @DirtiesContext
+       // @DirtiesContext
         public void createBeerBrandNullTypeBlankVolumeNegativeTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, " \t", -15.9)

@@ -65,7 +65,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Get all stores w/ authorization")
         public void getStoresAllAuthorizedTest() {
-            var getResponse = getRequestWithBasicAuth("/api/store", "admin", "admin");
+            var getResponse = getRequestWithBasicAuth("/api/admin/store", "admin", "admin");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String json = getResponse.getBody();
@@ -77,11 +77,11 @@ public class StoreApiTests {
         @Test
         @DisplayName("Get all stores w/o authorization")
         public void getStoresAllUnauthorizedTest() throws Exception {
-            var getResponse = getRequest("/api/store");
+            var getResponse = getRequest("/api/admin/store");
 
             String json = getResponse.getBody();
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/store");
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
         }
     }
 
@@ -108,7 +108,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: NAME null")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreNameNullTest() throws Exception {
             var postResponse = postRequest("/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
 
@@ -119,7 +119,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: NAME blank & NAME empty")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() throws Exception {
             var postResponse = postRequest("/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
 
@@ -136,7 +136,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: CITY null")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreCityNullTest() throws Exception {
             var postResponse = postRequest("/api/store",
                     createStoreRequest("Lubi", null, "ul. Kwiatkowa 3"));
@@ -148,7 +148,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: CITY blank & empty")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreCityBlankAndEmptyTest() throws Exception {
             var postResponse = postRequest("/api/store",
                     createStoreRequest("Lubi", "", "ul. Kwiatkowa 3"));
@@ -167,7 +167,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: STREET null")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreStreetNullTest() throws Exception {
             var postResponse = postRequest("/api/store",
                     createStoreRequest("Primo", "Olsztyn", null));
@@ -179,7 +179,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: STREET blank & empty")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreStreetBlankAndEmptyTest() throws Exception {
             var postResponse = postRequest("/api/store",
                     createStoreRequest("Primo", "Olsztyn", ""));
@@ -198,7 +198,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: ALREADY_EXISTS")
-        @DirtiesContext
+      // @DirtiesContext
         public void createStoreAlreadyExistsTest() throws Exception {
             var postResponse = postRequest("/api/store", createStoreRequest("Lidl", "Szczecin", "ul. Poranna 32"));
 
@@ -209,7 +209,7 @@ public class StoreApiTests {
 
         @Test
         @DisplayName("Create invalid store: NAME blank, CITY null, STREET empty")
-        @DirtiesContext
+       // @DirtiesContext
         public void createStoreNameBlankCityNullStreetEmptyTest() throws Exception {
             var postResponse = postRequest("/api/store",
                     createStoreRequest(" \t", null, ""));
