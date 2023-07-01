@@ -82,7 +82,7 @@ public class BeerApiTests {
         @Test
         @DisplayName("Get all stored beers in array w/o authorization")
         public void getBeerAllArrayUnauthorizedTest() throws Exception {
-            var getResponse = getRequest("/api/beer");
+            var getResponse = getRequest("/api/admin/beer");
 
             String json = getResponse.getBody();
 
