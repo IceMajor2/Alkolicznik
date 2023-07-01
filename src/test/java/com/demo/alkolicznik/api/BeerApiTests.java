@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,17 +95,20 @@ public class BeerApiTests {
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
-            List<BeerResponseDTO> actual = toBeerResponseDTOList(jsonResponse);
+            List<BeerPriceResponseDTO> actual = toBeerPriceResponseDTOList(jsonResponse);
 
-            List<BeerResponseDTO> expected = new ArrayList<>();
-            stores.stream()
-                    .filter((store -> store.getCity().equals("Olsztyn")))
-                    .map(Store::getPrices)
-                    .forEach(beerPrices -> beerPrices.stream()
-                            .map(BeerPrice::getBeer)
-                            .map(BeerResponseDTO::new)
-                            .forEach(beerResponseDTO -> expected.add(beerResponseDTO)));
-            assertThat(actual).isEqualTo(expected);
+            List<BeerPriceResponseDTO> expected = new ArrayList<>();
+
+            List<Store> olsztynStores = stores.stream()
+                    .filter(store -> store.getCity().equals("Olsztyn"))
+                    .collect(Collectors.toList());
+
+            for (Store store : olsztynStores) {
+                for(BeerPrice beer : store.getPrices()) {
+                    expected.add(new BeerPriceResponseDTO(beer));
+                }
+            }
+            assertThat(actual.toArray()).containsExactly(expected.toArray());
         }
 
         @Test
@@ -255,7 +260,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: TYPE present but blank")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerWithPresentButBlankTypeStatusCheckTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Heineken", " ", null));
@@ -270,7 +275,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: VOLUME negative and equal to zero")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerWithNegativeVolumeTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Pilsner Urquell", null, -0.5)
@@ -297,7 +302,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND null")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerWithNoBrandTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, "Jasne Okocimskie", null)
@@ -313,7 +318,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND blank")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerWithBlankBrandTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(" \t \t  \t\t ", "Cerny", null)
@@ -340,7 +345,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: TYPE blank")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerWithBlankType() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Miloslaw", "  \t\t ", 0.6)
@@ -367,7 +372,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: ALREADY_EXISTS")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerAlreadyPresentTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO("Perla", "Chmielowa Pils", null)
@@ -394,7 +399,7 @@ public class BeerApiTests {
 
         @Test
         @DisplayName("Create invalid beer: BRAND null, TYPE blank, VOLUME negative")
-       // @DirtiesContext
+        // @DirtiesContext
         public void createBeerBrandNullTypeBlankVolumeNegativeTest() throws Exception {
             var postResponse = postRequest("/api/beer",
                     createBeerRequestDTO(null, " \t", -15.9)
