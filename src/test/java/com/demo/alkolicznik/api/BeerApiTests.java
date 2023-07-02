@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,6 +108,31 @@ public class BeerApiTests {
                 }
             }
             assertThat(actual.toArray()).containsExactly(expected.toArray());
+        }
+
+        @Test
+        @DisplayName("Get all beers in array of empty city")
+        public void getBeerFromCityEmptyArrayTest() {
+            var getResponse = getRequest("/api/beer", Map.of("city", "Gdansk"));
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+
+            String expectedJson = "[]";
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Get all beers in array of non-existent city")
+        public void getBeerFromCityNotExistsArrayTest() throws Exception {
+            var getResponse = getRequest("/api/beer", Map.of("city", "Bydgoszcz"));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "No such city",
+                    "/api/beer");
         }
 
         @Test
