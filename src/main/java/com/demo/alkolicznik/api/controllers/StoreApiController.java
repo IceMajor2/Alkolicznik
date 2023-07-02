@@ -56,7 +56,7 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @PostMapping("/{id}/beer")
+    @PostMapping("/{id}/beer-price")
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
             @PathVariable Long id,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
