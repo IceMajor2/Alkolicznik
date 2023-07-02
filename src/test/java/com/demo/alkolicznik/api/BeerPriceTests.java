@@ -135,7 +135,7 @@ public class BeerPriceTests {
     class PostRequests {
 
         @Test
-        @DisplayName("Add valid beer price to store")
+        @DisplayName("Add valid beer price to store: ALL")
         @DirtiesContext
         public void addBeerPriceToStoreTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
@@ -144,13 +144,35 @@ public class BeerPriceTests {
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
                     createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
             );
             String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
 
+        @Test
+        @DisplayName("Add valid beer price to store: VOLUME not specified")
+        @DirtiesContext
+        public void addBeerPriceToStoreDefaultVolumeTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69),
+                    7);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
+                    3.69);
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
         }
 
@@ -179,6 +201,5 @@ public class BeerPriceTests {
                     "Volume must be a positive number",
                     "/api/store/6/beer-price");
         }
-        
     }
 }
