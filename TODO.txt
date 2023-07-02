@@ -1,7 +1,1 @@
-- make repositories 'Paging and Sorting'
-- add Lombok
-- update docs
-
-** TESTS **
-- update docs
-- make send helper method contain URL as parameter (refactor accordingly)
+https://icemajor.atlassian.net/jira/software/projects/AL/boards/1/backlog
