@@ -36,8 +36,12 @@ public class StoreApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Store>> getStores(@RequestParam String city) {
-        return ResponseEntity.ok(storeService.getStores(city));
+    public ResponseEntity<List<StoreResponseDTO>> getStores(@RequestParam String city) {
+        List<Store> stores = storeService.getStores(city);
+        List<StoreResponseDTO> storesDTO = stores.stream()
+                .map(StoreResponseDTO::new)
+                .toList();
+        return ResponseEntity.ok(storesDTO);
     }
 
     @PostMapping

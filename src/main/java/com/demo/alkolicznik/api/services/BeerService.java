@@ -33,11 +33,10 @@ public class BeerService {
     }
 
     public List<Beer> getBeers(String city) {
-        List<Store> cityStores = storeRepository.findAllByCity(city);
-
-        if(cityStores.isEmpty()) {
+        if(!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException();
         }
+        List<Store> cityStores = storeRepository.findAllByCity(city);
 
         List<Beer> beersInCity = new ArrayList<>();
         for(Store store : cityStores) {

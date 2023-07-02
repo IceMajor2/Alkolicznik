@@ -11,5 +11,7 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 
     List<Store> findAllByCity(String city);
 
+    boolean existsByCity(String city);
+
     boolean existsByNameAndCityAndStreet(String name, String city, String street);
 }

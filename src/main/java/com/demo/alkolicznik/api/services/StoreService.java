@@ -3,6 +3,7 @@ package com.demo.alkolicznik.api.services;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.exceptions.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
@@ -28,6 +29,9 @@ public class StoreService {
     }
 
     public List<Store> getStores(String city) {
+        if(!storeRepository.existsByCity(city)) {
+            throw new NoSuchCityException();
+        }
         return storeRepository.findAllByCity(city);
     }
 
