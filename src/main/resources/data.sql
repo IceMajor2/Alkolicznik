@@ -1,9 +1,9 @@
 -- stores
-INSERT INTO store (ID, NAME, CITY, STREET) VALUES (1, 'Carrefour', 'Olsztyn', 'ul. Borkowskiego 13')
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (nextval('store_id_seq'), 'Carrefour', 'Olsztyn', 'ul. Borkowskiego 13')
 ON CONFLICT DO NOTHING;
-INSERT INTO store (ID, NAME, CITY, STREET) VALUES (2, 'Biedronka', 'Olsztyn', 'ul. Krasickiego 8')
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (nextval('store_id_seq'), 'Biedronka', 'Olsztyn', 'ul. Krasickiego 8')
 ON CONFLICT DO NOTHING;
-INSERT INTO store (ID, NAME, CITY, STREET) VALUES (3, 'Grosik', 'Gdansk', 'ul. Marianskiego 9')
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (nextval('store_id_seq'), 'Grosik', 'Gdansk', 'ul. Marianskiego 9')
 ON CONFLICT DO NOTHING;
 
 -- beers
