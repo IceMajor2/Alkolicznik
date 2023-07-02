@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +68,17 @@ public class StoreApiTests {
         @Test
         @DisplayName("Get stores of city in array")
         public void getStoreFromCityArrayTest() {
-            var getResponse = getRequest("/api/beer-price", Map.of("city", "Wloclawek"));
+            var getResponse = getRequest("/api/store", Map.of("city", "Warszawa"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
-            //List<Store>
+            List<StoreResponseDTO> actual = toModelList(jsonResponse, StoreResponseDTO.class);
+
+            List<StoreResponseDTO> expected = stores.stream()
+                    .filter(store -> store.getCity().equals("Warszawa"))
+                    .map(StoreResponseDTO::new)
+                    .toList();
+            assertThat(actual.toArray()).containsExactly(expected.toArray());
         }
 
         @Test
@@ -99,7 +106,7 @@ public class StoreApiTests {
             List<StoreResponseDTO> expected = stores.stream()
                     .map(StoreResponseDTO::new)
                     .toList();
-            assertThat(actual).isEqualTo(stores);
+            assertThat(actual).isEqualTo(expected);
         }
 
         @Test
