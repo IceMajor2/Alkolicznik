@@ -100,7 +100,7 @@ public class StoreApiTests {
             String actualJson = postResponse.getBody();
             StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
-            StoreResponseDTO expected = createStoreResponseDTO(7L, "Dwojka", "Krakow", "ul. Powstancow 9");
+            StoreResponseDTO expected = createStoreResponseDTO(8L, "Dwojka", "Krakow", "ul. Powstancow 9");
             String expectedJson = toJsonString(expected);
 
             assertThat(actualJson).isEqualTo(expectedJson);

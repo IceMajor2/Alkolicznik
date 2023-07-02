@@ -88,9 +88,9 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beers in array of city")
+        @DisplayName("Get all beerPrices in array of city")
         public void getBeerFromCityArrayTest() {
-            var getResponse = getRequest("/api/beer", Map.of("city", "Olsztyn"));
+            var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String jsonResponse = getResponse.getBody();
@@ -111,9 +111,9 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beers in array of empty city")
+        @DisplayName("Get all beerPrices in array of empty city")
         public void getBeerFromCityEmptyArrayTest() {
-            var getResponse = getRequest("/api/beer", Map.of("city", "Gdansk"));
+            var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -123,16 +123,16 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beers in array of non-existent city")
+        @DisplayName("Get all beerPrices in array of non-existent city")
         public void getBeerFromCityNotExistsArrayTest() throws Exception {
-            var getResponse = getRequest("/api/beer", Map.of("city", "Bydgoszcz"));
+            var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
 
             String jsonResponse = getResponse.getBody();
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
                     "No such city",
-                    "/api/beer");
+                    "/api/beer-price");
         }
 
         @Test
