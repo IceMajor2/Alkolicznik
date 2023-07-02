@@ -201,7 +201,7 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: ALREADY_EXISTS")
         // @DirtiesContext
         public void createStoreAlreadyExistsTest() throws Exception {
-            var postResponse = postRequest("/api/store", createStoreRequestDTO("Lidl", "Szczecin", "ul. Poranna 32"));
+            var postResponse = postRequest("/api/store", createStoreRequestDTO("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
 
             String json = postResponse.getBody();
 

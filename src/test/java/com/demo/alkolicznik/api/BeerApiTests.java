@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,7 +89,7 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beerPrices in array of city")
+        @DisplayName("Get all beerPrices of city in array")
         public void getBeerFromCityArrayTest() {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -111,7 +112,7 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beerPrices in array of empty city")
+        @DisplayName("Get all beerPrices of empty city in array")
         public void getBeerFromCityEmptyArrayTest() {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -123,7 +124,7 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Get all beerPrices in array of non-existent city")
+        @DisplayName("Get all beerPrices of non-existing city in array")
         public void getBeerFromCityNotExistsArrayTest() throws Exception {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
 
