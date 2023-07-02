@@ -21,12 +21,7 @@ import java.util.Set;
 public class Beer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "beer_id_seq")
-    @SequenceGenerator(
-            name = "beer_id_seq",
-            sequenceName = "beer_id_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String brand;
     private String type;

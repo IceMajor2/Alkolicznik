@@ -22,12 +22,7 @@ import java.util.Set;
 public class Store {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "store_id_seq")
-    @SequenceGenerator(
-            name = "store_id_seq",
-            sequenceName = "store_id_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
