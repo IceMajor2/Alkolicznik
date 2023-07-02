@@ -2,8 +2,10 @@ package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +41,20 @@ public class AdminApiController {
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<List<BeerResponseDTO>> getAllBeers() {
         List<Beer> beers = beerService.getBeers();
-        List<BeerResponseDTO> beersDto = beers.stream()
+        List<BeerResponseDTO> beersDTO = beers.stream()
                 .map(beerService::convertToResponseDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(beersDto);
+        return ResponseEntity.ok(beersDTO);
+    }
+
+    @GetMapping("/beer-price")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
+    public ResponseEntity<List<BeerPriceResponseDTO>> getAllBeerPrices() {
+        List<BeerPrice> prices = beerService.getBeerPrices();
+        List<BeerPriceResponseDTO> pricesDTO = prices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(pricesDTO);
     }
 }

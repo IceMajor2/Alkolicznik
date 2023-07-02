@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class BeerApiController {
 
     @GetMapping
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@RequestParam("city") String city) {
-        List<BeerPrice> beers = beerService.getBeers(city);
+        List<BeerPrice> beers = beerService.getBeerPrices(city);
 
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)

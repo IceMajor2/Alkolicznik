@@ -31,18 +31,27 @@ public class BeerService {
         return beer;
     }
 
-    public List<BeerPrice> getBeers(String city) {
+    public List<BeerPrice> getBeerPrices() {
+        List<Store> stores = storeRepository.findAll();
+        List<BeerPrice> prices = new ArrayList<>();
+        for(Store store : stores) {
+            prices.addAll(store.getPrices());
+        }
+        return prices;
+    }
+
+    public List<BeerPrice> getBeerPrices(String city) {
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
         if(cityStores.isEmpty()) {
             throw new NoSuchCityException();
         }
 
-        List<BeerPrice> beers = new ArrayList<>();
+        List<BeerPrice> prices = new ArrayList<>();
         for(Store store : cityStores) {
-            beers.addAll(store.getPrices());
+            prices.addAll(store.getPrices());
         }
-        return beers;
+        return prices;
     }
 
     public List<Beer> getBeers() {
