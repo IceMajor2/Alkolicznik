@@ -31,11 +31,11 @@ public class BeerPriceTests {
 
     @Nested
     class GetRequests {
-        
+
         @Test
         @DisplayName("Get beer prices of city")
         public void getBeerPricesFromCityTest() {
-            var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
+            var getResponse = getRequest("/api/beer-prce", Map.of("city", "Olsztyn"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -83,7 +83,26 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices from non-existing store")
         public void getBeerPricesFromStoreNotExistsTest() {
+            var getResponse = getRequest("/api/store/{id}/beer-price", 8L);
 
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find store of 8 id",
+                    "/api/store/8/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get beer prices of empty store")
+        public void getBeerPricesFromStoreEmptyTest() {
+            var getResponse = getRequest("/api/store/{id}/beer-price", 7);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+
+            String expectedJson = "[]";
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
