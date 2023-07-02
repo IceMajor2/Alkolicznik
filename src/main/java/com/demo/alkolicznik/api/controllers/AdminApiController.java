@@ -5,6 +5,7 @@ import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +29,14 @@ public class AdminApiController {
 
     @GetMapping("/store")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<List<Store>> getAllStores() {
         return ResponseEntity.ok(storeService.getStores());
     }
 
     @GetMapping("/beer")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<List<BeerResponseDTO>> getAllBeers() {
         List<Beer> beers = beerService.getBeers();
         List<BeerResponseDTO> beersDto = beers.stream()
