@@ -135,23 +135,49 @@ public class BeerPriceTests {
     class PostRequests {
 
         @Test
-        @DisplayName("Valid add beer to store")
+        @DisplayName("Add valid beer price to store")
         @DirtiesContext
         public void addBeerPriceToStoreTest() {
-            var postResponse = postRequest("/api/store/{id}/beer",
-                    createBeerPriceRequest("Perla Chmielowa Pils", 3.69),
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69),
                     2);
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponseDTO(1L, "Perla Chmielowa Pils", 0.5),
-                    createStoreResponseDTO(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
+                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
             );
             String expectedJson = toJsonString(expected);
 
             assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
+        public void createBeerPriceWithNegativeVolumeTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09),
+                    6L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/store/6/beer");
+
+            postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Tyskie Gronie", 0d, 3.09),
+                    6L);
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/store/6/beer");
         }
     }
 }

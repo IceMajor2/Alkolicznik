@@ -37,7 +37,7 @@ public class StoreApiTests {
             String actualJson = getResponse.getBody();
             StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
-            StoreResponseDTO expected = createStoreResponseDTO(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1");
+            StoreResponseDTO expected = createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1");
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -119,13 +119,13 @@ public class StoreApiTests {
         @DirtiesContext
         public void createStoreTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Dwojka", "Krakow", "ul. Powstancow 9"));
+                    createStoreRequest("Dwojka", "Krakow", "ul. Powstancow 9"));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
-            StoreResponseDTO expected = createStoreResponseDTO(8L, "Dwojka", "Krakow", "ul. Powstancow 9");
+            StoreResponseDTO expected = createStoreResponse(8L, "Dwojka", "Krakow", "ul. Powstancow 9");
             String expectedJson = toJsonString(expected);
 
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -136,7 +136,7 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: NAME null")
         // @DirtiesContext
         public void createStoreNameNullTest() {
-            var postResponse = postRequest("/api/store", createStoreRequestDTO(null, "Mragowo", "ul. Wyspianskiego 17"));
+            var postResponse = postRequest("/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
 
             String json = postResponse.getBody();
 
@@ -147,13 +147,13 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: NAME blank & NAME empty")
         // @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() {
-            var postResponse = postRequest("/api/store", createStoreRequestDTO("", "Gdansk", "ul. Hallera 120"));
+            var postResponse = postRequest("/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/store");
 
-            postResponse = postRequest("/api/store", createStoreRequestDTO("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
+            postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
 
             json = postResponse.getBody();
 
@@ -165,7 +165,7 @@ public class StoreApiTests {
         // @DirtiesContext
         public void createStoreCityNullTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Lubi", null, "ul. Kwiatkowa 3"));
+                    createStoreRequest("Lubi", null, "ul. Kwiatkowa 3"));
 
             String json = postResponse.getBody();
 
@@ -177,14 +177,14 @@ public class StoreApiTests {
         // @DirtiesContext
         public void createStoreCityBlankAndEmptyTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Lubi", "", "ul. Kwiatkowa 3"));
+                    createStoreRequest("Lubi", "", "ul. Kwiatkowa 3"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified", "/api/store");
 
             postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Lubi", "\t \n", "ul. Brzozowa 31"));
+                    createStoreRequest("Lubi", "\t \n", "ul. Brzozowa 31"));
 
             json = postResponse.getBody();
 
@@ -196,7 +196,7 @@ public class StoreApiTests {
         // @DirtiesContext
         public void createStoreStreetNullTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Primo", "Olsztyn", null));
+                    createStoreRequest("Primo", "Olsztyn", null));
 
             String json = postResponse.getBody();
 
@@ -208,14 +208,14 @@ public class StoreApiTests {
         // @DirtiesContext
         public void createStoreStreetBlankAndEmptyTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Primo", "Olsztyn", ""));
+                    createStoreRequest("Primo", "Olsztyn", ""));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Street was not specified", "/api/store");
 
             postResponse = postRequest("/api/store",
-                    createStoreRequestDTO("Primo", "Olsztyn", "\t     "));
+                    createStoreRequest("Primo", "Olsztyn", "\t     "));
 
             json = postResponse.getBody();
 
@@ -226,7 +226,7 @@ public class StoreApiTests {
         @DisplayName("Create invalid store: ALREADY_EXISTS")
         // @DirtiesContext
         public void createStoreAlreadyExistsTest() {
-            var postResponse = postRequest("/api/store", createStoreRequestDTO("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
+            var postResponse = postRequest("/api/store", createStoreRequest("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
 
             String json = postResponse.getBody();
 
@@ -238,7 +238,7 @@ public class StoreApiTests {
         // @DirtiesContext
         public void createStoreNameBlankCityNullStreetEmptyTest() {
             var postResponse = postRequest("/api/store",
-                    createStoreRequestDTO(" \t", null, ""));
+                    createStoreRequest(" \t", null, ""));
 
             String json = postResponse.getBody();
 

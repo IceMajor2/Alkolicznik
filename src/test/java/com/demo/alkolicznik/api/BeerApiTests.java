@@ -93,13 +93,13 @@ public class BeerApiTests {
         @DirtiesContext
         public void createBeerTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Lech", null, null));
+                    createBeerRequest("Lech", null, null));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponseDTO(7L, "Lech", 0.5);
+            BeerResponseDTO expected = createBeerResponse(7L, "Lech", 0.5);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -119,13 +119,13 @@ public class BeerApiTests {
         @DirtiesContext
         public void createBeerWithCustomVolumeTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Karmi", null, 0.6));
+                    createBeerRequest("Karmi", null, 0.6));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponseDTO(7L, "Karmi", 0.6);
+            BeerResponseDTO expected = createBeerResponse(7L, "Karmi", 0.6);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -145,14 +145,14 @@ public class BeerApiTests {
         @DirtiesContext
         public void createBeerWithTypePresentTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Ksiazece", "Wisnia", null)
+                    createBeerRequest("Ksiazece", "Wisnia", null)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponseDTO(7L, "Ksiazece Wisnia", 0.5);
+            BeerResponseDTO expected = createBeerResponse(7L, "Ksiazece Wisnia", 0.5);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -172,14 +172,14 @@ public class BeerApiTests {
         @DirtiesContext
         public void createBeerWithCustomVolumeAndTypePresentTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Zywiec", "Jasne", 0.33)
+                    createBeerRequest("Zywiec", "Jasne", 0.33)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponseDTO(7L, "Zywiec Jasne", 0.33);
+            BeerResponseDTO expected = createBeerResponse(7L, "Zywiec Jasne", 0.33);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -199,14 +199,14 @@ public class BeerApiTests {
         @DirtiesContext
         public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Perla", "Chmielowa Pils", 0.33)
+                    createBeerRequest("Perla", "Chmielowa Pils", 0.33)
             );
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponseDTO(7L, "Perla Chmielowa Pils", 0.33);
+            BeerResponseDTO expected = createBeerResponse(7L, "Perla Chmielowa Pils", 0.33);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -226,7 +226,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerWithPresentButBlankTypeStatusCheckTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Heineken", " ", null));
+                    createBeerRequest("Heineken", " ", null));
 
             String jsonResponse = postResponse.getBody();
 
@@ -241,7 +241,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerWithNegativeVolumeTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Pilsner Urquell", null, -0.5)
+                    createBeerRequest("Pilsner Urquell", null, -0.5)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -252,7 +252,7 @@ public class BeerApiTests {
                     "/api/beer");
 
             postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Lomza", null, 0d)
+                    createBeerRequest("Lomza", null, 0d)
             );
 
             jsonResponse = postResponse.getBody();
@@ -268,7 +268,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerWithNoBrandTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO(null, "Jasne Okocimskie", null)
+                    createBeerRequest(null, "Jasne Okocimskie", null)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -284,7 +284,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerWithBlankBrandTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO(" \t \t  \t\t ", "Cerny", null)
+                    createBeerRequest(" \t \t  \t\t ", "Cerny", null)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -295,7 +295,7 @@ public class BeerApiTests {
                     "/api/beer");
 
             postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("", "Cerny", null)
+                    createBeerRequest("", "Cerny", null)
             );
 
             jsonResponse = postResponse.getBody();
@@ -311,7 +311,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerWithBlankType() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Miloslaw", "  \t\t ", 0.6)
+                    createBeerRequest("Miloslaw", "  \t\t ", 0.6)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -322,7 +322,7 @@ public class BeerApiTests {
                     "/api/beer");
 
             postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Miloslaw", "", null)
+                    createBeerRequest("Miloslaw", "", null)
             );
 
             jsonResponse = postResponse.getBody();
@@ -338,7 +338,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerAlreadyPresentTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Perla", "Chmielowa Pils", null)
+                    createBeerRequest("Perla", "Chmielowa Pils", null)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -349,7 +349,7 @@ public class BeerApiTests {
                     "/api/beer");
 
             postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO("Zubr", null, null)
+                    createBeerRequest("Zubr", null, null)
             );
 
             jsonResponse = postResponse.getBody();
@@ -365,7 +365,7 @@ public class BeerApiTests {
         // @DirtiesContext
         public void createBeerBrandNullTypeBlankVolumeNegativeTest() {
             var postResponse = postRequest("/api/beer",
-                    createBeerRequestDTO(null, " \t", -15.9)
+                    createBeerRequest(null, " \t", -15.9)
             );
 
             String jsonResponse = postResponse.getBody();

@@ -39,7 +39,7 @@ public class TestUtils {
      * @param name
      * @return {@code StoreRequestDTO}
      */
-    public static StoreRequestDTO createStoreRequestDTO(String name, String city, String street) {
+    public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
         request.setName(name);
         request.setCity(city);
@@ -47,7 +47,7 @@ public class TestUtils {
         return request;
     }
 
-    public static StoreResponseDTO createStoreResponseDTO(Long id, String name, String city, String street) {
+    public static StoreResponseDTO createStoreResponse(Long id, String name, String city, String street) {
         StoreResponseDTO store = new StoreResponseDTO();
         store.setId(id);
         store.setName(name);
@@ -66,7 +66,7 @@ public class TestUtils {
      * @param volume
      * @return {@code BeerResponseDTO}
      */
-    public static BeerResponseDTO createBeerResponseDTO(Long id, String name, Double volume) {
+    public static BeerResponseDTO createBeerResponse(Long id, String name, Double volume) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
         response.setFullName(name);
@@ -84,7 +84,7 @@ public class TestUtils {
      * @param volume
      * @return {@code BeerRequestDTO}
      */
-    public static BeerRequestDTO createBeerRequestDTO(String brand, String type, Double volume) {
+    public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
         BeerRequestDTO request = new BeerRequestDTO();
         request.setBrand(brand);
         request.setType(type);
@@ -98,12 +98,14 @@ public class TestUtils {
      * just replace it with {@code null}.
      *
      * @param beerName
+     * @param volume
      * @param price
      * @return {@code BeerPriceRequestDTO}
      */
-    public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double price) {
+    public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
         BeerPriceRequestDTO request = new BeerPriceRequestDTO();
         request.setBeerName(beerName);
+        request.setBeerVolume(volume);
         request.setPrice(price);
         return request;
     }
