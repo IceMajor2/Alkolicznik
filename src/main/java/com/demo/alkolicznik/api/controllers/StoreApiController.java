@@ -70,8 +70,11 @@ public class StoreApiController {
     }
 
     @GetMapping("/{id}/beer")
-    public ResponseEntity<Set<BeerPrice>> getBeers(@PathVariable("id") Long storeId) {
-        Set<BeerPrice> beers = storeService.getBeers(storeId);
-        return ResponseEntity.ok(beers);
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@PathVariable("id") Long storeId) {
+        Set<BeerPrice> prices = storeService.getBeers(storeId);
+        List<BeerPriceResponseDTO> pricesDTO = prices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .toList();
+        return ResponseEntity.ok(pricesDTO);
     }
 }
