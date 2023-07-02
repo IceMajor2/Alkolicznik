@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/beer")
+@RequestMapping("/api")
 public class BeerApiController {
 
     private BeerService beerService;
@@ -25,24 +25,32 @@ public class BeerApiController {
         this.beerService = beerService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/beer/{id}")
     public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id) {
         Beer beer = beerService.get(id);
-        BeerResponseDTO beerDto = new BeerResponseDTO(beer);
-        return ResponseEntity.ok(beerDto);
+        BeerResponseDTO beerDTO = new BeerResponseDTO(beer);
+        return ResponseEntity.ok(beerDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@RequestParam("city") String city) {
-        List<BeerPrice> beers = beerService.getBeerPrices(city);
+    @GetMapping("/beer")
+    public ResponseEntity<List<BeerResponseDTO>> getBeers(@RequestParam("city") String city) {
+        List<Beer> beers = beerService.getBeers(city);
+        List<BeerResponseDTO> beersDTO = beers.stream()
+                .map(BeerResponseDTO::new)
+                .toList();
+        return ResponseEntity.ok(beersDTO);
+    }
 
+    @GetMapping("/beer-price")
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrices(@RequestParam("city") String city) {
+        List<BeerPrice> beers = beerService.getBeerPrices(city);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(beersResponse);
     }
 
-    @PostMapping
+    @PostMapping("/beer")
     public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
         try {
             Beer saved = beerService.add(beerRequestDTO);

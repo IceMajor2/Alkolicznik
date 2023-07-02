@@ -13,6 +13,7 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BeerService {
@@ -29,6 +30,24 @@ public class BeerService {
         Optional<Beer> optBeer = beerRepository.findById(beerId);
         Beer beer = optBeer.orElseThrow(() -> new BeerNotFoundException(beerId));
         return beer;
+    }
+
+    public List<Beer> getBeers(String city) {
+        List<Store> cityStores = storeRepository.findAllByCity(city);
+
+        if(cityStores.isEmpty()) {
+            throw new NoSuchCityException();
+        }
+
+        List<Beer> beersInCity = new ArrayList<>();
+        for(Store store : cityStores) {
+            beersInCity.addAll(
+                    store.getPrices().stream()
+                            .map(BeerPrice::getBeer)
+                            .collect(Collectors.toList())
+            );
+        }
+        return beersInCity;
     }
 
     public List<BeerPrice> getBeerPrices() {
