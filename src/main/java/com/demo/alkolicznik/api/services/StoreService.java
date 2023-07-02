@@ -67,7 +67,8 @@ public class StoreService {
     }
 
     public Set<BeerPrice> getBeers(Long storeId) {
-        Store store = storeRepository.findById(storeId).get();
+        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId));
         Set<BeerPrice> beers = store.getPrices();
         return beers;
     }

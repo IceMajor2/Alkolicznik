@@ -69,7 +69,7 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(beerPriceResponse);
     }
 
-    @GetMapping("/{id}/beer")
+    @GetMapping("/{id}/beer-price")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@PathVariable("id") Long storeId) {
         Set<BeerPrice> prices = storeService.getBeers(storeId);
         List<BeerPriceResponseDTO> pricesDTO = prices.stream()
