@@ -37,7 +37,7 @@ public class StoreService {
 
     public Store add(StoreRequestDTO storeRequestDTO) {
         Store store = storeRequestDTO.convertToModel();
-        if(storeRepository.existsByName(store.getName())) {
+        if(storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
             throw new StoreAlreadyExistsException();
         }
         return storeRepository.save(store);
@@ -53,6 +53,7 @@ public class StoreService {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).get();
         String beerFullname = beerPriceRequestDTO.getBeerName();
+        System.out.println(beerFullname);
         Beer beer = beerRepository.findByFullname(beerFullname).get();
         // Pass beer with price to store and save changes.
         double price = beerPriceRequestDTO.getPrice();
