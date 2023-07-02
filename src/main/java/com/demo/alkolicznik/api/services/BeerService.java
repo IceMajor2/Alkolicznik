@@ -4,6 +4,7 @@ import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.NoSuchCityException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -32,6 +33,10 @@ public class BeerService {
 
     public List<BeerPrice> getBeers(String city) {
         List<Store> cityStores = storeRepository.findAllByCity(city);
+
+        if(cityStores.isEmpty()) {
+            throw new NoSuchCityException();
+        }
 
         List<BeerPrice> beers = new ArrayList<>();
         for(Store store : cityStores) {
