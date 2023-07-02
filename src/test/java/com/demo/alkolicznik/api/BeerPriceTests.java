@@ -35,7 +35,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices of city")
         public void getBeerPricesFromCityTest() {
-            var getResponse = getRequest("/api/beer-prce", Map.of("city", "Olsztyn"));
+            var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
