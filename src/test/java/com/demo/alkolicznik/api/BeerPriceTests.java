@@ -166,7 +166,7 @@ public class BeerPriceTests {
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "Volume must be a positive number",
-                    "/api/store/6/beer");
+                    "/api/store/6/beer-price");
 
             postResponse = postRequest("/api/store/{id}/beer-price",
                     createBeerPriceRequest("Tyskie Gronie", 0d, 3.09),
@@ -177,7 +177,8 @@ public class BeerPriceTests {
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "Volume must be a positive number",
-                    "/api/store/6/beer");
+                    "/api/store/6/beer-price");
         }
+        
     }
 }
