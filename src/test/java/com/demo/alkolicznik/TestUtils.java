@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @Component
 public class TestUtils {
@@ -113,7 +114,7 @@ public class TestUtils {
      * response in tests. If you don't want to specify some parameter,
      * just replace it with {@code null}.
      *
-     * @param beerResponseDTO mapped to DTO {@code Beer} model
+     * @param beerResponseDTO  mapped to DTO {@code Beer} model
      * @param storeResponseDTO mapped to DTO {@code Store} model
      * @param price
      * @return {@code BeerPriceResponseDTO}
@@ -178,7 +179,7 @@ public class TestUtils {
         JSONArray array = getJsonArray(json);
 
         List<BeerPriceResponseDTO> responseDTOs = new ArrayList<>();
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             try {
                 String beerPriceAsString = array.getString(i);
                 BeerPriceResponseDTO responseDTO = toModel(beerPriceAsString, BeerPriceResponseDTO.class);
@@ -223,7 +224,8 @@ public class TestUtils {
     /**
      * Helper method for sending an {@code HTTP GET}
      * request through {@code TestRestTemplate} with parameters in URL.
-     * @param url url of target request
+     *
+     * @param url        url of target request
      * @param parameters parameters as {@code Map}
      * @return {@ResponseEntity<String>}
      */
@@ -315,13 +317,34 @@ public class TestUtils {
     public static void assertIsError(JSONObject actual,
                                      HttpStatus expectedStatus,
                                      String expectedMessage,
-                                     String expectedPath) throws Exception {
+                                     String expectedPath) {
+
+        try {
+            assertThat(actual.getInt("status")).isEqualTo(expectedStatus.value());
+        } catch (JSONException e) {
+            fail("'status' key is not present");
+        }
+        try {
+            assertThat(actual.getString("message")).isEqualTo(expectedMessage);
+        } catch (JSONException e) {
+            fail("'message' key is not present");
+        }
+        try {
+            assertThat(actual.getString("error")).isEqualTo(expectedStatus.getReasonPhrase());
+        } catch (JSONException e) {
+            fail("'error' key is not present");
+        }
+        try {
+            assertThat(actual.getString("path")).isEqualTo(expectedPath);
+        } catch (JSONException e) {
+            fail("'path' key is not present");
+        }
+        try {
+            assertThat(actual.getString("timestamp")).isNotNull();
+        } catch (JSONException e) {
+            fail("'timestamp' key is not present");
+        }
         assertThat(actual.length()).isEqualTo(5);
-        assertThat(actual.getInt("status")).isEqualTo(expectedStatus.value());
-        assertThat(actual.getString("message")).isEqualTo(expectedMessage);
-        assertThat(actual.getString("error")).isEqualTo(expectedStatus.getReasonPhrase());
-        assertThat(actual.getString("path")).isEqualTo(expectedPath);
-        assertThat(actual.getString("timestamp")).isNotNull();
     }
 
     private static JSONObject getJsonObject(String json) {
