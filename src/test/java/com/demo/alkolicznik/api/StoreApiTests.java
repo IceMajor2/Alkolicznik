@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +24,6 @@ public class StoreApiTests {
 
     @Autowired
     private List<Store> stores;
-
-    /**
-     * Launch this test to see whether the
-     * ApplicationContext loads correctly.
-     */
-    @Test
-    void contextLoads() {
-    }
 
     @Nested
     class GetRequests {

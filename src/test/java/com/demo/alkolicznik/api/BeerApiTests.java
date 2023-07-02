@@ -1,10 +1,8 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,11 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.demo.alkolicznik.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,14 +27,6 @@ public class BeerApiTests {
 
     @Autowired
     private List<Store> stores;
-
-    /**
-     * Launch this test to see whether the
-     * ApplicationContext loads correctly.
-     */
-    @Test
-    public void contextLoads() {
-    }
 
     @Nested
     class GetRequests {
@@ -61,7 +47,7 @@ public class BeerApiTests {
         }
 
         @Test
-        @DisplayName("Error: Get beer of invalid id")
+        @DisplayName("Get beer of invalid id")
         public void getBeerNotExistingStatusCheckTest() {
             var getResponse = getRequest("/api/beer/{id}", 9999L);
 
@@ -71,54 +57,6 @@ public class BeerApiTests {
                     HttpStatus.NOT_FOUND,
                     "Unable to find beer of 9999 id",
                     "/api/beer/9999");
-        }
-
-        @Test
-        @DisplayName("Get beerPrices of city in array")
-        public void getBeerFromCityArrayTest() {
-            var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            String jsonResponse = getResponse.getBody();
-            List<BeerPriceResponseDTO> actual = toModelList(jsonResponse, BeerPriceResponseDTO.class);
-
-            List<BeerPriceResponseDTO> expected = new ArrayList<>();
-
-            List<Store> olsztynStores = stores.stream()
-                    .filter(store -> store.getCity().equals("Olsztyn"))
-                    .collect(Collectors.toList());
-
-            for (Store store : olsztynStores) {
-                for (BeerPrice beer : store.getPrices()) {
-                    expected.add(new BeerPriceResponseDTO(beer));
-                }
-            }
-            assertThat(actual.toArray()).containsExactly(expected.toArray());
-        }
-
-        @Test
-        @DisplayName("Get beerPrices of empty city in array")
-        public void getBeerFromCityEmptyArrayTest() {
-            var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            String actualJson = getResponse.getBody();
-
-            String expectedJson = "[]";
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
-
-        @Test
-        @DisplayName("Get beerPrices of non-existing city in array")
-        public void getBeerFromCityNotExistsArrayTest() {
-            var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
-
-            String jsonResponse = getResponse.getBody();
-
-            assertIsError(jsonResponse,
-                    HttpStatus.NOT_FOUND,
-                    "No such city",
-                    "/api/beer-price");
         }
 
         @Test
