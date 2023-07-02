@@ -1,9 +1,8 @@
 package com.demo.alkolicznik.dto;
 
-import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class BeerPriceResponseDTO {
 
     private BeerResponseDTO beer;
