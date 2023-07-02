@@ -1,7 +1,6 @@
 package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.dto.*;
-import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -129,66 +128,20 @@ public class TestUtils {
         return response;
     }
 
-    /**
-     * Converts JSON array (as {@code String}) representing
-     * {@code Store} to {@code java.util.List}.
-     *
-     * @param json JSON array
-     * @return {@code List<Store>}
-     */
-    public static List<Store> toStoreList(String json) {
+    public static <T> List<T> toModelList(String json, Class<T> clazz) {
         JSONArray array = getJsonArray(json);
 
-        List<Store> stores = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
+        List<T> tObjects = new ArrayList<>();
+        for(int i = 0; i < array.length(); i++) {
             try {
-                String storeJson = array.getString(i);
-                Store store = toModel(storeJson, Store.class);
-                stores.add(store);
+                String objectAsString = array.getString(i);
+                T object = toModel(objectAsString, clazz);
+                tObjects.add(object);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return stores;
-    }
-
-    /**
-     * Converts JSON array (as {@code String}) representing
-     * {@code BeerResponseDTO} to {@code java.util.List}.
-     *
-     * @param json JSON array
-     * @return {@code List<BeerResponseDTO>}
-     */
-    public static List<BeerResponseDTO> toBeerResponseDTOList(String json) {
-        JSONArray array = getJsonArray(json);
-
-        List<BeerResponseDTO> responseDTOs = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            try {
-                String beerAsString = array.getString(i);
-                BeerResponseDTO responseDTO = toModel(beerAsString, BeerResponseDTO.class);
-                responseDTOs.add(responseDTO);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return responseDTOs;
-    }
-
-    public static List<BeerPriceResponseDTO> toBeerPriceResponseDTOList(String json) {
-        JSONArray array = getJsonArray(json);
-
-        List<BeerPriceResponseDTO> responseDTOs = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            try {
-                String beerPriceAsString = array.getString(i);
-                BeerPriceResponseDTO responseDTO = toModel(beerPriceAsString, BeerPriceResponseDTO.class);
-                responseDTOs.add(responseDTO);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return responseDTOs;
+        return tObjects;
     }
 
     /**
@@ -301,7 +254,7 @@ public class TestUtils {
     public static void assertIsError(String actual,
                                      HttpStatus expectedStatus,
                                      String expectedMessage,
-                                     String expectedPath) throws Exception {
+                                     String expectedPath) {
         JSONObject object = getJsonObject(actual);
         assertIsError(object, expectedStatus, expectedMessage, expectedPath);
     }

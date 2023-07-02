@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.demo.alkolicznik.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,15 +52,39 @@ public class StoreApiTests {
         }
 
         @Test
-        @DisplayName("Error: get store of invalid id")
-        public void getStoreNotExistingTest() throws Exception {
+        @DisplayName("Get store of invalid id")
+        public void getStoreNotExistingTest() {
             var getResponse = getRequest("/api/store/{id}", 9999L);
 
             String json = getResponse.getBody();
 
             assertIsError(json,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find store of 9999 id", "/api/store/9999");
+                    "Unable to find store of 9999 id",
+                    "/api/store/9999");
+        }
+
+        @Test
+        @DisplayName("Get stores of city in array")
+        public void getStoreFromCityArrayTest() {
+            var getResponse = getRequest("/api/beer-price", Map.of("city", "Wloclawek"));
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String jsonResponse = getResponse.getBody();
+            //List<Store>
+        }
+
+        @Test
+        @DisplayName("Get stores of non-existing city in array")
+        public void getStoreFromCityNotExistsArrayTest() {
+            var getResponse = getRequest("/api/store", Map.of("city", "Ciechanow"));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "No such city",
+                    "/api/store");
         }
 
         @Test
@@ -69,15 +93,18 @@ public class StoreApiTests {
             var getResponse = getRequestWithBasicAuth("/api/admin/store", "admin", "admin");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            String json = getResponse.getBody();
-            List<Store> actual = toStoreList(json);
+            String jsonResponse = getResponse.getBody();
+            List<StoreResponseDTO> actual = toModelList(jsonResponse, StoreResponseDTO.class);
 
+            List<StoreResponseDTO> expected = stores.stream()
+                    .map(StoreResponseDTO::new)
+                    .toList();
             assertThat(actual).isEqualTo(stores);
         }
 
         @Test
         @DisplayName("Get all stores w/o authorization")
-        public void getStoresAllUnauthorizedTest() throws Exception {
+        public void getStoresAllUnauthorizedTest() {
             var getResponse = getRequest("/api/admin/store");
 
             String json = getResponse.getBody();
@@ -110,7 +137,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: NAME null")
         // @DirtiesContext
-        public void createStoreNameNullTest() throws Exception {
+        public void createStoreNameNullTest() {
             var postResponse = postRequest("/api/store", createStoreRequestDTO(null, "Mragowo", "ul. Wyspianskiego 17"));
 
             String json = postResponse.getBody();
@@ -121,7 +148,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: NAME blank & NAME empty")
         // @DirtiesContext
-        public void createStoreNameBlankAndEmptyTest() throws Exception {
+        public void createStoreNameBlankAndEmptyTest() {
             var postResponse = postRequest("/api/store", createStoreRequestDTO("", "Gdansk", "ul. Hallera 120"));
 
             String json = postResponse.getBody();
@@ -138,7 +165,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: CITY null")
         // @DirtiesContext
-        public void createStoreCityNullTest() throws Exception {
+        public void createStoreCityNullTest() {
             var postResponse = postRequest("/api/store",
                     createStoreRequestDTO("Lubi", null, "ul. Kwiatkowa 3"));
 
@@ -150,7 +177,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: CITY blank & empty")
         // @DirtiesContext
-        public void createStoreCityBlankAndEmptyTest() throws Exception {
+        public void createStoreCityBlankAndEmptyTest() {
             var postResponse = postRequest("/api/store",
                     createStoreRequestDTO("Lubi", "", "ul. Kwiatkowa 3"));
 
@@ -169,7 +196,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: STREET null")
         // @DirtiesContext
-        public void createStoreStreetNullTest() throws Exception {
+        public void createStoreStreetNullTest() {
             var postResponse = postRequest("/api/store",
                     createStoreRequestDTO("Primo", "Olsztyn", null));
 
@@ -181,7 +208,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: STREET blank & empty")
         // @DirtiesContext
-        public void createStoreStreetBlankAndEmptyTest() throws Exception {
+        public void createStoreStreetBlankAndEmptyTest() {
             var postResponse = postRequest("/api/store",
                     createStoreRequestDTO("Primo", "Olsztyn", ""));
 
@@ -200,7 +227,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: ALREADY_EXISTS")
         // @DirtiesContext
-        public void createStoreAlreadyExistsTest() throws Exception {
+        public void createStoreAlreadyExistsTest() {
             var postResponse = postRequest("/api/store", createStoreRequestDTO("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
 
             String json = postResponse.getBody();
@@ -211,7 +238,7 @@ public class StoreApiTests {
         @Test
         @DisplayName("Create invalid store: NAME blank, CITY null, STREET empty")
         // @DirtiesContext
-        public void createStoreNameBlankCityNullStreetEmptyTest() throws Exception {
+        public void createStoreNameBlankCityNullStreetEmptyTest() {
             var postResponse = postRequest("/api/store",
                     createStoreRequestDTO(" \t", null, ""));
 
@@ -219,30 +246,6 @@ public class StoreApiTests {
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified;" +
                     " Name was not specified; Street was not specified", "/api/store");
-        }
-    }
-
-    @Nested
-    class BeerPriceRequests {
-
-        @Test
-        @DisplayName("Valid add beer to store")
-        @DirtiesContext
-        public void addBeerToStoreTest() {
-            var postResponse = postRequest("/api/store/{id}/beer",
-                    createBeerPriceRequest("Perla Chmielowa Pils", 3.69),
-                    2);
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-            String actualJson = postResponse.getBody();
-
-            BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponseDTO(1L, "Perla Chmielowa Pils", 0.5),
-                    createStoreResponseDTO(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
-            );
-            String expectedJson = toJsonString(expected);
-
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
     }
 }
