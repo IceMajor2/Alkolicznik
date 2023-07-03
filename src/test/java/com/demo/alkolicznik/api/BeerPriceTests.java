@@ -132,71 +132,7 @@ public class BeerPriceTests {
     }
 
     @Nested
-    class PostRequests {
-
-        @Test
-        @DisplayName("Add valid beer price to store: ALL")
-        @DirtiesContext
-        public void addBeerPriceToStoreTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69),
-                    2);
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-            String actualJson = postResponse.getBody();
-            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-            BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
-                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
-            );
-            String expectedJson = toJsonString(expected);
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
-
-        @Test
-        @DisplayName("Add valid beer price to store: ALL (1-piece name)")
-        @DirtiesContext
-        public void addBeerPriceToStoreTest2() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Zubr", 0.5, 2.79),
-                    1L);
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-            String actualJson = postResponse.getBody();
-            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-            BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(4L, "Zubr", 0.5),
-                    createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
-                    2.79
-            );
-            String expectedJson = toJsonString(expected);
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
-
-        @Test
-        @DisplayName("Add valid beer price to store: VOLUME not specified")
-        @DirtiesContext
-        public void addBeerPriceToStoreDefaultVolumeTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69),
-                    7);
-            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-            String actualJson = postResponse.getBody();
-            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-            BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
-                    createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
-                    3.69);
-            String expectedJson = toJsonString(expected);
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
+    class PostRequestsParam {
 
         @Test
         @DisplayName("Add valid beer price (ID) to store")
@@ -289,6 +225,74 @@ public class BeerPriceTests {
                     HttpStatus.CONFLICT,
                     "Beer is already in store",
                     "/api/store/1/beer-price");
+        }
+    }
+
+    @Nested
+    class PostRequestsObject {
+
+        @Test
+        @DisplayName("Add valid beer price to store: ALL")
+        @DirtiesContext
+        public void addBeerPriceToStoreTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69),
+                    2);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
+            );
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Add valid beer price to store: ALL (1-piece name)")
+        @DirtiesContext
+        public void addBeerPriceToStoreTest2() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Zubr", 0.5, 2.79),
+                    1L);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(4L, "Zubr", 0.5),
+                    createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
+                    2.79
+            );
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Add valid beer price to store: VOLUME not specified")
+        @DirtiesContext
+        public void addBeerPriceToStoreDefaultVolumeTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69),
+                    7);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
+                    3.69);
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
