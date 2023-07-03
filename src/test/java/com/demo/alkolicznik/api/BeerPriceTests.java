@@ -2,6 +2,7 @@ package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,9 @@ public class BeerPriceTests {
     @Autowired
     private List<Store> stores;
 
+    @Autowired
+    private List<Beer> beers;
+
     @Nested
     class GetRequests {
 
@@ -54,6 +58,45 @@ public class BeerPriceTests {
             String expectedJson = toJsonString(expected);
             assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
             assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Get beer prices of beer")
+        public void getBeerPricesOfBeerTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", 3L);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+            List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+
+            Beer beer = null;
+            for(Beer beerObj : beers) {
+                if(beerObj.getId() == 3L) {
+                    beer = beerObj;
+                    break;
+                }
+            }
+
+            List<BeerPriceResponseDTO> expected = beer.getPrices()
+                    .stream()
+                    .map(BeerPriceResponseDTO::new)
+                    .toList();
+            String expectedJson = toJsonString(expected);
+            assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Get beer prices of beer: BEER_NOT_EXISTS")
+        public void getBeerPricesOfBeerNotExistsTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", 333L);
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '333' id",
+                    "/api/beer/333/beer-price");
         }
 
         @Test
