@@ -89,7 +89,7 @@ public class BeerPriceTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find store of 8 id",
+                    "Unable to find store of '8' id",
                     "/api/store/8/beer-price");
         }
 
@@ -218,6 +218,36 @@ public class BeerPriceTests {
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price (ID) to store: STORE_NOT_EXISTS")
+        public void addBeerPriceIdStoreNotExistsTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 3L, "beer_price", 4.19),
+                    9999L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find store of '9999' id",
+                    "/api/store/9999/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price (ID) to store: PRICE negative and zero")
+        public void addBeerPriceIdVolumeNegativeAndZeroTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 5L, "beer_price", 0d),
+                    2L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/store/5/beer-price");
         }
 
         @Test
@@ -369,7 +399,7 @@ public class BeerPriceTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find store of 9999 id",
+                    "Unable to find store of '9999' id",
                     "/api/store/9999/beer-price");
         }
     }

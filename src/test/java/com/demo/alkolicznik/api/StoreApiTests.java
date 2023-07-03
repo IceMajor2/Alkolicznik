@@ -52,7 +52,7 @@ public class StoreApiTests {
 
             assertIsError(json,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find store of 9999 id",
+                    "Unable to find store of '9999' id",
                     "/api/store/9999");
         }
 
