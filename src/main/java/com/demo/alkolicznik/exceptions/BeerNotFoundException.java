@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BeerNotFoundException extends RuntimeException {
 
     public BeerNotFoundException(Long id) {
-        super("Unable to find beer of %d id".formatted(id));
+        super("Unable to find beer of '%d' id".formatted(id));
     }
 
     public BeerNotFoundException(String fullname) {
         super("Unable to find beer of '%s' name".formatted(fullname));
+    }
+
+    public BeerNotFoundException(double volume) {
+        super("Unable to find beer of '%d' volume".formatted(volume));
     }
 }
