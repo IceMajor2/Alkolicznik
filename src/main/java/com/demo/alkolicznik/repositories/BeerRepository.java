@@ -11,8 +11,7 @@ public interface BeerRepository extends CrudRepository<Beer, Long> {
 
     Optional<Beer> findByBrand(String brand);
 
-    @Query(value =
-            "SELECT b FROM Beer b WHERE concat(brand, ' ', type) = ?1")
+    @Query(value = "SELECT * FROM beer b WHERE concat_ws(' ', brand, type) = ?1", nativeQuery = true)
     Optional<Beer> findByFullname(String fullname);
 
     List<Beer> findAll();
