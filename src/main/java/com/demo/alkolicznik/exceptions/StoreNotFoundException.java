@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class StoreNotFoundException extends RuntimeException {
     
     public StoreNotFoundException(Long id) {
-        super("Unable to find store of %d id".formatted(id));
+        super("Unable to find store of '%d' id".formatted(id));
     }
 }
