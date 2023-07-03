@@ -100,6 +100,68 @@ public class BeerPriceTests {
         }
 
         @Test
+        @DisplayName("Get beer price")
+        public void getBeerPriceTest() {
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("store_id", 3L, "beer_id", 3L));
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(3L, "Tyskie Gronie", 0.6),
+                    createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"),
+                    4.19
+            );
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Get beer price: STORE_NOT_EXISTS")
+        public void getBeerPriceStoreNotExistsTest() {
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("store_id", 95L, "beer_id", 3L));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find store of '95' id",
+                    "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get beer price: BEER_NOT_EXISTS")
+        public void getBeerPriceBeerNotExistsTest() {
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("store_id", 5L, "beer_id", 35L));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '35' id",
+                    "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get beer price: BEER_PRICE_NOT_EXISTS")
+        public void getBeerPriceNotExistsTest() {
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("store_id", 3L, "beer_id", 4L));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Store does not currently sell this beer",
+                    "/api/beer-price");
+        }
+
+        @Test
         @DisplayName("Get beer prices from store")
         public void getBeerPricesFromStoreTest() {
             var getResponse = getRequest("/api/store/{id}/beer-price", 3L);
