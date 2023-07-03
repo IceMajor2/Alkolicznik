@@ -426,7 +426,7 @@ public class BeerPriceTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find beer of '%.2f' volume".formatted(0.6),
+                    "Unable to find beer 'Zubr' of '%.2f' volume".formatted(0.6),
                     "/api/store/2/beer-price");
         }
 

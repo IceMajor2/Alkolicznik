@@ -14,7 +14,7 @@ public class BeerNotFoundException extends RuntimeException {
         super("Unable to find beer of '%s' name".formatted(fullname));
     }
 
-    public BeerNotFoundException(double volume) {
-        super("Unable to find beer of '%.2f' volume".formatted(volume));
+    public BeerNotFoundException(String fullname, double volume) {
+        super("Unable to find beer '%s' of '%.2f' volume".formatted(fullname, volume));
     }
 }

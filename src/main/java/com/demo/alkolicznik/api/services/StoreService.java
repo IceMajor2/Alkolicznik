@@ -63,7 +63,7 @@ public class StoreService {
         double volume = beerPriceRequestDTO.getBeerVolume();
         // If beer is not found in DB, then the reason is volume
         Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
-                () -> new BeerNotFoundException(volume)
+                () -> new BeerNotFoundException(beerFullname, volume)
         );
         if(store.getBeer(beer.getFullName()).isPresent()) {
             throw new BeerPriceAlreadyExistsException();
