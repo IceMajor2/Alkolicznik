@@ -3,6 +3,7 @@ package com.demo.alkolicznik.api.services;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.exceptions.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.StoreNotFoundException;
@@ -29,7 +30,7 @@ public class StoreService {
     }
 
     public List<Store> getStores(String city) {
-        if(!storeRepository.existsByCity(city)) {
+        if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException();
         }
         return storeRepository.findAllByCity(city);
@@ -41,7 +42,7 @@ public class StoreService {
 
     public Store add(StoreRequestDTO storeRequestDTO) {
         Store store = storeRequestDTO.convertToModel();
-        if(storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
+        if (storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
             throw new StoreAlreadyExistsException();
         }
         return storeRepository.save(store);
@@ -55,9 +56,13 @@ public class StoreService {
 
     public BeerPriceResponseDTO addBeer(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
-        Store store = storeRepository.findById(storeId).get();
+        Store store = storeRepository.findById(storeId).orElseThrow(
+                () -> new StoreNotFoundException(storeId)
+        );
         String beerFullname = beerPriceRequestDTO.getBeerName();
-        Beer beer = beerRepository.findByFullname(beerFullname).get();
+        Beer beer = beerRepository.findByFullname(beerFullname).orElseThrow(
+                () -> new BeerNotFoundException(beerFullname)
+        );
         // Pass beer with price to store and save changes.
         double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);
