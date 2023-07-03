@@ -55,7 +55,7 @@ public class BeerApiTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "Unable to find beer of 9999 id",
+                    "Unable to find beer of '9999' id",
                     "/api/beer/9999");
         }
 
