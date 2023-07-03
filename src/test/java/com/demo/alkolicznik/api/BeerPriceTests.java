@@ -277,6 +277,36 @@ public class BeerPriceTests {
         }
 
         @Test
+        @DisplayName("Add invalid beer price (ID) to store: BEER_PRICE_ALREADY_EXISTS")
+        public void addBeerPriceIdAlreadyExistsTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 2, "beer_price", 6.69),
+                    1L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.CONFLICT,
+                    "Beer is already in store",
+                    "/api/store/1/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: BEER_PRICE_ALREADY_EXISTS")
+        public void addBeerPriceAlreadyExistsTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Komes Malinowe", 0.33, 8.09),
+                    1L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.CONFLICT,
+                    "Beer is already in store",
+                    "/api/store/1/beer-price");
+        }
+
+        @Test
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
