@@ -59,10 +59,15 @@ public class StoreService {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
         );
+        // Check if beer exists by fullname
         String beerFullname = beerPriceRequestDTO.getBeerName();
+        if(!beerRepository.existsByFullname(beerFullname)) {
+            throw new BeerNotFoundException(beerFullname);
+        }
         double volume = beerPriceRequestDTO.getBeerVolume();
+        // If beer is not found in DB, then the reason is volume
         Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
-                () -> new BeerNotFoundException(beerFullname)
+                () -> new BeerNotFoundException(volume)
         );
         // Pass beer with price to store and save changes.
         double price = beerPriceRequestDTO.getPrice();

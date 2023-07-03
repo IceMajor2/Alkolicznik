@@ -60,6 +60,7 @@ public class StoreApiController {
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
             @PathVariable Long id,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
+        System.out.println(beerPriceRequestDTO.getBeerVolume());
         BeerPriceResponseDTO beerPriceResponse = storeService.addBeer(id, beerPriceRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
