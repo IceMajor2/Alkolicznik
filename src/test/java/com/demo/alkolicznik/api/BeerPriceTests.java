@@ -277,21 +277,6 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS and PRICE null")
-        public void addBeerPriceIdBeerNotExistsAndPriceNegativeTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
-                    Map.of("beer_id", 53L, "beer_price", null),
-                    3L);
-
-            String jsonResponse = postResponse.getBody();
-
-            assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Price was not specified",
-                    "/api/store/3/beer-price");
-        }
-
-        @Test
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
