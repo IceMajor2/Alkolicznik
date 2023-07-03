@@ -93,7 +93,7 @@ public class TestConfig {
                         .addScript("classpath:data_sql/schema.sql")
                         .addScript("classpath:data_sql/beer-data.sql")
                         .addScript("classpath:data_sql/store-data.sql")
-                        .addScript("classpath:data_sql/store_equipment-data.sql")
+                        .addScript("classpath:data_sql/beer-price-data.sql")
                         .build();
     }
 
