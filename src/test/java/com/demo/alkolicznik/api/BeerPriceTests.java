@@ -247,7 +247,48 @@ public class BeerPriceTests {
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "Price must be a positive number",
-                    "/api/store/5/beer-price");
+                    "/api/store/2/beer-price");
+
+            postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 5L, "beer_price", -5.213),
+                    2L);
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/store/2/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS")
+        public void addBeerPriceIdBeerNotExistsTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 999L, "beer_price", 6.69),
+                    1L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '999' id",
+                    "/api/store/1/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS and PRICE null")
+        public void addBeerPriceIdBeerNotExistsAndPriceNegativeTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 53L, "beer_price", null),
+                    3L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price was not specified",
+                    "/api/store/3/beer-price");
         }
 
         @Test
