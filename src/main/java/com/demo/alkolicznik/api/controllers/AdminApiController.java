@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.api.controllers;
 
+import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
@@ -23,10 +24,12 @@ public class AdminApiController {
 
     private BeerService beerService;
     private StoreService storeService;
+    private BeerPriceService beerPriceService;
 
-    public AdminApiController(BeerService beerService, StoreService storeService) {
+    public AdminApiController(BeerService beerService, StoreService storeService, BeerPriceService beerPriceService) {
         this.beerService = beerService;
         this.storeService = storeService;
+        this.beerPriceService = beerPriceService;
     }
 
     @GetMapping("/store")
@@ -51,7 +54,7 @@ public class AdminApiController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<List<BeerPriceResponseDTO>> getAllBeerPrices() {
-        List<BeerPrice> prices = beerService.getBeerPrices();
+        List<BeerPrice> prices = beerPriceService.getBeerPrices();
         List<BeerPriceResponseDTO> pricesDTO = prices.stream()
                 .map(BeerPriceResponseDTO::new)
                 .collect(Collectors.toList());

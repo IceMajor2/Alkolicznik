@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.api.controllers;
 
-import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.api.services.StoreService;
+import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -21,12 +20,10 @@ import java.util.Set;
 @Validated
 public class BeerPriceApiController {
 
-    private StoreService storeService;
-    private BeerService beerService;
+    private BeerPriceService beerPriceService;
 
-    public BeerPriceApiController(StoreService storeService, BeerService beerService) {
-        this.storeService = storeService;
-        this.beerService = beerService;
+    public BeerPriceApiController(BeerPriceService beerPriceService) {
+        this.beerPriceService = beerPriceService;
     }
 
     @PostMapping("/store/{store_id}/beer-price")
@@ -34,7 +31,7 @@ public class BeerPriceApiController {
             @PathVariable("store_id") Long storeId,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
 
-        BeerPrice beerPrice = storeService.addBeer(storeId, beerPriceRequestDTO);
+        BeerPrice beerPrice = beerPriceService.add(storeId, beerPriceRequestDTO);
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -50,7 +47,7 @@ public class BeerPriceApiController {
             @RequestParam("beer_id") Long beerId,
             @RequestParam("beer_price") @Positive(message = "Price must be a positive number") double price) {
 
-        BeerPrice beerPrice = storeService.addBeer(storeId, beerId, price);
+        BeerPrice beerPrice = beerPriceService.add(storeId, beerId, price);
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -62,7 +59,7 @@ public class BeerPriceApiController {
 
     @GetMapping("/store/{store_id}/beer-price")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPricesStoreId(@PathVariable("store_id") Long storeId) {
-        Set<BeerPrice> prices = storeService.getBeers(storeId);
+        Set<BeerPrice> prices = beerPriceService.getBeerPricesOnStoreId(storeId);
         List<BeerPriceResponseDTO> pricesDTO = prices.stream()
                 .map(BeerPriceResponseDTO::new)
                 .toList();
@@ -71,7 +68,7 @@ public class BeerPriceApiController {
 
     @GetMapping(value = "/beer-price", params = "city")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrices(@RequestParam("city") String city) {
-        List<BeerPrice> beers = beerService.getBeerPrices(city);
+        List<BeerPrice> beers = beerPriceService.getBeerPrices(city);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)
                 .toList();
@@ -80,7 +77,7 @@ public class BeerPriceApiController {
 
     @GetMapping("/beer/{beer_id}/beer-price")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPricesBeerId(@PathVariable("beer_id") Long beerId) {
-        List<BeerPrice> beers = beerService.getBeerPrices(beerId);
+        List<BeerPrice> beers = beerPriceService.getBeerPricesOnBeerId(beerId);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)
                 .toList();
@@ -90,7 +87,7 @@ public class BeerPriceApiController {
     @GetMapping(value = "/beer-price", params = {"store_id", "beer_id"})
     public ResponseEntity<BeerPriceResponseDTO> getBeerPrice(@RequestParam("store_id") Long storeId,
                                                              @RequestParam("beer_id") Long beerId) {
-        BeerPrice beerPrice = beerService.get(storeId, beerId);
+        BeerPrice beerPrice = beerPriceService.get(storeId, beerId);
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         return ResponseEntity.ok(beerPriceResponse);
     }

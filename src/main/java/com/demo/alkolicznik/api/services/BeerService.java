@@ -1,8 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.*;
+import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.NoSuchCityException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -10,7 +11,9 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,42 +50,6 @@ public class BeerService {
         return beersInCity;
     }
 
-    public List<BeerPrice> getBeerPrices() {
-        List<Store> stores = storeRepository.findAll();
-        List<BeerPrice> prices = new ArrayList<>();
-        for(Store store : stores) {
-            prices.addAll(store.getPrices());
-        }
-        return prices;
-    }
-
-    public List<BeerPrice> getBeerPrices(String city) {
-        List<Store> cityStores = storeRepository.findAllByCity(city);
-
-        if(cityStores.isEmpty()) {
-            throw new NoSuchCityException(city);
-        }
-
-        List<BeerPrice> prices = new ArrayList<>();
-        for(Store store : cityStores) {
-            prices.addAll(store.getPrices());
-        }
-        return prices;
-    }
-
-    public List<BeerPrice> getBeerPrices(Long beerId) {
-        Beer beer = beerRepository.findById(beerId).orElseThrow(
-                () -> new BeerNotFoundException(beerId)
-        );
-        List<Store> stores = storeRepository.findAll();
-
-        List<BeerPrice> prices = new ArrayList<>();
-        for(Store store : stores) {
-            store.getBeer(beerId).ifPresent((beerPrice -> prices.add(beerPrice)));
-        }
-        return prices;
-    }
-
     public List<Beer> getBeers() {
         return beerRepository.findAll();
     }
@@ -93,17 +60,5 @@ public class BeerService {
             throw new BeerAlreadyExistsException();
         }
         return beerRepository.save(beer);
-    }
-
-    public BeerPrice get(Long storeId, Long beerId) {
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new StoreNotFoundException(storeId)
-        );
-        Beer beer = beerRepository.findById(beerId).orElseThrow(
-                () -> new BeerNotFoundException(beerId)
-        );
-        return store.getBeer(beerId).orElseThrow(
-                () -> new BeerPriceNotFoundException()
-        );
     }
 }
