@@ -93,17 +93,17 @@ public class TestUtils {
     }
 
     /**
-     * Create {@code BeerPriceRequestDTO_Object}. Used mainly for hardcoding the expected
+     * Create {@code BeerPriceRequestDTO}. Used mainly for hardcoding the expected
      * response in tests. If you don't want to specify some parameter,
      * just replace it with {@code null}.
      *
      * @param beerName
      * @param volume
      * @param price
-     * @return {@code BeerPriceRequestDTO_Object}
+     * @return {@code BeerPriceRequestDTO}
      */
-    public static BeerPriceRequestDTO_Object createBeerPriceRequest(String beerName, Double volume, Double price) {
-        BeerPriceRequestDTO_Object request = new BeerPriceRequestDTO_Object();
+    public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
+        BeerPriceRequestDTO request = new BeerPriceRequestDTO();
         request.setBeerName(beerName);
         if (volume != null) {
             request.setBeerVolume(volume);
