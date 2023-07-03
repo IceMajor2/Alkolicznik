@@ -105,7 +105,9 @@ public class TestUtils {
     public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
         BeerPriceRequestDTO request = new BeerPriceRequestDTO();
         request.setBeerName(beerName);
-        request.setBeerVolume(volume);
+        if(volume != null) {
+            request.setBeerVolume(volume);
+        }
         request.setPrice(price);
         return request;
     }
