@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.BeerPriceRequestDTO_Object;
-import com.demo.alkolicznik.dto.BeerPriceRequestDTO_ID;
+import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.StoreRequestDTO;
 import com.demo.alkolicznik.exceptions.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.NoSuchCityException;
@@ -54,7 +53,7 @@ public class StoreService {
         return store;
     }
 
-    public BeerPrice addBeer(Long storeId, BeerPriceRequestDTO_Object beerPriceRequestDTO) {
+    public BeerPrice addBeer(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
@@ -77,15 +76,13 @@ public class StoreService {
         return store.getBeer(beerFullname).get();
     }
 
-    public BeerPrice addBeer(Long storeId, BeerPriceRequestDTO_ID beerPriceRequestDTO) {
+    public BeerPrice addBeer(Long storeId, Long beerId, double price) {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
         );
-        Long beerId = beerPriceRequestDTO.getBeerId();
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
-        double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);
         storeRepository.save(store);
         return store.getBeer(beerId).get();

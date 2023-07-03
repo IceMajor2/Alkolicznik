@@ -5,7 +5,9 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.api.services.StoreService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,6 +17,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/store")
+@Validated
 public class StoreApiController {
 
     private StoreService storeService;
@@ -23,8 +26,8 @@ public class StoreApiController {
         this.storeService = storeService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Store> getStore(@PathVariable Long id) {
+    @GetMapping("/{store_id}")
+    public ResponseEntity<Store> getStore(@PathVariable("store_id") Long id) {
         Store store = storeService.get(id);
         if (store == null) {
             return ResponseEntity.notFound().build();
@@ -56,7 +59,8 @@ public class StoreApiController {
     @PostMapping("/{store_id}/beer-price")
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
             @PathVariable("store_id") Long storeId,
-            @RequestBody @Valid BeerPriceRequestDTO_Object beerPriceRequestDTO) {
+            @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
+
         BeerPrice beerPrice = storeService.addBeer(storeId, beerPriceRequestDTO);
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         URI location = ServletUriComponentsBuilder
@@ -71,9 +75,9 @@ public class StoreApiController {
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
             @PathVariable("store_id") Long storeId,
             @RequestParam("beer_id") Long beerId,
-            @RequestParam("beer_price") Double beer_price) {
-        BeerPriceRequestDTO_ID beerPriceRequestDTO = new BeerPriceRequestDTO_ID(beerId, beer_price);
-        BeerPrice beerPrice = storeService.addBeer(storeId, beerPriceRequestDTO);
+            @RequestParam("beer_price") @Positive(message = "Price must be a positive number") double price) {
+
+        BeerPrice beerPrice = storeService.addBeer(storeId, beerId, price);
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -83,8 +87,8 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(beerPriceResponse);
     }
 
-    @GetMapping("/{id}/beer-price")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@PathVariable("id") Long storeId) {
+    @GetMapping("/{store_id}/beer-price")
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeers(@PathVariable("store_id") Long storeId) {
         Set<BeerPrice> prices = storeService.getBeers(storeId);
         List<BeerPriceResponseDTO> pricesDTO = prices.stream()
                 .map(BeerPriceResponseDTO::new)
