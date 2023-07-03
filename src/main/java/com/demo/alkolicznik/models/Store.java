@@ -94,4 +94,13 @@ public class Store {
         }
         return Optional.empty();
     }
+
+    public Optional<BeerPrice> getBeer(Long beerId) {
+        for(BeerPrice beer : prices) {
+            if(beer.getBeer().getId() == beerId) {
+                return Optional.of(beer);
+            }
+        }
+        return Optional.empty();
+    }
 }

@@ -1,9 +1,6 @@
 package com.demo.alkolicznik.api.controllers;
 
-import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.StoreRequestDTO;
-import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.api.services.StoreService;
@@ -29,7 +26,7 @@ public class StoreApiController {
     @GetMapping("/{id}")
     public ResponseEntity<Store> getStore(@PathVariable Long id) {
         Store store = storeService.get(id);
-        if(store == null) {
+        if (store == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(store);
@@ -56,11 +53,28 @@ public class StoreApiController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @PostMapping("/{id}/beer-price")
+    @PostMapping("/{store_id}/beer-price")
     public ResponseEntity<BeerPriceResponseDTO> addBeer(
-            @PathVariable Long id,
-            @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
-        BeerPriceResponseDTO beerPriceResponse = storeService.addBeer(id, beerPriceRequestDTO);
+            @PathVariable("store_id") Long storeId,
+            @RequestBody @Valid BeerPriceRequestDTO_Object beerPriceRequestDTO) {
+        BeerPrice beerPrice = storeService.addBeer(storeId, beerPriceRequestDTO);
+        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(beerPriceResponse.getBeer().getId())
+                .toUri();
+        return ResponseEntity.created(location).body(beerPriceResponse);
+    }
+
+    @PostMapping(value = "/{store_id}/beer-price", params = {"beer_id", "beer_price"})
+    public ResponseEntity<BeerPriceResponseDTO> addBeer(
+            @PathVariable("store_id") Long storeId,
+            @RequestParam("beer_id") Long beerId,
+            @RequestParam("beer_price") Double beer_price) {
+        BeerPriceRequestDTO_ID beerPriceRequestDTO = new BeerPriceRequestDTO_ID(beerId, beer_price);
+        BeerPrice beerPrice = storeService.addBeer(storeId, beerPriceRequestDTO);
+        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
