@@ -199,6 +199,21 @@ public class BeerPriceTests {
         }
 
         @Test
+        @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
+        public void createBeerPriceBeerExistsButDifferentVolumeTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Zubr", 0.6, 3.19),
+                    2L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '0.6' volume",
+                    "/api/store/2/beer-price");
+        }
+
+        @Test
         @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
         public void createBeerPriceNegativeAndZeroVolumeTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
