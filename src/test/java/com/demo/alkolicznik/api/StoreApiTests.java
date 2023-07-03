@@ -230,7 +230,7 @@ public class StoreApiTests {
 
             String json = postResponse.getBody();
 
-            assertIsError(json, HttpStatus.BAD_REQUEST, "Store already exists", "/api/store");
+            assertIsError(json, HttpStatus.CONFLICT, "Store already exists", "/api/store");
         }
 
         @Test

@@ -355,7 +355,7 @@ public class BeerApiTests {
             jsonResponse = postResponse.getBody();
 
             assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.CONFLICT,
                     "Beer already exists",
                     "/api/beer");
         }
