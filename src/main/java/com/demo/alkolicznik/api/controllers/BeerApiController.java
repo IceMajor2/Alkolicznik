@@ -22,8 +22,8 @@ public class BeerApiController {
         this.beerService = beerService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable Long id) {
+    @GetMapping("/{beer_id}")
+    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable("beer_id") Long id) {
         Beer beer = beerService.get(id);
         BeerResponseDTO beerDTO = new BeerResponseDTO(beer);
         return ResponseEntity.ok(beerDTO);

@@ -42,7 +42,7 @@ public class AdminApiController {
     public ResponseEntity<List<BeerResponseDTO>> getAllBeers() {
         List<Beer> beers = beerService.getBeers();
         List<BeerResponseDTO> beersDTO = beers.stream()
-                .map(beerService::convertToResponseDto)
+                .map(BeerResponseDTO::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(beersDTO);
     }
