@@ -72,6 +72,19 @@ public class BeerService {
         return prices;
     }
 
+    public List<BeerPrice> getBeerPrices(Long beerId) {
+        Beer beer = beerRepository.findById(beerId).orElseThrow(
+                () -> new BeerNotFoundException(beerId)
+        );
+        List<Store> stores = storeRepository.findAll();
+
+        List<BeerPrice> prices = new ArrayList<>();
+        for(Store store : stores) {
+            store.getBeer(beerId).ifPresent((beerPrice -> prices.add(beerPrice)));
+        }
+        return prices;
+    }
+
     public List<Beer> getBeers() {
         return beerRepository.findAll();
     }
@@ -82,9 +95,5 @@ public class BeerService {
             throw new BeerAlreadyExistsException();
         }
         return beerRepository.save(beer);
-    }
-
-    public BeerResponseDTO convertToResponseDto(Beer beer) {
-        return new BeerResponseDTO(beer);
     }
 }
