@@ -231,7 +231,7 @@ public class BeerPriceTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "No such city",
+                    "No such city: Bydgoszcz",
                     "/api/beer-price");
         }
     }

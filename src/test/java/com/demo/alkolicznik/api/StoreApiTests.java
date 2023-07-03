@@ -81,7 +81,7 @@ public class StoreApiTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.NOT_FOUND,
-                    "No such city",
+                    "No such city: Ciechanow",
                     "/api/store");
         }
 

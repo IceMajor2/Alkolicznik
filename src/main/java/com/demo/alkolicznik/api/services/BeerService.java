@@ -32,7 +32,7 @@ public class BeerService {
 
     public List<Beer> getBeers(String city) {
         if(!storeRepository.existsByCity(city)) {
-            throw new NoSuchCityException();
+            throw new NoSuchCityException(city);
         }
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
@@ -60,7 +60,7 @@ public class BeerService {
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
         if(cityStores.isEmpty()) {
-            throw new NoSuchCityException();
+            throw new NoSuchCityException(city);
         }
 
         List<BeerPrice> prices = new ArrayList<>();

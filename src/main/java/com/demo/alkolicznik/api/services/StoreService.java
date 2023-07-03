@@ -27,7 +27,7 @@ public class StoreService {
 
     public List<Store> getStores(String city) {
         if (!storeRepository.existsByCity(city)) {
-            throw new NoSuchCityException();
+            throw new NoSuchCityException(city);
         }
         return storeRepository.findAllByCity(city);
     }
