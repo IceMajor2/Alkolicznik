@@ -93,19 +93,19 @@ public class TestUtils {
     }
 
     /**
-     * Create {@code BeerPriceRequestDTO}. Used mainly for hardcoding the expected
+     * Create {@code BeerPriceRequestDTO_Object}. Used mainly for hardcoding the expected
      * response in tests. If you don't want to specify some parameter,
      * just replace it with {@code null}.
      *
      * @param beerName
      * @param volume
      * @param price
-     * @return {@code BeerPriceRequestDTO}
+     * @return {@code BeerPriceRequestDTO_Object}
      */
-    public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
-        BeerPriceRequestDTO request = new BeerPriceRequestDTO();
+    public static BeerPriceRequestDTO_Object createBeerPriceRequest(String beerName, Double volume, Double price) {
+        BeerPriceRequestDTO_Object request = new BeerPriceRequestDTO_Object();
         request.setBeerName(beerName);
-        if(volume != null) {
+        if (volume != null) {
             request.setBeerVolume(volume);
         }
         request.setPrice(price);
@@ -136,7 +136,7 @@ public class TestUtils {
         JSONArray array = getJsonArray(json);
 
         List<T> tObjects = new ArrayList<>();
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             try {
                 String objectAsString = array.getString(i);
                 T object = toModel(objectAsString, clazz);
@@ -186,12 +186,8 @@ public class TestUtils {
      * @param parameters parameters as {@code Map}
      * @return {@ResponseEntity<String>}
      */
-    public static ResponseEntity<String> getRequest(String url, Map<String, String> parameters) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
-        for (var entry : parameters.entrySet()) {
-            builder.queryParam(entry.getKey(), "{%s}".formatted(entry.getKey()));
-        }
-        String urlTemplate = builder.encode().toUriString();
+    public static ResponseEntity<String> getRequest(String url, Map<String, ?> parameters) {
+        String urlTemplate = buildURI(url, parameters);
 
         ResponseEntity<String> getResponse = restTemplate
                 .exchange(urlTemplate, HttpMethod.GET, HttpEntity.EMPTY, String.class, parameters);
@@ -210,6 +206,13 @@ public class TestUtils {
     public static ResponseEntity<String> postRequest(String url, Object requestObject, Object... pathVariables) {
         ResponseEntity<String> postResponse = restTemplate
                 .postForEntity(url, requestObject, String.class, pathVariables);
+        return postResponse;
+    }
+
+    public static ResponseEntity<String> postRequest(String url, Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+        ResponseEntity<String> postResponse = restTemplate
+                .postForEntity(urlTemplate, null, String.class, pathVariables);
         return postResponse;
     }
 
@@ -322,5 +325,15 @@ public class TestUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static String buildURI(String uriString, Map<String, ?> parameters) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
+        for (var entry : parameters.entrySet()) {
+            builder
+                    .queryParam(entry.getKey(), entry.getValue());
+        }
+        String urlTemplate = builder.encode().toUriString();
+        return urlTemplate;
     }
 }

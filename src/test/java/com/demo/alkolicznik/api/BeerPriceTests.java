@@ -199,6 +199,28 @@ public class BeerPriceTests {
         }
 
         @Test
+        @DisplayName("Add valid beer price (ID) to store")
+        @DirtiesContext
+        public void addBeerPriceIdTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    Map.of("beer_id", 3L, "beer_price", 4.19),
+                    1L);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(3L, "Tyskie Gronie", 0.6),
+                    createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
+                    4.19
+            );
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
