@@ -60,7 +60,8 @@ public class StoreService {
                 () -> new StoreNotFoundException(storeId)
         );
         String beerFullname = beerPriceRequestDTO.getBeerName();
-        Beer beer = beerRepository.findByFullname(beerFullname).orElseThrow(
+        double volume = beerPriceRequestDTO.getBeerVolume();
+        Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
                 () -> new BeerNotFoundException(beerFullname)
         );
         // Pass beer with price to store and save changes.
