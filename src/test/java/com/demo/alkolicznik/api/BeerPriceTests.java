@@ -52,7 +52,7 @@ public class BeerPriceTests {
                 }
             }
             String expectedJson = toJsonString(expected);
-            assertThat(actual.toArray()).containsExactly(expected.toArray());
+            assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
             assertThat(actualJson).isEqualTo(expectedJson);
         }
 
@@ -178,7 +178,7 @@ public class BeerPriceTests {
 
         @Test
         @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
-        public void createBeerPriceWithNegativeVolumeTest() {
+        public void createBeerPriceNegativeAndZeroVolumeTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
                     createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09),
                     6L);
@@ -200,6 +200,88 @@ public class BeerPriceTests {
                     HttpStatus.BAD_REQUEST,
                     "Volume must be a positive number",
                     "/api/store/6/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: BRAND null")
+        public void createBeerPriceBrandNullTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest(null, 0.5, 3.09),
+                    5L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer was not specified",
+                    "/api/store/5/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: BRAND blank and empty")
+        public void createBeerPriceBrandBlankAndEmptyTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("", 0.5, 3.09),
+                    5L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer was not specified",
+                    "/api/store/5/beer-price");
+
+            postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest(" \t \n\n \t", 1d, 7.99),
+                    3L);
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer was not specified",
+                    "/api/store/3/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: PRICE null")
+        public void createBeerPriceNegativeAndZeroPriceTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Kormoran Miodne", 0.5, -1d),
+                    2L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/store/2/beer-price");
+
+            postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest("Kormoran Miodne", 0.5, 0d),
+                    2L);
+
+            jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/store/2/beer-price");
+        }
+
+        @Test
+        @DisplayName("Add invalid beer price to store: BRAND null, VOLUME zero, PRICE negative")
+        public void createBeerPricePriceNullTest() {
+            var postResponse = postRequest("/api/store/{id}/beer-price",
+                    createBeerPriceRequest(null, 0d, -9.4),
+                    2L);
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Beer was not specified; Price must be a positive number; Volume must be a positive number",
+                    "/api/store/2/beer-price");
         }
     }
 }
