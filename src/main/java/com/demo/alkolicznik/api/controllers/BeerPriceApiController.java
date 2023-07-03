@@ -69,7 +69,7 @@ public class BeerPriceApiController {
         return ResponseEntity.ok(pricesDTO);
     }
 
-    @GetMapping("/beer-price")
+    @GetMapping(value = "/beer-price", params = "city")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrices(@RequestParam("city") String city) {
         List<BeerPrice> beers = beerService.getBeerPrices(city);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
@@ -85,5 +85,13 @@ public class BeerPriceApiController {
                 .map(BeerPriceResponseDTO::new)
                 .toList();
         return ResponseEntity.ok(beersResponse);
+    }
+
+    @GetMapping(value = "/beer-price", params = {"store_id", "beer_id"})
+    public ResponseEntity<BeerPriceResponseDTO> getBeerPrice(@RequestParam("store_id") Long storeId,
+                                                             @RequestParam("beer_id") Long beerId) {
+        BeerPrice beerPrice = beerService.get(storeId, beerId);
+        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
+        return ResponseEntity.ok(beerPriceResponse);
     }
 }

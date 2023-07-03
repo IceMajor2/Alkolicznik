@@ -2,9 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -95,5 +93,17 @@ public class BeerService {
             throw new BeerAlreadyExistsException();
         }
         return beerRepository.save(beer);
+    }
+
+    public BeerPrice get(Long storeId, Long beerId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(
+                () -> new StoreNotFoundException(storeId)
+        );
+        Beer beer = beerRepository.findById(beerId).orElseThrow(
+                () -> new BeerNotFoundException(beerId)
+        );
+        return store.getBeer(beerId).orElseThrow(
+                () -> new BeerPriceNotFoundException()
+        );
     }
 }
