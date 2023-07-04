@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.ResultActions;
@@ -12,7 +13,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
 
 import static com.demo.alkolicznik.api.AdminApiTests.mockMvc;
+import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @Component
 public class ResponseUtils {
@@ -88,8 +91,19 @@ public class ResponseUtils {
         try {
             return mockMvc.perform(get(url));
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ResultActions mockPutRequest(String url, Object request, Object... pathVariables) {
+        try {
+            return mockMvc.perform(
+                    put(url, pathVariables)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJsonString(request))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
