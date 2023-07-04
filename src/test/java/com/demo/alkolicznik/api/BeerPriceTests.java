@@ -106,7 +106,7 @@ public class BeerPriceTests {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(3L, "Tyskie Gronie", 0.6),
                     createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"),
-                    4.19
+                    "PLN 4.19"
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -302,7 +302,7 @@ public class BeerPriceTests {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(3L, "Tyskie Gronie", 0.6),
                     createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
-                    4.19
+                    "PLN 4.19"
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -398,7 +398,8 @@ public class BeerPriceTests {
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
-                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"), 3.69
+                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"),
+                    "PLN 3.69"
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -420,7 +421,7 @@ public class BeerPriceTests {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(4L, "Zubr", 0.5),
                     createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
-                    2.79
+                    "PLN 2.79"
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -442,7 +443,7 @@ public class BeerPriceTests {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
                     createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
-                    3.69);
+                    "PLN 3.69");
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);

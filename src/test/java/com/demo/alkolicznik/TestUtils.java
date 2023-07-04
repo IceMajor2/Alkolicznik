@@ -127,12 +127,11 @@ public class TestUtils {
      */
     public static BeerPriceResponseDTO createBeerPriceResponse(BeerResponseDTO beerResponseDTO,
                                                                StoreResponseDTO storeResponseDTO,
-                                                               double price) {
+                                                               String price) {
         BeerPriceResponseDTO response = new BeerPriceResponseDTO();
         response.setBeer(beerResponseDTO);
         response.setStore(storeResponseDTO);
-        response.setPrice(Monetary.getDefaultAmountFactory()
-                .setCurrency("PLN").setNumber(price).create());
+        response.setPrice(price);
         return response;
     }
 
