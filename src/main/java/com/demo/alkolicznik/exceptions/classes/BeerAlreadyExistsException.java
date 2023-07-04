@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.exceptions;
+package com.demo.alkolicznik.exceptions.classes;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

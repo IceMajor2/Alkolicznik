@@ -2,9 +2,9 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
-import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

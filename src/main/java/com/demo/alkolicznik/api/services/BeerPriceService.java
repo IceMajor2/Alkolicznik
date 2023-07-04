@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
-import com.demo.alkolicznik.exceptions.*;
+import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;

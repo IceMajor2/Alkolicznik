@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.StoreRequestDTO;
-import com.demo.alkolicznik.exceptions.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.StoreAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.StoreNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
