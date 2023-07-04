@@ -17,7 +17,8 @@ CREATE TABLE store (
 CREATE TABLE beer_price (
     beer_id BIGINT NOT NULL,
     store_id BIGINT NOT NULL,
-    price FLOAT(53) NOT NULL,
+    price_amount NUMERIC(38, 2) NOT NULL,
+    price_currency VARCHAR(255) DEFAULT 'PLN',
     PRIMARY KEY (beer_id, store_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id),
     FOREIGN KEY (store_id) REFERENCES store(id)
