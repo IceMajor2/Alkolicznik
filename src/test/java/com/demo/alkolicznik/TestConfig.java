@@ -140,7 +140,8 @@ public class TestConfig {
                 beerPrice.setStore(store);
 
                 MonetaryAmount price = Monetary.getDefaultAmountFactory()
-                        .setCurrency("PLN").setNumber(rs.getBigDecimal("price")).create();
+                        .setCurrency(rs.getString("price_currency"))
+                        .setNumber(rs.getBigDecimal("price_amount")).create();
                 beerPrice.setPrice(price);
                 return beerPrice;
             }
