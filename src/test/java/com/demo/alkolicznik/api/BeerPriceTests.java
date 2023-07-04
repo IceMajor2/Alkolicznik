@@ -135,6 +135,45 @@ public class BeerPriceTests {
         }
 
         @Test
+        @DisplayName("Get invalid beer price of defined beer in a city: BEER_NOT_EXISTS")
+        public void getBeersPriceInCityBeerNotExistsTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Gdansk"), 10L);
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '10' id",
+                    "/api/beer/10/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get invalid beer price of defined beer in a city: CITY_NOT_EXISTS")
+        public void getBeersPriceInCityCityNotExistsTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Ciechocinek"), 5);
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "No such city: Ciechocinek",
+                    "/api/beer/5/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get valid beer price of defined beer in a city: city EXISTS but EMPTY")
+        public void getBeersPriceInCityCityEmptyTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Gdansk"), 4L);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+
+            String expectedJson = "[]";
+
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
         @DisplayName("Get beer price: STORE_NOT_EXISTS")
         public void getBeerPriceStoreNotExistsTest() {
             var getResponse = getRequest("/api/beer-price",
