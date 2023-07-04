@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class NoSuchCityException extends RuntimeException {
 
     public NoSuchCityException(String city) {
-        super("No such city: %s".formatted(city));
+        super("No such city: '%s'".formatted(city));
     }
 }
