@@ -12,12 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class CustomAssertions {
 
-    public static String assertMockGetRequest(ResultActions postRequest,
+    public static String assertMockRequest(ResultActions mockResponse,
                                               HttpStatus expectedStatus,
                                               String expectedJson) {
         String actualJson = null;
         try {
-            actualJson = postRequest
+            actualJson = mockResponse
                     .andExpect(status().is(expectedStatus.value()))
                     .andExpect(content().json(expectedJson))
                     .andReturn().getResponse().getContentAsString();

@@ -24,11 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
-import static com.demo.alkolicznik.utils.CustomAssertions.assertMockGetRequest;
+import static com.demo.alkolicznik.utils.CustomAssertions.*;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseUtils.getRequest;
-import static com.demo.alkolicznik.utils.ResponseUtils.mockGetRequest;
+import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -64,7 +62,7 @@ public class AdminApiTests {
                     .toList();
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockGetRequest(mockGetRequest("/api/admin/store"),
+            String actualJson = assertMockRequest(mockGetRequest("/api/admin/store"),
                     HttpStatus.OK, expectedJson);
             List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
@@ -80,7 +78,7 @@ public class AdminApiTests {
                     .toList();
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockGetRequest(mockGetRequest("/api/admin/beer"),
+            String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer"),
                     HttpStatus.OK,
                     expectedJson);
             List<BeerResponseDTO> actual = toModelList(actualJson, BeerResponseDTO.class);
@@ -100,7 +98,7 @@ public class AdminApiTests {
             }
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockGetRequest(mockGetRequest("/api/admin/beer-price"),
+            String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer-price"),
                     HttpStatus.OK, expectedJson);
             List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
@@ -147,17 +145,15 @@ public class AdminApiTests {
         @WithUserDetails("admin")
         public void updateBeerVolumeTest() throws Exception {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
+
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
             String expectedJson = toJsonString(expected);
 
-            String actualJson = mockMvc.perform(
-                            put("/api/admin/beer/{id}", 3L)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJsonString(request))
-                    )
-                    .andExpect(status().isNoContent())
-                    .andExpect(content().json(expectedJson))
-                    .andReturn().getResponse().getContentAsString();
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                    HttpStatus.NO_CONTENT,
+                    expectedJson
+            );
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
@@ -169,17 +165,15 @@ public class AdminApiTests {
         @WithUserDetails("admin")
         public void updateBeerBrandTest() throws Exception {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
             String expectedJson = toJsonString(expected);
 
-            String actualJson = mockMvc.perform(
-                            put("/api/admin/beer/{id}", 3L)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJsonString(request))
-                    )
-                    .andExpect(status().isNoContent())
-                    .andExpect(content().json(expectedJson))
-                    .andReturn().getResponse().getContentAsString();
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                    HttpStatus.NO_CONTENT,
+                    expectedJson
+            );
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
