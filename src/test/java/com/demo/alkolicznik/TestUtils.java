@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.money.Monetary;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +131,8 @@ public class TestUtils {
         BeerPriceResponseDTO response = new BeerPriceResponseDTO();
         response.setBeer(beerResponseDTO);
         response.setStore(storeResponseDTO);
-        response.setPrice(price);
+        response.setPrice(Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN").setNumber(price).create());
         return response;
     }
 

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.money.MonetaryAmount;
+
 @JsonPropertyOrder({"beer", "price", "store"})
 @NoArgsConstructor
 @Getter
@@ -16,7 +18,7 @@ public class BeerPriceResponseDTO {
 
     private BeerResponseDTO beer;
     private StoreResponseDTO store;
-    private double price;
+    private MonetaryAmount price;
 
     public BeerPriceResponseDTO(BeerPrice beerPrice) {
         this.store = new StoreResponseDTO(beerPrice.getStore());

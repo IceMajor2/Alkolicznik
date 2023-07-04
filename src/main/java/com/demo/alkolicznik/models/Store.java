@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
@@ -66,6 +68,11 @@ public class Store {
     }
 
     public void addBeer(Beer beer, double price) {
+        addBeer(beer, Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN").setNumber(price).create());
+    }
+
+    public void addBeer(Beer beer, MonetaryAmount price) {
         BeerPrice beerPrice = new BeerPrice(this, beer, price);
         this.prices.add(beerPrice);
         beer.getPrices().add(beerPrice);

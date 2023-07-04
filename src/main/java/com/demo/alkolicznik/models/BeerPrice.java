@@ -1,11 +1,15 @@
 package com.demo.alkolicznik.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CompositeType;
 
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
 import java.util.Objects;
 
 @Entity(name = "BeerPrice")
@@ -29,13 +33,20 @@ public class BeerPrice {
     private Beer beer;
 
     @Column(name = "price")
-    private double price;
+    @CompositeType(MonetaryAmountType.class)
+    private MonetaryAmount price;
+    //private double price;
 
-    public BeerPrice(Store store, Beer beer, double price) {
+    public BeerPrice(Store store, Beer beer, MonetaryAmount price) {
         this.store = store;
         this.beer = beer;
         this.price = price;
         this.id = new BeerPriceId(beer.getId(), store.getId());
+    }
+
+    public BeerPrice(Store store, Beer beer, double price) {
+        this(store, beer, Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN").setNumber(price).create());
     }
 
     @Override
