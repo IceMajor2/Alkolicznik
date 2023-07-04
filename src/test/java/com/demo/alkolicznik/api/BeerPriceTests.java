@@ -69,13 +69,7 @@ public class BeerPriceTests {
             String actualJson = getResponse.getBody();
             List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-            Beer beer = null;
-            for(Beer beerObj : beers) {
-                if(beerObj.getId() == 3L) {
-                    beer = beerObj;
-                    break;
-                }
-            }
+            Beer beer = getBeer(3L, beers);
 
             List<BeerPriceResponseDTO> expected = beer.getPrices()
                     .stream()
@@ -114,6 +108,27 @@ public class BeerPriceTests {
                     createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"),
                     4.19
             );
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Get beer price of defined beer in a city")
+        public void getBeersPriceInCityTest() {
+            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Warszawa"), 2L);
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String actualJson = getResponse.getBody();
+            List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+
+            Beer expectedBeer = getBeer(2L, beers);
+            List<BeerPriceResponseDTO> expected = new ArrayList<>();
+            for (BeerPrice beerPrice : expectedBeer.getPrices()) {
+                if (beerPrice.getStore().getCity().equals("Warszawa")) {
+                    expected.add(new BeerPriceResponseDTO(beerPrice));
+                }
+            }
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -170,13 +185,7 @@ public class BeerPriceTests {
             String actualJson = getResponse.getBody();
             List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-            Store store = null;
-            for (Store storeObj : stores) {
-                if (storeObj.getId() == 3L) {
-                    store = storeObj;
-                    break;
-                }
-            }
+            Store store = getStore(3L, stores);
             List<BeerPriceResponseDTO> expected = store.getPrices().stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
