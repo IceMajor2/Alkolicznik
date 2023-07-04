@@ -17,4 +17,8 @@ public class BeerUpdateDTO {
     private String type;
     @Positive(message = "Volume must be a positive number")
     private Double volume;
+
+    public boolean propertiesMissing() {
+        return brand == null && type == null && volume == null;
+    }
 }

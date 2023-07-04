@@ -5,6 +5,7 @@ import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -64,6 +65,9 @@ public class BeerService {
     }
 
     public Beer update(Long beerId, BeerUpdateDTO updateDTO) {
+        if(updateDTO.propertiesMissing()) {
+            throw new PropertiesMissingException();
+        }
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
