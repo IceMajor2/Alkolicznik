@@ -9,7 +9,6 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -125,6 +124,9 @@ public class BeerPriceService {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
+        if(!storeRepository.existsByCity(city)) {
+            throw new NoSuchCityException(city);
+        }
         Set<BeerPrice> beerPricesInCity = new LinkedHashSet<>();
         for(BeerPrice beerPrice: beer.getPrices()) {
             if(beerPrice.getStore().getCity().equals(city)) {
