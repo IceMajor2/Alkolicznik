@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -141,7 +142,11 @@ public class AdminApiTests {
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
             String expectedJson = toJsonString(expected);
 
-            String actualJson = mockMvc.perform(put("/api/admin/beer/{id}", 3L).requestAttr("volume", 0.5))
+            String actualJson = mockMvc.perform(
+                    put("/api/admin/beer/{id}", 3L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJsonString(expected))
+                    )
                     .andExpect(status().isNoContent())
                     .andExpect(content().json(expectedJson))
                     .andReturn().getResponse().getContentAsString();
