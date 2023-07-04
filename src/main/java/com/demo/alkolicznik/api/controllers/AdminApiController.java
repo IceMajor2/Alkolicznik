@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,7 +55,7 @@ public class AdminApiController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<List<BeerPriceResponseDTO>> getAllBeerPrices() {
-        List<BeerPrice> prices = beerPriceService.getBeerPrices();
+        Set<BeerPrice> prices = beerPriceService.getBeerPrices();
         List<BeerPriceResponseDTO> pricesDTO = prices.stream()
                 .map(BeerPriceResponseDTO::new)
                 .collect(Collectors.toList());

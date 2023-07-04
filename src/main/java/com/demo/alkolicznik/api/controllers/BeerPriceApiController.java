@@ -68,7 +68,7 @@ public class BeerPriceApiController {
 
     @GetMapping(value = "/beer-price", params = "city")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrices(@RequestParam("city") String city) {
-        List<BeerPrice> beers = beerPriceService.getBeerPrices(city);
+        Set<BeerPrice> beers = beerPriceService.getBeerPrices(city);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)
                 .toList();
@@ -76,8 +76,8 @@ public class BeerPriceApiController {
     }
 
     @GetMapping("/beer/{beer_id}/beer-price")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPricesBeerId(@PathVariable("beer_id") Long beerId) {
-        List<BeerPrice> beers = beerPriceService.getBeerPricesOnBeerId(beerId);
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeersPrice(@PathVariable("beer_id") Long beerId) {
+        Set<BeerPrice> beers = beerPriceService.getBeerPricesOnBeerId(beerId);
         List<BeerPriceResponseDTO> beersResponse = beers.stream()
                 .map(BeerPriceResponseDTO::new)
                 .toList();
@@ -92,9 +92,13 @@ public class BeerPriceApiController {
         return ResponseEntity.ok(beerPriceResponse);
     }
 
-    @GetMapping("/{beer_id}/beer-price")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrice(@PathVariable("beer_id") Long beerId,
+    @GetMapping(value = "beer/{beer_id}/beer-price", params = "city")
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeersPrice(@PathVariable("beer_id") Long beerId,
                                                                    @RequestParam("city") String city) {
-        return null;
+        Set<BeerPrice> beerPrices = beerPriceService.getBeerPrices(beerId, city);
+        List<BeerPriceResponseDTO> beersResponse = beerPrices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .toList();
+        return ResponseEntity.ok(beersResponse);
     }
 }
