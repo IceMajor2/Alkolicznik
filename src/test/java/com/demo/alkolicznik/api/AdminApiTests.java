@@ -39,13 +39,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AdminApiTests {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private List<Store> stores;
 
     @Autowired
     private List<Beer> beers;
+
+    public static MockMvc mockMvc;
+
+    @Autowired
+    public void setMockMvc(MockMvc mockMvc) {
+        AdminApiTests.mockMvc = mockMvc;
+    }
 
     @Nested
     class GetRequests {
@@ -53,16 +57,13 @@ public class AdminApiTests {
         @Test
         @DisplayName("Get all stores w/ authorization")
         @WithUserDetails("admin")
-        public void getStoresAllAuthorizedTest() throws Exception {
+        public void getStoresAllAuthorizedTest() {
             List<StoreResponseDTO> expected = stores.stream()
                     .map(StoreResponseDTO::new)
                     .toList();
             String expectedJson = toJsonString(expected);
 
-            String actualJson = mockMvc.perform(get("/api/admin/store"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().json(expectedJson))
-                    .andReturn().getResponse().getContentAsString();
+            String actualJson = assertMockGetRequest("/api/admin/store", HttpStatus.OK, expectedJson);
             List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
             assertThat(actual).isEqualTo(expected);
@@ -85,7 +86,7 @@ public class AdminApiTests {
 
             String json = getResponse.getBody();
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
         }
 
         @Test
@@ -95,7 +96,7 @@ public class AdminApiTests {
 
             String json = getResponse.getBody();
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
         }
 
         @Test
@@ -147,9 +148,9 @@ public class AdminApiTests {
             String expectedJson = toJsonString(expected);
 
             String actualJson = mockMvc.perform(
-                    put("/api/admin/beer/{id}", 3L)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(toJsonString(request))
+                            put("/api/admin/beer/{id}", 3L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJsonString(request))
                     )
                     .andExpect(status().isNoContent())
                     .andExpect(content().json(expectedJson))
