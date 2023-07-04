@@ -16,7 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.CustomAssertions.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 

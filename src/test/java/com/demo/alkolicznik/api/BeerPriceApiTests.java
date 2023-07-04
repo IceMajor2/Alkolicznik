@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.CustomAssertions.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
