@@ -21,11 +21,11 @@ INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (6, 'Miloslaw', 'Biale', 0.5)
 ON CONFLICT DO NOTHING;
 
 -- store equipment
-INSERT INTO beer_price (store_id, beer_id, amount, currency) VALUES (1, 1, 3.39, 'PLN')
+INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (1, 1, 3.39, 'PLN')
 ON CONFLICT DO NOTHING;
-INSERT INTO beer_price (store_id, beer_id, amount, currency) VALUES (1, 3, 3.29, 'PLN')
+INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (1, 3, 3.29, 'PLN')
 ON CONFLICT DO NOTHING;
-INSERT INTO beer_price (store_id, beer_id, amount, currency) VALUES (2, 4, 2.99, 'PLN')
+INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (2, 4, 2.99, 'PLN')
 ON CONFLICT DO NOTHING;
-INSERT INTO beer_price (store_id, beer_id, amount, currency) VALUES (3, 6, 6.99, 'PLN')
+INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (3, 6, 6.99, 'PLN')
 ON CONFLICT DO NOTHING;
