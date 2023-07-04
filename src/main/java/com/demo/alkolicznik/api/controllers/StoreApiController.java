@@ -26,12 +26,13 @@ public class StoreApiController {
     }
 
     @GetMapping("/{store_id}")
-    public ResponseEntity<Store> getStore(@PathVariable("store_id") Long id) {
+    public ResponseEntity<StoreResponseDTO> getStore(@PathVariable("store_id") Long id) {
         Store store = storeService.get(id);
+        StoreResponseDTO storeResponse = new StoreResponseDTO(store);
         if (store == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(store);
+        return ResponseEntity.ok(storeResponse);
     }
 
     @GetMapping
