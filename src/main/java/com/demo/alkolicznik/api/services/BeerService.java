@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
+import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.exceptions.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.NoSuchCityException;
@@ -28,8 +29,9 @@ public class BeerService {
     }
 
     public Beer get(Long beerId) {
-        Optional<Beer> optBeer = beerRepository.findById(beerId);
-        Beer beer = optBeer.orElseThrow(() -> new BeerNotFoundException(beerId));
+        Beer beer = beerRepository.findById(beerId).orElseThrow(
+                () -> new BeerNotFoundException(beerId)
+        );
         return beer;
     }
 
@@ -58,6 +60,25 @@ public class BeerService {
         Beer beer = beerRequestDTO.convertToModel();
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
+        }
+        return beerRepository.save(beer);
+    }
+
+    public Beer update(Long beerId, BeerUpdateDTO updateDTO) {
+        Beer beer = beerRepository.findById(beerId).orElseThrow(
+                () -> new BeerNotFoundException(beerId)
+        );
+        String updatedBrand = updateDTO.getBrand();
+        String updatedType = updateDTO.getType();
+        Double updatedVolume = updateDTO.getVolume();
+        if(updatedBrand != null) {
+            beer.setBrand(updatedBrand);
+        }
+        if(updatedType != null) {
+            beer.setType(updatedType);
+        }
+        if(updatedVolume != null) {
+            beer.setVolume(updatedVolume);
         }
         return beerRepository.save(beer);
     }

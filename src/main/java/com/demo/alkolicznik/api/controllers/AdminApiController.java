@@ -5,15 +5,16 @@ import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
+import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -60,5 +61,15 @@ public class AdminApiController {
                 .map(BeerPriceResponseDTO::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(pricesDTO);
+    }
+
+    @PutMapping("/beer/{beer_id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
+    public ResponseEntity<BeerResponseDTO> updateBeer(@PathVariable("beer_id") Long beerId,
+                                                           @RequestBody @Valid BeerUpdateDTO updateDTO) {
+        Beer updated = beerService.update(beerId, updateDTO);
+        BeerResponseDTO updatedResponse = new BeerResponseDTO(updated);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updatedResponse);
     }
 }
