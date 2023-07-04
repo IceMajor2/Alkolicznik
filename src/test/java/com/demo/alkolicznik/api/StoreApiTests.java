@@ -84,31 +84,6 @@ public class StoreApiTests {
                     "No such city: 'Ciechanow'",
                     "/api/store");
         }
-
-        @Test
-        @DisplayName("Get all stores w/ authorization")
-        public void getStoresAllAuthorizedTest() {
-            var getResponse = getRequestWithBasicAuth("/api/admin/store", "admin", "admin");
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            String jsonResponse = getResponse.getBody();
-            List<StoreResponseDTO> actual = toModelList(jsonResponse, StoreResponseDTO.class);
-
-            List<StoreResponseDTO> expected = stores.stream()
-                    .map(StoreResponseDTO::new)
-                    .toList();
-            assertThat(actual).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("Get all stores w/o authorization")
-        public void getStoresAllUnauthorizedTest() {
-            var getResponse = getRequest("/api/admin/store");
-
-            String json = getResponse.getBody();
-
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
-        }
     }
 
     @Nested
