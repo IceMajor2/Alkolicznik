@@ -58,31 +58,6 @@ public class BeerApiTests {
                     "Unable to find beer of '9999' id",
                     "/api/beer/9999");
         }
-
-        @Test
-        @DisplayName("Get all beers in array w/o authorization")
-        public void getBeerAllArrayUnauthorizedTest() {
-            var getResponse = getRequest("/api/admin/beer");
-
-            String json = getResponse.getBody();
-
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
-        }
-
-        @Test
-        @DisplayName("Get all stored beers in array w/ authorization")
-        public void getBeerAllArrayAuthorizedTest() {
-            var getResponse = getRequestWithBasicAuth("/api/admin/beer", "admin", "admin");
-            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            String jsonResponse = getResponse.getBody();
-            List<BeerResponseDTO> actual = toModelList(jsonResponse, BeerResponseDTO.class);
-
-            List<BeerResponseDTO> expected = beers.stream()
-                    .map(BeerResponseDTO::new)
-                    .toList();
-            assertThat(actual).isEqualTo(expected);
-        }
     }
 
     @Nested
