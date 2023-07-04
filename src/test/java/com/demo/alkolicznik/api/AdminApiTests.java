@@ -178,5 +178,39 @@ public class AdminApiTests {
 
             assertThat(actual).isEqualTo(expected);
         }
+
+        @Test
+        @DisplayName("Update beer: TYPE")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateBeerTypeTest() throws Exception {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
+
+            BeerResponseDTO expected = new BeerResponseDTO(2L, "Ksiazece IPA", 0.5);
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/admin/beer/{id}", request, 2L),
+                    HttpStatus.NO_CONTENT,
+                    expectedJson
+            );
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: request EMPTY")
+        @WithUserDetails("admin")
+        public void updateBeerEmptyRequestTest() throws Exception {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
+
+            assertIsError(
+                    mockPutRequest("/api/admin/beer/{id}", request, 6L),
+                    HttpStatus.BAD_REQUEST,
+                    "No property to update was specified",
+                    "/api/admin/beer/6"
+            );
+        }
     }
 }
