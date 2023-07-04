@@ -5,8 +5,6 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.io.UnsupportedEncodingException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,8 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CustomAssertions {
 
     public static String assertMockRequest(ResultActions mockResponse,
-                                              HttpStatus expectedStatus,
-                                              String expectedJson) {
+                                           HttpStatus expectedStatus,
+                                           String expectedJson) {
         String actualJson = null;
         try {
             actualJson = mockResponse
@@ -28,18 +26,6 @@ public class CustomAssertions {
             e.printStackTrace();
         }
         return actualJson;
-    }
-
-    public static void assertIsError(ResultActions mockResponse,
-                                                    HttpStatus expectedStatus,
-                                                    String expectedMessage,
-                                                    String expectedPath) {
-        try {
-            String actual = mockResponse.andReturn().getResponse().getContentAsString();
-            assertIsError(actual, expectedStatus, expectedMessage, expectedPath);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

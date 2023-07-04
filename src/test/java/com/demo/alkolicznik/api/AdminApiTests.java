@@ -16,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,13 +23,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.demo.alkolicznik.utils.CustomAssertions.*;
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
@@ -202,11 +199,14 @@ public class AdminApiTests {
         @Test
         @DisplayName("Invalid beer update: request EMPTY")
         @WithUserDetails("admin")
-        public void updateBeerEmptyRequestTest() throws Exception {
+        public void updateBeerEmptyRequestTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
+            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 6L);
+
+            String jsonResponse = putResponse.getBody();
 
             assertIsError(
-                    mockPutRequest("/api/admin/beer/{id}", request, 6L),
+                    jsonResponse,
                     HttpStatus.BAD_REQUEST,
                     "No property to update was specified",
                     "/api/admin/beer/6"

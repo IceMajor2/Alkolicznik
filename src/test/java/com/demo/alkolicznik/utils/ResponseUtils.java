@@ -87,6 +87,13 @@ public class ResponseUtils {
         return postResponse;
     }
 
+    public static ResponseEntity<String> putRequestAuth(String username, String password, String url, Object request, Object... pathVariables) {
+        ResponseEntity<String> putResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(url, HttpMethod.PUT, new HttpEntity(request), String.class, pathVariables);
+        return putResponse;
+    }
+
     public static ResultActions mockGetRequest(String url) {
         try {
             return mockMvc.perform(get(url));
