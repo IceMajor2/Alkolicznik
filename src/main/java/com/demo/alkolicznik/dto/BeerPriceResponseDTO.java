@@ -26,6 +26,6 @@ public class BeerPriceResponseDTO {
 
     @Override
     public String toString() {
-        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getFullName(), this.price);
+        return "%s: %s - %s".formatted(this.store.getName(), this.beer.getFullName(), this.price);
     }
 }
