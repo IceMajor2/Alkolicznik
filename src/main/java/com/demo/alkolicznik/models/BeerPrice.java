@@ -32,7 +32,14 @@ public class BeerPrice {
     @JsonIgnore
     private Beer beer;
 
-    @Column(name = "price")
+    @AttributeOverride(
+            name = "amount",
+            column = @Column(name = "price_amount")
+    )
+    @AttributeOverride(
+            name = "currency",
+            column = @Column(name = "price_currency")
+    )
     @CompositeType(MonetaryAmountType.class)
     private MonetaryAmount price;
     //private double price;
