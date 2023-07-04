@@ -4,11 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
+
+import static com.demo.alkolicznik.api.AdminApiTests.mockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Component
 public class ResponseUtils {
@@ -78,6 +85,21 @@ public class ResponseUtils {
         ResponseEntity<String> postResponse = restTemplate
                 .postForEntity(urlTemplate, null, String.class, pathVariables);
         return postResponse;
+    }
+
+    public static String assertMockGetRequest(String url,
+                                                 HttpStatus expectedStatus,
+                                                 String expectedJson) {
+        String actualJson = null;
+        try {
+            actualJson = mockMvc.perform(get(url))
+                    .andExpect(status().is(expectedStatus.value()))
+                    .andExpect(content().json(expectedJson))
+                    .andReturn().getResponse().getContentAsString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return actualJson;
     }
 
     private static String buildURI(String uriString, Map<String, ?> parameters) {
