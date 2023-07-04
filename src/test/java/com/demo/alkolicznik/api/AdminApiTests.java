@@ -79,6 +79,16 @@ public class AdminApiTests {
 
             String json = getResponse.getBody();
 
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
+        }
+
+        @Test
+        @DisplayName("Get all beer prices in array w/o authorization")
+        public void getBeerPriceAllArrayUnauthorizedTest() {
+            var getResponse = getRequest("/api/admin/beer-price");
+
+            String json = getResponse.getBody();
+
             assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
         }
 
