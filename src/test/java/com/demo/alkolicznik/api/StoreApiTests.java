@@ -15,7 +15,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.demo.alkolicznik.TestUtils.*;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

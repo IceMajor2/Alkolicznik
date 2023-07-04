@@ -4,6 +4,7 @@ import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -23,7 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.demo.alkolicznik.TestUtils.*;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -135,17 +138,40 @@ public class AdminApiTests {
     class PutRequests {
 
         @Test
-        @DisplayName("Update beer")
+        @DisplayName("Update beer: VOLUME")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerTest() throws Exception {
+        public void updateBeerVolumeTest() throws Exception {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
             String expectedJson = toJsonString(expected);
 
             String actualJson = mockMvc.perform(
                     put("/api/admin/beer/{id}", 3L)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(toJsonString(expected))
+                            .content(toJsonString(request))
+                    )
+                    .andExpect(status().isNoContent())
+                    .andExpect(content().json(expectedJson))
+                    .andReturn().getResponse().getContentAsString();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Update beer: BRAND")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateBeerBrandTest() throws Exception {
+            BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+            BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = mockMvc.perform(
+                            put("/api/admin/beer/{id}", 3L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJsonString(request))
                     )
                     .andExpect(status().isNoContent())
                     .andExpect(content().json(expectedJson))
