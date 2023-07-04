@@ -34,13 +34,13 @@ public class BeerService {
     }
 
     public List<Beer> getBeers(String city) {
-        if(!storeRepository.existsByCity(city)) {
+        if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
         List<Beer> beersInCity = new ArrayList<>();
-        for(Store store : cityStores) {
+        for (Store store : cityStores) {
             beersInCity.addAll(
                     store.getPrices().stream()
                             .map(BeerPrice::getBeer)
@@ -56,7 +56,7 @@ public class BeerService {
 
     public Beer add(BeerRequestDTO beerRequestDTO) {
         Beer beer = beerRequestDTO.convertToModel();
-        if(beerRepository.exists(beer)) {
+        if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
         }
         return beerRepository.save(beer);

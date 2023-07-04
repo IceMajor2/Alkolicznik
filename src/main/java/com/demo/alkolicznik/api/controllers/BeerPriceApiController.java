@@ -91,4 +91,10 @@ public class BeerPriceApiController {
         BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
         return ResponseEntity.ok(beerPriceResponse);
     }
+
+    @GetMapping("/{beer_id}/beer-price")
+    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrice(@PathVariable("beer_id") Long beerId,
+                                                                   @RequestParam("city") String city) {
+        return null;
+    }
 }

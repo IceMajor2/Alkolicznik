@@ -119,4 +119,8 @@ public class BeerPriceService {
         }
         return prices;
     }
+
+    public BeerPrice getBeerPrice(Long beerId, String city) {
+        return null;
+    }
 }
