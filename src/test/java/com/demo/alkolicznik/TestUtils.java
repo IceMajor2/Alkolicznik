@@ -1,6 +1,8 @@
 package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.dto.*;
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -132,6 +134,24 @@ public class TestUtils {
         return response;
     }
 
+    public static Beer getBeer(Long beerId, List<Beer> beers) {
+        for (Beer beer : beers) {
+            if (beer.getId() == beerId) {
+                return beer;
+            }
+        }
+        return null;
+    }
+
+    public static Store getStore(Long storeId, List<Store> stores) {
+        for (Store store : stores) {
+            if (store.getId() == storeId) {
+                return store;
+            }
+        }
+        return null;
+    }
+
     public static <T> List<T> toModelList(String json, Class<T> clazz) {
         JSONArray array = getJsonArray(json);
 
@@ -191,6 +211,14 @@ public class TestUtils {
 
         ResponseEntity<String> getResponse = restTemplate
                 .exchange(urlTemplate, HttpMethod.GET, HttpEntity.EMPTY, String.class, parameters);
+        return getResponse;
+    }
+
+    public static ResponseEntity<String> getRequest(String url, Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(urlTemplate, String.class, pathVariables);
         return getResponse;
     }
 
