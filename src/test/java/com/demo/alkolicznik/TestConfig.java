@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -137,7 +139,9 @@ public class TestConfig {
                 Store store = stores.get(rs.getLong("store_id"));
                 beerPrice.setStore(store);
 
-                beerPrice.setPrice(rs.getDouble("price"));
+                MonetaryAmount price = Monetary.getDefaultAmountFactory()
+                        .setCurrency("PLN").setNumber(rs.getBigDecimal("price")).create();
+                beerPrice.setPrice(price);
                 return beerPrice;
             }
         };
