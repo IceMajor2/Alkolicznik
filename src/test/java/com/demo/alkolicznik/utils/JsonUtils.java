@@ -2,9 +2,11 @@ package com.demo.alkolicznik.utils;
 
 import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -80,8 +82,11 @@ public class JsonUtils {
     }
 
     public static BeerDeleteResponseDTO createBeerDeleteResponse(Beer beer, String status) {
-        BeerDeleteResponseDTO response = new BeerDeleteResponseDTO(beer, status);
-        return response;
+        return new BeerDeleteResponseDTO(beer, status);
+    }
+
+    public static StoreDeleteResponseDTO createStoreDeleteResponse(Store store, String status) {
+        return new StoreDeleteResponseDTO(store, status);
     }
 
     public static StoreUpdateDTO createStoreUpdateRequest(String name, String city, String street) {

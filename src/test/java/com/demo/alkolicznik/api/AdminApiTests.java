@@ -5,6 +5,7 @@ import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -30,6 +31,7 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -566,6 +568,27 @@ public class AdminApiTests {
                         "City was not specified",
                         "/api/admin/store/4"
                 );
+            }
+        }
+
+        @Nested
+        class DeleteRequests {
+
+            @Test
+            @DisplayName("Delete store")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void deleteStoreTest() {
+                StoreDeleteResponseDTO expected = createStoreDeleteResponse(
+                        getStore(6L, stores),
+                        "Store was deleted successfully!"
+                );
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/store/{id}", 6L),
+                        HttpStatus.OK,
+                        expectedJson);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
         }
     }
