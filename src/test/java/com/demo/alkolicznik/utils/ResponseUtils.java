@@ -14,8 +14,7 @@ import java.util.Map;
 
 import static com.demo.alkolicznik.api.AdminApiTests.mockMvc;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @Component
 public class ResponseUtils {
@@ -108,6 +107,16 @@ public class ResponseUtils {
                     put(url, pathVariables)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(toJsonString(request))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ResultActions mockDeleteRequest(String url, Object... pathVariables) {
+        try {
+            return mockMvc.perform(
+                    delete(url, pathVariables)
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -4,10 +4,12 @@ import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.utils.TestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -140,7 +143,7 @@ public class AdminApiTests {
         @DisplayName("Update beer: VOLUME")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerVolumeTest() throws Exception {
+        public void updateBeerVolumeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
@@ -160,7 +163,7 @@ public class AdminApiTests {
         @DisplayName("Update beer: BRAND")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerBrandTest() throws Exception {
+        public void updateBeerBrandTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
             BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
@@ -180,7 +183,7 @@ public class AdminApiTests {
         @DisplayName("Update beer: TYPE")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerTypeTest() throws Exception {
+        public void updateBeerTypeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
 
             BeerResponseDTO expected = new BeerResponseDTO(2L, "Ksiazece IPA", 0.5);
@@ -310,6 +313,43 @@ public class AdminApiTests {
                     "Brand was not specified",
                     "/api/admin/beer/5"
             );
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: NOT_AUTHORIZED")
+        public void updateBeerUnauthorizedTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+            var putResponse = putRequestAuth("user", "user", "/api/admin/beer/{id}", request, 2L);
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/admin/beer/2"
+            );
+        }
+    }
+
+    @Nested
+    class DeleteRequests {
+
+        @Test
+        @DisplayName("Delete beer")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateBeerVolumeTest() {
+            BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+                    getBeer(6L, beers),
+                    "Beer was deleted successfully!"
+            );
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(mockDeleteRequest("/api/beer/6"),
+                    HttpStatus.OK,
+                    expectedJson);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
     }
 }
