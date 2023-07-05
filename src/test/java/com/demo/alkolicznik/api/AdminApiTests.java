@@ -381,7 +381,7 @@ public class AdminApiTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 1L),
-                        HttpStatus.OK,
+                        HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
@@ -399,7 +399,7 @@ public class AdminApiTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 7L),
-                        HttpStatus.OK,
+                        HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
@@ -417,7 +417,7 @@ public class AdminApiTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 4L),
-                        HttpStatus.OK,
+                        HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
