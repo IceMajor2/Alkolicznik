@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
@@ -39,9 +41,29 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
-    public Store get(Long id) {
-        Optional<Store> optStore = storeRepository.findById(id);
-        Store store = optStore.orElseThrow(() -> new StoreNotFoundException(id));
-        return store;
+    public Store get(Long storeId) {
+        return storeRepository.findById(storeId).orElseThrow(() ->
+                        new StoreNotFoundException(storeId));
+    }
+
+    public Store update(Long storeId, StoreUpdateDTO updateDTO) {
+        if(updateDTO.propertiesMissing()) {
+            throw new PropertiesMissingException();
+        }
+        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId));
+        String updatedName = updateDTO.getName();
+        String updatedCity = updateDTO.getCity();
+        String updatedStreet = updateDTO.getStreet();
+        if(updatedName != null) {
+            store.setName(updatedName);
+        }
+        if(updatedCity != null) {
+            store.setCity(updatedCity);
+        }
+        if(updatedStreet != null) {
+            store.setStreet(updatedStreet);
+        }
+        return storeRepository.save(store);
     }
 }
