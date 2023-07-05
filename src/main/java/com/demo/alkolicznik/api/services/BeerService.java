@@ -2,10 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerRequestDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
+import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,6 +69,9 @@ public class BeerService {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
+        if(!anythingToUpdate(beer, updateDTO)) {
+            throw new ObjectsAreEqualException();
+        }
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
@@ -91,5 +92,26 @@ public class BeerService {
                 new BeerNotFoundException(beerId));
         beerRepository.delete(toDelete);
         return toDelete;
+    }
+
+    private boolean anythingToUpdate(Beer beer, BeerUpdateDTO update) {
+        String currBrand = beer.getBrand();
+        String currType = beer.getType();
+        Double currVolume = beer.getVolume();
+
+        String upBrand = update.getBrand();
+        String upType = update.getType();
+        Double upVolume = update.getVolume();
+
+        if(upBrand != null && !Objects.equals(currBrand, upBrand)) {
+            return true;
+        }
+        if(upType != null && !Objects.equals(currType, upType)) {
+            return true;
+        }
+        if(upVolume != null && !Objects.equals(currVolume, upVolume)) {
+            return true;
+        }
+        return false;
     }
 }
