@@ -290,7 +290,7 @@ public class AdminApiTests {
                 assertIsError(
                         jsonResponse,
                         HttpStatus.OK,
-                        "Such object already exists: nothing to change",
+                        "Objects are the same: nothing to update",
                         "/api/admin/beer/5"
                 );
             }
