@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -9,6 +10,8 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -134,5 +137,24 @@ public class BeerPriceService {
             }
         }
         return beerPricesInCity;
+    }
+
+    public BeerPrice update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId));
+        Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
+                new BeerNotFoundException(beerId));
+        BeerPrice beerPrice = store.getBeer(beerId).orElseThrow(() ->
+                new BeerPriceNotFoundException());
+
+        MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN").setNumber(updateDTO.getPrice()).create();
+
+        if(beerPrice.getPrice().isEqualTo(updatedPrice)) {
+            throw new ObjectsAreEqualException();
+        }
+        beerPrice.setPrice(updatedPrice);
+        storeRepository.save(store);
+        return beerPrice;
     }
 }
