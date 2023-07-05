@@ -85,4 +85,11 @@ public class BeerService {
         }
         return beerRepository.save(beer);
     }
+
+    public Beer delete(Long beerId) {
+        Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
+                new BeerNotFoundException(beerId));
+        beerRepository.delete(toDelete);
+        return toDelete;
+    }
 }

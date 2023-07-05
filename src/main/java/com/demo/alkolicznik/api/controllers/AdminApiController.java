@@ -5,6 +5,7 @@ import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
+import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -67,9 +68,18 @@ public class AdminApiController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<BeerResponseDTO> updateBeer(@PathVariable("beer_id") Long beerId,
-                                                           @RequestBody @Valid BeerUpdateDTO updateDTO) {
+                                                      @RequestBody @Valid BeerUpdateDTO updateDTO) {
         Beer updated = beerService.update(beerId, updateDTO);
         BeerResponseDTO updatedResponse = new BeerResponseDTO(updated);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updatedResponse);
+    }
+
+    @DeleteMapping("/beer/{beer_id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
+    public ResponseEntity<BeerDeleteResponseDTO> deleteBeer(@PathVariable("beer_id") Long beerId) {
+        Beer deleted = beerService.delete(beerId);
+        BeerDeleteResponseDTO deletedResponse = new BeerDeleteResponseDTO(deleted, "Beer was deleted successfully!");
+        return ResponseEntity.ok(deletedResponse);
     }
 }
