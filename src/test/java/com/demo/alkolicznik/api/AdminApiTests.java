@@ -345,10 +345,42 @@ public class AdminApiTests {
             );
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/6"),
+            String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/{id}", 6L),
                     HttpStatus.OK,
                     expectedJson);
             assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("Invalid delete beer: UNAUTHORIZED")
+        public void deleteBeerUnauthorizedTest() {
+            var deleteResponse = deleteRequestAuth("user", "user",
+                    "/api/admin/beer/{id}", 2L);
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/admin/beer/2"
+            );
+        }
+
+        @Test
+        @DisplayName("Invalid delete beer: BEER_NOT_EXISTS")
+        public void deleteBeerNotExistsTest() {
+            var deleteResponse = deleteRequestAuth("admin", "admin",
+                    "/api/admin/beer/{id}", 0L);
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '0' id",
+                    "/api/admin/beer/0"
+            );
         }
     }
 }
