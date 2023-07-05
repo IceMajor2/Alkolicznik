@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.dto.put;
 
+import com.demo.alkolicznik.models.BeerPrice;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BeerPriceUpdateDTO implements UpdateModel {
+public class BeerPriceUpdateDTO implements UpdateModel<BeerPrice> {
 
     @Positive(message = "Price must be a positive number")
     private Double price;
@@ -16,5 +17,12 @@ public class BeerPriceUpdateDTO implements UpdateModel {
     @Override
     public boolean propertiesMissing() {
         return price == null;
+    }
+
+    @Override
+    public boolean anythingToUpdate(BeerPrice beerPrice) {
+        Double currPrice = beerPrice.getPrice().getNumber().doubleValueExact();
+        Double upPrice = this.getPrice();
+        return !currPrice.equals(upPrice);
     }
 }
