@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BeerUpdateDTO {
+public class BeerUpdateDTO implements UpdateModel {
 
     @NotBlankIfExists(message = "Brand was not specified")
     private String brand;
