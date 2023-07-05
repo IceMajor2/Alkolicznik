@@ -63,27 +63,16 @@ public class BeerService {
     }
 
     public Beer update(Long beerId, BeerUpdateDTO updateDTO) {
-        if(updateDTO.propertiesMissing()) {
+        if (updateDTO.propertiesMissing()) {
             throw new PropertiesMissingException();
         }
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
-        if(!anythingToUpdate(beer, updateDTO)) {
+        if (!anythingToUpdate(beer, updateDTO)) {
             throw new ObjectsAreEqualException();
         }
-        String updatedBrand = updateDTO.getBrand();
-        String updatedType = updateDTO.getType();
-        Double updatedVolume = updateDTO.getVolume();
-        if(updatedBrand != null) {
-            beer.setBrand(updatedBrand);
-        }
-        if(updatedType != null) {
-            beer.setType(updatedType);
-        }
-        if(updatedVolume != null) {
-            beer.setVolume(updatedVolume);
-        }
+        setFieldsWhenValidated(beer, updateDTO);
         return beerRepository.save(beer);
     }
 
@@ -103,15 +92,35 @@ public class BeerService {
         String upType = update.getType();
         Double upVolume = update.getVolume();
 
-        if(upBrand != null && !Objects.equals(currBrand, upBrand)) {
+        if (upBrand != null && !Objects.equals(currBrand, upBrand)) {
             return true;
         }
-        if(upType != null && !Objects.equals(currType, upType)) {
+        if (upType != null && !Objects.equals(currType, upType)) {
             return true;
         }
-        if(upVolume != null && !Objects.equals(currVolume, upVolume)) {
+        if (upVolume != null && !Objects.equals(currVolume, upVolume)) {
             return true;
         }
         return false;
+    }
+
+    private void setFieldsWhenValidated(Beer beer, BeerUpdateDTO updateDTO) {
+        String updatedBrand = updateDTO.getBrand();
+        String updatedType = updateDTO.getType();
+        Double updatedVolume = updateDTO.getVolume();
+        
+        if (updatedBrand != null) {
+            beer.setBrand(updatedBrand);
+        }
+        if (updatedType != null) {
+            if ("".equals(updatedType)) {
+                beer.setType(null);
+            } else {
+                beer.setType(updatedType);
+            }
+        }
+        if (updatedVolume != null) {
+            beer.setVolume(updatedVolume);
+        }
     }
 }
