@@ -9,7 +9,6 @@ import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.utils.TestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -339,14 +338,14 @@ public class AdminApiTests {
         @DisplayName("Delete beer")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerVolumeTest() {
+        public void deleteBeerTest() {
             BeerDeleteResponseDTO expected = createBeerDeleteResponse(
                     getBeer(6L, beers),
                     "Beer was deleted successfully!"
             );
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(mockDeleteRequest("/api/beer/6"),
+            String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/6"),
                     HttpStatus.OK,
                     expectedJson);
             assertThat(actualJson).isEqualTo(expectedJson);
