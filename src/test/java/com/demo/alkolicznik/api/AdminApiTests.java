@@ -758,7 +758,7 @@ public class AdminApiTests {
                 BeerPriceResponseDTO expected = createBeerPriceResponse(
                         createBeerResponse(getBeer(3L, beers)),
                         createStoreResponse(getStore(3L, stores)),
-                        "4.59 PLN"
+                        "PLN 4.59"
                 );
                 String expectedJson = toJsonString(expected);
 
