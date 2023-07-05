@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
@@ -140,6 +141,9 @@ public class BeerPriceService {
     }
 
     public BeerPrice update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
+        if(updateDTO.propertiesMissing()) {
+            throw new PropertiesMissingException();
+        }
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
         Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
@@ -147,12 +151,12 @@ public class BeerPriceService {
         BeerPrice beerPrice = store.getBeer(beerId).orElseThrow(() ->
                 new BeerPriceNotFoundException());
 
-        MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
-                .setCurrency("PLN").setNumber(updateDTO.getPrice()).create();
-
-        if(beerPrice.getPrice().isEqualTo(updatedPrice)) {
+        if(!updateDTO.anythingToUpdate(beerPrice)) {
             throw new ObjectsAreEqualException();
         }
+
+        MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN").setNumber(updateDTO.getPrice()).create();
         beerPrice.setPrice(updatedPrice);
         storeRepository.save(store);
         return beerPrice;

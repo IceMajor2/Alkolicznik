@@ -69,7 +69,7 @@ public class BeerService {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
-        if (!anythingToUpdate(beer, updateDTO)) {
+        if (!updateDTO.anythingToUpdate(beer)) {
             throw new ObjectsAreEqualException();
         }
         setFieldsWhenValidated(beer, updateDTO);
@@ -81,27 +81,6 @@ public class BeerService {
                 new BeerNotFoundException(beerId));
         beerRepository.delete(toDelete);
         return toDelete;
-    }
-
-    private boolean anythingToUpdate(Beer beer, BeerUpdateDTO update) {
-        String currBrand = beer.getBrand();
-        String currType = beer.getType();
-        Double currVolume = beer.getVolume();
-
-        String upBrand = update.getBrand();
-        String upType = update.getType();
-        Double upVolume = update.getVolume();
-
-        if (upBrand != null && !Objects.equals(currBrand, upBrand)) {
-            return true;
-        }
-        if (upType != null && !Objects.equals(currType, upType)) {
-            return true;
-        }
-        if (upVolume != null && !Objects.equals(currVolume, upVolume)) {
-            return true;
-        }
-        return false;
     }
 
     private void setFieldsWhenValidated(Beer beer, BeerUpdateDTO updateDTO) {
