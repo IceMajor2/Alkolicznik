@@ -483,6 +483,90 @@ public class AdminApiTests {
                         "/api/admin/store/4"
                 );
             }
+
+            @Test
+            @DisplayName("Invalid update store: NAME blank")
+            public void updateStoreNameBlankTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest("", null, null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Name was not specified",
+                        "/api/admin/store/4"
+                );
+
+                request = createStoreUpdateRequest("\t\n ", null, null);
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Name was not specified",
+                        "/api/admin/store/4"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid update store: STREET blank")
+            public void updateStoreStreetBlankTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest(null, null, "");
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Street was not specified",
+                        "/api/admin/store/4"
+                );
+
+                request = createStoreUpdateRequest(null, null, "\t\n ");
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Street was not specified",
+                        "/api/admin/store/4"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid update store: CITY blank")
+            public void updateStoreCityBlankTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest(null, "", null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "City was not specified",
+                        "/api/admin/store/4"
+                );
+
+                request = createStoreUpdateRequest(null, "\t\n ", null);
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "City was not specified",
+                        "/api/admin/store/4"
+                );
+            }
         }
     }
 
