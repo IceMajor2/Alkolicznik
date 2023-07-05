@@ -278,6 +278,22 @@ public class AdminApiTests {
                         "/api/admin/beer/2"
                 );
             }
+
+            @Test
+            @DisplayName("Invalid beer update: PROPERTIES_SAME")
+            public void updateBeerUnchangedTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Malinowe", 0.33);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.OK,
+                        "Such object already exists: nothing to change",
+                        "/api/admin/beer/5"
+                );
+            }
         }
 
         @Nested
@@ -422,6 +438,22 @@ public class AdminApiTests {
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Invalid update store: UNAUTHORIZED")
+            public void updateStoreUnauthorizedTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest("Lubi", null, null);
+                var putResponse = putRequestAuth("user", "user", "/api/admin/store/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/store/{id}"
+                );
             }
         }
     }
