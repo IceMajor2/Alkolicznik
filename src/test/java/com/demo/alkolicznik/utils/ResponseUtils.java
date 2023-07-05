@@ -120,6 +120,19 @@ public class ResponseUtils {
         }
     }
 
+    public static ResultActions mockPutRequest(String url, Object request, Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+        try {
+            return mockMvc.perform(
+                    put(urlTemplate, pathVariables)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJsonString(request))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static ResultActions mockDeleteRequest(String url, Object... pathVariables) {
         try {
             return mockMvc.perform(

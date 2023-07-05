@@ -3,6 +3,7 @@ package com.demo.alkolicznik.utils;
 import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
+import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -37,12 +38,20 @@ public class JsonUtils {
         return store;
     }
 
+    public static StoreResponseDTO createStoreResponse(Store store) {
+        return createStoreResponse(store.getId(), store.getName(), store.getCity(), store.getStreet());
+    }
+
     public static BeerResponseDTO createBeerResponse(Long id, String name, Double volume) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
         response.setFullName(name);
         response.setVolume(volume);
         return response;
+    }
+
+    public static BeerResponseDTO createBeerResponse(Beer beer) {
+        return createBeerResponse(beer.getId(), beer.getFullName(), beer.getVolume());
     }
 
     public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
@@ -78,6 +87,12 @@ public class JsonUtils {
         request.setBrand(brand);
         request.setType(type);
         request.setVolume(volume);
+        return request;
+    }
+
+    public static BeerPriceUpdateDTO createBeerPriceUpdateRequest(Double price) {
+        BeerPriceUpdateDTO request = new BeerPriceUpdateDTO();
+        request.setPrice(price);
         return request;
     }
 

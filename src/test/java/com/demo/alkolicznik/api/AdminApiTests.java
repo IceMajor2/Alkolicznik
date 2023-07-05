@@ -6,6 +6,7 @@ import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
+import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
@@ -740,6 +742,42 @@ public class AdminApiTests {
                 String json = getResponse.getBody();
 
                 assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
+            }
+        }
+
+        @Nested
+        class PutRequests {
+
+            @Test
+            @DisplayName("Update beer price: PRICE")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerPricePriceTest() {
+                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(4.59);
+
+                BeerPriceResponseDTO expected = createBeerPriceResponse(
+                        createBeerResponse(getBeer(3L, beers)),
+                        createStoreResponse(getStore(3L, stores)),
+                        "4.59 PLN"
+                );
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockPutRequest(
+                                "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L)
+                        ),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson);
+                BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L));
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
         }
     }

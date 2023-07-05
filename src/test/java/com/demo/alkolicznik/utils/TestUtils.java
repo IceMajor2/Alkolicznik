@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.utils;
 
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 
 import java.util.List;
@@ -20,6 +21,16 @@ public class TestUtils {
         for (Store store : stores) {
             if (store.getId() == storeId) {
                 return store;
+            }
+        }
+        return null;
+    }
+
+    public static BeerPrice getBeerPrice(Long storeId, Long beerId, List<Store> stores, List<Beer> beers) {
+        Store store = getStore(storeId, stores);
+        for(BeerPrice beerPrice : store.getPrices()) {
+            if(beerPrice.getBeer().getId().equals(beerId)) {
+                return beerPrice;
             }
         }
         return null;

@@ -92,7 +92,7 @@ public class BeerPriceApiController {
         return ResponseEntity.ok(beerPriceResponse);
     }
 
-    @GetMapping(value = "beer/{beer_id}/beer-price", params = "city")
+    @GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
     public ResponseEntity<List<BeerPriceResponseDTO>> getBeersPrice(@PathVariable("beer_id") Long beerId,
                                                                    @RequestParam("city") String city) {
         Set<BeerPrice> beerPrices = beerPriceService.getBeerPrices(beerId, city);
