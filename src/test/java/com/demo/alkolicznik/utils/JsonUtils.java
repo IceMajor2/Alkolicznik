@@ -3,6 +3,7 @@ package com.demo.alkolicznik.utils;
 import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +82,14 @@ public class JsonUtils {
     public static BeerDeleteResponseDTO createBeerDeleteResponse(Beer beer, String status) {
         BeerDeleteResponseDTO response = new BeerDeleteResponseDTO(beer, status);
         return response;
+    }
+
+    public static StoreUpdateDTO createStoreUpdateRequest(String name, String city, String street) {
+        StoreUpdateDTO request = new StoreUpdateDTO();
+        request.setName(name);
+        request.setCity(city);
+        request.setStreet(street);
+        return request;
     }
 
     public static <T> List<T> toModelList(String json, Class<T> clazz) {

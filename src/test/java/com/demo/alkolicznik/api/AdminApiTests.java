@@ -6,6 +6,7 @@ import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -93,7 +94,7 @@ public class AdminApiTests {
             public void updateBeerVolumeTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
-                BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
+                BeerResponseDTO expected = createBeerResponse(3L, "Tyskie Gronie", 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -113,7 +114,7 @@ public class AdminApiTests {
             public void updateBeerBrandTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
-                BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
+                BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece Gronie", 0.6);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -133,7 +134,7 @@ public class AdminApiTests {
             public void updateBeerTypeTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
 
-                BeerResponseDTO expected = new BeerResponseDTO(2L, "Ksiazece IPA", 0.5);
+                BeerResponseDTO expected = createBeerResponse(2L, "Ksiazece IPA", 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -363,6 +364,64 @@ public class AdminApiTests {
                 String json = getResponse.getBody();
 
                 assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
+            }
+        }
+
+        @Nested
+        class PutRequests {
+
+            @Test
+            @DisplayName("Update store: NAME")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateStoreNameTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest("Carrefour Express", null, null);
+
+                StoreResponseDTO expected = createStoreResponse(1L, "Carrefour Express", "Olsztyn", "ul. Barcza 4");
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 1L),
+                        HttpStatus.OK,
+                        expectedJson);
+                StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Update store: CITY")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateStoreCityTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest(null, "Gdynia", null);
+
+                StoreResponseDTO expected = createStoreResponse(7L, "Tesco", "Gdynia", "ul. Morska 22");
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 7L),
+                        HttpStatus.OK,
+                        expectedJson);
+                StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Update store: STREET")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateStoreStreetTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest(null, null, "ul. Zeromskiego 4");
+
+                StoreResponseDTO expected = createStoreResponse(4L, "ABC", "Warszawa", "ul. Zeromskiego 4");
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 4L),
+                        HttpStatus.OK,
+                        expectedJson);
+                StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
             }
         }
     }
