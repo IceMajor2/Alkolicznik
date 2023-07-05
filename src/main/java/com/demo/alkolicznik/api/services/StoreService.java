@@ -2,15 +2,13 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.StoreRequestDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
-import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -52,6 +50,9 @@ public class StoreService {
         }
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
+        if(!updateDTO.anythingToUpdate(store)) {
+            throw new ObjectsAreEqualException();
+        }
         String updatedName = updateDTO.getName();
         String updatedCity = updateDTO.getCity();
         String updatedStreet = updateDTO.getStreet();
