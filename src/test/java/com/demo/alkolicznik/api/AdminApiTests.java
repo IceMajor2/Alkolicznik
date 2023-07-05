@@ -107,6 +107,14 @@ public class AdminApiTests {
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer/{id}", 3L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -127,6 +135,14 @@ public class AdminApiTests {
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer/{id}", 3L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -147,6 +163,14 @@ public class AdminApiTests {
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer/{id}", 2L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -287,6 +311,14 @@ public class AdminApiTests {
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer/{id}", 6L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -323,6 +355,14 @@ public class AdminApiTests {
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/beer/{id}", 4L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
         }
 
@@ -344,6 +384,15 @@ public class AdminApiTests {
                         HttpStatus.OK,
                         expectedJson);
                 assertThat(actualJson).isEqualTo(expectedJson);
+
+                var getRequest = getRequest("/api/beer/{id}", 6);
+
+                String jsonResponse = getRequest.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find beer of '6' id",
+                        "/api/beer/6");
             }
 
             @Test
@@ -432,6 +481,14 @@ public class AdminApiTests {
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/store/{id}", 1L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -450,6 +507,14 @@ public class AdminApiTests {
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/store/{id}", 7L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -468,6 +533,14 @@ public class AdminApiTests {
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
+
+                var getResponse = getRequest("/api/store/{id}", 4L);
+
+                actualJson = getResponse.getBody();
+                actual = toModel(actualJson, StoreResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @Test
@@ -589,6 +662,15 @@ public class AdminApiTests {
                         HttpStatus.OK,
                         expectedJson);
                 assertThat(actualJson).isEqualTo(expectedJson);
+
+                var getRequest = getRequest("/api/store/{id}", 6);
+
+                String jsonResponse = getRequest.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find store of '6' id",
+                        "/api/store/6");
             }
         }
     }

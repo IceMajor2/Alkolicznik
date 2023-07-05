@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
@@ -107,6 +108,14 @@ public class StoreApiTests {
 
             assertThat(actualJson).isEqualTo(expectedJson);
             assertThat(actual).isEqualTo(expected);
+
+            var getResponse = getRequest("/api/store/{id}", 8L);
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, StoreResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test

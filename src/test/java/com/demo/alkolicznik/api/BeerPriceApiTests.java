@@ -309,6 +309,15 @@ public class BeerPriceApiTests {
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
+
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("beer_id", 3L, "store_id", 1L));
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -406,6 +415,15 @@ public class BeerPriceApiTests {
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
+
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("beer_id", 1L, "store_id", 2L));
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -428,6 +446,15 @@ public class BeerPriceApiTests {
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
+
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("beer_id", 4L, "store_id", 1L));
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -447,6 +474,15 @@ public class BeerPriceApiTests {
                     createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
                     "PLN 3.69");
             String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+
+            var getResponse = getRequest("/api/beer-price",
+                    Map.of("beer_id", 1L, "store_id", 7L));
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
         }
