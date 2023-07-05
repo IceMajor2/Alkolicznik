@@ -66,4 +66,11 @@ public class StoreService {
         }
         return storeRepository.save(store);
     }
+
+    public Store delete(Long storeId) {
+        Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId));
+        storeRepository.delete(toDelete);
+        return toDelete;
+    }
 }

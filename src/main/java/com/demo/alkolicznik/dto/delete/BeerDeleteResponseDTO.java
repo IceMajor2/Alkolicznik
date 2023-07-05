@@ -17,7 +17,13 @@ public class BeerDeleteResponseDTO {
     @JsonProperty("name")
     private String fullName;
     private double volume;
-    private String status;
+    private String status = "Beer was deleted successfully!";
+
+    public BeerDeleteResponseDTO(Beer beer) {
+        this.id = beer.getId();
+        this.fullName = beer.getFullName();
+        this.volume = beer.getVolume();
+    }
 
     public BeerDeleteResponseDTO(Beer beer, String status) {
         this.id = beer.getId();

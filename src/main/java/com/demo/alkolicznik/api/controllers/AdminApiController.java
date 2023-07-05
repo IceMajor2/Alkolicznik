@@ -7,6 +7,7 @@ import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,19 +81,28 @@ public class AdminApiController {
     @DeleteMapping("/beer/{beer_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<BeerDeleteResponseDTO> deleteBeer(@PathVariable("beer_id") Long beerId) {
+    public ResponseEntity<BeerDeleteResponseDTO> updateStore(@PathVariable("beer_id") Long beerId) {
         Beer deleted = beerService.delete(beerId);
-        BeerDeleteResponseDTO deletedResponse = new BeerDeleteResponseDTO(deleted, "Beer was deleted successfully!");
+        BeerDeleteResponseDTO deletedResponse = new BeerDeleteResponseDTO(deleted);
         return ResponseEntity.ok(deletedResponse);
     }
 
     @PutMapping("/store/{store_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<StoreResponseDTO> deleteBeer(@PathVariable("store_id") Long storeId,
-                                                       @RequestBody @Valid StoreUpdateDTO updateDTO) {
+    public ResponseEntity<StoreResponseDTO> updateStore(@PathVariable("store_id") Long storeId,
+                                                        @RequestBody @Valid StoreUpdateDTO updateDTO) {
         Store updated = storeService.update(storeId, updateDTO);
         StoreResponseDTO updatedResponse = new StoreResponseDTO(updated);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updatedResponse);
+    }
+
+    @DeleteMapping("/store/{store_id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
+    public ResponseEntity<StoreDeleteResponseDTO> deleteStore(@PathVariable("store_id") Long storeId) {
+        Store deleted = storeService.delete(storeId);
+        StoreDeleteResponseDTO deleteResponseDTO = new StoreDeleteResponseDTO(deleted);
+        return ResponseEntity.ok(deleteResponseDTO);
     }
 }

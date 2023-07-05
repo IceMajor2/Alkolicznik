@@ -16,7 +16,14 @@ public class StoreDeleteResponseDTO {
     private String name;
     private String city;
     private String street;
-    private String status;
+    private String status = "Store was deleted successfully!";
+
+    public StoreDeleteResponseDTO(Store store) {
+        this.id = store.getId();
+        this.name = store.getName();
+        this.city = store.getCity();
+        this.street = store.getStreet();
+    }
 
     public StoreDeleteResponseDTO(Store store, String status) {
         this.id = store.getId();
