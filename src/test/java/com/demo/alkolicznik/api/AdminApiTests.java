@@ -50,337 +50,357 @@ public class AdminApiTests {
     }
 
     @Nested
-    class GetRequests {
+    class BeerTests {
 
-        @Test
-        @DisplayName("Get all stores w/ authorization")
-        @WithUserDetails("admin")
-        public void getStoresAllAuthorizedTest() {
-            List<StoreResponseDTO> expected = stores.stream()
-                    .map(StoreResponseDTO::new)
-                    .toList();
-            String expectedJson = toJsonString(expected);
+        @Nested
+        class GetRequests {
 
-            String actualJson = assertMockRequest(mockGetRequest("/api/admin/store"),
-                    HttpStatus.OK, expectedJson);
-            List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
+            @Test
+            @DisplayName("Get all stored beers in array")
+            @WithUserDetails("admin")
+            public void getBeerAllArrayAuthorizedTest() throws Exception {
+                List<BeerResponseDTO> expected = beers.stream()
+                        .map(BeerResponseDTO::new)
+                        .toList();
+                String expectedJson = toJsonString(expected);
 
-            assertThat(actual).isEqualTo(expected);
-        }
+                String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer"),
+                        HttpStatus.OK,
+                        expectedJson);
+                List<BeerResponseDTO> actual = toModelList(actualJson, BeerResponseDTO.class);
 
-        @Test
-        @DisplayName("Get all stored beers in array w/ authorization")
-        @WithUserDetails("admin")
-        public void getBeerAllArrayAuthorizedTest() throws Exception {
-            List<BeerResponseDTO> expected = beers.stream()
-                    .map(BeerResponseDTO::new)
-                    .toList();
-            String expectedJson = toJsonString(expected);
-
-            String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer"),
-                    HttpStatus.OK,
-                    expectedJson);
-            List<BeerResponseDTO> actual = toModelList(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("Get all stored beer prices in array w/ authorization")
-        @WithUserDetails("admin")
-        public void getBeerPricesAllArrayAuthorizedTest() throws Exception {
-            List<BeerPriceResponseDTO> expected = new ArrayList<>();
-            for (Store store : stores) {
-                for (BeerPrice beerPrice : store.getPrices()) {
-                    expected.add(new BeerPriceResponseDTO(beerPrice));
-                }
+                assertThat(actual).isEqualTo(expected);
             }
-            String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer-price"),
-                    HttpStatus.OK, expectedJson);
-            List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+            @Test
+            @DisplayName("Get all beers in array: UNAUTHORIZED")
+            public void getBeerAllArrayUnauthorizedTest() {
+                var getResponse = getRequest("/api/admin/beer");
 
-            assertThat(actual).isEqualTo(expected);
+                String json = getResponse.getBody();
+
+                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
+            }
         }
 
-        @Test
-        @DisplayName("Get all stores w/o authorization")
-        public void getStoresAllUnauthorizedTest() {
-            var getResponse = getRequest("/api/admin/store");
+        @Nested
+        class PutRequests {
 
-            String json = getResponse.getBody();
+            @Test
+            @DisplayName("Update beer: VOLUME")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerVolumeTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
+                BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(
+                        mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson
+                );
+                BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Update beer: BRAND")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerBrandTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+
+                BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(
+                        mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson
+                );
+                BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Update beer: TYPE")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerTypeTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
+
+                BeerResponseDTO expected = new BeerResponseDTO(2L, "Ksiazece IPA", 0.5);
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(
+                        mockPutRequest("/api/admin/beer/{id}", request, 2L),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson
+                );
+                BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: request EMPTY")
+            public void updateBeerEmptyRequestTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 6L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "No property to update was specified",
+                        "/api/admin/beer/6"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: VOLUME negative and zero")
+            public void updateBeerVolumeNegativeAndZeroRequestTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Volume must be a positive number",
+                        "/api/admin/beer/4"
+                );
+
+                request = createBeerUpdateRequest(null, null, -5.1d);
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Volume must be a positive number",
+                        "/api/admin/beer/4"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: BEER_NOT_EXISTS")
+            public void updateBeerNotExistsRequestTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 321L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find beer of '321' id",
+                        "/api/admin/beer/321"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: TYPE blank")
+            public void updateBeerTypeBlankRequestTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "\t \n", null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Type was not specified",
+                        "/api/admin/beer/5"
+                );
+
+                request = createBeerUpdateRequest(null, "", null);
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Type was not specified",
+                        "/api/admin/beer/5"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: BRAND blank")
+            public void updateBeerBrandBlankRequestTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Brand was not specified",
+                        "/api/admin/beer/5"
+                );
+
+                request = createBeerUpdateRequest("", null, null);
+                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+                jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Brand was not specified",
+                        "/api/admin/beer/5"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid beer update: NOT_AUTHORIZED")
+            public void updateBeerUnauthorizedTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+                var putResponse = putRequestAuth("user", "user", "/api/admin/beer/{id}", request, 2L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/beer/2"
+                );
+            }
         }
 
-        @Test
-        @DisplayName("Get all beers in array w/o authorization")
-        public void getBeerAllArrayUnauthorizedTest() {
-            var getResponse = getRequest("/api/admin/beer");
+        @Nested
+        class DeleteRequests {
 
-            String json = getResponse.getBody();
+            @Test
+            @DisplayName("Delete beer")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void deleteBeerTest() {
+                BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+                        getBeer(6L, beers),
+                        "Beer was deleted successfully!"
+                );
+                String expectedJson = toJsonString(expected);
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
-        }
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/{id}", 6L),
+                        HttpStatus.OK,
+                        expectedJson);
+                assertThat(actualJson).isEqualTo(expectedJson);
+            }
 
-        @Test
-        @DisplayName("Get all beer prices in array w/o authorization")
-        public void getBeerPriceAllArrayUnauthorizedTest() {
-            var getResponse = getRequest("/api/admin/beer-price");
+            @Test
+            @DisplayName("Invalid delete beer: UNAUTHORIZED")
+            public void deleteBeerUnauthorizedTest() {
+                var deleteResponse = deleteRequestAuth("user", "user",
+                        "/api/admin/beer/{id}", 2L);
 
-            String json = getResponse.getBody();
+                String jsonResponse = deleteResponse.getBody();
 
-            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/beer/2"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid delete beer: BEER_NOT_EXISTS")
+            public void deleteBeerNotExistsTest() {
+                var deleteResponse = deleteRequestAuth("admin", "admin",
+                        "/api/admin/beer/{id}", 0L);
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find beer of '0' id",
+                        "/api/admin/beer/0"
+                );
+            }
         }
     }
 
     @Nested
-    class PutRequests {
+    class StoreTests {
 
-        @Test
-        @DisplayName("Update beer: VOLUME")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void updateBeerVolumeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
+        @Nested
+        class GetRequests {
 
-            BeerResponseDTO expected = new BeerResponseDTO(3L, "Tyskie Gronie", 0.5);
-            String expectedJson = toJsonString(expected);
+            @Test
+            @DisplayName("Get all stores")
+            @WithUserDetails("admin")
+            public void getStoresAllTest() {
+                List<StoreResponseDTO> expected = stores.stream()
+                        .map(StoreResponseDTO::new)
+                        .toList();
+                String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/admin/beer/{id}", request, 3L),
-                    HttpStatus.NO_CONTENT,
-                    expectedJson
-            );
-            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+                String actualJson = assertMockRequest(mockGetRequest("/api/admin/store"),
+                        HttpStatus.OK, expectedJson);
+                List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
-            assertThat(actual).isEqualTo(expected);
-        }
+                assertThat(actual).isEqualTo(expected);
+            }
 
-        @Test
-        @DisplayName("Update beer: BRAND")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void updateBeerBrandTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+            @Test
+            @DisplayName("Get all stores: UNAUTHORIZED")
+            public void getStoresAllUnauthorizedTest() {
+                var getResponse = getRequest("/api/admin/store");
 
-            BeerResponseDTO expected = new BeerResponseDTO(3L, "Ksiazece Gronie", 0.6);
-            String expectedJson = toJsonString(expected);
+                String json = getResponse.getBody();
 
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/admin/beer/{id}", request, 3L),
-                    HttpStatus.NO_CONTENT,
-                    expectedJson
-            );
-            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("Update beer: TYPE")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void updateBeerTypeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
-
-            BeerResponseDTO expected = new BeerResponseDTO(2L, "Ksiazece IPA", 0.5);
-            String expectedJson = toJsonString(expected);
-
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/admin/beer/{id}", request, 2L),
-                    HttpStatus.NO_CONTENT,
-                    expectedJson
-            );
-            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: request EMPTY")
-        public void updateBeerEmptyRequestTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
-            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 6L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "No property to update was specified",
-                    "/api/admin/beer/6"
-            );
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: VOLUME negative and zero")
-        public void updateBeerVolumeNegativeAndZeroRequestTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
-            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Volume must be a positive number",
-                    "/api/admin/beer/4"
-            );
-
-            request = createBeerUpdateRequest(null, null, -5.1d);
-            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
-
-            jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Volume must be a positive number",
-                    "/api/admin/beer/4"
-            );
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: BEER_NOT_EXISTS")
-        public void updateBeerNotExistsRequestTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 321L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.NOT_FOUND,
-                    "Unable to find beer of '321' id",
-                    "/api/admin/beer/321"
-            );
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: TYPE blank")
-        public void updateBeerTypeBlankRequestTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "\t \n", null);
-            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Type was not specified",
-                    "/api/admin/beer/5"
-            );
-
-            request = createBeerUpdateRequest(null, "", null);
-            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-            jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Type was not specified",
-                    "/api/admin/beer/5"
-            );
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: BRAND blank")
-        public void updateBeerBrandBlankRequestTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
-            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Brand was not specified",
-                    "/api/admin/beer/5"
-            );
-
-            request = createBeerUpdateRequest("", null, null);
-            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-            jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Brand was not specified",
-                    "/api/admin/beer/5"
-            );
-        }
-
-        @Test
-        @DisplayName("Invalid beer update: NOT_AUTHORIZED")
-        public void updateBeerUnauthorizedTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-            var putResponse = putRequestAuth("user", "user", "/api/admin/beer/{id}", request, 2L);
-
-            String jsonResponse = putResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.NOT_FOUND,
-                    "Resource not found",
-                    "/api/admin/beer/2"
-            );
+                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
+            }
         }
     }
 
     @Nested
-    class DeleteRequests {
+    class BeerPriceAdminTests {
 
-        @Test
-        @DisplayName("Delete beer")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void deleteBeerTest() {
-            BeerDeleteResponseDTO expected = createBeerDeleteResponse(
-                    getBeer(6L, beers),
-                    "Beer was deleted successfully!"
-            );
-            String expectedJson = toJsonString(expected);
+        @Nested
+        class GetRequests {
 
-            String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/{id}", 6L),
-                    HttpStatus.OK,
-                    expectedJson);
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
+            @Test
+            @DisplayName("Get all stored beer prices in array")
+            @WithUserDetails("admin")
+            public void getBeerPricesAllArrayTest() {
+                List<BeerPriceResponseDTO> expected = new ArrayList<>();
+                for (Store store : stores) {
+                    for (BeerPrice beerPrice : store.getPrices()) {
+                        expected.add(new BeerPriceResponseDTO(beerPrice));
+                    }
+                }
+                String expectedJson = toJsonString(expected);
 
-        @Test
-        @DisplayName("Invalid delete beer: UNAUTHORIZED")
-        public void deleteBeerUnauthorizedTest() {
-            var deleteResponse = deleteRequestAuth("user", "user",
-                    "/api/admin/beer/{id}", 2L);
+                String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer-price"),
+                        HttpStatus.OK, expectedJson);
+                List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-            String jsonResponse = deleteResponse.getBody();
+                assertThat(actual).isEqualTo(expected);
+            }
 
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.NOT_FOUND,
-                    "Resource not found",
-                    "/api/admin/beer/2"
-            );
-        }
+            @Test
+            @DisplayName("Get all beer prices in array: UNAUTHORIZED")
+            public void getBeerPriceAllArrayUnauthorizedTest() {
+                var getResponse = getRequest("/api/admin/beer-price");
 
-        @Test
-        @DisplayName("Invalid delete beer: BEER_NOT_EXISTS")
-        public void deleteBeerNotExistsTest() {
-            var deleteResponse = deleteRequestAuth("admin", "admin",
-                    "/api/admin/beer/{id}", 0L);
+                String json = getResponse.getBody();
 
-            String jsonResponse = deleteResponse.getBody();
-
-            assertIsError(
-                    jsonResponse,
-                    HttpStatus.NOT_FOUND,
-                    "Unable to find beer of '0' id",
-                    "/api/admin/beer/0"
-            );
+                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
+            }
         }
     }
 }
