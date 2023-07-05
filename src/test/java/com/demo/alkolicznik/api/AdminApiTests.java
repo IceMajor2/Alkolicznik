@@ -779,6 +779,78 @@ public class AdminApiTests {
                 assertThat(actual).isEqualTo(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
             }
+
+            @Test
+            @DisplayName("Invalid update beer price: PRICE negative and zero")
+            public void updateBeerPricePriceNegativeAndZeroTest() {
+                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(0d);
+                var putResponse = putRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+                String jsonResponse = putResponse.getBody();
+                assertIsError(jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Price must be a positive number",
+                        "/api/admin/beer-price");
+
+                request = createBeerPriceUpdateRequest(-5.9);
+                putResponse = putRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+                jsonResponse = putResponse.getBody();
+                assertIsError(jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "Price must be a positive number",
+                        "/api/admin/beer-price");
+            }
+
+            @Test
+            @DisplayName("Invalid update beer price: PRICE missing")
+            public void updateBeerPricePriceNullTest() {
+                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(null);
+                var putResponse = putRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+                String jsonResponse = putResponse.getBody();
+                assertIsError(jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "No property to update was specified",
+                        "/api/admin/beer-price");
+            }
+
+            @Test
+            @DisplayName("Invalid update beer price: SAME_PROPERTIES")
+            public void updateBeerPricePropertiesSameTest() {
+                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(2.89);
+                var putResponse = putRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", request, Map.of("beer_id", 4L, "store_id", 2L));
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.OK,
+                        "Objects are the same: nothing to update",
+                        "/api/admin/beer-price");
+            }
+
+            @Test
+            @DisplayName("Invalid update beer price: UNAUTHORIZED")
+            public void updateBeerPricePriceUnauthorizedTest() {
+                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(7.89);
+                var putResponse = putRequestAuth("user", "user",
+                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 2L));
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/beer-price"
+                );
+            }
         }
     }
 }
+
+// Write tests for checking 'Same_Properties' of Store PUT requests

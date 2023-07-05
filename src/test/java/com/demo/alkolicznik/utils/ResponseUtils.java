@@ -93,6 +93,16 @@ public class ResponseUtils {
         return putResponse;
     }
 
+    public static ResponseEntity<String> putRequestAuth(String username, String password, String url, Object request,
+                                                        Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+
+        ResponseEntity<String> putResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(urlTemplate, HttpMethod.PUT, new HttpEntity(request), String.class, pathVariables);
+        return putResponse;
+    }
+
     public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url, Object... pathVariables) {
         ResponseEntity<String> deleteResponse = restTemplate
                 .withBasicAuth(username, password)
