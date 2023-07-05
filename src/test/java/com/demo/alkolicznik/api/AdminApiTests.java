@@ -452,7 +452,7 @@ public class AdminApiTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Resource not found",
-                        "/api/admin/store/{id}"
+                        "/api/admin/store/4"
                 );
             }
         }
