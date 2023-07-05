@@ -672,6 +672,38 @@ public class AdminApiTests {
                         "Unable to find store of '6' id",
                         "/api/store/6");
             }
+
+            @Test
+            @DisplayName("Invalid delete store: UNAUTHORIZED")
+            public void deleteStoreUnauthorizedTest() {
+                var deleteResponse = deleteRequestAuth("user", "user",
+                        "/api/admin/store/{id}", 2L);
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/store/2"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid delete store: STORE_NOT_EXISTS")
+            public void deleteStoreNotExistsTest() {
+                var deleteResponse = deleteRequestAuth("admin", "admin",
+                        "/api/admin/store/{id}", 0L);
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find store of '0' id",
+                        "/api/admin/store/0"
+                );
+            }
         }
     }
 
