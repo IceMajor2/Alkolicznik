@@ -198,7 +198,6 @@ public class AdminApiTests {
 
         @Test
         @DisplayName("Invalid beer update: request EMPTY")
-        @WithUserDetails("admin")
         public void updateBeerEmptyRequestTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 6L);
@@ -210,6 +209,106 @@ public class AdminApiTests {
                     HttpStatus.BAD_REQUEST,
                     "No property to update was specified",
                     "/api/admin/beer/6"
+            );
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: VOLUME negative and zero")
+        public void updateBeerVolumeNegativeAndZeroRequestTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
+            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/admin/beer/4"
+            );
+
+            request = createBeerUpdateRequest(null, null, -5.1d);
+            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+
+            jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Volume must be a positive number",
+                    "/api/admin/beer/4"
+            );
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: BEER_NOT_EXISTS")
+        public void updateBeerNotExistsRequestTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 321L);
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '321' id",
+                    "/api/admin/beer/321"
+            );
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: TYPE blank")
+        public void updateBeerTypeBlankRequestTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "\t \n", null);
+            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Type was not specified",
+                    "/api/admin/beer/5"
+            );
+
+            request = createBeerUpdateRequest(null, "", null);
+            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+            jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Type was not specified",
+                    "/api/admin/beer/5"
+            );
+        }
+
+        @Test
+        @DisplayName("Invalid beer update: BRAND blank")
+        public void updateBeerBrandBlankRequestTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
+            var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified",
+                    "/api/admin/beer/5"
+            );
+
+            request = createBeerUpdateRequest("", null, null);
+            putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+
+            jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Brand was not specified",
+                    "/api/admin/beer/5"
             );
         }
     }
