@@ -69,9 +69,4 @@ public class BeerPrice {
     public int hashCode() {
         return Objects.hash(store, beer);
     }
-
-    @Override
-    public String toString() {
-        return "%s: %s - %.2fzl".formatted(this.store.getName(), this.beer.getBrand(), this.price);
-    }
 }
