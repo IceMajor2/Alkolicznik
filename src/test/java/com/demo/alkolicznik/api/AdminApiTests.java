@@ -208,34 +208,6 @@ public class AdminApiTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: TYPE blank")
-            public void updateBeerTypeBlankRequestTest() {
-                BeerUpdateDTO request = createBeerUpdateRequest(null, "\t \n", null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-                String jsonResponse = putResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.BAD_REQUEST,
-                        "Type was not specified",
-                        "/api/admin/beer/5"
-                );
-
-                request = createBeerUpdateRequest(null, "", null);
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
-
-                jsonResponse = putResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.BAD_REQUEST,
-                        "Type was not specified",
-                        "/api/admin/beer/5"
-                );
-            }
-
-            @Test
             @DisplayName("Invalid beer update: BRAND blank")
             public void updateBeerBrandBlankRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
@@ -293,6 +265,62 @@ public class AdminApiTests {
                         "Objects are the same: nothing to update",
                         "/api/admin/beer/5"
                 );
+            }
+
+            @Test
+            @DisplayName("Update beer: remove TYPE")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerSetTypeToNullTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
+
+                BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", 0.5);
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(
+                        mockPutRequest("/api/admin/beer/{id}", request, 6L),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson
+                );
+                BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            @DisplayName("Invalid update beer: PROPERTIES_SAME (2)")
+            public void updateBeerUnchangedTwoTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
+                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.OK,
+                        "Objects are the same: nothing to update",
+                        "/api/admin/beer/4"
+                );
+            }
+
+            @Test
+            @DisplayName("Update beer: previously TYPE null")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void updateBeerWithTypeNullTest() {
+                BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
+
+                BeerResponseDTO expected = createBeerResponse(4L, "Zubr Ciemnozloty", 0.5);
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(
+                        mockPutRequest("/api/admin/beer/{id}", request, 4L),
+                        HttpStatus.NO_CONTENT,
+                        expectedJson
+                );
+                BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
             }
         }
 

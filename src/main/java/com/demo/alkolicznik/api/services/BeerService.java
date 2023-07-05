@@ -108,7 +108,7 @@ public class BeerService {
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
-        
+
         if (updatedBrand != null) {
             beer.setBrand(updatedBrand);
         }
