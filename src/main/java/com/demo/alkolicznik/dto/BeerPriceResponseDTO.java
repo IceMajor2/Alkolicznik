@@ -2,16 +2,14 @@ package com.demo.alkolicznik.dto;
 
 import com.demo.alkolicznik.models.BeerPrice;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @JsonPropertyOrder({"beer", "price", "store"})
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class BeerPriceResponseDTO {
 
     private BeerResponseDTO beer;
@@ -22,10 +20,5 @@ public class BeerPriceResponseDTO {
         this.store = new StoreResponseDTO(beerPrice.getStore());
         this.beer = new BeerResponseDTO(beerPrice.getBeer());
         this.price = beerPrice.getPrice().toString();
-    }
-
-    @Override
-    public String toString() {
-        return "%s: %s - %s".formatted(this.store.getName(), this.beer.getFullName(), this.price);
     }
 }
