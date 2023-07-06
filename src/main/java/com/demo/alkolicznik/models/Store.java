@@ -40,7 +40,8 @@ public class Store {
     @OneToMany(mappedBy = "store",
             cascade = {CascadeType.ALL,
                     CascadeType.MERGE},
-            orphanRemoval = true)
+            orphanRemoval = true,
+            fetch = FetchType.EAGER)
     private Set<BeerPrice> prices = new HashSet<>();
 
     @Override

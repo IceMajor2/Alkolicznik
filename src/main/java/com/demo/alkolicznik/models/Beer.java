@@ -29,7 +29,8 @@ public class Beer {
 
     @OneToMany(mappedBy = "beer",
             cascade = CascadeType.MERGE,
-            orphanRemoval = true)
+            orphanRemoval = true,
+            fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<BeerPrice> prices = new HashSet<>();
 
@@ -58,7 +59,7 @@ public class Beer {
     @JsonProperty("name")
     public String getFullName() {
         StringBuilder sb = new StringBuilder(this.brand);
-        if(this.type != null) {
+        if (this.type != null) {
             sb.append(" ");
             sb.append(this.type);
         }
@@ -84,7 +85,7 @@ public class Beer {
         sb.append("Full name: ").append(this.getFullName()).append('\n');
         sb.append("Brand: ").append(this.brand).append('\n');
         sb.append("Type: ");
-        if(this.type != null) {
+        if (this.type != null) {
             sb.append(this.type);
         } else {
             sb.append("---");
