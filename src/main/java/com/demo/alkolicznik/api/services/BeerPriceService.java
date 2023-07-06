@@ -146,11 +146,11 @@ public class BeerPriceService {
         }
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
-        Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
-                new BeerNotFoundException(beerId));
+        if(!beerRepository.existsById(beerId)) {
+            throw new BeerNotFoundException(beerId);
+        }
         BeerPrice beerPrice = store.getBeer(beerId).orElseThrow(() ->
                 new BeerPriceNotFoundException());
-
         if(!updateDTO.anythingToUpdate(beerPrice)) {
             throw new ObjectsAreEqualException();
         }
@@ -160,5 +160,18 @@ public class BeerPriceService {
         beerPrice.setPrice(updatedPrice);
         storeRepository.save(store);
         return beerPrice;
+    }
+
+    public BeerPrice delete(Long storeId, Long beerId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId));
+        Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
+                new BeerNotFoundException(beerId));
+        BeerPrice beerPrice = store.getBeer(beerId).orElseThrow(() ->
+                new BeerPriceNotFoundException());
+        BeerPrice deleted = store.removeBeer(beer);
+        beerRepository.save(beer);
+        storeRepository.save(store);
+        return deleted;
     }
 }

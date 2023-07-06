@@ -7,6 +7,7 @@ import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
@@ -115,5 +116,15 @@ public class AdminApiController {
         BeerPrice updated = beerPriceService.update(storeId, beerId, updateDTO);
         BeerPriceResponseDTO response = new BeerPriceResponseDTO(updated);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
+    @DeleteMapping("/beer-price")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SecurityRequirement(name = "Basic Authentication") // OpenAPI
+    public ResponseEntity<BeerPriceDeleteDTO> deleteBeerPrice(@RequestParam("store_id") Long storeId,
+                                                              @RequestParam("beer_id") Long beerId) {
+        BeerPrice deleted = beerPriceService.delete(storeId, beerId);
+        BeerPriceDeleteDTO response = new BeerPriceDeleteDTO(deleted);
+        return ResponseEntity.ok(response);
     }
 }

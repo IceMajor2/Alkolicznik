@@ -78,19 +78,21 @@ public class Store {
         beer.getPrices().add(beerPrice);
     }
 
-    public void removeBeer(Beer beer) {
+    public BeerPrice removeBeer(Beer beer) {
         for (Iterator<BeerPrice> iterator = prices.iterator();
              iterator.hasNext(); ) {
             BeerPrice beerPrice = iterator.next();
-
             if (beerPrice.getStore().equals(this) &&
                     beerPrice.getBeer().equals(beer)) {
+                BeerPrice copy = beerPrice.clone();
                 iterator.remove();
                 beerPrice.getBeer().getPrices().remove(beerPrice);
                 beerPrice.setStore(null);
                 beerPrice.setBeer(null);
+                return copy;
             }
         }
+        return null;
     }
 
     public Optional<BeerPrice> getBeer(String beerFullname) {
@@ -103,8 +105,8 @@ public class Store {
     }
 
     public Optional<BeerPrice> getBeer(Long beerId) {
-        for(BeerPrice beer : prices) {
-            if(beer.getBeer().getId() == beerId) {
+        for (BeerPrice beer : prices) {
+            if (beer.getBeer().getId() == beerId) {
                 return Optional.of(beer);
             }
         }

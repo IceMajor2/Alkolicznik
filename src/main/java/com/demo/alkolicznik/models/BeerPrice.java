@@ -3,9 +3,7 @@ package com.demo.alkolicznik.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CompositeType;
 
 import javax.money.Monetary;
@@ -14,9 +12,11 @@ import java.util.Objects;
 
 @Entity(name = "BeerPrice")
 @Table(name = "beer_price")
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class BeerPrice {
 
     @EmbeddedId
@@ -67,5 +67,10 @@ public class BeerPrice {
     @Override
     public int hashCode() {
         return Objects.hash(store, beer);
+    }
+
+    @Override
+    protected BeerPrice clone() {
+        return new BeerPrice(this.id, this.store, this.beer, this.price);
     }
 }
