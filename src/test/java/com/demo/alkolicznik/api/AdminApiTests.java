@@ -590,6 +590,21 @@ public class AdminApiTests {
             }
 
             @Test
+            @DisplayName("Invalid update store: SAME_PROPERTIES")
+            public void updateStorePropertiesSameTest() {
+                StoreUpdateDTO request = createStoreUpdateRequest("Lubi", "Warszawa", "ul. Nowaka 5");
+                var putResponse = putRequestAuth("admin", "admin",
+                        "/api/admin/store/{id}", request, 5L);
+
+                String jsonResponse = putResponse.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.OK,
+                        "Objects are the same: nothing to update",
+                        "/api/admin/store/5");
+            }
+
+            @Test
             @DisplayName("Invalid update store: STREET blank")
             public void updateStoreStreetBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest(null, null, "");
@@ -852,5 +867,3 @@ public class AdminApiTests {
         }
     }
 }
-
-// Write tests for checking 'Same_Properties' of Store PUT requests
