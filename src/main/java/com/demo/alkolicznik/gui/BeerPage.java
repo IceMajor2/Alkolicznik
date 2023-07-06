@@ -15,12 +15,30 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Baza piw")
 public class BeerPage extends VerticalLayout {
 
+    private Grid<Beer> grid;
+    private BeerForm form;
+    private Component searchToolbar;
+
     public BeerPage() {
         setSizeFull();
         add(
                 getCityToolbar(),
-                getBeerGrid()
+                getContent()
         );
+    }
+
+    private Component getContent() {
+        HorizontalLayout content = new HorizontalLayout(getBeerGrid(), getBeerForm());
+        content.setFlexGrow(2, grid);
+        content.setFlexGrow(1, form);
+        content.setSizeFull();
+        return content;
+    }
+
+    private BeerForm getBeerForm() {
+        this.form = new BeerForm();
+        form.setWidth("25em");
+        return form;
     }
 
     private Component getCityToolbar() {
@@ -32,11 +50,12 @@ public class BeerPage extends VerticalLayout {
         Button getCityButton = new Button("Szukaj");
 
         HorizontalLayout toolbar = new HorizontalLayout(filterCityText, getCityButton);
+        this.searchToolbar = toolbar;
         return toolbar;
     }
 
     private Component getBeerGrid() {
-        Grid<Beer> grid = new Grid<>();
+        this.grid = new Grid<>();
         grid.setSizeFull();
 
         grid.addColumn(beer -> beer.getId()).setHeader("Id");
