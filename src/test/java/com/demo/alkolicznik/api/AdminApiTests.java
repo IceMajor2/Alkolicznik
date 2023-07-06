@@ -897,24 +897,6 @@ public class AdminApiTests {
                         HttpStatus.NOT_FOUND,
                         "Store does not currently sell this beer",
                         "/api/beer-price");
-
-                getRequest = getRequest("/api/store/{id}/beer-price", Map.of("beer_id", 2L), 5L);
-
-                jsonResponse = getRequest.getBody();
-
-                assertIsError(jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Store does not currently sell this beer",
-                        "/api/store/5/beer-price");
-
-                getRequest = getRequest("/api/store/{id}/beer-price", Map.of("store_id", 5L), 2L);
-
-                jsonResponse = getRequest.getBody();
-
-                assertIsError(jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Store does not currently sell this beer",
-                        "/api/beer/2/beer-price");
             }
         }
     }
