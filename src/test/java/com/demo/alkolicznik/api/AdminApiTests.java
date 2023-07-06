@@ -876,27 +876,45 @@ public class AdminApiTests {
             @WithUserDetails("admin")
             public void deleteBeerPriceTest() {
                 BeerPriceDeleteDTO expected = createBeerPriceDeleteResponse(
-                        getBeer(5L, beers),
-                        getStore(2L, stores),
+                        getBeer(2L, beers),
+                        getStore(5L, stores),
                         "5.49 PLN",
                         "Beer price was deleted successfully!"
                 );
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer-price",
-                                Map.of("beer_id", 5L, "store_id", 2L)),
+                                Map.of("beer_id", 2L, "store_id", 5L)),
                         HttpStatus.OK,
                         expectedJson);
                 assertThat(actualJson).isEqualTo(expectedJson);
 
-                var getRequest = getRequest("/api/beer-price", Map.of("beer_id", 5L, "store_id", 2L));
+                var getRequest = getRequest("/api/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
 
                 String jsonResponse = getRequest.getBody();
 
                 assertIsError(jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Store does not currently sell this beer",
-                        "/api/beer-price/");
+                        "/api/beer-price");
+
+                getRequest = getRequest("/api/store/{id}/beer-price", Map.of("beer_id", 2L), 5L);
+
+                jsonResponse = getRequest.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Store does not currently sell this beer",
+                        "/api/store/5/beer-price");
+
+                getRequest = getRequest("/api/store/{id}/beer-price", Map.of("store_id", 5L), 2L);
+
+                jsonResponse = getRequest.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Store does not currently sell this beer",
+                        "/api/beer/2/beer-price");
             }
         }
     }
