@@ -898,6 +898,70 @@ public class AdminApiTests {
                         "Store does not currently sell this beer",
                         "/api/beer-price");
             }
+
+            @Test
+            @DisplayName("Invalid delete beer price: UNAUTHORIZED")
+            public void deleteBeerPriceUnauthorizedTest() {
+                var deleteResponse = deleteRequestAuth("user", "user",
+                        "/api/admin/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        "/api/admin/beer-price"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid delete beer price: STORE_NOT_EXISTS")
+            public void deleteBeerPriceStoreNotExistsTest() {
+                var deleteResponse = deleteRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
+
+                String jsonResponse = deleteResponse.getBody();
+                System.out.println(jsonResponse);
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find store of '913' id",
+                        "/api/admin/beer-price"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid delete beer price: BEER_NOT_EXISTS")
+            public void deleteBeerPriceBeerNotExistsTest() {
+                var deleteResponse = deleteRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find beer of '433' id",
+                        "/api/admin/beer-price"
+                );
+            }
+
+            @Test
+            @DisplayName("Invalid delete beer price: BEER_PRICE_NOT_EXISTS")
+            public void deleteBeerPricePriceNotExistsTest() {
+                var deleteResponse = deleteRequestAuth("admin", "admin",
+                        "/api/admin/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
+
+                String jsonResponse = deleteResponse.getBody();
+
+                assertIsError(
+                        jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Store does not currently sell this beer",
+                        "/api/admin/beer-price"
+                );
+            }
         }
     }
 }

@@ -110,6 +110,15 @@ public class ResponseUtils {
         return deleteResponse;
     }
 
+    public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url, Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+
+        ResponseEntity<String> deleteResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(urlTemplate, HttpMethod.DELETE, HttpEntity.EMPTY, String.class, pathVariables);
+        return deleteResponse;
+    }
+
     public static ResultActions mockGetRequest(String url) {
         try {
             return mockMvc.perform(get(url));
