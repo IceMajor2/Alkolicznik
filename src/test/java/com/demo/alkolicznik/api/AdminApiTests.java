@@ -4,8 +4,9 @@ import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
-import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
-import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
@@ -63,7 +64,7 @@ public class AdminApiTests {
             @Test
             @DisplayName("Get all stored beers in array")
             @WithUserDetails("admin")
-            public void getBeerAllArrayAuthorizedTest() throws Exception {
+            public void getBeerAllArrayAuthorizedTest() {
                 List<BeerResponseDTO> expected = beers.stream()
                         .map(BeerResponseDTO::new)
                         .toList();
@@ -376,7 +377,7 @@ public class AdminApiTests {
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerTest() {
-                BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+                BeerDeleteDTO expected = createBeerDeleteResponse(
                         getBeer(6L, beers),
                         "Beer was deleted successfully!"
                 );
@@ -669,7 +670,7 @@ public class AdminApiTests {
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteStoreTest() {
-                StoreDeleteResponseDTO expected = createStoreDeleteResponse(
+                StoreDeleteDTO expected = createStoreDeleteResponse(
                         getStore(6L, stores),
                         "Store was deleted successfully!"
                 );
@@ -863,6 +864,39 @@ public class AdminApiTests {
                         "Resource not found",
                         "/api/admin/beer-price"
                 );
+            }
+        }
+
+        @Nested
+        class DeleteRequests {
+
+            @Test
+            @DisplayName("Delete beer price")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void deleteBeerPriceTest() {
+                BeerPriceDeleteDTO expected = createBeerPriceDeleteResponse(
+                        getBeer(5L, beers),
+                        getStore(2L, stores),
+                        "5.49 PLN",
+                        "Beer price was deleted successfully!"
+                );
+                String expectedJson = toJsonString(expected);
+
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer-price",
+                                Map.of("beer_id", 5L, "store_id", 2L)),
+                        HttpStatus.OK,
+                        expectedJson);
+                assertThat(actualJson).isEqualTo(expectedJson);
+
+                var getRequest = getRequest("/api/beer-price", Map.of("beer_id", 5L, "store_id", 2L));
+
+                String jsonResponse = getRequest.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "Store does not currently sell this beer",
+                        "/api/beer-price/");
             }
         }
     }

@@ -1,8 +1,9 @@
 package com.demo.alkolicznik.utils;
 
 import com.demo.alkolicznik.dto.*;
-import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
-import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
@@ -14,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,12 +118,12 @@ public class JsonUtils {
         return request;
     }
 
-    public static BeerDeleteResponseDTO createBeerDeleteResponse(Beer beer, String status) {
-        return new BeerDeleteResponseDTO(beer, status);
+    public static BeerDeleteDTO createBeerDeleteResponse(Beer beer, String status) {
+        return new BeerDeleteDTO(beer, status);
     }
 
-    public static StoreDeleteResponseDTO createStoreDeleteResponse(Store store, String status) {
-        return new StoreDeleteResponseDTO(store, status);
+    public static StoreDeleteDTO createStoreDeleteResponse(Store store, String status) {
+        return new StoreDeleteDTO(store, status);
     }
 
     public static StoreUpdateDTO createStoreUpdateRequest(String name, String city, String street) {
@@ -132,6 +132,24 @@ public class JsonUtils {
         request.setCity(city);
         request.setStreet(street);
         return request;
+    }
+
+    public static BeerPriceDeleteDTO createBeerPriceDeleteResponse(BeerResponseDTO beerDTO,
+                                                                   StoreResponseDTO storeDTO,
+                                                                   String price,
+                                                                   String status) {
+        BeerPriceDeleteDTO response = new BeerPriceDeleteDTO();
+        response.setBeer(beerDTO);
+        response.setStore(storeDTO);
+        response.setPrice(price);
+        response.setStatus(status);
+        return response;
+    }
+
+    public static BeerPriceDeleteDTO createBeerPriceDeleteResponse(Beer beer, Store store, String price, String status) {
+        BeerResponseDTO beerResponseDTO = createBeerResponse(beer);
+        StoreResponseDTO storeResponseDTO = createStoreResponse(store);
+        return createBeerPriceDeleteResponse(beerResponseDTO, storeResponseDTO, price, status);
     }
 
     public static <T> List<T> toModelList(String json, Class<T> clazz) {

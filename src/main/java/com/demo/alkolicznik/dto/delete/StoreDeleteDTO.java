@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StoreDeleteResponseDTO {
+public class StoreDeleteDTO {
 
     private Long id;
     private String name;
@@ -18,14 +18,14 @@ public class StoreDeleteResponseDTO {
     private String street;
     private String status = "Store was deleted successfully!";
 
-    public StoreDeleteResponseDTO(Store store) {
+    public StoreDeleteDTO(Store store) {
         this.id = store.getId();
         this.name = store.getName();
         this.city = store.getCity();
         this.street = store.getStreet();
     }
 
-    public StoreDeleteResponseDTO(Store store, String status) {
+    public StoreDeleteDTO(Store store, String status) {
         this.id = store.getId();
         this.name = store.getName();
         this.city = store.getCity();

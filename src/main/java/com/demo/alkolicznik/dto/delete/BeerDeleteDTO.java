@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BeerDeleteResponseDTO {
+public class BeerDeleteDTO {
 
     private Long id;
     @JsonProperty("name")
@@ -19,13 +19,13 @@ public class BeerDeleteResponseDTO {
     private double volume;
     private String status = "Beer was deleted successfully!";
 
-    public BeerDeleteResponseDTO(Beer beer) {
+    public BeerDeleteDTO(Beer beer) {
         this.id = beer.getId();
         this.fullName = beer.getFullName();
         this.volume = beer.getVolume();
     }
 
-    public BeerDeleteResponseDTO(Beer beer, String status) {
+    public BeerDeleteDTO(Beer beer, String status) {
         this.id = beer.getId();
         this.fullName = beer.getFullName();
         this.volume = beer.getVolume();

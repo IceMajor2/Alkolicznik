@@ -42,7 +42,6 @@ public class BeerPrice {
     )
     @CompositeType(MonetaryAmountType.class)
     private MonetaryAmount price;
-    //private double price;
 
     public BeerPrice(Store store, Beer beer, MonetaryAmount price) {
         this.store = store;

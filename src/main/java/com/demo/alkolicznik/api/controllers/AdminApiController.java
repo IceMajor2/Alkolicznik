@@ -6,8 +6,8 @@ import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.BeerResponseDTO;
 import com.demo.alkolicznik.dto.StoreResponseDTO;
-import com.demo.alkolicznik.dto.delete.BeerDeleteResponseDTO;
-import com.demo.alkolicznik.dto.delete.StoreDeleteResponseDTO;
+import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,9 +81,9 @@ public class AdminApiController {
     @DeleteMapping("/beer/{beer_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<BeerDeleteResponseDTO> updateStore(@PathVariable("beer_id") Long beerId) {
+    public ResponseEntity<BeerDeleteDTO> updateStore(@PathVariable("beer_id") Long beerId) {
         Beer deleted = beerService.delete(beerId);
-        BeerDeleteResponseDTO deletedResponse = new BeerDeleteResponseDTO(deleted);
+        BeerDeleteDTO deletedResponse = new BeerDeleteDTO(deleted);
         return ResponseEntity.ok(deletedResponse);
     }
 
@@ -101,9 +100,9 @@ public class AdminApiController {
     @DeleteMapping("/store/{store_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<StoreDeleteResponseDTO> deleteStore(@PathVariable("store_id") Long storeId) {
+    public ResponseEntity<StoreDeleteDTO> deleteStore(@PathVariable("store_id") Long storeId) {
         Store deleted = storeService.delete(storeId);
-        StoreDeleteResponseDTO deleteResponseDTO = new StoreDeleteResponseDTO(deleted);
+        StoreDeleteDTO deleteResponseDTO = new StoreDeleteDTO(deleted);
         return ResponseEntity.ok(deleteResponseDTO);
     }
 

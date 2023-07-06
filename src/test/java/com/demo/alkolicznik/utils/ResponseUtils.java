@@ -153,6 +153,17 @@ public class ResponseUtils {
         }
     }
 
+    public static ResultActions mockDeleteRequest(String url, Map<String, ?> parameters, Object... pathVariables) {
+        String urlTemplate = buildURI(url, parameters);
+        try {
+            return mockMvc.perform(
+                    delete(urlTemplate, pathVariables)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String buildURI(String uriString, Map<String, ?> parameters) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
         for (var entry : parameters.entrySet()) {
