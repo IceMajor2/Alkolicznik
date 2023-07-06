@@ -38,7 +38,8 @@ public class Store {
 
     @JsonIgnore
     @OneToMany(mappedBy = "store",
-            cascade = CascadeType.MERGE,
+            cascade = {CascadeType.ALL,
+                    CascadeType.MERGE},
             orphanRemoval = true)
     private Set<BeerPrice> prices = new HashSet<>();
 
