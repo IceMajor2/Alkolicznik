@@ -7,12 +7,14 @@ import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,10 @@ public class JsonUtils {
         request.setCity(city);
         request.setStreet(street);
         return request;
+    }
+
+    public static StoreRequestDTO createStoreRequest(Store store) {
+        return createStoreRequest(store.getName(), store.getCity(), store.getStreet());
     }
 
     public static StoreResponseDTO createStoreResponse(Long id, String name, String city, String street) {
@@ -62,6 +68,10 @@ public class JsonUtils {
         return request;
     }
 
+    public static BeerRequestDTO createBeerRequest(Beer beer) {
+        return createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
+    }
+
     public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
         BeerPriceRequestDTO request = new BeerPriceRequestDTO();
         request.setBeerName(beerName);
@@ -72,6 +82,12 @@ public class JsonUtils {
         return request;
     }
 
+    public static BeerPriceRequestDTO createBeerPriceRequest(BeerPrice beerPrice) {
+        return createBeerPriceRequest(beerPrice.getBeer().getFullName(),
+                beerPrice.getBeer().getVolume(),
+                beerPrice.getPrice().getNumber().doubleValueExact());
+    }
+
     public static BeerPriceResponseDTO createBeerPriceResponse(BeerResponseDTO beerResponseDTO,
                                                                StoreResponseDTO storeResponseDTO,
                                                                String price) {
@@ -80,6 +96,12 @@ public class JsonUtils {
         response.setStore(storeResponseDTO);
         response.setPrice(price);
         return response;
+    }
+
+    public static BeerPriceResponseDTO createBeerPriceResponse(Beer beer, Store store, String price) {
+        BeerResponseDTO beerDTO = createBeerResponse(beer);
+        StoreResponseDTO storeDTO = createStoreResponse(store);
+        return createBeerPriceResponse(beerDTO, storeDTO, price);
     }
 
     public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume) {
