@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui;
 
+import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.models.Beer;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -18,8 +19,13 @@ public class BeerPage extends VerticalLayout {
     private Grid<Beer> grid;
     private BeerForm form;
     private Component searchToolbar;
+    private TextField filterCity;
 
-    public BeerPage() {
+    private BeerService beerService;
+
+    public BeerPage(BeerService beerService) {
+        this.beerService = beerService;
+
         setSizeFull();
         add(
                 getCityToolbar(),
@@ -42,14 +48,15 @@ public class BeerPage extends VerticalLayout {
     }
 
     private Component getCityToolbar() {
-        TextField filterCityText = new TextField();
-        filterCityText.setPlaceholder("Wpisz miasto...");
-        filterCityText.setClearButtonVisible(true);
-        filterCityText.setValueChangeMode(ValueChangeMode.LAZY);
+        this.filterCity = new TextField();
+        filterCity.setPlaceholder("Wpisz miasto...");
+        filterCity.setClearButtonVisible(true);
+        filterCity.setValueChangeMode(ValueChangeMode.LAZY);
+        filterCity.addValueChangeListener(event -> updateList());
 
         Button getCityButton = new Button("Szukaj");
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterCityText, getCityButton);
+        HorizontalLayout toolbar = new HorizontalLayout(filterCity, getCityButton);
         this.searchToolbar = toolbar;
         return toolbar;
     }
@@ -65,5 +72,10 @@ public class BeerPage extends VerticalLayout {
 
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         return grid;
+    }
+
+    private void updateList() {
+        System.out.println(filterCity.getValue());
+        this.grid.setItems(beerService.getBeers(filterCity.getValue()));
     }
 }
