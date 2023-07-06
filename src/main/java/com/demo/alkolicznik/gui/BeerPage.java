@@ -75,7 +75,6 @@ public class BeerPage extends VerticalLayout {
     }
 
     private void updateList() {
-        System.out.println(filterCity.getValue());
         this.grid.setItems(beerService.getBeers(filterCity.getValue()));
     }
 }
