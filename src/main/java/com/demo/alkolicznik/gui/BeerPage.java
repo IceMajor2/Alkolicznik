@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.gui;
 
-import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.vaadin.flow.component.Component;
@@ -12,23 +11,30 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 @Route("beer")
 @PageTitle("Baza piw")
 public class BeerPage extends VerticalLayout {
+
+    private RestTemplate restTemplate;
 
     private Grid<BeerResponseDTO> grid;
     private BeerForm form;
     private Component searchToolbar;
     private TextField filterCity;
 
-    private BeerService beerService;
-
-    public BeerPage(BeerService beerService) {
-        this.beerService = beerService;
-
+    public BeerPage(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.rootUri("http://localhost:8080").build();
         setSizeFull();
         add(
                 getCityToolbar(),
@@ -87,7 +93,7 @@ public class BeerPage extends VerticalLayout {
     }
 
     private void editBeer(BeerResponseDTO beer) {
-        if(beer == null) {
+        if (beer == null) {
             closeEditor();
         } else {
             BeerRequestDTO formBeer = convertToRequest(beer);
@@ -107,10 +113,20 @@ public class BeerPage extends VerticalLayout {
     }
 
     private void updateList(String city) {
-        List<BeerResponseDTO> beers = beerService.getBeers(city)
-                .stream()
-                .map(BeerResponseDTO::new)
-                .toList();
+        String uri = buildURI("/api/beer", Map.of("city", city));
+        ResponseEntity<List<BeerResponseDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY,
+                new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
+        List<BeerResponseDTO> beers = response.getBody();
         this.grid.setItems(beers);
+    }
+
+    private String buildURI(String uriString, Map<String, ?> parameters) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
+        for (var entry : parameters.entrySet()) {
+            builder
+                    .queryParam(entry.getKey(), entry.getValue());
+        }
+        String urlTemplate = builder.encode().toUriString();
+        return urlTemplate;
     }
 }
