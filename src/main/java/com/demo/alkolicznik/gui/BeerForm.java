@@ -38,6 +38,8 @@ public class BeerForm extends FormLayout {
     }
 
     private Component createButtonLayout() {
+        getBinder();
+
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
