@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto;
+package com.demo.alkolicznik.dto.requests;
 
 import com.demo.alkolicznik.models.Store;
 import jakarta.validation.constraints.NotBlank;

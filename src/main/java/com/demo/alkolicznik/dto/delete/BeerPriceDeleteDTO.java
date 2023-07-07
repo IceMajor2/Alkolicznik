@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.dto.delete;
 
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;

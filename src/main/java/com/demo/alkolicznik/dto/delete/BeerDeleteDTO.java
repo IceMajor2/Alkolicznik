@@ -2,6 +2,7 @@ package com.demo.alkolicznik.dto.delete;
 
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "name", "volume", "status"})
 public class BeerDeleteDTO {
 
     private Long id;

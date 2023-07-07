@@ -1,12 +1,17 @@
 package com.demo.alkolicznik.utils;
 
-import com.demo.alkolicznik.dto.*;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
+import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -48,16 +53,17 @@ public class JsonUtils {
         return createStoreResponse(store.getId(), store.getName(), store.getCity(), store.getStreet());
     }
 
-    public static BeerResponseDTO createBeerResponse(Long id, String name, Double volume) {
+    public static BeerResponseDTO createBeerResponse(Long id, String brand, String type, Double volume) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
-        response.setFullName(name);
+        response.setBrand(brand);
+        response.setType(type);
         response.setVolume(volume);
         return response;
     }
 
     public static BeerResponseDTO createBeerResponse(Beer beer) {
-        return createBeerResponse(beer.getId(), beer.getFullName(), beer.getVolume());
+        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume());
     }
 
     public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {

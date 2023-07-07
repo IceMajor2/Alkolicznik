@@ -1,8 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

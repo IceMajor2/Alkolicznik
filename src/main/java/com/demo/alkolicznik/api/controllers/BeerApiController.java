@@ -1,8 +1,8 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.dto.BeerRequestDTO;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
+import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

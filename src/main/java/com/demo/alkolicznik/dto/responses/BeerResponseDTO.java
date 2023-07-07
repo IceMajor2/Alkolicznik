@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto;
+package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,7 +23,6 @@ public class BeerResponseDTO {
 
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();
-//        this.fullName = beer.getFullName();
         this.brand = beer.getBrand();
         this.type = beer.getType();
         this.volume = beer.getVolume();

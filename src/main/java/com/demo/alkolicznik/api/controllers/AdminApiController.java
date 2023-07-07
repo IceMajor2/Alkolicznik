@@ -3,9 +3,9 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
@@ -82,7 +82,7 @@ public class AdminApiController {
     @DeleteMapping("/beer/{beer_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<BeerDeleteDTO> updateStore(@PathVariable("beer_id") Long beerId) {
+    public ResponseEntity<BeerDeleteDTO> deleteBeer(@PathVariable("beer_id") Long beerId) {
         Beer deleted = beerService.delete(beerId);
         BeerDeleteDTO deletedResponse = new BeerDeleteDTO(deleted);
         return ResponseEntity.ok(deletedResponse);

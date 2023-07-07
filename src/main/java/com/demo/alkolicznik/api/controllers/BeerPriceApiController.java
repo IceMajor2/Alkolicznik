@@ -1,8 +1,8 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.BeerPriceRequestDTO;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.BeerPrice;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

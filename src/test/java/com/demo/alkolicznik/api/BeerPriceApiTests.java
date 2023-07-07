@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -106,7 +106,7 @@ public class BeerPriceApiTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(3L, "Tyskie Gronie", 0.6),
+                    createBeerResponse(3L, "Tyskie", "Gronie", 0.6),
                     createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"),
                     "PLN 4.19"
             );
@@ -302,7 +302,7 @@ public class BeerPriceApiTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(3L, "Tyskie Gronie", 0.6),
+                    createBeerResponse(3L, "Tyskie", "Gronie", 0.6),
                     createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
                     "PLN 4.19"
             );
@@ -408,7 +408,7 @@ public class BeerPriceApiTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5),
                     createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"),
                     "PLN 3.69"
             );
@@ -439,7 +439,7 @@ public class BeerPriceApiTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(4L, "Zubr", 0.5),
+                    createBeerResponse(4L, "Zubr", null, 0.5),
                     createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
                     "PLN 2.79"
             );
@@ -470,7 +470,7 @@ public class BeerPriceApiTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla Chmielowa Pils", 0.5),
+                    createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5),
                     createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
                     "PLN 3.69");
             String expectedJson = toJsonString(expected);

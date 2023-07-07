@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +18,7 @@ import java.util.List;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.CustomAssertions.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,7 +43,7 @@ public class BeerApiTests {
             String actualJson = getResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = new BeerResponseDTO(1L, "Perla Chmielowa Pils", 0.5);
+            BeerResponseDTO expected = createBeerResponse(getBeer(1L, beers));
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -76,7 +77,7 @@ public class BeerApiTests {
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(7L, "Lech", 0.5);
+            BeerResponseDTO expected = createBeerResponse(7L, "Lech", null, 0.5);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -102,7 +103,7 @@ public class BeerApiTests {
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(7L, "Karmi", 0.6);
+            BeerResponseDTO expected = createBeerResponse(7L, "Karmi", null, 0.6);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -129,7 +130,7 @@ public class BeerApiTests {
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(7L, "Ksiazece Wisnia", 0.5);
+            BeerResponseDTO expected = createBeerResponse(7L, "Ksiazece", "Wisnia", 0.5);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -156,7 +157,7 @@ public class BeerApiTests {
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(7L, "Zywiec Jasne", 0.33);
+            BeerResponseDTO expected = createBeerResponse(7L, "Zywiec", "Jasne", 0.33);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -183,7 +184,7 @@ public class BeerApiTests {
             String actualJson = postResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(7L, "Perla Chmielowa Pils", 0.33);
+            BeerResponseDTO expected = createBeerResponse(7L, "Perla", "Chmielowa Pils", 0.33);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);

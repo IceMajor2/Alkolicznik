@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto;
+package com.demo.alkolicznik.dto.requests;
 
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;

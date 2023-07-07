@@ -29,8 +29,7 @@ public class Beer {
 
     @OneToMany(mappedBy = "beer",
             cascade = CascadeType.MERGE,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER)
+            orphanRemoval = true)
     @JsonIgnore
     private Set<BeerPrice> prices = new HashSet<>();
 

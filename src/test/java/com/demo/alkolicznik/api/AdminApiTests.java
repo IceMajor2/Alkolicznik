@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.BeerResponseDTO;
-import com.demo.alkolicznik.dto.StoreResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
@@ -99,7 +99,7 @@ public class AdminApiTests {
             public void updateBeerVolumeTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
-                BeerResponseDTO expected = createBeerResponse(3L, "Tyskie Gronie", 0.5);
+                BeerResponseDTO expected = createBeerResponse(3L, "Tyskie", "Gronie", 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -127,7 +127,7 @@ public class AdminApiTests {
             public void updateBeerBrandTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
-                BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece Gronie", 0.6);
+                BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.6);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -155,7 +155,7 @@ public class AdminApiTests {
             public void updateBeerTypeTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
 
-                BeerResponseDTO expected = createBeerResponse(2L, "Ksiazece IPA", 0.5);
+                BeerResponseDTO expected = createBeerResponse(2L, "Ksiazece", "IPA", 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -303,7 +303,7 @@ public class AdminApiTests {
             public void updateBeerSetTypeToNullTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
 
-                BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", 0.5);
+                BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -347,7 +347,7 @@ public class AdminApiTests {
             public void updateBeerWithTypeNullTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
 
-                BeerResponseDTO expected = createBeerResponse(4L, "Zubr Ciemnozloty", 0.5);
+                BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5);
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(

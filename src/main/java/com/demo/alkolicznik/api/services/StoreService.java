@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.StoreRequestDTO;
+import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Store;
@@ -8,8 +8,6 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class StoreService {
