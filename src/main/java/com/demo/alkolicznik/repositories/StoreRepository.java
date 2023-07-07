@@ -11,7 +11,7 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 
     List<Store> findAll();
 
-    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE s.city = :city")
+    //@Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE s.city = :city")
     List<Store> findAllByCity(@Param("city") String city);
 
     boolean existsByCity(String city);
