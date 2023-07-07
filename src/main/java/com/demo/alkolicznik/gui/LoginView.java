@@ -7,9 +7,11 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterListener;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route("login")
 @PageTitle("Zaloguj się | Alkolicznik")
+@AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterListener {
 
     private LoginForm login = new LoginForm();
