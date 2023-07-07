@@ -61,7 +61,21 @@ public class BeerPage extends VerticalLayout {
     private BeerForm getBeerForm() {
         this.form = new BeerForm();
         form.setWidth("25em");
+
+        form.addSaveListener(this::saveBeer);
+       // form.addDeleteListener(this::deleteBeer);
+        form.addCloseListener(event -> closeEditor());
         return form;
+    }
+
+    private void saveBeer(BeerForm.SaveEvent saveEvent) {
+        ResponseEntity<BeerResponseDTO> response = restTemplate
+                .postForEntity("/api/beer", saveEvent.getBeer(), BeerResponseDTO.class);
+        closeEditor();
+    }
+
+    private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
+        // to implement
     }
 
     private Component getCityToolbar() {
@@ -128,5 +142,9 @@ public class BeerPage extends VerticalLayout {
         }
         String urlTemplate = builder.encode().toUriString();
         return urlTemplate;
+    }
+
+    private void updateList() {
+        updateList("Olsztyn");
     }
 }
