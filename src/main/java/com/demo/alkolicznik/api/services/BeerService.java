@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BeerService {
@@ -43,7 +42,7 @@ public class BeerService {
             beersInCity.addAll(
                     store.getPrices().stream()
                             .map(BeerPrice::getBeer)
-                            .collect(Collectors.toList())
+                            .toList()
             );
         }
         return beersInCity;

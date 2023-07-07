@@ -16,7 +16,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class BeerPrice {
 
     @EmbeddedId
@@ -67,6 +66,13 @@ public class BeerPrice {
     @Override
     public int hashCode() {
         return Objects.hash(store, beer);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("");
+        sb.append(beer.getFullName()).append(" | ").append(store.getName()).append(" | ").append(price);
+        return sb.toString();
     }
 
     @Override

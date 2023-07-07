@@ -922,7 +922,7 @@ public class AdminApiTests {
                         "/api/admin/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
 
                 String jsonResponse = deleteResponse.getBody();
-                System.out.println(jsonResponse);
+
                 assertIsError(
                         jsonResponse,
                         HttpStatus.NOT_FOUND,

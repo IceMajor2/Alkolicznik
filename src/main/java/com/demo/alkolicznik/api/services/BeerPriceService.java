@@ -9,6 +9,7 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
@@ -49,7 +50,6 @@ public class BeerPriceService {
         double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);
         storeRepository.save(store);
-        // Convert to and return BeerPriceResponseDTO.
         return store.getBeer(beerFullname).get();
     }
 
@@ -127,12 +127,12 @@ public class BeerPriceService {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
-        if(!storeRepository.existsByCity(city)) {
+        if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
         Set<BeerPrice> beerPricesInCity = new LinkedHashSet<>();
-        for(BeerPrice beerPrice: beer.getPrices()) {
-            if(beerPrice.getStore().getCity().equals(city)) {
+        for (BeerPrice beerPrice : beer.getPrices()) {
+            if (beerPrice.getStore().getCity().equals(city)) {
                 beerPricesInCity.add(beerPrice);
             }
         }
@@ -140,17 +140,17 @@ public class BeerPriceService {
     }
 
     public BeerPrice update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
-        if(updateDTO.propertiesMissing()) {
+        if (updateDTO.propertiesMissing()) {
             throw new PropertiesMissingException();
         }
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
-        if(!beerRepository.existsById(beerId)) {
+        if (!beerRepository.existsById(beerId)) {
             throw new BeerNotFoundException(beerId);
         }
         BeerPrice beerPrice = store.getBeer(beerId).orElseThrow(() ->
                 new BeerPriceNotFoundException());
-        if(!updateDTO.anythingToUpdate(beerPrice)) {
+        if (!updateDTO.anythingToUpdate(beerPrice)) {
             throw new ObjectsAreEqualException();
         }
 

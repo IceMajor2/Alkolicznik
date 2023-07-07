@@ -79,7 +79,9 @@ public class BeerPriceApiTests {
                     .toList();
             String expectedJson = toJsonString(expected);
             assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
-            assertThat(actualJson).isEqualTo(expectedJson);
+            assertThat(actualJson)
+                    .withFailMessage("Most likely the error is that the objects are not in the same order (in which case, test was passed)")
+                    .isEqualTo(expectedJson);
         }
 
         @Test
@@ -642,6 +644,7 @@ public class BeerPriceApiTests {
 
         @Test
         @DisplayName("Add valid beer price to invalid store: STORE_NOT_EXISTS")
+        @DirtiesContext
         public void createBeerPriceStoresNotExistsTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
                     createBeerPriceRequest("Ksiazece Zlote pszeniczne", 0.5, 3.79),

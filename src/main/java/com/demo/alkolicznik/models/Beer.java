@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -14,7 +12,7 @@ import java.util.Set;
 
 @Entity(name = "Beer")
 @Table(name = "beer")
-@JsonPropertyOrder({"id", "name", "volume"})
+@JsonPropertyOrder({"id", "brand", "type", "volume"})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -28,8 +26,9 @@ public class Beer {
     private Double volume;
 
     @OneToMany(mappedBy = "beer",
-            cascade = CascadeType.MERGE,
-            orphanRemoval = true)
+            cascade = {CascadeType.MERGE},
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<BeerPrice> prices = new HashSet<>();
 
@@ -67,29 +66,23 @@ public class Beer {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Beer beer = (Beer) o;
-        return Objects.equals(brand, beer.brand) && Objects.equals(type, beer.type) && Objects.equals(volume, beer.volume);
+        return Objects.equals(id, beer.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(brand, type, volume);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ID: ").append(this.id).append('\n');
-        sb.append("Full name: ").append(this.getFullName()).append('\n');
-        sb.append("Brand: ").append(this.brand).append('\n');
-        sb.append("Type: ");
-        if (this.type != null) {
-            sb.append(this.type);
-        } else {
-            sb.append("---");
-        }
-        sb.append('\n').append("Volume: ").append(this.volume);
-        return sb.toString();
+        return this.getBrand() + " " + this.getType() + " (" + this.id + ") [" + this.volume + "l]";
     }
 }

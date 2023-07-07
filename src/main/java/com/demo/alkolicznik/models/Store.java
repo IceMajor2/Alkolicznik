@@ -10,10 +10,7 @@ import lombok.Setter;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Table(name = "store")
 @Entity(name = "Store")
@@ -38,34 +35,22 @@ public class Store {
 
     @JsonIgnore
     @OneToMany(mappedBy = "store",
-            cascade = {CascadeType.ALL,
-                    CascadeType.MERGE},
-            orphanRemoval = true)
+            cascade = {CascadeType.ALL, CascadeType.MERGE},
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     private Set<BeerPrice> prices = new HashSet<>();
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Store)) {
-            return false;
-        }
-
-        Store compare = (Store) obj;
-
-        return compare.getName().equals(this.getName());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Store store = (Store) o;
+        return Objects.equals(id, store.id);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "ID %d. %s, %s (%s)".formatted(this.id, this.name, this.street, this.city);
+        return Objects.hash(id);
     }
 
     public void addBeer(Beer beer, double price) {
@@ -112,5 +97,10 @@ public class Store {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return this.name + ", " + this.city + " " + this.street + " (" + this.id + ")";
     }
 }
