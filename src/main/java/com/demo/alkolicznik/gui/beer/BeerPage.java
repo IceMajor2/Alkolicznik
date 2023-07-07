@@ -1,7 +1,8 @@
-package com.demo.alkolicznik.gui;
+package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.gui.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;

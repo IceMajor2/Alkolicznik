@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.gui;
+package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.vaadin.flow.component.Component;

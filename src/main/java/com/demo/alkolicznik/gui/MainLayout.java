@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui;
 
+import com.demo.alkolicznik.gui.beer.BeerPage;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
