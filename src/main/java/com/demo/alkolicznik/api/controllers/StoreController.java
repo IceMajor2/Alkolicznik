@@ -14,11 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/store")
-public class StoreApiController {
+public class StoreController {
 
     private StoreService storeService;
 
-    public StoreApiController(StoreService storeService) {
+    public StoreController(StoreService storeService) {
         this.storeService = storeService;
     }
 

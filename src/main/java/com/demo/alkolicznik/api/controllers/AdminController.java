@@ -28,13 +28,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
-public class AdminApiController {
+public class AdminController {
 
     private BeerService beerService;
     private StoreService storeService;
     private BeerPriceService beerPriceService;
 
-    public AdminApiController(BeerService beerService, StoreService storeService, BeerPriceService beerPriceService) {
+    public AdminController(BeerService beerService, StoreService storeService, BeerPriceService beerPriceService) {
         this.beerService = beerService;
         this.storeService = storeService;
         this.beerPriceService = beerPriceService;

@@ -18,11 +18,11 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api")
 @Validated
-public class BeerPriceApiController {
+public class BeerPriceController {
 
     private BeerPriceService beerPriceService;
 
-    public BeerPriceApiController(BeerPriceService beerPriceService) {
+    public BeerPriceController(BeerPriceService beerPriceService) {
         this.beerPriceService = beerPriceService;
     }
 
