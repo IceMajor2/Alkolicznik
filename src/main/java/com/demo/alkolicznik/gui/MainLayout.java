@@ -22,6 +22,15 @@ public class MainLayout extends AppLayout {
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo);
 
+        /*
+        response = GET is_user_logged
+        if(response == true) {
+            addLogoutButton().onClickLogout();
+         } else {
+            do nothing;
+         }
+         */
+
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.expand(logo);
         header.setWidthFull();
