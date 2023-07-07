@@ -24,13 +24,8 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     private String name;
-
-    @NotBlank
     private String city;
-
-    @NotBlank
     private String street;
 
     @JsonIgnore
