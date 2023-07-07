@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Map;
 
-@Route("beer")
+@Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw")
 public class BeerPage extends VerticalLayout {
 
