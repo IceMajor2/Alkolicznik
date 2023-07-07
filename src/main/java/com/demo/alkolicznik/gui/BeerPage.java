@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.gui;
 
 import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,11 +12,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.util.List;
+
 @Route("beer")
 @PageTitle("Baza piw")
 public class BeerPage extends VerticalLayout {
 
-    private Grid<Beer> grid;
+    private Grid<BeerResponseDTO> grid;
     private BeerForm form;
     private Component searchToolbar;
     private TextField filterCity;
@@ -61,7 +63,7 @@ public class BeerPage extends VerticalLayout {
         return toolbar;
     }
 
-    private Component getBeerGrid() {
+    private Grid getBeerGrid() {
         this.grid = new Grid<>();
         grid.setSizeFull();
 
@@ -75,6 +77,10 @@ public class BeerPage extends VerticalLayout {
     }
 
     private void updateList() {
-        this.grid.setItems(beerService.getBeers(filterCity.getValue()));
+        List<BeerResponseDTO> beers = beerService.getBeers(filterCity.getValue())
+                .stream()
+                .map(BeerResponseDTO::new)
+                .toList();
+        this.grid.setItems(beers);
     }
 }
