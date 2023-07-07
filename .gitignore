@@ -39,4 +39,4 @@ out/
 .vscode/
 
 ### Vaadin ###
-frontend/**
+frontend/generated
