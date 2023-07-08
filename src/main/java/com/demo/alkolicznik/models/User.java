@@ -1,14 +1,13 @@
 package com.demo.alkolicznik.models;
 
 import com.demo.alkolicznik.dto.requests.UserRequestDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -19,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class User implements Serializable {
 
     @Id
@@ -29,9 +29,8 @@ public class User implements Serializable {
     @NotBlank
     private String password;
     @NotEmpty
-    @JsonProperty("roles")
+    @Enumerated(EnumType.STRING)
     private Set<Roles> roles;
-    @JsonIgnore
     private boolean accountNonLocked = true;
 
     public User(UserRequestDTO userRequestDTO) {
