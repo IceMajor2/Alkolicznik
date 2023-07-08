@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS beer_price;
 DROP TABLE IF EXISTS store;
 DROP TABLE IF EXISTS beer;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE beer (
     id BIGINT IDENTITY PRIMARY KEY,
@@ -29,5 +30,5 @@ CREATE TABLE users (
     username VARCHAR(32) NOT NULL,
     password VARCHAR(255) NOT NULL,
     account_non_locked BOOLEAN,
-    roles SMALLINT ARRAY
+    roles VARCHAR(255) ARRAY
 );
