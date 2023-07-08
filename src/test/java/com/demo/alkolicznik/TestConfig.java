@@ -56,6 +56,14 @@ public class TestConfig {
         return initializedPrices;
     }
 
+    @Bean
+    public List<String> randomPasswordsRight() {
+        List<String> randomPasswords = List.of("kl;jdvba;gbirjea",
+                "3rt90qw4gmkvsvr", "ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
+                "dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK");
+        return randomPasswords;
+    }
+
     private void updateBeersWithPrices(List<BeerPrice> prices) {
         List<Beer> beers = (List<Beer>) context.getBean("beers");
         for(Beer beer : beers) {

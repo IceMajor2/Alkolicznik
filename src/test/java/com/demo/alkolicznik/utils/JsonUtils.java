@@ -9,11 +9,14 @@ import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.dto.requests.UserRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.responses.UserResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class JsonUtils {
 
@@ -156,6 +160,20 @@ public class JsonUtils {
         BeerResponseDTO beerResponseDTO = createBeerResponse(beer);
         StoreResponseDTO storeResponseDTO = createStoreResponse(store);
         return createBeerPriceDeleteResponse(beerResponseDTO, storeResponseDTO, price, status);
+    }
+
+    public static UserRequestDTO createUserRequest(String username, String password) {
+        UserRequestDTO userRequestDTO = new UserRequestDTO();
+        userRequestDTO.setUsername(username);
+        userRequestDTO.setPassword(password);
+        return userRequestDTO;
+    }
+
+    public static UserResponseDTO createUserResponse(String username, Roles... roles) {
+        UserResponseDTO userResponseDTO = new UserResponseDTO();
+        userResponseDTO.setUsername(username);
+        userResponseDTO.setRoles(Set.of(roles));
+        return userResponseDTO;
     }
 
     public static <T> List<T> toModelList(String json, Class<T> clazz) {

@@ -12,7 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
-import static com.demo.alkolicznik.api.AdminApiTests.mockMvc;
+import static com.demo.alkolicznik.api.AdminTests.mockMvc;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

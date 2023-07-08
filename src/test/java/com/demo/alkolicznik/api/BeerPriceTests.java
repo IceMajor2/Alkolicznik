@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
-public class BeerPriceApiTests {
+public class BeerPriceTests {
 
     @Autowired
     private List<Store> stores;

@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
 @AutoConfigureMockMvc
-public class AdminApiTests {
+public class AdminTests {
 
     @Autowired
     private List<Store> stores;
@@ -52,7 +52,7 @@ public class AdminApiTests {
 
     @Autowired
     public void setMockMvc(MockMvc mockMvc) {
-        AdminApiTests.mockMvc = mockMvc;
+        AdminTests.mockMvc = mockMvc;
     }
 
     @Nested
