@@ -17,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 import java.util.Random;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertPasswordHashed;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseUtils.postRequest;
@@ -64,5 +65,20 @@ public class UserTests {
         assertPasswordHashed(pass, userInDb.getPassword());
         assertThat(actual).isEqualTo(expected);
         assertThat(actualJson).isEqualTo(expectedJson);
+    }
+
+    @Test
+    @DisplayName("Invalid create user: USER_ALREADY_EXISTS")
+    public void createUserAlreadyExistsTest() {
+        String pass = getRandomPassword();
+        var postResponse = postRequest("/api/auth/signup",
+                createUserRequest("jacek", pass));
+
+        String jsonResponse = postResponse.getBody();
+
+        assertIsError(jsonResponse,
+                HttpStatus.CONFLICT,
+                "Username is already taken",
+                "/api/auth/signup");
     }
 }
