@@ -77,11 +77,11 @@ public class BeerPriceTests {
                     .stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
-            String expectedJson = toJsonString(expected);
+//            String expectedJson = toJsonString(expected);
             assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
-            assertThat(actualJson)
-                    .withFailMessage("Most likely the error is that the objects are not in the same order (in which case, test was passed)")
-                    .isEqualTo(expectedJson);
+//            assertThat(actualJson)
+//                    .withFailMessage("Most likely the error is that the objects are not in the same order (in which case, test was passed)")
+//                    .isEqualTo(expectedJson);
         }
 
         @Test
