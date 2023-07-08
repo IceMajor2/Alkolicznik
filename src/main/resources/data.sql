@@ -29,3 +29,11 @@ INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES 
 ON CONFLICT DO NOTHING;
 INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (3, 6, 6.99, 'PLN')
 ON CONFLICT DO NOTHING;
+
+-- users
+INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES)
+   VALUES (1, 'admin', '$2a$13$30DIvESARokaAl6jws6zz.7d6aH3QH7KW4SvVurPDU739U90UUiwu', true, ARRAY['ADMIN'])
+       ON CONFLICT DO NOTHING;
+INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES)
+   VALUES (2, 'user', '$2a$13$f/negBSxX5/nlzkFv/M7fOzS/b5AeuKYD/1ZqoES.zbPQiMGrL97y', true, ARRAY['USER'])
+       ON CONFLICT DO NOTHING;
