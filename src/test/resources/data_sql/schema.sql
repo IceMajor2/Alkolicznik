@@ -23,3 +23,11 @@ CREATE TABLE beer_price (
     FOREIGN KEY (beer_id) REFERENCES beer(id),
     FOREIGN KEY (store_id) REFERENCES store(id)
     );
+
+CREATE TABLE users (
+    id BIGINT IDENTITY PRIMARY KEY,
+    username VARCHAR(32) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    account_non_locked BOOLEAN,
+    roles SMALLINT ARRAY
+);
