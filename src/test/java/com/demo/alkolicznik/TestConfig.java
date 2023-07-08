@@ -51,6 +51,28 @@ public class TestConfig {
     }
 
     @Bean
+    public List<User> users() {
+        String sql = "SELECT * FROM users";
+        var handler = new TestUtils.UserRowCallbackHandler();
+        jdbcTemplate.query(sql, handler);
+        List<User> initializedUsers = new ArrayList<>(handler.getResults().values());
+        for (User user : initializedUsers) {
+            users.put(user.getId(), user);
+        }
+        return initializedUsers;
+    }
+
+    @Bean
+    public List<Beer> beers() {
+        String sql = "SELECT * FROM beer";
+        List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
+        for (Beer beer : initializedBeers) {
+            beers.put(beer.getId(), beer);
+        }
+        return initializedBeers;
+    }
+
+    @Bean
     @DependsOn({"stores", "beers"})
     public List<BeerPrice> beerPrice() {
         String sql = "SELECT * FROM beer_price";
@@ -91,28 +113,6 @@ public class TestConfig {
     }
 
     @Bean
-    public List<User> users() {
-        String sql = "SELECT * FROM users";
-        var handler = new TestUtils.UserRowCallbackHandler();
-        jdbcTemplate.query(sql, handler);
-        List<User> initializedUsers = new ArrayList<>(handler.getResults().values());
-        for (User user : initializedUsers) {
-            users.put(user.getId(), user);
-        }
-        return initializedUsers;
-    }
-
-    @Bean
-    public List<Beer> beers() {
-        String sql = "SELECT * FROM beer";
-        List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
-        for (Beer beer : initializedBeers) {
-            beers.put(beer.getId(), beer);
-        }
-        return initializedBeers;
-    }
-
-    @Bean
     public DataSource dataSource() {
         return
                 (new EmbeddedDatabaseBuilder())
@@ -120,6 +120,7 @@ public class TestConfig {
                         .addScript("classpath:data_sql/beer-data.sql")
                         .addScript("classpath:data_sql/store-data.sql")
                         .addScript("classpath:data_sql/beer-price-data.sql")
+                        .addScript("classpath:data_sql/user-data.sql")
                         .build();
     }
 
