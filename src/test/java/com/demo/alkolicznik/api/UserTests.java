@@ -45,7 +45,7 @@ public class UserTests {
     @DisplayName("Create a user")
     @DirtiesContext
     public void whenCreateValidUser_thenSuccessTest() {
-        String pass = "stringstring";
+        String pass = getRandomPassword();
         var postResponse = postRequest("/api/auth/signup",
                 createUserRequest("john", pass));
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -68,6 +68,41 @@ public class UserTests {
     }
 
     @Test
+    @DisplayName("Assert password encoding")
+    @DirtiesContext
+    public void whenCreateUser_thenPasswordMustBeEncodedTest() {
+        String pass = getRandomPassword();
+        var postResponse = postRequest("/api/auth/signup",
+                createUserRequest("george", pass));
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        User userInDb = TestUtils.fetchUser(6L);
+
+        assertPasswordHashed(pass, userInDb.getPassword());
+    }
+
+    @Test
+    @DisplayName("Assert password conditions constraints")
+    @DirtiesContext
+    public void whenCreateUser_thenCheckPasswordIsStrongEnoughTest() {
+        String pass = "stringstrin";
+        var postResponse = postRequest("/api/auth/signup",
+                createUserRequest("user01", pass));
+
+        String jsonResponse = postResponse.getBody();
+
+        assertIsError(jsonResponse,
+                HttpStatus.BAD_REQUEST,
+                "Password length must be at least 12 characters long",
+                "/api/auth/signup");
+
+        pass = "stringstring";
+        postResponse = postRequest("/api/auth/signup",
+                createUserRequest("user01", pass));
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
     @DisplayName("Invalid create user: USER_ALREADY_EXISTS")
     public void whenCreateUserThatAlreadyExists_thenThrowExceptionTest() {
         String pass = getRandomPassword();
@@ -79,21 +114,6 @@ public class UserTests {
         assertIsError(jsonResponse,
                 HttpStatus.CONFLICT,
                 "Username is already taken",
-                "/api/auth/signup");
-    }
-
-    @Test
-    @DisplayName("Invalid create user: PASSWORD_TOO_SHORT")
-    public void whenCreateUserPasswordShort_thenThrowExceptionTest() {
-        String pass = "stringstrin";
-        var postResponse = postRequest("/api/auth/signup",
-                createUserRequest("user01", pass));
-
-        String jsonResponse = postResponse.getBody();
-
-        assertIsError(jsonResponse,
-                HttpStatus.BAD_REQUEST,
-                "Password length must be at least 12 characters long",
                 "/api/auth/signup");
     }
 }
