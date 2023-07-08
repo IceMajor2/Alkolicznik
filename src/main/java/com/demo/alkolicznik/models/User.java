@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -27,17 +27,16 @@ public class User implements Serializable {
     @NotBlank
     private String username;
     @NotBlank
-    @JsonIgnore
     private String password;
     @NotEmpty
     @JsonProperty("roles")
-    private List<Roles> roles;
+    private Set<Roles> roles;
     @JsonIgnore
     private boolean accountNonLocked = true;
 
     public User(UserRequestDTO userRequestDTO) {
         this.username = userRequestDTO.getUsername();
         this.password = userRequestDTO.getPassword();
-        this.roles = new ArrayList<>(List.of(Roles.USER));
+        this.roles = new HashSet<>(Set.of(Roles.USER));
     }
 }
