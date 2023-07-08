@@ -1,9 +1,9 @@
-INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "admin", "Nacovuvaxa77"
-    VALUES (1, 'admin', '$2y$13$kSVDc2VayVtA4Zv6eGcLn.rlC3DJWSOoXJL2mlp77Pf9q7ksze5pO', true, ARRAY['ADMIN']);
+INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "admin", "admin"
+    VALUES (1, 'admin', '$2a$13$30DIvESARokaAl6jws6zz.7d6aH3QH7KW4SvVurPDU739U90UUiwu', true, ARRAY['ADMIN']);
 INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "jacek", "Lasuviyojo90"
     VALUES (2, 'jacek', '$2y$13$gs0zdMMq/Ed1PFEiOWi7ZeJaFlXryv6bJ6ywgkmf1yQMh3DFeVfpm', true, ARRAY['USER']);
-INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "user", "Wijotatewo42"
-    VALUES (3, 'user', '$2y$13$kOPlxvOwGQavy7zniiBUG.RxRy9ZjcvF906pN8JY0oL9jOKIUhqq6', true, ARRAY['USER']);
+INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "user", "user"
+    VALUES (3, 'user', '$2a$13$0n3gSQKZ1747bFHIjfdAy./h.i6Buhas2uUAHAyXigrsn1n2IAMaC', true, ARRAY['USER']);
 INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "kacprox07", "Kodobarazi20"
     VALUES (4, 'kacprox07', '$2y$13$8gz4b5kwgWQ2t6a.SY3lk.Uct6zySI1blvdh6MF.8EmEMDd1ufulu', true, ARRAY['ACCOUNTANT']);
 INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "heckler", "Gaziwubalu66"
