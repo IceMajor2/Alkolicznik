@@ -19,10 +19,15 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@SequenceGenerator(
+        name = "userIdSeq",
+        sequenceName = "user_id_seq",
+        allocationSize = 1
+)
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userIdSeq")
     private Long id;
     @NotBlank
     private String username;
@@ -36,6 +41,6 @@ public class User implements Serializable {
     public User(UserRequestDTO userRequestDTO) {
         this.username = userRequestDTO.getUsername();
         this.password = userRequestDTO.getPassword();
-        this.roles = new HashSet<>(Set.of(Roles.USER));
+        this.roles = new HashSet<>();
     }
 }

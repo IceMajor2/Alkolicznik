@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.security;
 
+import com.demo.alkolicznik.models.Roles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,14 +35,18 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder.encode("admin"))
-                .authorities("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
-    }
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+//        UserDetails admin = User.withUsername("admin")
+//                .password(passwordEncoder.encode("admin"))
+//                .authorities("ADMIN")
+//                .build();
+//        UserDetails admin2 = User.withUsername("admin2")
+//                .password(passwordEncoder.encode("admin"))
+//                .authorities("ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(admin, admin2);
+//    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
