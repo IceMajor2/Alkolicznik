@@ -3,6 +3,8 @@ package com.demo.alkolicznik;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.utils.TestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +19,7 @@ import javax.money.MonetaryAmount;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,7 @@ public class TestConfig {
     private static JdbcTemplate jdbcTemplate;
     private static Map<Long, Beer> beers = new HashMap<>();
     private static Map<Long, Store> stores = new HashMap<>();
+    private static Map<Long, User> users = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -40,7 +44,7 @@ public class TestConfig {
     public List<Store> stores() {
         String sql = "SELECT * FROM store";
         List<Store> initializedStores = jdbcTemplate.query(sql, this.mapToStore());
-        for(Store store : initializedStores) {
+        for (Store store : initializedStores) {
             stores.put(store.getId(), store);
         }
         return initializedStores;
@@ -66,9 +70,9 @@ public class TestConfig {
 
     private void updateBeersWithPrices(List<BeerPrice> prices) {
         List<Beer> beers = (List<Beer>) context.getBean("beers");
-        for(Beer beer : beers) {
-            for(BeerPrice price : prices) {
-                if(price.getBeer().equals(beer)) {
+        for (Beer beer : beers) {
+            for (BeerPrice price : prices) {
+                if (price.getBeer().equals(beer)) {
                     beer.getPrices().add(price);
                 }
             }
@@ -77,9 +81,9 @@ public class TestConfig {
 
     private void updateStoresWithPrices(List<BeerPrice> prices) {
         List<Store> stores = (List<Store>) context.getBean("stores");
-        for(Store store : stores) {
-            for(BeerPrice price : prices) {
-                if(price.getStore().equals(store)) {
+        for (Store store : stores) {
+            for (BeerPrice price : prices) {
+                if (price.getStore().equals(store)) {
                     store.addBeer(price.getBeer(), price.getPrice());
                 }
             }
@@ -87,10 +91,22 @@ public class TestConfig {
     }
 
     @Bean
+    public List<User> users() {
+        String sql = "SELECT * FROM users";
+        var handler = new TestUtils.UserRowCallbackHandler();
+        jdbcTemplate.query(sql, handler);
+        List<User> initializedUsers = new ArrayList<>(handler.getResults().values());
+        for (User user : initializedUsers) {
+            users.put(user.getId(), user);
+        }
+        return initializedUsers;
+    }
+
+    @Bean
     public List<Beer> beers() {
         String sql = "SELECT * FROM beer";
         List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
-        for(Beer beer : initializedBeers) {
+        for (Beer beer : initializedBeers) {
             beers.put(beer.getId(), beer);
         }
         return initializedBeers;
