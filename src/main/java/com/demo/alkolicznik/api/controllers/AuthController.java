@@ -2,6 +2,7 @@ package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.AuthService;
 import com.demo.alkolicznik.dto.requests.UserRequestDTO;
+import com.demo.alkolicznik.dto.responses.UserResponseDTO;
 import com.demo.alkolicznik.models.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,14 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> registerUser(@RequestBody @Valid UserRequestDTO userDTO) {
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody @Valid UserRequestDTO userDTO) {
         User saved = authService.registerUser(userDTO);
+        UserResponseDTO responseDTO = new UserResponseDTO(saved);
         return ResponseEntity.created(ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
                         .buildAndExpand(saved.getId())
                         .toUri())
-                .build();
+                .body(responseDTO);
     }
 }
