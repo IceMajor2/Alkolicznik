@@ -12,6 +12,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -25,7 +27,8 @@ import java.util.Map;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw")
-public class BeerPage extends VerticalLayout {
+@PermitAll
+public class BeerView extends VerticalLayout {
 
     private RestTemplate restTemplate;
 
@@ -34,7 +37,7 @@ public class BeerPage extends VerticalLayout {
     private Component searchToolbar;
     private TextField filterCity;
 
-    public BeerPage(RestTemplateBuilder restTemplateBuilder) {
+    public BeerView(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.rootUri("http://localhost:8080").build();
         setSizeFull();
         add(
