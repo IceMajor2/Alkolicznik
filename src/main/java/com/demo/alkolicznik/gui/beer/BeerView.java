@@ -2,6 +2,7 @@ package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -12,16 +13,17 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,12 +41,13 @@ public class BeerView extends VerticalLayout {
 
     public BeerView(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.rootUri("http://localhost:8080").build();
+        //   addClassName("list-view");
         setSizeFull();
         add(
                 getCityToolbar(),
                 getContent()
         );
-        updateList("Olsztyn");
+        updateList();
         closeEditor();
     }
 
@@ -67,7 +70,7 @@ public class BeerView extends VerticalLayout {
         form.setWidth("25em");
 
         form.addSaveListener(this::saveBeer);
-       // form.addDeleteListener(this::deleteBeer);
+        // form.addDeleteListener(this::deleteBeer);
         form.addCloseListener(event -> closeEditor());
         return form;
     }
@@ -132,10 +135,15 @@ public class BeerView extends VerticalLayout {
 
     private void updateList(String city) {
         String uri = buildURI("/api/beer", Map.of("city", city));
-        ResponseEntity<List<BeerResponseDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY,
-                new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
-        List<BeerResponseDTO> beers = response.getBody();
-        this.grid.setItems(beers);
+        try {
+            ResponseEntity<List<BeerResponseDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<List<BeerResponseDTO>>() {
+                    });
+            List<BeerResponseDTO> beers = response.getBody();
+            this.grid.setItems(beers);
+        } catch (HttpClientErrorException e) {
+            this.grid.setItems(Collections.EMPTY_LIST);
+        }
     }
 
     private String buildURI(String uriString, Map<String, ?> parameters) {
