@@ -11,7 +11,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @Theme(value = "style")
 @PWA(
         name = "Alkolicznik",
-        shortName = "Alkolicznik"
+        shortName = "Alkolicznik",
+        offlinePath = "offline.html",
+        offlineResources = {"images/drunk_man.png", "icon/icon.png"}
 )
 public class AlkolicznikApplication implements AppShellConfigurator {
 
