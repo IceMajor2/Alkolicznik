@@ -1,6 +1,5 @@
-package com.demo.alkolicznik.api.controllers;
+package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.api.services.AuthService;
 import com.demo.alkolicznik.dto.requests.UserRequestDTO;
 import com.demo.alkolicznik.dto.responses.UserResponseDTO;
 import com.demo.alkolicznik.models.User;
