@@ -17,13 +17,13 @@ import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @Component
-public class ResponseUtils {
+public class ResponseTestUtils {
 
     private static TestRestTemplate restTemplate;
 
     @Autowired
     public void setRestTemplate(TestRestTemplate restTemplate) {
-        ResponseUtils.restTemplate = restTemplate;
+        ResponseTestUtils.restTemplate = restTemplate;
     }
 
     /**

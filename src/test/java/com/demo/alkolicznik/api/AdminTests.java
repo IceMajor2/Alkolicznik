@@ -32,7 +32,7 @@ import java.util.Map;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseUtils.*;
+import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static org.assertj.core.api.Assertions.assertThat;

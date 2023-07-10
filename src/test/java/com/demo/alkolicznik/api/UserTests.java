@@ -20,7 +20,7 @@ import java.util.Random;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertPasswordHashed;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseUtils.postRequest;
+import static com.demo.alkolicznik.utils.ResponseTestUtils.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

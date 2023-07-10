@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.ResponseUtils.*;
+import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

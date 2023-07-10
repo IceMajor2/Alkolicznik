@@ -17,7 +17,7 @@ import java.util.List;
 
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.ResponseUtils.*;
+import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static org.assertj.core.api.Assertions.assertThat;
 
