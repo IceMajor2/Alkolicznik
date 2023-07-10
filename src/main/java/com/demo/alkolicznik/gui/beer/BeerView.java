@@ -1,10 +1,11 @@
 package com.demo.alkolicznik.gui.beer;
 
+import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
-import com.demo.alkolicznik.gui.utils.ResponseUtils;
-import com.demo.alkolicznik.models.Roles;
+import com.demo.alkolicznik.security.UserDetailsImpl;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -15,13 +16,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 
@@ -30,21 +25,18 @@ import java.util.Collections;
 @PermitAll
 public class BeerView extends VerticalLayout {
 
-    private UserDetails loggedUser;
+    private UserDetailsImpl loggedUser;
 
     private Grid<BeerResponseDTO> grid;
     private BeerForm form;
     private Component searchToolbar;
     private TextField filterCity;
 
-    private RestTemplate restTemplate;
+    private BeerService beerService;
 
-    public BeerView(RestTemplateBuilder restTemplateBuilder) {
-        restTemplate = restTemplateBuilder
-                .rootUri("http://localhost:8080")
-                .build();
-
-        this.loggedUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public BeerView(BeerService beerService) {
+        this.loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        this.beerService = beerService;
         // addClassName("list-view");
         setSizeFull();
         add(
@@ -80,9 +72,7 @@ public class BeerView extends VerticalLayout {
     }
 
     private void saveBeer(BeerForm.SaveEvent saveEvent) {
-        ResponseEntity<BeerResponseDTO> response = restTemplate
-                .postForEntity("/api/beer", saveEvent.getBeer(), BeerResponseDTO.class);
-        closeEditor();
+        //closeEditor();
     }
 
     private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
@@ -139,17 +129,17 @@ public class BeerView extends VerticalLayout {
 
     private void updateList(String city) {
         try {
-            var response = ResponseUtils.getBeersRequest(city);
-            this.grid.setItems(response.getBody());
-        } catch (HttpClientErrorException e) {
+            var beers = beerService.getBeers(city);
+            this.grid.setItems(beers);
+        } catch (NoSuchCityException e) {
             this.grid.setItems(Collections.EMPTY_LIST);
         }
     }
 
     private void updateList() {
-        if (loggedUser.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ADMIN.toString()))) {
-            var response = ResponseUtils.getAllBeersRequest();
-            this.grid.setItems(response.getBody());
+        if (loggedUser.isAdmin()) {
+            var beers = beerService.getBeers();
+            this.grid.setItems(beers);
         } else {
             updateList("Olsztyn");
         }
