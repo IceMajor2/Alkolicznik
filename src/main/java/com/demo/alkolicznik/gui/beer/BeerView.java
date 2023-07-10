@@ -2,8 +2,9 @@ package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.utils.ResponseUtils;
+import com.demo.alkolicznik.models.Roles;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -15,33 +16,36 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw")
 @PermitAll
 public class BeerView extends VerticalLayout {
 
-    private RestTemplate restTemplate;
+    private UserDetails loggedUser;
 
     private Grid<BeerResponseDTO> grid;
     private BeerForm form;
     private Component searchToolbar;
     private TextField filterCity;
 
+    private RestTemplate restTemplate;
+
     public BeerView(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.rootUri("http://localhost:8080").build();
-        //   addClassName("list-view");
+        restTemplate = restTemplateBuilder
+                .rootUri("http://localhost:8080")
+                .build();
+
+        this.loggedUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // addClassName("list-view");
         setSizeFull();
         add(
                 getCityToolbar(),
@@ -86,7 +90,7 @@ public class BeerView extends VerticalLayout {
     }
 
     private Component getCityToolbar() {
-        this.filterCity = new TextField();
+        filterCity = new TextField();
         filterCity.setPlaceholder("Wpisz miasto...");
         filterCity.setClearButtonVisible(true);
         filterCity.setValueChangeMode(ValueChangeMode.LAZY);
@@ -134,29 +138,20 @@ public class BeerView extends VerticalLayout {
     }
 
     private void updateList(String city) {
-        String uri = buildURI("/api/beer", Map.of("city", city));
         try {
-            ResponseEntity<List<BeerResponseDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<List<BeerResponseDTO>>() {
-                    });
-            List<BeerResponseDTO> beers = response.getBody();
-            this.grid.setItems(beers);
+            var response = ResponseUtils.getBeersRequest(city);
+            this.grid.setItems(response.getBody());
         } catch (HttpClientErrorException e) {
             this.grid.setItems(Collections.EMPTY_LIST);
         }
     }
 
-    private String buildURI(String uriString, Map<String, ?> parameters) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
-        for (var entry : parameters.entrySet()) {
-            builder
-                    .queryParam(entry.getKey(), entry.getValue());
-        }
-        String urlTemplate = builder.encode().toUriString();
-        return urlTemplate;
-    }
-
     private void updateList() {
-        updateList("Olsztyn");
+        if (loggedUser.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ADMIN.toString()))) {
+            var response = ResponseUtils.getAllBeersRequest();
+            this.grid.setItems(response.getBody());
+        } else {
+            updateList("Olsztyn");
+        }
     }
 }

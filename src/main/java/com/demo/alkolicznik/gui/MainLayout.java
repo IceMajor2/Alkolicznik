@@ -1,12 +1,12 @@
 package com.demo.alkolicznik.gui;
 
-import com.demo.alkolicznik.security.AuthService;
 import com.demo.alkolicznik.gui.beer.BeerView;
+import com.demo.alkolicznik.security.AuthService;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
@@ -28,16 +28,9 @@ public class MainLayout extends AppLayout {
         H1 logo = new H1("Alkolicznik");
 
         logo.addClassName("logo");
-        HorizontalLayout header;
-        if (authService.getAuthenticatedUser() != null) {
-            Button logout = new Button("Logout", click ->
-                    authService.logout());
-            header = new HorizontalLayout(new DrawerToggle(), logo, logout);
-        } else {
-            header = new HorizontalLayout(new DrawerToggle(), logo);
-        }
+        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, getAuthButton());
 
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         header.expand(logo);
         header.setWidthFull();
 
@@ -51,5 +44,10 @@ public class MainLayout extends AppLayout {
         addToDrawer(new VerticalLayout(
                 listView
         ));
+    }
+
+    private Button getAuthButton() {
+        Button loginout = new Button("Wyloguj się", click -> authService.logout());
+        return loginout;
     }
 }
