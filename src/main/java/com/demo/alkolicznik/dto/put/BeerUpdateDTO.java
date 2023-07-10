@@ -21,6 +21,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
     @Positive(message = "Volume must be a positive number")
     private Double volume;
 
+    @Override
     public boolean propertiesMissing() {
         return brand == null && type == null && volume == null;
     }
