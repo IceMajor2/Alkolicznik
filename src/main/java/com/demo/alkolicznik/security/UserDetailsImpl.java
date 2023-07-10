@@ -62,4 +62,8 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean isAdmin() {
+        return this.rolesAndAuthorities.contains(new SimpleGrantedAuthority(Roles.ADMIN.toString()));
+    }
 }
