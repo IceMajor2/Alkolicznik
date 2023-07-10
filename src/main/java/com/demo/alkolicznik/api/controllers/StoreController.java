@@ -1,9 +1,8 @@
 package com.demo.alkolicznik.api.controllers;
 
+import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
 import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
-import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.api.services.StoreService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,33 +22,25 @@ public class StoreController {
     }
 
     @GetMapping("/{store_id}")
-    public ResponseEntity<StoreResponseDTO> getStore(@PathVariable("store_id") Long id) {
-        Store store = storeService.get(id);
-        StoreResponseDTO storeResponse = new StoreResponseDTO(store);
-        if (store == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(storeResponse);
+    public StoreResponseDTO getStore(@PathVariable("store_id") Long id) {
+        return storeService.get(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<StoreResponseDTO>> getStores(@RequestParam String city) {
-        List<Store> stores = storeService.getStores(city);
-        List<StoreResponseDTO> storesDTO = stores.stream()
-                .map(StoreResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(storesDTO);
+    public List<StoreResponseDTO> getStores(@RequestParam String city) {
+        return storeService.getStores(city);
     }
 
     @PostMapping
-    public ResponseEntity<Store> addStore(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
-        Store saved = storeService.add(storeRequestDTO);
-        StoreResponseDTO responseDTO = new StoreResponseDTO(saved);
+    public ResponseEntity<StoreResponseDTO> addStore(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
+        StoreResponseDTO saved = storeService.add(storeRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(saved.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(saved);
+        return ResponseEntity
+                .created(location)
+                .body(saved);
     }
 }

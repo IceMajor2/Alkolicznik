@@ -3,18 +3,15 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -43,30 +39,22 @@ public class AdminController {
     @GetMapping("/store")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<List<Store>> getAllStores() {
-        return ResponseEntity.ok(storeService.getStores());
+    public List<StoreResponseDTO> getAllStores() {
+        return storeService.getStores();
     }
 
     @GetMapping("/beer")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<List<BeerResponseDTO>> getAllBeers() {
-        List<Beer> beers = beerService.getBeers();
-        List<BeerResponseDTO> beersDTO = beers.stream()
-                .map(BeerResponseDTO::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(beersDTO);
+    public List<BeerResponseDTO> getAllBeers() {
+        return beerService.getBeers();
     }
 
     @GetMapping("/beer-price")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<List<BeerPriceResponseDTO>> getAllBeerPrices() {
-        Set<BeerPrice> prices = beerPriceService.getBeerPrices();
-        List<BeerPriceResponseDTO> pricesDTO = prices.stream()
-                .map(BeerPriceResponseDTO::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(pricesDTO);
+    public Set<BeerPriceResponseDTO> getAllBeerPrices() {
+        return beerPriceService.getBeerPrices();
     }
 
     @PutMapping("/beer/{beer_id}")
@@ -74,18 +62,16 @@ public class AdminController {
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<BeerResponseDTO> updateBeer(@PathVariable("beer_id") Long beerId,
                                                       @RequestBody @Valid BeerUpdateDTO updateDTO) {
-        Beer updated = beerService.update(beerId, updateDTO);
-        BeerResponseDTO updatedResponse = new BeerResponseDTO(updated);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updatedResponse);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(beerService.update(beerId, updateDTO));
     }
 
     @DeleteMapping("/beer/{beer_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<BeerDeleteDTO> deleteBeer(@PathVariable("beer_id") Long beerId) {
-        Beer deleted = beerService.delete(beerId);
-        BeerDeleteDTO deletedResponse = new BeerDeleteDTO(deleted);
-        return ResponseEntity.ok(deletedResponse);
+    public BeerDeleteDTO deleteBeer(@PathVariable("beer_id") Long beerId) {
+        return beerService.delete(beerId);
     }
 
     @PutMapping("/store/{store_id}")
@@ -93,18 +79,16 @@ public class AdminController {
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
     public ResponseEntity<StoreResponseDTO> updateStore(@PathVariable("store_id") Long storeId,
                                                         @RequestBody @Valid StoreUpdateDTO updateDTO) {
-        Store updated = storeService.update(storeId, updateDTO);
-        StoreResponseDTO updatedResponse = new StoreResponseDTO(updated);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updatedResponse);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(storeService.update(storeId, updateDTO));
     }
 
     @DeleteMapping("/store/{store_id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<StoreDeleteDTO> deleteStore(@PathVariable("store_id") Long storeId) {
-        Store deleted = storeService.delete(storeId);
-        StoreDeleteDTO deleteResponseDTO = new StoreDeleteDTO(deleted);
-        return ResponseEntity.ok(deleteResponseDTO);
+    public StoreDeleteDTO deleteStore(@PathVariable("store_id") Long storeId) {
+        return storeService.delete(storeId);
     }
 
     @PutMapping("/beer-price")
@@ -113,18 +97,16 @@ public class AdminController {
     public ResponseEntity<BeerPriceResponseDTO> updateBeerPrice(@RequestParam("store_id") Long storeId,
                                                                 @RequestParam("beer_id") Long beerId,
                                                                 @RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
-        BeerPrice updated = beerPriceService.update(storeId, beerId, updateDTO);
-        BeerPriceResponseDTO response = new BeerPriceResponseDTO(updated);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(beerPriceService.update(storeId, beerId, updateDTO));
     }
 
     @DeleteMapping("/beer-price")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Basic Authentication") // OpenAPI
-    public ResponseEntity<BeerPriceDeleteDTO> deleteBeerPrice(@RequestParam("store_id") Long storeId,
-                                                              @RequestParam("beer_id") Long beerId) {
-        BeerPrice deleted = beerPriceService.delete(storeId, beerId);
-        BeerPriceDeleteDTO response = new BeerPriceDeleteDTO(deleted);
-        return ResponseEntity.ok(response);
+    public BeerPriceDeleteDTO deleteBeerPrice(@RequestParam("store_id") Long storeId,
+                                              @RequestParam("beer_id") Long beerId) {
+        return beerPriceService.delete(storeId, beerId);
     }
 }

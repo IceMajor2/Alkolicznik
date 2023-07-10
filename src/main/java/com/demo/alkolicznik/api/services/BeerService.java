@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
+import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
+import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -24,14 +26,14 @@ public class BeerService {
         this.storeRepository = storeRepository;
     }
 
-    public Beer get(Long beerId) {
+    public BeerResponseDTO get(Long beerId) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
-        return beer;
+        return new BeerResponseDTO(beer);
     }
 
-    public List<Beer> getBeers(String city) {
+    public List<BeerResponseDTO> getBeers(String city) {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
@@ -45,22 +47,22 @@ public class BeerService {
                             .toList()
             );
         }
-        return beersInCity;
+        return this.mapToDto(beersInCity);
     }
 
-    public List<Beer> getBeers() {
-        return beerRepository.findAll();
+    public List<BeerResponseDTO> getBeers() {
+        return this.mapToDto(beerRepository.findAll());
     }
 
-    public Beer add(BeerRequestDTO beerRequestDTO) {
+    public BeerResponseDTO add(BeerRequestDTO beerRequestDTO) {
         Beer beer = beerRequestDTO.convertToModel();
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
         }
-        return beerRepository.save(beer);
+        return new BeerResponseDTO(beerRepository.save(beer));
     }
 
-    public Beer update(Long beerId, BeerUpdateDTO updateDTO) {
+    public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
         if (updateDTO.propertiesMissing()) {
             throw new PropertiesMissingException();
         }
@@ -71,14 +73,14 @@ public class BeerService {
             throw new ObjectsAreEqualException();
         }
         setFieldsWhenValidated(beer, updateDTO);
-        return beerRepository.save(beer);
+        return new BeerResponseDTO(beerRepository.save(beer));
     }
 
-    public Beer delete(Long beerId) {
+    public BeerDeleteDTO delete(Long beerId) {
         Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
                 new BeerNotFoundException(beerId));
         beerRepository.delete(toDelete);
-        return toDelete;
+        return new BeerDeleteDTO(toDelete);
     }
 
     private void setFieldsWhenValidated(Beer beer, BeerUpdateDTO updateDTO) {
@@ -99,5 +101,11 @@ public class BeerService {
         if (updatedVolume != null) {
             beer.setVolume(updatedVolume);
         }
+    }
+
+    private List<BeerResponseDTO> mapToDto(List<Beer> beers) {
+        return beers.stream()
+                .map(BeerResponseDTO::new)
+                .toList();
     }
 }

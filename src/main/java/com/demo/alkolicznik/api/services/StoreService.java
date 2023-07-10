@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
@@ -18,58 +20,65 @@ public class StoreService {
         this.storeRepository = storeRepository;
     }
 
-    public List<Store> getStores(String city) {
+    public List<StoreResponseDTO> getStores(String city) {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
-        return storeRepository.findAllByCity(city);
+        return this.mapToDto(storeRepository.findAllByCity(city));
     }
 
-    public List<Store> getStores() {
-        return storeRepository.findAll();
+    public List<StoreResponseDTO> getStores() {
+        return this.mapToDto(storeRepository.findAll());
     }
 
-    public Store add(StoreRequestDTO storeRequestDTO) {
+    public StoreResponseDTO add(StoreRequestDTO storeRequestDTO) {
         Store store = storeRequestDTO.convertToModel();
         if (storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
             throw new StoreAlreadyExistsException();
         }
-        return storeRepository.save(store);
+        return new StoreResponseDTO(storeRepository.save(store));
     }
 
-    public Store get(Long storeId) {
-        return storeRepository.findById(storeId).orElseThrow(() ->
-                        new StoreNotFoundException(storeId));
+    public StoreResponseDTO get(Long storeId) {
+        return new StoreResponseDTO(storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException(storeId))
+        );
     }
 
-    public Store update(Long storeId, StoreUpdateDTO updateDTO) {
-        if(updateDTO.propertiesMissing()) {
+    public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
+        if (updateDTO.propertiesMissing()) {
             throw new PropertiesMissingException();
         }
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
-        if(!updateDTO.anythingToUpdate(store)) {
+        if (!updateDTO.anythingToUpdate(store)) {
             throw new ObjectsAreEqualException();
         }
         String updatedName = updateDTO.getName();
         String updatedCity = updateDTO.getCity();
         String updatedStreet = updateDTO.getStreet();
-        if(updatedName != null) {
+        if (updatedName != null) {
             store.setName(updatedName);
         }
-        if(updatedCity != null) {
+        if (updatedCity != null) {
             store.setCity(updatedCity);
         }
-        if(updatedStreet != null) {
+        if (updatedStreet != null) {
             store.setStreet(updatedStreet);
         }
-        return storeRepository.save(store);
+        return new StoreResponseDTO(storeRepository.save(store));
     }
 
-    public Store delete(Long storeId) {
+    public StoreDeleteDTO delete(Long storeId) {
         Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
         storeRepository.delete(toDelete);
-        return toDelete;
+        return new StoreDeleteDTO(toDelete);
+    }
+
+    private List<StoreResponseDTO> mapToDto(List<Store> stores) {
+        return stores.stream()
+                .map(StoreResponseDTO::new)
+                .toList();
     }
 }

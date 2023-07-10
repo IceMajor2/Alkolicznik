@@ -3,7 +3,6 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
-import com.demo.alkolicznik.models.BeerPrice;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -30,15 +28,15 @@ public class BeerPriceController {
     public ResponseEntity<BeerPriceResponseDTO> addBeerPrice(
             @PathVariable("store_id") Long storeId,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
-
-        BeerPrice beerPrice = beerPriceService.add(storeId, beerPriceRequestDTO);
-        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
+        BeerPriceResponseDTO beerPrice = beerPriceService.add(storeId, beerPriceRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(beerPriceResponse.getBeer().getId())
+                .buildAndExpand(beerPrice.getBeer().getId())
                 .toUri();
-        return ResponseEntity.created(location).body(beerPriceResponse);
+        return ResponseEntity
+                .created(location)
+                .body(beerPrice);
     }
 
     @PostMapping(value = "/store/{store_id}/beer-price", params = {"beer_id", "beer_price"})
@@ -46,59 +44,41 @@ public class BeerPriceController {
             @PathVariable("store_id") Long storeId,
             @RequestParam("beer_id") Long beerId,
             @RequestParam("beer_price") @Positive(message = "Price must be a positive number") double price) {
-
-        BeerPrice beerPrice = beerPriceService.add(storeId, beerId, price);
-        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
+        BeerPriceResponseDTO beerPrice = beerPriceService.add(storeId, beerId, price);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(beerPriceResponse.getBeer().getId())
+                .buildAndExpand(beerPrice.getBeer().getId())
                 .toUri();
-        return ResponseEntity.created(location).body(beerPriceResponse);
+        return ResponseEntity
+                .created(location)
+                .body(beerPrice);
     }
 
     @GetMapping("/store/{store_id}/beer-price")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPricesStoreId(@PathVariable("store_id") Long storeId) {
-        Set<BeerPrice> prices = beerPriceService.getBeerPricesOnStoreId(storeId);
-        List<BeerPriceResponseDTO> pricesDTO = prices.stream()
-                .map(BeerPriceResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(pricesDTO);
+    public Set<BeerPriceResponseDTO> getBeerPricesStoreId(@PathVariable("store_id") Long storeId) {
+        return beerPriceService.getBeerPricesOnStoreId(storeId);
     }
 
     @GetMapping(value = "/beer-price", params = "city")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeerPrices(@RequestParam("city") String city) {
-        Set<BeerPrice> beers = beerPriceService.getBeerPrices(city);
-        List<BeerPriceResponseDTO> beersResponse = beers.stream()
-                .map(BeerPriceResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(beersResponse);
+    public Set<BeerPriceResponseDTO> getBeerPrices(@RequestParam("city") String city) {
+        return beerPriceService.getBeerPrices(city);
     }
 
     @GetMapping("/beer/{beer_id}/beer-price")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeersPrice(@PathVariable("beer_id") Long beerId) {
-        Set<BeerPrice> beers = beerPriceService.getBeerPricesOnBeerId(beerId);
-        List<BeerPriceResponseDTO> beersResponse = beers.stream()
-                .map(BeerPriceResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(beersResponse);
+    public Set<BeerPriceResponseDTO> getBeersPrice(@PathVariable("beer_id") Long beerId) {
+        return beerPriceService.getBeerPricesOnBeerId(beerId);
     }
 
     @GetMapping(value = "/beer-price", params = {"store_id", "beer_id"})
-    public ResponseEntity<BeerPriceResponseDTO> getBeerPrice(@RequestParam("store_id") Long storeId,
-                                                             @RequestParam("beer_id") Long beerId) {
-        BeerPrice beerPrice = beerPriceService.get(storeId, beerId);
-        BeerPriceResponseDTO beerPriceResponse = new BeerPriceResponseDTO(beerPrice);
-        return ResponseEntity.ok(beerPriceResponse);
+    public BeerPriceResponseDTO getBeerPrice(@RequestParam("store_id") Long storeId,
+                                             @RequestParam("beer_id") Long beerId) {
+        return beerPriceService.get(storeId, beerId);
     }
 
     @GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
-    public ResponseEntity<List<BeerPriceResponseDTO>> getBeersPrice(@PathVariable("beer_id") Long beerId,
-                                                                   @RequestParam("city") String city) {
-        Set<BeerPrice> beerPrices = beerPriceService.getBeerPrices(beerId, city);
-        List<BeerPriceResponseDTO> beersResponse = beerPrices.stream()
-                .map(BeerPriceResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(beersResponse);
+    public Set<BeerPriceResponseDTO> getBeersPrice(@PathVariable("beer_id") Long beerId,
+                                                   @RequestParam("city") String city) {
+        return beerPriceService.getBeerPrices(beerId, city);
     }
 }

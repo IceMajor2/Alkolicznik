@@ -3,7 +3,6 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.models.Beer;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,35 +22,25 @@ public class BeerController {
     }
 
     @GetMapping("/{beer_id}")
-    public ResponseEntity<BeerResponseDTO> getBeer(@PathVariable("beer_id") Long id) {
-        Beer beer = beerService.get(id);
-        BeerResponseDTO beerDTO = new BeerResponseDTO(beer);
-        return ResponseEntity.ok(beerDTO);
+    public BeerResponseDTO getBeer(@PathVariable("beer_id") Long id) {
+        return beerService.get(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<BeerResponseDTO>> getBeers(@RequestParam("city") String city) {
-        List<Beer> beers = beerService.getBeers(city);
-        List<BeerResponseDTO> beersDTO = beers.stream()
-                .map(BeerResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(beersDTO);
+    public List<BeerResponseDTO> getBeers(@RequestParam("city") String city) {
+        return beerService.getBeers(city);
     }
 
     @PostMapping
     public ResponseEntity<BeerResponseDTO> addBeer(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
-        try {
-            Beer saved = beerService.add(beerRequestDTO);
-            BeerResponseDTO savedDto = new BeerResponseDTO(saved);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(saved.getId())
-                    .toUri();
-            var resEntity = ResponseEntity.created(location).body(savedDto);
-            return resEntity;
-        } catch (RuntimeException e) {
-            throw e;
-        }
+        BeerResponseDTO savedDTO = beerService.add(beerRequestDTO);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedDTO.getId())
+                .toUri();
+        return ResponseEntity
+                .created(location)
+                .body(savedDTO);
     }
 }

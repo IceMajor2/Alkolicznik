@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -9,13 +11,13 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BeerPriceService {
@@ -28,7 +30,7 @@ public class BeerPriceService {
         this.beerRepository = beerRepository;
     }
 
-    public BeerPrice add(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
+    public BeerPriceResponseDTO add(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
@@ -50,10 +52,10 @@ public class BeerPriceService {
         double price = beerPriceRequestDTO.getPrice();
         store.addBeer(beer, price);
         storeRepository.save(store);
-        return store.getBeer(beerFullname).get();
+        return new BeerPriceResponseDTO(store.getBeer(beerFullname).get());
     }
 
-    public BeerPrice add(Long storeId, Long beerId, double price) {
+    public BeerPriceResponseDTO add(Long storeId, Long beerId, double price) {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
         );
@@ -65,38 +67,42 @@ public class BeerPriceService {
         }
         store.addBeer(beer, price);
         storeRepository.save(store);
-        return store.getBeer(beerId).get();
+        return new BeerPriceResponseDTO(store.getBeer(beerId).get());
     }
 
-    public Set<BeerPrice> getBeerPricesOnStoreId(Long storeId) {
+    public Set<BeerPriceResponseDTO> getBeerPricesOnStoreId(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
-        Set<BeerPrice> beers = store.getPrices();
-        return beers;
+        Set<BeerPrice> prices = store.getPrices();
+        return this.mapToDto(prices);
     }
 
-    public BeerPrice get(Long storeId, Long beerId) {
+    public BeerPriceResponseDTO get(Long storeId, Long beerId) {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
         );
-        Beer beer = beerRepository.findById(beerId).orElseThrow(
-                () -> new BeerNotFoundException(beerId)
-        );
-        return store.getBeer(beerId).orElseThrow(
+        if (!beerRepository.existsById(beerId)) {
+            throw new BeerNotFoundException(beerId);
+        }
+        return new BeerPriceResponseDTO(store.getBeer(beerId).orElseThrow(
                 () -> new BeerPriceNotFoundException()
-        );
+        ));
     }
 
-    public Set<BeerPrice> getBeerPrices() {
+    public Set<BeerPriceResponseDTO> getBeerPrices() {
         List<Store> stores = storeRepository.findAll();
         Set<BeerPrice> prices = new LinkedHashSet<>();
         for (Store store : stores) {
             prices.addAll(store.getPrices());
         }
-        return prices;
+
+        Set<BeerPriceResponseDTO> pricesDTO = prices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .collect(Collectors.toSet());
+        return pricesDTO;
     }
 
-    public Set<BeerPrice> getBeerPrices(String city) {
+    public Set<BeerPriceResponseDTO> getBeerPrices(String city) {
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
         if (cityStores.isEmpty()) {
@@ -107,10 +113,10 @@ public class BeerPriceService {
         for (Store store : cityStores) {
             prices.addAll(store.getPrices());
         }
-        return prices;
+        return this.mapToDto(prices);
     }
 
-    public Set<BeerPrice> getBeerPricesOnBeerId(Long beerId) {
+    public Set<BeerPriceResponseDTO> getBeerPricesOnBeerId(Long beerId) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
@@ -120,10 +126,10 @@ public class BeerPriceService {
         for (Store store : stores) {
             store.getBeer(beerId).ifPresent((beerPrice -> prices.add(beerPrice)));
         }
-        return prices;
+        return this.mapToDto(prices);
     }
 
-    public Set<BeerPrice> getBeerPrices(Long beerId, String city) {
+    public Set<BeerPriceResponseDTO> getBeerPrices(Long beerId, String city) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
@@ -136,10 +142,10 @@ public class BeerPriceService {
                 beerPricesInCity.add(beerPrice);
             }
         }
-        return beerPricesInCity;
+        return this.mapToDto(beerPricesInCity);
     }
 
-    public BeerPrice update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
+    public BeerPriceResponseDTO update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
         if (updateDTO.propertiesMissing()) {
             throw new PropertiesMissingException();
         }
@@ -157,11 +163,12 @@ public class BeerPriceService {
         MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
                 .setCurrency("PLN").setNumber(updateDTO.getPrice()).create();
         beerPrice.setPrice(updatedPrice);
+
         storeRepository.save(store);
-        return beerPrice;
+        return new BeerPriceResponseDTO(beerPrice);
     }
 
-    public BeerPrice delete(Long storeId, Long beerId) {
+    public BeerPriceDeleteDTO delete(Long storeId, Long beerId) {
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
         Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
@@ -171,6 +178,12 @@ public class BeerPriceService {
         BeerPrice deleted = store.removeBeer(beer);
         beerRepository.save(beer);
         storeRepository.save(store);
-        return deleted;
+        return new BeerPriceDeleteDTO(deleted);
+    }
+
+    private Set<BeerPriceResponseDTO> mapToDto(Set<BeerPrice> beerPrices) {
+        return beerPrices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .collect(Collectors.toUnmodifiableSet());
     }
 }
