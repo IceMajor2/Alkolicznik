@@ -51,30 +51,10 @@ public class BeerView extends VerticalLayout {
         closeEditor();
     }
 
-    private void closeEditor() {
-        if(!loggedUser.isUser()) {
-            form.setBeer(null);
-            form.setVisible(false);
-            removeClassName("editing");
-        }
-    }
-
     private Component getDisplayText() {
         H2 text = new H2("Piwa w: ");
         this.displayText = text;
         return text;
-    }
-
-    private void updateDisplayText(String city) {
-        this.displayText.setText("Piwa w: " + city);
-    }
-
-    private void updateDisplayText() {
-        if(loggedUser.isUser()) {
-            updateDisplayText("Olsztyn");
-        } else {
-            updateDisplayText("cała Polska");
-        }
     }
 
     private Component getContent() {
@@ -90,7 +70,7 @@ public class BeerView extends VerticalLayout {
         return content;
     }
 
-    private BeerForm getBeerForm() {
+    private Component getBeerForm() {
         this.form = new BeerForm();
         form.setWidth("25em");
 
@@ -98,14 +78,6 @@ public class BeerView extends VerticalLayout {
         // form.addDeleteListener(this::deleteBeer);
         form.addCloseListener(event -> closeEditor());
         return form;
-    }
-
-    private void saveBeer(BeerForm.SaveEvent saveEvent) {
-        //closeEditor();
-    }
-
-    private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
-        // to implement
     }
 
     private Component getCityToolbar() {
@@ -124,6 +96,22 @@ public class BeerView extends VerticalLayout {
         return toolbar;
     }
 
+    private void closeEditor() {
+        if (!loggedUser.isUser()) {
+            form.setBeer(null);
+            form.setVisible(false);
+            removeClassName("editing");
+        }
+    }
+
+    private void saveBeer(BeerForm.SaveEvent saveEvent) {
+        //closeEditor();
+    }
+
+    private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
+        // to implement
+    }
+
     private Grid getBeerGrid() {
         this.grid = new Grid<>();
         grid.setSizeFull();
@@ -134,7 +122,7 @@ public class BeerView extends VerticalLayout {
         grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-        if(!loggedUser.isUser()) {
+        if (!loggedUser.isUser()) {
             grid.asSingleSelect().addValueChangeListener(event -> editBeer(event.getValue()));
         }
         return grid;
@@ -149,7 +137,6 @@ public class BeerView extends VerticalLayout {
             form.setVisible(true);
             addClassName("editing");
         }
-
     }
 
     private BeerRequestDTO convertToRequest(BeerResponseDTO beerResponse) {
@@ -161,7 +148,7 @@ public class BeerView extends VerticalLayout {
     }
 
     private void updateList(String city) {
-        if(city.isBlank()) {
+        if (city.isBlank()) {
             updateList();
             return;
         }
@@ -182,6 +169,18 @@ public class BeerView extends VerticalLayout {
         } else {
             updateList("Olsztyn");
             updateDisplayText("Olsztyn");
+        }
+    }
+
+    private void updateDisplayText(String city) {
+        this.displayText.setText("Piwa w: " + city);
+    }
+
+    private void updateDisplayText() {
+        if (loggedUser.isUser()) {
+            updateDisplayText("Olsztyn");
+        } else {
+            updateDisplayText("cała Polska");
         }
     }
 }
