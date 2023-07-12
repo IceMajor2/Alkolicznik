@@ -9,6 +9,7 @@ import com.demo.alkolicznik.security.UserDetailsImpl;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -26,37 +27,65 @@ import java.util.Collections;
 public class BeerView extends VerticalLayout {
 
     private UserDetailsImpl loggedUser;
+    private BeerService beerService;
 
-    private Grid<BeerResponseDTO> grid;
-    private BeerForm form;
     private Component searchToolbar;
     private TextField filterCity;
-
-    private BeerService beerService;
+    private H2 displayText;
+    private Grid<BeerResponseDTO> grid;
+    private BeerForm form;
 
     public BeerView(BeerService beerService) {
         this.loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         this.beerService = beerService;
+
         // addClassName("list-view");
         setSizeFull();
         add(
                 getCityToolbar(),
+                getDisplayText(),
                 getContent()
         );
         updateList();
+        updateDisplayText();
         closeEditor();
     }
 
     private void closeEditor() {
-        form.setBeer(null);
-        form.setVisible(false);
-        removeClassName("editing");
+        if(!loggedUser.isUser()) {
+            form.setBeer(null);
+            form.setVisible(false);
+            removeClassName("editing");
+        }
+    }
+
+    private Component getDisplayText() {
+        H2 text = new H2("Piwa w: ");
+        this.displayText = text;
+        return text;
+    }
+
+    private void updateDisplayText(String city) {
+        this.displayText.setText("Piwa w: " + city);
+    }
+
+    private void updateDisplayText() {
+        if(loggedUser.isUser()) {
+            updateDisplayText("Olsztyn");
+        } else {
+            updateDisplayText("cała Polska");
+        }
     }
 
     private Component getContent() {
-        HorizontalLayout content = new HorizontalLayout(getBeerGrid(), getBeerForm());
-        content.setFlexGrow(2, grid);
-        content.setFlexGrow(1, form);
+        HorizontalLayout content;
+        if (loggedUser.isUser()) {
+            content = new HorizontalLayout(getBeerGrid());
+        } else {
+            content = new HorizontalLayout(getBeerGrid(), getBeerForm());
+            content.setFlexGrow(2, grid);
+            content.setFlexGrow(1, form);
+        }
         content.setSizeFull();
         return content;
     }
@@ -84,7 +113,9 @@ public class BeerView extends VerticalLayout {
         filterCity.setPlaceholder("Wpisz miasto...");
         filterCity.setClearButtonVisible(true);
         filterCity.setValueChangeMode(ValueChangeMode.LAZY);
-        filterCity.addValueChangeListener(event -> updateList(filterCity.getValue()));
+        filterCity.addValueChangeListener(event -> {
+            updateList(filterCity.getValue());
+        });
 
         Button getCityButton = new Button("Szukaj");
 
@@ -103,7 +134,9 @@ public class BeerView extends VerticalLayout {
         grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-        grid.asSingleSelect().addValueChangeListener(event -> editBeer(event.getValue()));
+        if(!loggedUser.isUser()) {
+            grid.asSingleSelect().addValueChangeListener(event -> editBeer(event.getValue()));
+        }
         return grid;
     }
 
@@ -128,20 +161,27 @@ public class BeerView extends VerticalLayout {
     }
 
     private void updateList(String city) {
+        if(city.isBlank()) {
+            updateList();
+            return;
+        }
         try {
             var beers = beerService.getBeers(city);
             this.grid.setItems(beers);
         } catch (NoSuchCityException e) {
             this.grid.setItems(Collections.EMPTY_LIST);
         }
+        updateDisplayText(city);
     }
 
     private void updateList() {
-        if (loggedUser.isAdmin()) {
+        if (!loggedUser.isUser()) {
             var beers = beerService.getBeers();
             this.grid.setItems(beers);
+            updateDisplayText("cała Polska");
         } else {
             updateList("Olsztyn");
+            updateDisplayText("Olsztyn");
         }
     }
 }

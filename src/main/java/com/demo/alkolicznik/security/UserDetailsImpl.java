@@ -64,6 +64,14 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public boolean isAdmin() {
-        return this.rolesAndAuthorities.contains(new SimpleGrantedAuthority(Roles.ADMIN.toString()));
+        return this.rolesAndAuthorities.contains(new SimpleGrantedAuthority(Roles.ADMIN.name()));
+    }
+
+    public boolean isUser() {
+        return this.rolesAndAuthorities.contains(new SimpleGrantedAuthority(Roles.USER.name()));
+    }
+
+    public boolean isAccountant() {
+        return this.rolesAndAuthorities.contains(new SimpleGrantedAuthority(Roles.ACCOUNTANT.toString()));
     }
 }
