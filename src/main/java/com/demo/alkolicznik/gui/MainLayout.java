@@ -3,6 +3,7 @@ package com.demo.alkolicznik.gui;
 import com.demo.alkolicznik.gui.beer.BeerView;
 import com.demo.alkolicznik.gui.store.StoreView;
 import com.demo.alkolicznik.security.AuthService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -39,11 +40,13 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
+        RouterLink homeView = new RouterLink("Strona główna", WelcomeView.class);
         RouterLink beerView = new RouterLink("Piwa", BeerView.class);
         RouterLink storeView = new RouterLink("Sklepy", StoreView.class);
         beerView.setHighlightCondition(HighlightConditions.sameLocation());
 
         addToDrawer(new VerticalLayout(
+                homeView,
                 beerView,
                 storeView
         ));
