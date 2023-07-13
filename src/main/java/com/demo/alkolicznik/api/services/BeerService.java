@@ -13,6 +13,7 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -37,7 +38,7 @@ public class BeerService {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
-        List<Store> cityStores = storeRepository.findAllByCity(city);
+        List<Store> cityStores = storeRepository.findAllByCityOrderByIdAsc(city);
 
         List<Beer> beersInCity = new ArrayList<>();
         for (Store store : cityStores) {
@@ -47,6 +48,7 @@ public class BeerService {
                             .toList()
             );
         }
+        beersInCity.sort(Comparator.comparing(Beer::getId));
         return this.mapToDto(beersInCity);
     }
 
