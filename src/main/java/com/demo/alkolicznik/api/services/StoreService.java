@@ -24,11 +24,11 @@ public class StoreService {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
         }
-        return this.mapToDto(storeRepository.findAllByCity(city));
+        return this.mapToDto(storeRepository.findAllByCityOrderByIdAsc(city));
     }
 
     public List<StoreResponseDTO> getStores() {
-        return this.mapToDto(storeRepository.findAll());
+        return this.mapToDto(storeRepository.findAllByOrderByIdAsc());
     }
 
     public StoreResponseDTO add(StoreRequestDTO storeRequestDTO) {
