@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.gui.store;
 
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.gui.Template;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -14,6 +15,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 
+import java.util.List;
+
 public class StoreForm extends FormLayout {
 
     private Binder<StoreRequestDTO> binder = new BeanValidationBinder<>(StoreRequestDTO.class);
@@ -22,10 +25,10 @@ public class StoreForm extends FormLayout {
     private TextField city = new TextField("Miasto");
     private TextField street = new TextField("Ulica");
 
-    private Button create = new Button("Dodaj");
-    private Button update = new Button("Aktualizuj");
-    private Button delete = new Button("Usuń");
-    private Button close = new Button("Zamknij");
+    private Button create;
+    private Button update;
+    private Button delete;
+    private Button close;
 
     public StoreForm() {
         binder.bindInstanceFields(this);
@@ -53,17 +56,17 @@ public class StoreForm extends FormLayout {
 //    }
 
     private Component createButtonLayout() {
-        create.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        List<Button> buttons = Template.getStyledButtons();
+        create = buttons.get(0);
+        update = buttons.get(1);
+        delete = buttons.get(2);
+        close = buttons.get(3);
 
         create.addClickListener(event -> fireEvent(new StoreForm.CreateEvent(this, binder.getBean())));
         update.addClickListener(event -> fireEvent(new StoreForm.UpdateEvent(this, binder.getBean())));
         delete.addClickListener(event -> fireEvent(new StoreForm.DeleteEvent(this, binder.getBean())));
         close.addClickListener(event -> fireEvent(new StoreForm.CloseEvent(this)));
 
-        close.addClickShortcut(Key.ESCAPE);
         return new HorizontalLayout(create, update, delete, close);
     }
 
