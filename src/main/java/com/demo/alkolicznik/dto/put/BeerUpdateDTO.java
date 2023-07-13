@@ -2,6 +2,7 @@ package com.demo.alkolicznik.dto.put;
 
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,5 +47,15 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
             return true;
         }
         return false;
+    }
+
+    @JsonIgnore
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder(this.brand);
+        if (this.type != null) {
+            sb.append(" ");
+            sb.append(this.type);
+        }
+        return sb.toString();
     }
 }
