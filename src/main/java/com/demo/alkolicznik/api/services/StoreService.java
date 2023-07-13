@@ -76,6 +76,13 @@ public class StoreService {
         return new StoreDeleteDTO(toDelete);
     }
 
+    public StoreDeleteDTO delete(StoreRequestDTO store) {
+        Store toDelete = storeRepository.findByStoreRequest(store)
+                .orElseThrow(() -> new StoreNotFoundException(store.getName(), store.getCity(), store.getStreet()));
+        storeRepository.delete(toDelete);
+        return new StoreDeleteDTO(toDelete);
+    }
+
     private List<StoreResponseDTO> mapToDto(List<Store> stores) {
         return stores.stream()
                 .map(StoreResponseDTO::new)
