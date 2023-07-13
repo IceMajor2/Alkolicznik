@@ -2,12 +2,13 @@ package com.demo.alkolicznik.gui.store;
 
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
 import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.*;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
+import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
-import com.demo.alkolicznik.gui.beer.BeerForm;
 import com.demo.alkolicznik.security.UserDetailsImpl;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -50,6 +51,7 @@ public class StoreView extends VerticalLayout {
                 getContent()
         );
         updateList();
+        updateDisplayText();
         closeEditor();
     }
 
@@ -186,7 +188,7 @@ public class StoreView extends VerticalLayout {
         StoreUpdateDTO storeUpdate = new StoreUpdateDTO();
         storeUpdate.setName(store.getName());
         storeUpdate.setCity(store.getCity());
-        storeUpdate.setStreet(store.getCity());
+        storeUpdate.setStreet(store.getStreet());
         return storeUpdate;
     }
 

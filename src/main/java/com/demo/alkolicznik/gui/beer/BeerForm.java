@@ -24,7 +24,7 @@ public class BeerForm extends FormLayout {
     private NumberField volume = new NumberField("Objętość");
 
     private Button create = new Button("Dodaj");
-    private Button update = new Button("Nadpisz");
+    private Button update = new Button("Aktualizuj");
     private Button delete = new Button("Usuń");
     private Button close = new Button("Zamknij");
 
@@ -54,9 +54,9 @@ public class BeerForm extends FormLayout {
 //    }
 
     private Component createButtonLayout() {
-        create.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        create.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         create.addClickListener(event -> fireEvent(new CreateEvent(this, binder.getBean())));

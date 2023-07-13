@@ -1,8 +1,6 @@
 package com.demo.alkolicznik.gui.store;
 
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.gui.beer.BeerForm;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -21,11 +19,11 @@ public class StoreForm extends FormLayout {
     private Binder<StoreRequestDTO> binder = new BeanValidationBinder<>(StoreRequestDTO.class);
 
     private TextField name = new TextField("Sklep");
-    private TextField city = new TextField("Olsztyn");
+    private TextField city = new TextField("Miasto");
     private TextField street = new TextField("Ulica");
 
     private Button create = new Button("Dodaj");
-    private Button update = new Button("Nadpisz");
+    private Button update = new Button("Aktualizuj");
     private Button delete = new Button("Usuń");
     private Button close = new Button("Zamknij");
 
@@ -40,10 +38,24 @@ public class StoreForm extends FormLayout {
         );
     }
 
+//    private void configureBinder() {
+//        binder.bindInstanceFields(this);
+//
+//        binder.forField(name)
+//                .withValidator(name -> name != null && !name.trim().isBlank(), "Name was not specified")
+//                .bind(StoreRequestDTO::getName, StoreRequestDTO::setName);
+//        binder.forField(city)
+//                .withValidator(city -> city != null && !city.trim().isBlank(), "City was not specified")
+//                .bind(StoreRequestDTO::getCity, StoreRequestDTO::setCity);
+//        binder.forField(street)
+//                .withValidator(street -> street != null && !street.trim().isBlank(), "Street was not specified")
+//                .bind(StoreRequestDTO::getStreet, StoreRequestDTO::setStreet);
+//    }
+
     private Component createButtonLayout() {
-        create.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        create.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         create.addClickListener(event -> fireEvent(new StoreForm.CreateEvent(this, binder.getBean())));
