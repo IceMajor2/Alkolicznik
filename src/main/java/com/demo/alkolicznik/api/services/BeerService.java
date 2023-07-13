@@ -51,7 +51,7 @@ public class BeerService {
     }
 
     public List<BeerResponseDTO> getBeers() {
-        return this.mapToDto(beerRepository.findAll());
+        return this.mapToDto(beerRepository.findAllByOrderByIdAsc());
     }
 
     public BeerResponseDTO add(BeerRequestDTO beerRequestDTO) {
@@ -79,6 +79,13 @@ public class BeerService {
     public BeerDeleteDTO delete(Long beerId) {
         Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
                 new BeerNotFoundException(beerId));
+        beerRepository.delete(toDelete);
+        return new BeerDeleteDTO(toDelete);
+    }
+
+    public BeerDeleteDTO delete(BeerRequestDTO beer) {
+        Beer toDelete = beerRepository.findByFullnameAndVolume(beer.getFullName(), beer.getVolume())
+                .orElseThrow(() -> new BeerNotFoundException(beer.getFullName(), beer.getVolume()));
         beerRepository.delete(toDelete);
         return new BeerDeleteDTO(toDelete);
     }
