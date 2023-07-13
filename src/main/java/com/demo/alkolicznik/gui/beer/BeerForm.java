@@ -13,24 +13,24 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 
 public class BeerForm extends FormLayout {
 
-    private Binder<BeerRequestDTO> binder;
-
-    private BeerRequestDTO beer;
+    private Binder<BeerRequestDTO> binder = new BeanValidationBinder<>(BeerRequestDTO.class);
 
     private TextField brand = new TextField("Marka");
     private TextField type = new TextField("Typ");
     private NumberField volume = new NumberField("Objętość");
 
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button cancel = new Button("Cancel");
+    private Button create = new Button("Dodaj");
+    private Button update = new Button("Nadpisz");
+    private Button delete = new Button("Usuń");
+    private Button close = new Button("Zamknij");
 
     public BeerForm() {
+        binder.bindInstanceFields(this);
+
         add(
                 brand,
                 type,
@@ -39,47 +39,44 @@ public class BeerForm extends FormLayout {
         );
     }
 
+//    private void configureBinder() {
+//        binder.bindInstanceFields(this);
+//
+//        binder.forField(brand)
+//                .withValidator(brand -> brand != null && !brand.trim().isBlank(), "Brand is null")
+//                .bind(BeerRequestDTO::getBrand, BeerRequestDTO::setBrand);
+//        binder.forField(type)
+//                .withValidator(type -> type == null || !type.trim().isBlank(), "Type is blank")
+//                .bind(BeerRequestDTO::getType, BeerRequestDTO::setType);
+//        binder.forField(volume)
+//                .withValidator(volume -> volume > 0d, "Volume must be a positive number")
+//                .bind(BeerRequestDTO::getVolume, BeerRequestDTO::setVolume);
+//    }
+
     private Component createButtonLayout() {
-        getBinder();
-
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        create.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        save.addClickListener(event -> validateAndSave());
-        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, beer)));
-        cancel.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        create.addClickListener(event -> fireEvent(new CreateEvent(this, binder.getBean())));
+        update.addClickListener(event -> fireEvent(new UpdateEvent(this, binder.getBean())));
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
+        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
-        save.addClickShortcut(Key.ENTER);
-        cancel.addClickShortcut(Key.ESCAPE);
-        return new HorizontalLayout(save, delete, cancel);
-    }
-
-    private void validateAndSave() {
-        try {
-            binder.writeBean(beer);
-            fireEvent(new SaveEvent(this, beer));
-        } catch (ValidationException e) {
-            e.printStackTrace();
-        }
+        close.addClickShortcut(Key.ESCAPE);
+        return new HorizontalLayout(create, update, delete, close);
     }
 
     public void setBeer(BeerRequestDTO beer) {
-        this.beer = beer;
-        binder.readBean(beer);
+        binder.setBean(beer);
     }
 
-    private Binder<BeerRequestDTO> getBinder() {
-        this.binder = new BeanValidationBinder<>(BeerRequestDTO.class);
-        binder.bindInstanceFields(this);
-        return binder;
-    }
-
-    public static abstract class BeerFormEvent extends ComponentEvent<BeerForm> {
+    public static abstract class BeerEditFormEvent extends ComponentEvent<BeerForm> {
 
         private BeerRequestDTO beer;
 
-        protected BeerFormEvent(BeerForm source, BeerRequestDTO beer) {
+        protected BeerEditFormEvent(BeerForm source, BeerRequestDTO beer) {
             super(source, false);
             this.beer = beer;
         }
@@ -89,33 +86,44 @@ public class BeerForm extends FormLayout {
         }
     }
 
-    public static class SaveEvent extends BeerFormEvent {
+    public static class CreateEvent extends BeerEditFormEvent {
 
-        SaveEvent(BeerForm source, BeerRequestDTO beer) {
+        CreateEvent(BeerForm source, BeerRequestDTO beer) {
             super(source, beer);
         }
     }
 
-    public static class DeleteEvent extends BeerFormEvent {
+    public static class UpdateEvent extends BeerEditFormEvent {
+
+        UpdateEvent(BeerForm source, BeerRequestDTO beer) {
+            super(source, beer);
+        }
+    }
+
+    public static class DeleteEvent extends BeerEditFormEvent {
 
         DeleteEvent(BeerForm source, BeerRequestDTO beer) {
             super(source, beer);
         }
     }
 
-    public static class CloseEvent extends BeerFormEvent {
+    public static class CloseEvent extends BeerEditFormEvent {
 
         CloseEvent(BeerForm source) {
             super(source, null);
         }
     }
 
+    public Registration addCreateListener(ComponentEventListener<CreateEvent> listener) {
+        return addListener(CreateEvent.class, listener);
+    }
+
     public Registration addDeleteListener(ComponentEventListener<DeleteEvent> listener) {
         return addListener(DeleteEvent.class, listener);
     }
 
-    public Registration addSaveListener(ComponentEventListener<SaveEvent> listener) {
-        return addListener(SaveEvent.class, listener);
+    public Registration addUpdateListener(ComponentEventListener<UpdateEvent> listener) {
+        return addListener(UpdateEvent.class, listener);
     }
 
     public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
