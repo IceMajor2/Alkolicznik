@@ -15,6 +15,6 @@ public class NotBlankIfExistsValidator implements
 
     @Override
     public void initialize(NotBlankIfExists constraintAnnotation) {
-        //ConstraintValidator.super.initialize(constraintAnnotation);
+        ConstraintValidator.super.initialize(constraintAnnotation);
     }
 }
