@@ -28,14 +28,13 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Route(value = "beer", layout = MainLayout.class)
-@PageTitle("Baza piw")
+@PageTitle("Baza piw | Alkolicznik")
 @PermitAll
 public class BeerView extends VerticalLayout {
 
     private UserDetailsImpl loggedUser;
     private BeerService beerService;
 
-    private Component searchToolbar;
     private TextField filterCity;
     private H2 displayText;
     private Grid<BeerResponseDTO> grid;
@@ -87,9 +86,9 @@ public class BeerView extends VerticalLayout {
         return wizard;
     }
 
-    private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
+    private void deleteBeer(BeerForm.DeleteEvent event) {
         try {
-            beerService.delete(deleteEvent.getBeer());
+            beerService.delete(event.getBeer());
         } catch (BeerNotFoundException e) {
             Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
         }
@@ -106,20 +105,16 @@ public class BeerView extends VerticalLayout {
             updateList(filterCity.getValue());
         });
 
+        if(loggedUser.isUser()) {
+            return new HorizontalLayout(filterCity);
+        }
+
         Button editorButton = new Button("Otwórz edytor");
         editorButton.addClickListener(click -> {
             grid.asSingleSelect().clear();
             openEditor(new BeerRequestDTO());
         });
-
-        HorizontalLayout toolbar;
-        if (loggedUser.isUser()) {
-            toolbar = new HorizontalLayout(filterCity);
-        } else {
-            toolbar = new HorizontalLayout(filterCity, editorButton);
-        }
-        this.searchToolbar = toolbar;
-        return toolbar;
+        return new HorizontalLayout(filterCity, editorButton);
     }
 
     private void createBeer(BeerForm.CreateEvent event) {
@@ -136,13 +131,13 @@ public class BeerView extends VerticalLayout {
     private void updateBeer(BeerForm.UpdateEvent event) {
         Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
         if(selection.isEmpty()) {
-            Notification.show("Nie zaznaczyłeś piwa do nadpisania", 4000, Notification.Position.BOTTOM_END);
+            Notification.show("Nie zaznaczyłeś piwa do aktualizacji", 4000, Notification.Position.BOTTOM_END);
             return;
         }
         Long beerToUpdateId = selection.get().getId();
-        BeerUpdateDTO updateItem = convertToUpdate(event.getBeer());
+        BeerUpdateDTO newItem = convertToUpdate(event.getBeer());
         try {
-            beerService.update(beerToUpdateId, updateItem);
+            beerService.update(beerToUpdateId, newItem);
         } catch (ObjectsAreEqualException e) {
             Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
             return;
