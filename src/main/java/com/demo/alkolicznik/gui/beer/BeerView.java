@@ -5,6 +5,7 @@ import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.gui.MainLayout;
@@ -87,7 +88,11 @@ public class BeerView extends VerticalLayout {
     }
 
     private void deleteBeer(BeerForm.DeleteEvent deleteEvent) {
-        beerService.delete(deleteEvent.getBeer());
+        try {
+            beerService.delete(deleteEvent.getBeer());
+        } catch (BeerNotFoundException e) {
+            Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
+        }
         updateList();
         closeEditor();
     }
