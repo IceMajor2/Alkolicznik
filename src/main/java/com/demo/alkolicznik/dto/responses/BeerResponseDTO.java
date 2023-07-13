@@ -19,7 +19,7 @@ public class BeerResponseDTO {
     private String brand;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
-    private double volume;
+    private Double volume;
 
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();
