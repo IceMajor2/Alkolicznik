@@ -1,14 +1,13 @@
 package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
-import com.demo.alkolicznik.gui.Template;
+import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -16,9 +15,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 
-import java.util.List;
-
-public class BeerForm extends FormLayout {
+public class BeerForm extends FormTemplate<BeerRequestDTO> {
 
     private Binder<BeerRequestDTO> binder = new BeanValidationBinder<>(BeerRequestDTO.class);
 
@@ -26,10 +23,10 @@ public class BeerForm extends FormLayout {
     private TextField type = new TextField("Typ");
     private NumberField volume = new NumberField("Objętość");
 
-    private Button create;
-    private Button update;
-    private Button delete;
-    private Button close;
+    private Button create = new Button("Dodaj");
+    private Button update = new Button("Modyfikuj");
+    private Button delete = new Button("Usuń");
+    private Button close = new Button("Zamknij");
 
     public BeerForm() {
         binder.bindInstanceFields(this);
@@ -42,36 +39,22 @@ public class BeerForm extends FormLayout {
         );
     }
 
-//    private void configureBinder() {
-//        binder.bindInstanceFields(this);
-//
-//        binder.forField(brand)
-//                .withValidator(brand -> brand != null && !brand.trim().isBlank(), "Brand is null")
-//                .bind(BeerRequestDTO::getBrand, BeerRequestDTO::setBrand);
-//        binder.forField(type)
-//                .withValidator(type -> type == null || !type.trim().isBlank(), "Type is blank")
-//                .bind(BeerRequestDTO::getType, BeerRequestDTO::setType);
-//        binder.forField(volume)
-//                .withValidator(volume -> volume > 0d, "Volume must be a positive number")
-//                .bind(BeerRequestDTO::getVolume, BeerRequestDTO::setVolume);
-//    }
-
     private Component createButtonLayout() {
-        List<Button> buttons = Template.getStyledButtons();
-        create = buttons.get(0);
-        update = buttons.get(1);
-        delete = buttons.get(2);
-        close = buttons.get(3);
+        create.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        close.addClickShortcut(Key.ESCAPE);
 
         create.addClickListener(event -> fireEvent(new CreateEvent(this, binder.getBean())));
         update.addClickListener(event -> fireEvent(new UpdateEvent(this, binder.getBean())));
         delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
-
         return new HorizontalLayout(create, update, delete, close);
     }
 
-    public void setBeer(BeerRequestDTO beer) {
+    public void setModel(BeerRequestDTO beer) {
         binder.setBean(beer);
     }
 

@@ -8,21 +8,14 @@ import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
+import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.MainLayout;
-import com.demo.alkolicznik.security.UserDetailsImpl;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
+import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,24 +23,19 @@ import java.util.Optional;
 @Route(value = "store", layout = MainLayout.class)
 @PageTitle("Baza sklepów | Alkolicznik")
 @PermitAll
-public class StoreView extends VerticalLayout {
+public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
-    private UserDetailsImpl loggedUser;
     private StoreService storeService;
-
-    private TextField filterCity;
-    private H2 displayText;
-    private Grid<StoreResponseDTO> grid;
     private StoreForm wizard;
 
     public StoreView(StoreService storeService) {
-        this.loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        super();
         this.storeService = storeService;
 
         setSizeFull();
         add(
-                getCityToolbar(),
-                getDisplayText(),
+                getToolbar(new StoreRequestDTO()),
+                getSearchText("Sklepy"),
                 getContent()
         );
         updateList();
@@ -55,28 +43,7 @@ public class StoreView extends VerticalLayout {
         closeEditor();
     }
 
-    private Component getCityToolbar() {
-        filterCity = new TextField();
-        filterCity.setPlaceholder("Wpisz miasto...");
-        filterCity.setClearButtonVisible(true);
-        filterCity.setValueChangeMode(ValueChangeMode.LAZY);
-        filterCity.addValueChangeListener(event -> {
-            updateList(filterCity.getValue());
-        });
-
-        if (loggedUser.isUser()) {
-            return new HorizontalLayout(filterCity);
-        }
-
-        Button editorButton = new Button("Otwórz edytor");
-        editorButton.addClickListener(click -> {
-            grid.asSingleSelect().clear();
-            openEditor(new StoreRequestDTO());
-        });
-        return new HorizontalLayout(filterCity, editorButton);
-    }
-
-    private void updateList() {
+    public void updateList() {
         if (!loggedUser.isUser()) {
             var store = storeService.getStores();
             this.grid.setItems(store);
@@ -87,7 +54,7 @@ public class StoreView extends VerticalLayout {
         }
     }
 
-    private void updateList(String city) {
+    protected void updateList(String city) {
         if (city.isBlank()) {
             updateList();
             return;
@@ -101,11 +68,11 @@ public class StoreView extends VerticalLayout {
         updateDisplayText(city);
     }
 
-    private void updateDisplayText(String city) {
+    protected void updateDisplayText(String city) {
         this.displayText.setText("Sklepy w: " + city);
     }
 
-    private void updateDisplayText() {
+    protected void updateDisplayText() {
         if (loggedUser.isUser()) {
             updateDisplayText("Olsztyn");
         } else {
@@ -113,26 +80,7 @@ public class StoreView extends VerticalLayout {
         }
     }
 
-    private Component getDisplayText() {
-        H2 text = new H2("Sklepy w: ");
-        this.displayText = text;
-        return text;
-    }
-
-    private Component getContent() {
-        HorizontalLayout content;
-        if (loggedUser.isUser()) {
-            content = new HorizontalLayout(getStoreGrid());
-        } else {
-            content = new HorizontalLayout(getStoreGrid(), getStoreForm());
-            content.setFlexGrow(2, grid);
-            content.setFlexGrow(1, wizard);
-        }
-        content.setSizeFull();
-        return content;
-    }
-
-    private Grid getStoreGrid() {
+    protected Grid getGrid() {
         this.grid = new Grid<>();
         grid.setSizeFull();
 
@@ -149,13 +97,13 @@ public class StoreView extends VerticalLayout {
                 if (!(wizard instanceof StoreForm)) {
                     wizard = new StoreForm();
                 }
-                editStore(event.getValue());
+                editModel(event.getValue());
             });
         }
         return grid;
     }
 
-    private Component getStoreForm() {
+    protected FormTemplate<StoreRequestDTO> getForm() {
         wizard = new StoreForm();
         wizard.setWidth("25em");
 
@@ -213,32 +161,11 @@ public class StoreView extends VerticalLayout {
         closeEditor();
     }
 
-    private void editStore(StoreResponseDTO store) {
-        if (store == null) {
-            closeEditor();
-        } else {
-            StoreRequestDTO formStore = convertToRequest(store);
-            openEditor(formStore);
-        }
-    }
-
-    private void openEditor(StoreRequestDTO store) {
-        wizard.setStore(store);
-        wizard.setVisible(true);
-    }
-
-    private StoreRequestDTO convertToRequest(StoreResponseDTO store) {
+    protected StoreRequestDTO convertToRequest(StoreResponseDTO store) {
         StoreRequestDTO storeRequest = new StoreRequestDTO();
         storeRequest.setName(store.getName());
         storeRequest.setCity(store.getCity());
         storeRequest.setStreet(store.getStreet());
         return storeRequest;
-    }
-
-    private void closeEditor() {
-        if (wizard != null) {
-            wizard.setStore(null);
-            wizard.setVisible(false);
-        }
     }
 }
