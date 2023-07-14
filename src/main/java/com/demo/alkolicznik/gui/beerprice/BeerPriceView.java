@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.gui.beer_price;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceParamDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
@@ -17,7 +17,7 @@ import java.util.Collections;
 @Route(value = "beer-price", layout = MainLayout.class)
 @PageTitle("Baza cen | Alkolicznik")
 @PermitAll
-public class BeerPriceView extends ViewTemplate<BeerPriceRequestDTO, BeerPriceResponseDTO> {
+public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResponseDTO> {
 
     private BeerPriceService beerPriceService;
     private BeerPriceForm wizard;
@@ -28,7 +28,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceRequestDTO, BeerPriceRe
 
         setSizeFull();
         add(
-                getToolbar(new BeerPriceRequestDTO()),
+                getToolbar(new BeerPriceParamDTO()),
                 getSearchText(),
                 getContent()
         );
@@ -38,7 +38,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceRequestDTO, BeerPriceRe
     }
 
     @Override
-    protected FormTemplate<BeerPriceRequestDTO> getForm() {
+    protected FormTemplate<BeerPriceParamDTO> getForm() {
         wizard = new BeerPriceForm();
         wizard.setWidth("25em");
 
@@ -73,10 +73,10 @@ public class BeerPriceView extends ViewTemplate<BeerPriceRequestDTO, BeerPriceRe
     }
 
     @Override
-    protected BeerPriceRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
-        BeerPriceRequestDTO priceRequest = new BeerPriceRequestDTO();
-        priceRequest.setBeerName(priceResponse.getBeer().getFullName());
-        priceRequest.setBeerVolume(priceResponse.getBeer().getVolume());
+    protected BeerPriceParamDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
+        BeerPriceParamDTO priceRequest = new BeerPriceParamDTO();
+        priceRequest.setBeerId(Double.valueOf(priceResponse.getBeer().getId()));
+        priceRequest.setStoreId(Double.valueOf(priceResponse.getStore().getId()));
         priceRequest.setPrice(priceResponse.getAmountOnly());
         return priceRequest;
     }

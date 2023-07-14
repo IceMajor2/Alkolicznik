@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.beer_price;
 
-import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceParamDTO;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -8,15 +8,15 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.shared.Registration;
 
-public class BeerPriceForm extends FormTemplate<BeerPriceRequestDTO> {
+public class BeerPriceForm extends FormTemplate<BeerPriceParamDTO> {
 
     private NumberField storeId = new NumberField("Id sklepu");
     private NumberField beerId = new NumberField("Id piwa");
     private NumberField price = new NumberField("Cena");
 
     protected BeerPriceForm() {
-        super(BeerPriceRequestDTO.class);
-        super.binder.bindInstanceFields(this);
+        super(BeerPriceParamDTO.class);
+        configureBinder();
 
         add(
                 storeId,
@@ -24,6 +24,13 @@ public class BeerPriceForm extends FormTemplate<BeerPriceRequestDTO> {
                 price,
                 this.createButtonLayout()
         );
+    }
+
+    private void configureBinder() {
+        binder.bindInstanceFields(this);
+        binder.bind(storeId, BeerPriceParamDTO::getStoreId, BeerPriceParamDTO::setStoreId);
+        binder.bind(beerId, BeerPriceParamDTO::getBeerId, BeerPriceParamDTO::setBeerId);
+        binder.bind(price, BeerPriceParamDTO::getPrice, BeerPriceParamDTO::setPrice);
     }
 
     @Override
@@ -37,35 +44,35 @@ public class BeerPriceForm extends FormTemplate<BeerPriceRequestDTO> {
 
     public static abstract class BeerPriceEditFormEvent extends ComponentEvent<BeerPriceForm> {
 
-        private BeerPriceRequestDTO price;
+        private BeerPriceParamDTO price;
 
-        protected BeerPriceEditFormEvent(BeerPriceForm source, BeerPriceRequestDTO price) {
+        protected BeerPriceEditFormEvent(BeerPriceForm source, BeerPriceParamDTO price) {
             super(source, false);
             this.price = price;
         }
 
-        public BeerPriceRequestDTO getPrice() {
+        public BeerPriceParamDTO getPrice() {
             return price;
         }
     }
 
     public static class CreateEvent extends BeerPriceEditFormEvent {
 
-        CreateEvent(BeerPriceForm source, BeerPriceRequestDTO price) {
+        CreateEvent(BeerPriceForm source, BeerPriceParamDTO price) {
             super(source, price);
         }
     }
 
     public static class UpdateEvent extends BeerPriceEditFormEvent {
 
-        UpdateEvent(BeerPriceForm source, BeerPriceRequestDTO price) {
+        UpdateEvent(BeerPriceForm source, BeerPriceParamDTO price) {
             super(source, price);
         }
     }
 
     public static class DeleteEvent extends BeerPriceEditFormEvent {
 
-        DeleteEvent(BeerPriceForm source, BeerPriceRequestDTO price) {
+        DeleteEvent(BeerPriceForm source, BeerPriceParamDTO price) {
             super(source, price);
         }
     }
