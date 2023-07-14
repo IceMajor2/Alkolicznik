@@ -1,23 +1,28 @@
-package com.demo.alkolicznik.gui.beer_price;
+package com.demo.alkolicznik.gui.beerprice;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.requests.BeerPriceParamDTO;
+import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.exceptions.classes.BeerPriceNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import org.aspectj.weaver.ast.Not;
 
 import java.util.Collections;
 
 @Route(value = "beer-price", layout = MainLayout.class)
 @PageTitle("Baza cen | Alkolicznik")
 @PermitAll
-public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResponseDTO> {
+public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPriceResponseDTO> {
 
     private BeerPriceService beerPriceService;
     private BeerPriceForm wizard;
@@ -28,7 +33,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResp
 
         setSizeFull();
         add(
-                getToolbar(new BeerPriceParamDTO()),
+                getToolbar(new BeerPriceParamRequestDTO()),
                 getSearchText(),
                 getContent()
         );
@@ -38,13 +43,13 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResp
     }
 
     @Override
-    protected FormTemplate<BeerPriceParamDTO> getForm() {
+    protected FormTemplate<BeerPriceParamRequestDTO> getForm() {
         wizard = new BeerPriceForm();
         wizard.setWidth("25em");
 
-//        wizard.addCreateListener(this::createPrice);
-//        wizard.addUpdateListener(this::updatePrice);
-//        wizard.addDeleteListener(this::deletePrice);
+        wizard.addCreateListener(this::createPrice);
+        wizard.addUpdateListener(this::updatePrice);
+        wizard.addDeleteListener(this::deletePrice);
         wizard.addCloseListener(event -> closeEditor());
         return wizard;
     }
@@ -73,8 +78,8 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResp
     }
 
     @Override
-    protected BeerPriceParamDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
-        BeerPriceParamDTO priceRequest = new BeerPriceParamDTO();
+    protected BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
+        BeerPriceParamRequestDTO priceRequest = new BeerPriceParamRequestDTO();
         priceRequest.setBeerId(Double.valueOf(priceResponse.getBeer().getId()));
         priceRequest.setStoreId(Double.valueOf(priceResponse.getStore().getId()));
         priceRequest.setPrice(priceResponse.getAmountOnly());
@@ -106,6 +111,58 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamDTO, BeerPriceResp
             updateList("Olsztyn");
             updateDisplayText("Olsztyn");
         }
+    }
+
+    private void deletePrice(BeerPriceForm.DeleteEvent event) {
+        BeerPriceParamRequestDTO request = event.getPrice();
+        try {
+            beerPriceService.delete(request.getStoreId().longValue(),
+                    request.getBeerId().longValue());
+        } catch (BeerPriceNotFoundException e) {
+            Notification.show("Nie znaleziono takiej relacji", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private void updatePrice(BeerPriceForm.UpdateEvent event) {
+        BeerPriceParamRequestDTO request = event.getPrice();
+        BeerPriceUpdateDTO update = convertToUpdate(request);
+        try {
+            beerPriceService.update(request.getStoreId().longValue(),
+                    request.getBeerId().longValue(),
+                    update
+            );
+        } catch (ObjectsAreEqualException e) {
+            Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
+            return;
+        } catch (BeerPriceNotFoundException e) {
+            Notification.show("Edytować można jedynie cenę", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private void createPrice(BeerPriceForm.CreateEvent event) {
+        BeerPriceParamRequestDTO request = event.getPrice();
+        try {
+            beerPriceService.add(request.getStoreId().longValue(),
+                    request.getBeerId().longValue(),
+                    request.getPrice());
+        } catch (BeerPriceNotFoundException e) {
+            Notification.show("Relacja już istnieje", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private BeerPriceUpdateDTO convertToUpdate(BeerPriceParamRequestDTO priceRequest) {
+        BeerPriceUpdateDTO priceUpdate = new BeerPriceUpdateDTO();
+        priceUpdate.setPrice(priceRequest.getPrice());
+        return priceUpdate;
     }
 
     private void setColumnsForAdmin() {
