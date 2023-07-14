@@ -60,6 +60,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             beerService.delete(event.getBeer());
         } catch (BeerNotFoundException e) {
             Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
+            return;
         }
         updateList();
         closeEditor();
