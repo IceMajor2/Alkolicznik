@@ -69,13 +69,17 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     }
 
     protected void openEditor(REQUEST model) {
-        wizard.setModel(model);
-        wizard.setVisible(true);
+        if(wizard != null) {
+            wizard.setModel(model);
+            wizard.setVisible(true);
+        }
     }
 
     protected void closeEditor() {
-        wizard.setModel(null);
-        wizard.setVisible(false);
+        if(wizard != null) {
+            wizard.setModel(null);
+            wizard.setVisible(false);
+        }
     }
 
     protected void editModel(RESPONSE model) {
