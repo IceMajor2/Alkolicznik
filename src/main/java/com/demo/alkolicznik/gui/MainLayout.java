@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.gui;
 
 import com.demo.alkolicznik.gui.beer.BeerView;
-import com.demo.alkolicznik.gui.beer_price.BeerPriceView;
+import com.demo.alkolicznik.gui.beerprice.BeerPriceView;
 import com.demo.alkolicznik.gui.store.StoreView;
 import com.demo.alkolicznik.security.AuthService;
 import com.vaadin.flow.component.applayout.AppLayout;
