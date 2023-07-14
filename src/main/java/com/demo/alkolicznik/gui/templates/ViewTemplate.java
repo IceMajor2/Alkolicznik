@@ -20,12 +20,15 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     protected Grid<RESPONSE> grid;
     protected FormTemplate<REQUEST> wizard;
 
-    public ViewTemplate() {
+    protected String textModel;
+
+    public ViewTemplate(String textModel) {
         this.loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        this.textModel = textModel;
     }
 
-    protected Component getSearchText(String model) {
-        this.displayText = new H2("%s w: ".formatted(model));
+    protected Component getSearchText() {
+        this.displayText = new H2("%s w: ".formatted(textModel));
         return displayText;
     }
 
@@ -84,6 +87,18 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
         }
     }
 
+    protected void updateDisplayText(String city) {
+        this.displayText.setText("%s w: %s".formatted(textModel, city));
+    }
+
+    protected void updateDisplayText() {
+        if (loggedUser.isUser()) {
+            updateDisplayText("Olsztyn");
+        } else {
+            updateDisplayText("cała Polska");
+        }
+    }
+
     protected abstract FormTemplate<REQUEST> getForm();
 
     protected abstract Grid<RESPONSE> getGrid();
@@ -93,8 +108,4 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     protected abstract void updateList(String city);
 
     protected abstract void updateList();
-
-    protected abstract void updateDisplayText(String city);
-
-    protected abstract void updateDisplayText();
 }
