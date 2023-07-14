@@ -29,13 +29,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     private BeerForm wizard;
 
     public BeerView(BeerService beerService) {
-        super();
+        super("Piwa");
         this.beerService = beerService;
 
         setSizeFull();
         add(
                 getToolbar(new BeerRequestDTO()),
-                getSearchText("Piwa"),
+                getSearchText(),
                 getContent()
         );
         updateList();
@@ -43,6 +43,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         closeEditor();
     }
 
+    @Override
     protected FormTemplate<BeerRequestDTO> getForm() {
         wizard = new BeerForm();
         wizard.setWidth("25em");
@@ -67,7 +68,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     private void createBeer(BeerForm.CreateEvent event) {
         try {
             beerService.add(event.getBeer());
-        } catch(BeerAlreadyExistsException e) {
+        } catch (BeerAlreadyExistsException e) {
             Notification.show("Piwo już istnieje", 4000, Notification.Position.BOTTOM_END);
             return;
         }
@@ -77,7 +78,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
     private void updateBeer(BeerForm.UpdateEvent event) {
         Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
-        if(selection.isEmpty()) {
+        if (selection.isEmpty()) {
             Notification.show("Nie zaznaczyłeś piwa do aktualizacji", 4000, Notification.Position.BOTTOM_END);
             return;
         }
@@ -93,6 +94,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         closeEditor();
     }
 
+    @Override
     protected Grid getGrid() {
         this.grid = new Grid<>();
         grid.setSizeFull();
@@ -116,6 +118,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         return grid;
     }
 
+    @Override
     protected BeerRequestDTO convertToRequest(BeerResponseDTO beerResponse) {
         BeerRequestDTO beerRequest = new BeerRequestDTO();
         beerRequest.setBrand(beerResponse.getBrand());
@@ -132,6 +135,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         return beerUpdate;
     }
 
+    @Override
     protected void updateList(String city) {
         if (city.isBlank()) {
             updateList();
@@ -146,6 +150,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         updateDisplayText(city);
     }
 
+    @Override
     protected void updateList() {
         if (!loggedUser.isUser()) {
             var beers = beerService.getBeers();
@@ -154,18 +159,6 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         } else {
             updateList("Olsztyn");
             updateDisplayText("Olsztyn");
-        }
-    }
-
-    protected void updateDisplayText(String city) {
-        this.displayText.setText("Piwa w: " + city);
-    }
-
-    protected void updateDisplayText() {
-        if (loggedUser.isUser()) {
-            updateDisplayText("Olsztyn");
-        } else {
-            updateDisplayText("cała Polska");
         }
     }
 }

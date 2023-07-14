@@ -29,13 +29,13 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
     private StoreForm wizard;
 
     public StoreView(StoreService storeService) {
-        super();
+        super("Sklepy");
         this.storeService = storeService;
 
         setSizeFull();
         add(
                 getToolbar(new StoreRequestDTO()),
-                getSearchText("Sklepy"),
+                getSearchText(),
                 getContent()
         );
         updateList();
@@ -43,7 +43,8 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         closeEditor();
     }
 
-    public void updateList() {
+    @Override
+    protected void updateList() {
         if (!loggedUser.isUser()) {
             var store = storeService.getStores();
             this.grid.setItems(store);
@@ -54,6 +55,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         }
     }
 
+    @Override
     protected void updateList(String city) {
         if (city.isBlank()) {
             updateList();
@@ -68,18 +70,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         updateDisplayText(city);
     }
 
-    protected void updateDisplayText(String city) {
-        this.displayText.setText("Sklepy w: " + city);
-    }
-
-    protected void updateDisplayText() {
-        if (loggedUser.isUser()) {
-            updateDisplayText("Olsztyn");
-        } else {
-            updateDisplayText("cała Polska");
-        }
-    }
-
+    @Override
     protected Grid getGrid() {
         this.grid = new Grid<>();
         grid.setSizeFull();
@@ -103,6 +94,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         return grid;
     }
 
+    @Override
     protected FormTemplate<StoreRequestDTO> getForm() {
         wizard = new StoreForm();
         wizard.setWidth("25em");
@@ -161,6 +153,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         closeEditor();
     }
 
+    @Override
     protected StoreRequestDTO convertToRequest(StoreResponseDTO store) {
         StoreRequestDTO storeRequest = new StoreRequestDTO();
         storeRequest.setName(store.getName());

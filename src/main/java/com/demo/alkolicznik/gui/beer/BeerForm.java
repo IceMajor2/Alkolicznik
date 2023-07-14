@@ -5,57 +5,35 @@ import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 
 public class BeerForm extends FormTemplate<BeerRequestDTO> {
-
-    private Binder<BeerRequestDTO> binder = new BeanValidationBinder<>(BeerRequestDTO.class);
 
     private TextField brand = new TextField("Marka");
     private TextField type = new TextField("Typ");
     private NumberField volume = new NumberField("Objętość");
 
-    private Button create = new Button("Dodaj");
-    private Button update = new Button("Modyfikuj");
-    private Button delete = new Button("Usuń");
-    private Button close = new Button("Zamknij");
-
     public BeerForm() {
-        binder.bindInstanceFields(this);
+        super(BeerRequestDTO.class);
+        super.binder.bindInstanceFields(this);
 
         add(
                 brand,
                 type,
                 volume,
-                createButtonLayout()
+                this.createButtonLayout()
         );
     }
 
-    private Component createButtonLayout() {
-        create.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-
-        close.addClickShortcut(Key.ESCAPE);
-
+    @Override
+    protected Component createButtonLayout() {
         create.addClickListener(event -> fireEvent(new CreateEvent(this, binder.getBean())));
         update.addClickListener(event -> fireEvent(new UpdateEvent(this, binder.getBean())));
         delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
-        return new HorizontalLayout(create, update, delete, close);
-    }
-
-    public void setModel(BeerRequestDTO beer) {
-        binder.setBean(beer);
+        return super.createButtonLayout();
     }
 
     public static abstract class BeerEditFormEvent extends ComponentEvent<BeerForm> {
