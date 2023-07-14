@@ -11,6 +11,8 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
@@ -55,6 +57,8 @@ public class BeerPriceService {
         return new BeerPriceResponseDTO(store.getBeer(beerFullname).get());
     }
 
+    // No annotation throws Hibernation lazy-loading exception (on GUI)
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
     public BeerPriceResponseDTO add(Long storeId, Long beerId, double price) {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
@@ -168,6 +172,8 @@ public class BeerPriceService {
         return new BeerPriceResponseDTO(beerPrice);
     }
 
+    // No annotation throws Hibernation lazy-loading exception (on GUI)
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
     public BeerPriceDeleteDTO delete(Long storeId, Long beerId) {
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
