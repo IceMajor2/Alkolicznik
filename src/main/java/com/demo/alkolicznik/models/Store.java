@@ -37,19 +37,6 @@ public class Store {
     @EqualsAndHashCode.Exclude
     private Set<BeerPrice> prices = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Store store = (Store) o;
-        return Objects.equals(name, store.name) && Objects.equals(city, store.city) && Objects.equals(street, store.street);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, city, street);
-    }
-
     public void addBeer(Beer beer, double price) {
         addBeer(beer, Monetary.getDefaultAmountFactory()
                 .setCurrency("PLN").setNumber(price).create());
