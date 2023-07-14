@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.Beer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
@@ -26,6 +27,16 @@ public class BeerResponseDTO {
         this.brand = beer.getBrand();
         this.type = beer.getType();
         this.volume = beer.getVolume();
+    }
+
+    @JsonIgnore
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder(this.brand);
+        if (this.type != null) {
+            sb.append(" ");
+            sb.append(this.type);
+        }
+        return sb.toString();
     }
 
     @Override
