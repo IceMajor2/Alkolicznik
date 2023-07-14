@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity(name = "Beer")
@@ -16,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Beer {
 
     @Id
@@ -30,6 +33,7 @@ public class Beer {
             orphanRemoval = true,
             fetch = FetchType.LAZY)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<BeerPrice> prices = new HashSet<>();
 
     public Beer(String brand) {
@@ -64,22 +68,23 @@ public class Beer {
         return sb.toString();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Beer beer = (Beer) o;
-        return Objects.equals(id, beer.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || !(o instanceof Beer)) return false;
+//        Beer beer = (Beer) o;
+//        System.out.println(this);
+//        System.out.println(beer);
+//        System.out.println(brand + " | " + beer.brand + " ->> "+Objects.equals(brand, beer.brand));
+//        System.out.println(Objects.equals(type, beer.type));
+//        System.out.println(Objects.equals(volume, beer.volume));
+//        return Objects.equals(brand, beer.brand) && Objects.equals(type, beer.type) && Objects.equals(volume, beer.volume);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(brand, type, volume);
+//    }
 
     @Override
     public String toString() {

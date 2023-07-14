@@ -3,7 +3,7 @@ package com.demo.alkolicznik.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +18,7 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Store {
 
     @Id
@@ -28,11 +29,12 @@ public class Store {
     private String city;
     private String street;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "store",
             cascade = {CascadeType.ALL, CascadeType.MERGE},
             orphanRemoval = true,
             fetch = FetchType.LAZY)
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<BeerPrice> prices = new HashSet<>();
 
     @Override
@@ -40,12 +42,12 @@ public class Store {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Store store = (Store) o;
-        return Objects.equals(id, store.id);
+        return Objects.equals(name, store.name) && Objects.equals(city, store.city) && Objects.equals(street, store.street);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name, city, street);
     }
 
     public void addBeer(Beer beer, double price) {
@@ -63,6 +65,7 @@ public class Store {
         for (Iterator<BeerPrice> iterator = prices.iterator();
              iterator.hasNext(); ) {
             BeerPrice beerPrice = iterator.next();
+            beer.equals(beerPrice.getBeer());
             if (beerPrice.getStore().equals(this) &&
                     beerPrice.getBeer().equals(beer)) {
                 BeerPrice copy = beerPrice.clone();
