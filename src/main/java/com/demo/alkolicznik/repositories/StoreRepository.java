@@ -12,8 +12,10 @@ import java.util.Optional;
 
 public interface StoreRepository extends CrudRepository<Store, Long> {
 
+    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices ORDER BY s.id ASC")
     List<Store> findAllByOrderByIdAsc();
 
+    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices")
     List<Store> findAll();
 
     @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE s.city = :city")
