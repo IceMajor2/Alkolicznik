@@ -4,9 +4,7 @@ import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.BeerPriceNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
+import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -15,7 +13,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.aspectj.weaver.ast.Not;
 
 import java.util.Collections;
 
@@ -137,8 +134,9 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
         } catch (ObjectsAreEqualException e) {
             Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
             return;
-        } catch (BeerPriceNotFoundException e) {
-            Notification.show("Edytować można jedynie cenę", 4000, Notification.Position.BOTTOM_END);
+        } catch (BeerPriceNotFoundException | BeerNotFoundException | StoreNotFoundException e) {
+            Notification.show("Edytować można jedynie cenę (relacja sklep-piwo musi już istnieć)",
+                    4000, Notification.Position.BOTTOM_END);
             return;
         }
         updateList();
@@ -151,8 +149,14 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             beerPriceService.add(request.getStoreId().longValue(),
                     request.getBeerId().longValue(),
                     request.getPrice());
-        } catch (BeerPriceNotFoundException e) {
+        } catch (BeerPriceAlreadyExistsException e) {
             Notification.show("Relacja już istnieje", 4000, Notification.Position.BOTTOM_END);
+            return;
+        } catch (StoreNotFoundException e) {
+            Notification.show("Nie znaleziono sklepu o tym id", 4000, Notification.Position.BOTTOM_END);
+            return;
+        } catch (BeerNotFoundException e) {
+            Notification.show("Nie znaleziono piwa o tym id", 4000, Notification.Position.BOTTOM_END);
             return;
         }
         updateList();
