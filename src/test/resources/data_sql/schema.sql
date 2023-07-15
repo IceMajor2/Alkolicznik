@@ -28,7 +28,7 @@ CREATE TABLE beer_price (
 
 CREATE TABLE IF NOT EXISTS image (
     beer_id BIGINT NOT NULL,
-    image_address VARCHAR(255),
+    url VARCHAR(255),
     PRIMARY KEY (beer_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
