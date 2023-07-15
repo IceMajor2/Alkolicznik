@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,9 @@ public class Image {
     @Column(name = "url")
     @URL
     private String imageUrl;
+
+    @JsonIgnore
+    private com.vaadin.flow.component.html.Image imageComponent;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

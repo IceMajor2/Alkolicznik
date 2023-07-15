@@ -75,7 +75,7 @@ public class BeerController {
         return beerService.delete(beerId);
     }
 
-    @DeleteMapping("/beer")
+    @DeleteMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
     public BeerDeleteDTO delete(@RequestBody @Valid BeerRequestDTO requestDTO) {
