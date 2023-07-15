@@ -16,19 +16,11 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint, A
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        if (request.getRequestURI().contains("/api/admin")) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
-        }
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        if (request.getRequestURI().contains("/api/admin")) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, accessDeniedException.getMessage());
-        }
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
     }
 }
