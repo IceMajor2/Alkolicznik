@@ -58,7 +58,7 @@ public class BeerPriceTests {
                 }
             }
             String expectedJson = toJsonString(expected);
-            assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
+            assertThat(actual).hasSameElementsAs(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
         }
 
@@ -77,11 +77,10 @@ public class BeerPriceTests {
                     .stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
-//            String expectedJson = toJsonString(expected);
-            assertThat(actual.toArray()).containsExactlyInAnyOrder(expected.toArray());
-//            assertThat(actualJson)
-//                    .withFailMessage("Most likely the error is that the objects are not in the same order (in which case, test was passed)")
-//                    .isEqualTo(expectedJson);
+            String expectedJson = toJsonString(expected);
+
+            assertThat(actual).hasSameElementsAs(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -108,8 +107,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(3L, "Tyskie", "Gronie", 0.6),
-                    createStoreResponse(3L, "Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"),
+                    createBeerResponse(getBeer(3L, beers)),
+                    createStoreResponse(getStore(3L, stores)),
                     "PLN 4.19"
             );
             String expectedJson = toJsonString(expected);
@@ -134,7 +133,7 @@ public class BeerPriceTests {
                 }
             }
             String expectedJson = toJsonString(expected);
-            assertThat(actual).isEqualTo(expected);
+            assertThat(actual).hasSameElementsAs(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
         }
 
@@ -304,8 +303,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(3L, "Tyskie", "Gronie", 0.6),
-                    createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
+                    createBeerResponse(getBeer(3L, beers)),
+                    createStoreResponse(getStore(1L, stores)),
                     "PLN 4.19"
             );
             String expectedJson = toJsonString(expected);
@@ -410,8 +409,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5),
-                    createStoreResponse(2L, "Biedronka", "Olsztyn", "ul. Sikorskiego-Wilczynskiego 12"),
+                    createBeerResponse(getBeer(1L, beers)),
+                    createStoreResponse(getStore(2L, stores)),
                     "PLN 3.69"
             );
             String expectedJson = toJsonString(expected);
@@ -441,8 +440,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(4L, "Zubr", null, 0.5),
-                    createStoreResponse(1L, "Carrefour", "Olsztyn", "ul. Barcza 4"),
+                    createBeerResponse(getBeer(4L, beers)),
+                    createStoreResponse(getStore(1L, stores)),
                     "PLN 2.79"
             );
             String expectedJson = toJsonString(expected);
@@ -472,8 +471,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5),
-                    createStoreResponse(7L, "Tesco", "Gdansk", "ul. Morska 22"),
+                    createBeerResponse(getBeer(1L, beers)),
+                    createStoreResponse(getStore(7L, stores)),
                     "PLN 3.69");
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -493,7 +492,7 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BEER_PRICE_ALREADY_EXISTS")
         public void addBeerPriceAlreadyExistsTest() {
             var postResponse = postRequest("/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Komes Malinowe", 0.33, 8.09),
+                    createBeerPriceRequest("Komes Porter Malinowy", 0.33, 8.09),
                     1L);
 
             String jsonResponse = postResponse.getBody();

@@ -33,8 +33,7 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getStore;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -99,9 +98,10 @@ public class AdminTests {
             public void updateBeerVolumeTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
-                BeerResponseDTO expected = createBeerResponse(3L, "Tyskie", "Gronie", 0.5);
+                BeerResponseDTO expected = createBeerResponse(
+                        3L, "Tyskie", "Gronie", 0.5, getImage(3L, beers));
                 String expectedJson = toJsonString(expected);
-
+                System.out.println(expectedJson);
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/admin/beer/{id}", request, 3L),
                         HttpStatus.NO_CONTENT,
@@ -127,7 +127,7 @@ public class AdminTests {
             public void updateBeerBrandTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
-                BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.6);
+                BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.65, getImage(3L, beers));
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -283,7 +283,7 @@ public class AdminTests {
             @Test
             @DisplayName("Invalid beer update: PROPERTIES_SAME")
             public void updateBeerUnchangedTest() {
-                BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Malinowe", 0.33);
+                BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
                 var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
 
                 String jsonResponse = putResponse.getBody();
@@ -347,7 +347,7 @@ public class AdminTests {
             public void updateBeerWithTypeNullTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
 
-                BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5);
+                BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5, getImage(4L, beers));
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
@@ -747,6 +747,7 @@ public class AdminTests {
                         HttpStatus.OK, expectedJson);
                 List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
+                assertThat(actual).containsExactlyInAnyOrder((BeerPriceResponseDTO[]) expected.toArray());
                 assertThat(actual).isEqualTo(expected);
             }
 

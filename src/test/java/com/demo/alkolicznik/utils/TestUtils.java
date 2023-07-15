@@ -53,6 +53,10 @@ public class TestUtils {
         return null;
     }
 
+    public static Image getImage(Long beerId, List<Beer> beers) {
+        return getBeer(beerId, beers).getImage();
+    }
+
     public static User fetchUser(Long id) {
         var handler = new UserRowCallbackHandler();
 
