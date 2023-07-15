@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.dto.responses;
 
-import com.demo.alkolicznik.models.Image;
+import com.demo.alkolicznik.models.ImageModel;
+import com.vaadin.flow.component.html.Image;
 import jakarta.persistence.Column;
 import lombok.*;
 
@@ -9,12 +10,15 @@ import lombok.*;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class ImageResponseDTO {
+public class ImageModelResponseDTO {
 
     @Column(name = "url")
     private String imageUrl;
 
-    public ImageResponseDTO(Image image) {
+    private Image imageComponent;
+
+    public ImageModelResponseDTO(ImageModel image) {
         this.imageUrl = image.getImageUrl();
+        this.imageComponent = image.getImageComponent();
     }
 }

@@ -4,10 +4,7 @@ import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
+import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -103,6 +100,14 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         if (!loggedUser.isUser()) {
             grid.addColumn(beer -> beer.getId()).setHeader("Id");
         }
+        grid.addComponentColumn(beer -> {
+            try {
+
+                return beer.getImage().getImageComponent();
+            } catch (Exception e) {
+                return null;
+            }
+        }).setHeader("Zdjęcie");
         grid.addColumn(beer -> beer.getBrand()).setHeader("Marka");
         grid.addColumn(beer -> beer.getType()).setHeader("Typ");
         grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");

@@ -4,6 +4,7 @@ import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @JsonPropertyOrder({"id", "brand", "type", "volume"})
@@ -19,16 +20,16 @@ public class BeerResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     private Double volume;
-    private ImageResponseDTO image;
+    private ImageModelResponseDTO image;
 
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();
         this.brand = beer.getBrand();
         this.type = beer.getType();
         this.volume = beer.getVolume();
-        if(beer.getImage() != null) {
-            this.image = new ImageResponseDTO(beer.getImage());
-        }
+        try {
+            this.image = new ImageModelResponseDTO(beer.getImage().get());
+        } catch(NoSuchElementException e) {}
     }
 
     @JsonIgnore

@@ -10,6 +10,7 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
+import com.vaadin.flow.component.html.Image;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,10 +22,12 @@ public class BeerService {
 
     private BeerRepository beerRepository;
     private StoreRepository storeRepository;
+    private ImageService imageService;
 
-    public BeerService(BeerRepository beerRepository, StoreRepository storeRepository) {
+    public BeerService(BeerRepository beerRepository, StoreRepository storeRepository, ImageService imageService) {
         this.beerRepository = beerRepository;
         this.storeRepository = storeRepository;
+        this.imageService = imageService;
     }
 
     public BeerResponseDTO get(Long beerId) {
@@ -32,6 +35,10 @@ public class BeerService {
                 () -> new BeerNotFoundException(beerId)
         );
         return new BeerResponseDTO(beer);
+    }
+
+    public Image getImageComponent(Long beerId) {
+        return imageService.getBeerImageComponent(beerId);
     }
 
     public List<BeerResponseDTO> getBeers(String city) {

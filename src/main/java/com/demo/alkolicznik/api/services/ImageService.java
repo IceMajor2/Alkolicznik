@@ -1,10 +1,12 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.responses.ImageResponseDTO;
+import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.Image;
+import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.repositories.BeerRepository;
+import com.vaadin.flow.component.html.Image;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.models.FileCreateRequest;
@@ -31,18 +33,28 @@ public class ImageService {
         setConfig();
     }
 
-    public ImageResponseDTO getBeerImage(Long beerId) {
+    public ImageModelResponseDTO getBeerImageLink(Long beerId) {
         Beer beer = beerRepository.findById(beerId)
                 .orElseThrow(() -> new BeerNotFoundException(beerId));
-        Image image = beer.getImage();
-        return new ImageResponseDTO(image);
+        ImageModel image = beer.getImage()
+                .orElseThrow(() -> new ImageNotFoundException());
+        return new ImageModelResponseDTO(image);
+    }
+
+    public Image getBeerImageComponent(Long beerId) {
+        Beer beer = beerRepository.findById(beerId)
+                .orElseThrow(() -> new BeerNotFoundException(beerId));
+        ImageModel image = beer.getImage()
+                .orElseThrow(() -> new ImageNotFoundException());
+        Image component = image.getImageComponent();
+        return component;
     }
 
     @SneakyThrows
     public Result uploadImage(String path) {
         BufferedImage image = ImageIO.read(new File(path));
         if(!areImageProportionsOk(image)) {
-            throw new RuntimeException("Obrazek jest niewlasciwych proporcji");
+            throw new RuntimeException("Image's proportions are invalid");
         }
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, "sample_image.jpg");

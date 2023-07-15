@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity(name = "Beer")
@@ -32,7 +33,7 @@ public class Beer {
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
-    private Image image;
+    private ImageModel image;
 
     @OneToMany(mappedBy = "beer",
             cascade = {CascadeType.MERGE},
@@ -64,6 +65,14 @@ public class Beer {
         this.volume = volume;
     }
 
+    public Optional<ImageModel> getImage() {
+        return Optional.ofNullable(image);
+    }
+
+    public void setImage(ImageModel image) {
+        this.image = image;
+    }
+
     @JsonProperty("name")
     public String getFullName() {
         StringBuilder sb = new StringBuilder(this.brand);
@@ -73,24 +82,6 @@ public class Beer {
         }
         return sb.toString();
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || !(o instanceof Beer)) return false;
-//        Beer beer = (Beer) o;
-//        System.out.println(this);
-//        System.out.println(beer);
-//        System.out.println(brand + " | " + beer.brand + " ->> "+Objects.equals(brand, beer.brand));
-//        System.out.println(Objects.equals(type, beer.type));
-//        System.out.println(Objects.equals(volume, beer.volume));
-//        return Objects.equals(brand, beer.brand) && Objects.equals(type, beer.type) && Objects.equals(volume, beer.volume);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(brand, type, volume);
-//    }
 
     @Override
     public String toString() {
