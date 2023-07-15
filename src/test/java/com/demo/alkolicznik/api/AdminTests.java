@@ -747,7 +747,7 @@ public class AdminTests {
                         HttpStatus.OK, expectedJson);
                 List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-                assertThat(actual).containsExactlyInAnyOrder((BeerPriceResponseDTO[]) expected.toArray());
+                assertThat(actual).hasSameElementsAs(expected);
                 assertThat(actual).isEqualTo(expected);
             }
 
