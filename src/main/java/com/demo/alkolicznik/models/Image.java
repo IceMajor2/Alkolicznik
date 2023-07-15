@@ -1,11 +1,11 @@
 package com.demo.alkolicznik.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.URL;
 
 @Entity(name = "Image")
 @Table(name = "image")
@@ -20,11 +20,11 @@ public class Image {
     private Long id;
 
     @Column(name = "url")
+    @URL
     private String imageUrl;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "beer_id")
-    @JsonIgnore
     private Beer beer;
 }
