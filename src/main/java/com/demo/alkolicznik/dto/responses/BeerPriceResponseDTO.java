@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.BeerPrice;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class BeerPriceResponseDTO {
         this.price = beerPrice.getPrice().toString();
     }
 
+    @JsonIgnore
     public Double getAmountOnly() {
         int firstDigitIndex = findFirstDigitIndex(this.price);
         int lastDigitIndex = findLastDigitIndex(this.price, firstDigitIndex);

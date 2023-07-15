@@ -26,7 +26,9 @@ public class BeerResponseDTO {
         this.brand = beer.getBrand();
         this.type = beer.getType();
         this.volume = beer.getVolume();
-        this.image = new ImageResponseDTO(beer.getImage());
+        if(beer.getImage() != null) {
+            this.image = new ImageResponseDTO(beer.getImage());
+        }
     }
 
     @JsonIgnore
