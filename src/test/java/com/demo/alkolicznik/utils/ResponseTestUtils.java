@@ -173,6 +173,18 @@ public class ResponseTestUtils {
         }
     }
 
+    public static ResultActions mockDeleteRequest(String url, Object request) {
+        try {
+            return mockMvc.perform(
+                    delete(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJsonString(request))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String buildURI(String uriString, Map<String, ?> parameters) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
         for (var entry : parameters.entrySet()) {

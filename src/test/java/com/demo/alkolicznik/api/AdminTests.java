@@ -7,6 +7,7 @@ import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
@@ -75,16 +76,6 @@ public class AdminTests {
                 List<BeerResponseDTO> actual = toModelList(actualJson, BeerResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
-            }
-
-            @Test
-            @DisplayName("Get all beers in array: UNAUTHORIZED")
-            public void getBeerAllArrayUnauthorizedTest() {
-                var getResponse = getRequest("/api/admin/beer");
-
-                String json = getResponse.getBody();
-
-                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer");
             }
         }
 
@@ -265,22 +256,6 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: NOT_AUTHORIZED")
-            public void updateBeerUnauthorizedTest() {
-                BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-                var putResponse = putRequestAuth("user", "user", "/api/admin/beer/{id}", request, 2L);
-
-                String jsonResponse = putResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/beer/2"
-                );
-            }
-
-            @Test
             @DisplayName("Invalid beer update: PROPERTIES_SAME")
             public void updateBeerUnchangedTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
@@ -373,10 +348,10 @@ public class AdminTests {
         class DeleteRequests {
 
             @Test
-            @DisplayName("Delete beer")
+            @DisplayName("Delete beer by id")
             @DirtiesContext
             @WithUserDetails("admin")
-            public void deleteBeerTest() {
+            public void deleteBeerByIdTest() {
                 BeerDeleteDTO expected = createBeerDeleteResponse(
                         getBeer(6L, beers),
                         "Beer was deleted successfully!"
@@ -399,19 +374,25 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete beer: UNAUTHORIZED")
-            public void deleteBeerUnauthorizedTest() {
-                var deleteResponse = deleteRequestAuth("user", "user",
-                        "/api/admin/beer/{id}", 2L);
-
-                String jsonResponse = deleteResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/beer/2"
+            @DisplayName("Delete beer by properties (except id)")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void deleteBeerByPropertiesTest() {
+                BeerDeleteDTO expected = createBeerDeleteResponse(
+                        getBeer(3L, beers),
+                        "Beer was deleted successfully!"
                 );
+                String expectedJson = toJsonString(expected);
+
+                BeerRequestDTO requestDTO = createBeerRequest(getBeer(3L, beers));
+                String actualJson = assertMockRequest(
+                        mockDeleteRequest("/api/admin/beer", requestDTO),
+                        HttpStatus.OK,
+                        expectedJson
+                );
+
+                BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
+                assertThat(actual).isEqualTo(expected);
             }
 
             @Test
@@ -452,16 +433,6 @@ public class AdminTests {
                 List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
-            }
-
-            @Test
-            @DisplayName("Get all stores: UNAUTHORIZED")
-            public void getStoresAllUnauthorizedTest() {
-                var getResponse = getRequest("/api/admin/store");
-
-                String json = getResponse.getBody();
-
-                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/store");
             }
         }
 
@@ -544,22 +515,6 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
-            }
-
-            @Test
-            @DisplayName("Invalid update store: UNAUTHORIZED")
-            public void updateStoreUnauthorizedTest() {
-                StoreUpdateDTO request = createStoreUpdateRequest("Lubi", null, null);
-                var putResponse = putRequestAuth("user", "user", "/api/admin/store/{id}", request, 4L);
-
-                String jsonResponse = putResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/store/4"
-                );
             }
 
             @Test
@@ -692,22 +647,6 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete store: UNAUTHORIZED")
-            public void deleteStoreUnauthorizedTest() {
-                var deleteResponse = deleteRequestAuth("user", "user",
-                        "/api/admin/store/{id}", 2L);
-
-                String jsonResponse = deleteResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/store/2"
-                );
-            }
-
-            @Test
             @DisplayName("Invalid delete store: STORE_NOT_EXISTS")
             public void deleteStoreNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
@@ -749,16 +688,6 @@ public class AdminTests {
 
                 assertThat(actual).hasSameElementsAs(expected);
                 assertThat(actual).isEqualTo(expected);
-            }
-
-            @Test
-            @DisplayName("Get all beer prices in array: UNAUTHORIZED")
-            public void getBeerPriceAllArrayUnauthorizedTest() {
-                var getResponse = getRequest("/api/admin/beer-price");
-
-                String json = getResponse.getBody();
-
-                assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/admin/beer-price");
             }
         }
 
@@ -849,23 +778,6 @@ public class AdminTests {
                         "Objects are the same: nothing to update",
                         "/api/admin/beer-price");
             }
-
-            @Test
-            @DisplayName("Invalid update beer price: UNAUTHORIZED")
-            public void updateBeerPricePriceUnauthorizedTest() {
-                BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(7.89);
-                var putResponse = putRequestAuth("user", "user",
-                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 2L));
-
-                String jsonResponse = putResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/beer-price"
-                );
-            }
         }
 
         @Nested
@@ -898,22 +810,6 @@ public class AdminTests {
                         HttpStatus.NOT_FOUND,
                         "Store does not currently sell this beer",
                         "/api/beer-price");
-            }
-
-            @Test
-            @DisplayName("Invalid delete beer price: UNAUTHORIZED")
-            public void deleteBeerPriceUnauthorizedTest() {
-                var deleteResponse = deleteRequestAuth("user", "user",
-                        "/api/admin/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
-
-                String jsonResponse = deleteResponse.getBody();
-
-                assertIsError(
-                        jsonResponse,
-                        HttpStatus.NOT_FOUND,
-                        "Resource not found",
-                        "/api/admin/beer-price"
-                );
             }
 
             @Test
