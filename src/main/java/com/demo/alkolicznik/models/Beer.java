@@ -23,10 +23,16 @@ public class Beer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     private String brand;
     private String type;
     private Double volume;
+    @OneToOne(mappedBy = "beer",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    private Image image;
 
     @OneToMany(mappedBy = "beer",
             cascade = {CascadeType.MERGE},

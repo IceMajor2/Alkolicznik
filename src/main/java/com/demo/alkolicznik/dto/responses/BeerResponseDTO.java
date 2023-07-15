@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Image;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,6 +22,7 @@ public class BeerResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     private Double volume;
+    private Image image;
 
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();

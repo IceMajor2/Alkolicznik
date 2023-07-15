@@ -38,7 +38,7 @@ public class ImageService {
         }
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, "sample_image.jpg");
-        Result result = ImageKit.getInstance().upload(fileCreateRequest);
+        Result result = this.imageKit.upload(fileCreateRequest);
         return result;
     }
 
