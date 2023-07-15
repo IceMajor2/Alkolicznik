@@ -26,6 +26,13 @@ CREATE TABLE beer_price (
     FOREIGN KEY (store_id) REFERENCES store(id)
     );
 
+CREATE TABLE IF NOT EXISTS image (
+    beer_id BIGINT NOT NULL,
+    image_address VARCHAR(255),
+    PRIMARY KEY (beer_id),
+    FOREIGN KEY (beer_id) REFERENCES beer(id)
+);
+
 CREATE TABLE users (
     id BIGINT IDENTITY PRIMARY KEY,
     username VARCHAR(32) NOT NULL,
