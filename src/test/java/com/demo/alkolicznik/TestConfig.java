@@ -1,9 +1,6 @@
 package com.demo.alkolicznik;
 
-import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.models.*;
 import com.demo.alkolicznik.utils.TestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +31,7 @@ public class TestConfig {
     private static Map<Long, Beer> beers = new HashMap<>();
     private static Map<Long, Store> stores = new HashMap<>();
     private static Map<Long, User> users = new HashMap<>();
+    private static Map<Long, Image> images = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -70,6 +68,16 @@ public class TestConfig {
             beers.put(beer.getId(), beer);
         }
         return initializedBeers;
+    }
+
+    @Bean
+    public List<Image> images() {
+        String sql = "SELECT * FROM image";
+        List<Image> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
+        for (Image image : initializedImages) {
+            images.put(image.getId(), image);
+        }
+        return initializedImages;
     }
 
     @Bean
@@ -148,6 +156,18 @@ public class TestConfig {
                 beer.setType(rs.getString("type"));
                 beer.setVolume(rs.getDouble("volume"));
                 return beer;
+            }
+        };
+    }
+
+    private RowMapper<Image> mapToImage() {
+        return new RowMapper<Image>() {
+            @Override
+            public Image mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Image image = new Image();
+                image.setId(rs.getLong("beer_id"));
+                image.setImageAddress(rs.getString("image_address"));
+                return image;
             }
         };
     }
