@@ -10,14 +10,8 @@ import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
 import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
 import com.demo.alkolicznik.dto.requests.UserRequestDTO;
-import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
-import com.demo.alkolicznik.dto.responses.UserResponseDTO;
-import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.Roles;
-import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.dto.responses.*;
+import com.demo.alkolicznik.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -68,6 +62,12 @@ public class JsonUtils {
 
     public static BeerResponseDTO createBeerResponse(Beer beer) {
         return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume());
+    }
+
+    public static ImageResponseDTO createImageResponse(Image image) {
+        ImageResponseDTO response = new ImageResponseDTO();
+        response.setImageUrl(image.getImageUrl());
+        return response;
     }
 
     public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {

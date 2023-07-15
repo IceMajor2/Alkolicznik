@@ -1,8 +1,8 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.dto.responses.ImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.Image;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
-import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
-import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseTestUtils.getRequest;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,17 +38,16 @@ public class ImageTests {
         @Test
         @DisplayName("Get beer image as accountant")
         public void whenUserGetsBeerImage_returnOKTest() {
-            Image expected = getBeer(5L, beers).getImage();
+            ImageResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage());
             String expectedJson = toJsonString(expected);
-            System.out.println(expected);
 
-            var response = getRequest("/api/beer/image/{id}", 5L);
+            var response = getRequest("/api/beer/{id}/image", 5L);
 
             String actualJson = response.getBody();
-            Image actual = toModel(actualJson, Image.class);
+            ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
 
+            assertThat(actualJson).isEqualTo(expectedJson);
             assertThat(actual).isEqualTo(expected);
-
         }
     }
 }

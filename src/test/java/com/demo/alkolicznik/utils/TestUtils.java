@@ -1,13 +1,10 @@
 package com.demo.alkolicznik.utils;
 
-import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Array;
