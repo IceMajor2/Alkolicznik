@@ -20,7 +20,7 @@ import java.util.Random;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertPasswordHashed;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.postRequest;
+import static com.demo.alkolicznik.utils.ResponseTestUtils.postRequestAuth;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -46,7 +46,8 @@ public class UserTests {
     @DirtiesContext
     public void whenCreateValidUser_thenSuccessTest() {
         String pass = getRandomPassword();
-        var postResponse = postRequest("/api/auth/signup",
+        var postResponse = postRequestAuth("admin", "admin",
+                "/api/auth/signup",
                 createUserRequest("john", pass));
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -72,7 +73,8 @@ public class UserTests {
     @DirtiesContext
     public void whenCreateUser_thenPasswordMustBeEncodedTest() {
         String pass = getRandomPassword();
-        var postResponse = postRequest("/api/auth/signup",
+        var postResponse = postRequestAuth("admin", "admin",
+                "/api/auth/signup",
                 createUserRequest("george", pass));
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -86,7 +88,8 @@ public class UserTests {
     @DirtiesContext
     public void whenCreateUser_thenCheckPasswordIsStrongEnoughTest() {
         String pass = "stringstrin";
-        var postResponse = postRequest("/api/auth/signup",
+        var postResponse = postRequestAuth("admin", "admin",
+                "/api/auth/signup",
                 createUserRequest("user01", pass));
 
         String jsonResponse = postResponse.getBody();
@@ -97,7 +100,8 @@ public class UserTests {
                 "/api/auth/signup");
 
         pass = "stringstring";
-        postResponse = postRequest("/api/auth/signup",
+        postResponse = postRequestAuth("admin", "admin",
+                "/api/auth/signup",
                 createUserRequest("user01", pass));
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -106,7 +110,8 @@ public class UserTests {
     @DisplayName("Invalid create user: USER_ALREADY_EXISTS")
     public void whenCreateUserThatAlreadyExists_thenThrowExceptionTest() {
         String pass = getRandomPassword();
-        var postResponse = postRequest("/api/auth/signup",
+        var postResponse = postRequestAuth("admin", "admin",
+                "/api/auth/signup",
                 createUserRequest("jacek", pass));
 
         String jsonResponse = postResponse.getBody();

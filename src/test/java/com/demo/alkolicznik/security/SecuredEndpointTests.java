@@ -4,22 +4,40 @@ import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
 public class SecuredEndpointTests {
+
+    @Autowired
+    private List<Beer> beers;
+
+    @Autowired
+    private List<Store> stores;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     @Nested
     class BeerController {
@@ -35,10 +53,26 @@ public class SecuredEndpointTests {
         }
 
         @Test
+        @DisplayName("ANONYMOUS: creates beer")
+        public void whenAnonCreatesBeer_thenReturn404Test() {
+            BeerRequestDTO request = createBeerRequest(beers.get(1));
+            var postResponse = restTemplate
+                    .postForEntity("/api/beer", request, String.class);
+
+            String json = postResponse.getBody();
+
+            assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/beer");
+        }
+
+        @Test
         @DisplayName("ANONYMOUS: update beer")
         public void whenAnonUpdatesBeer_thenReturn404Test() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-            var putResponse = putRequestAuth("user", "user", "/api/beer/{id}", request, 2L);
+            var putResponse = restTemplate.exchange("/api/beer/{id}",
+                    HttpMethod.PUT,
+                    new HttpEntity<>(request),
+                    String.class,
+                    2L);
 
             String jsonResponse = putResponse.getBody();
 
@@ -53,8 +87,11 @@ public class SecuredEndpointTests {
         @Test
         @DisplayName("ANONYMOUS: delete beer (id)")
         public void whenAnonDeletesBeer_thenReturn404Test() {
-            var deleteResponse = deleteRequestAuth("user", "user",
-                    "/api/beer/{id}", 2L);
+            var deleteResponse = restTemplate.exchange("/api/beer/{id}",
+                    HttpMethod.DELETE,
+                    HttpEntity.EMPTY,
+                    String.class,
+                    2L);
 
             String jsonResponse = deleteResponse.getBody();
 
@@ -66,27 +103,105 @@ public class SecuredEndpointTests {
             );
         }
 
-        //        @Test
-//        @DisplayName("ANONYMOUS: delete beer (fields)")
+        @Test
+        @DisplayName("ANONYMOUS: delete beer (fields)")
+        public void whenAnonDeletesBeerByFields_thenReturn404Test() {
+            BeerRequestDTO request = createBeerRequest(getBeer(3L, beers));
+            var deleteResponse = restTemplate.exchange("/api/beer",
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(request),
+                    String.class);
 
-//        @Test
-//        @DisplayName("ANONYMOUS: creates beer")
+            String jsonResponse = deleteResponse.getBody();
 
-//        @Test
-//        @DisplayName("USER: get beers")
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer"
+            );
+        }
 
-//        @Test
-//        @DisplayName("USER: update beer")
+        @Test
+        @DisplayName("USER: get beers")
+        public void whenUserGetsBeers_thenReturn404Test() {
+            var getResponse = restTemplate
+                    .withBasicAuth("user", "user")
+                    .getForEntity("/api/beer", String.class);
 
-//        @Test
-//        @DisplayName("USER: delete beer (ID)")
+            String json = getResponse.getBody();
 
-        //        @Test
-//        @DisplayName("ADMIN: delete beer (fields)")
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer");
+        }
+
+        @Test
+        @DisplayName("USER: creates beer")
+        public void whenUserCreatesBeers_thenReturn404Test() {
+            BeerRequestDTO request = createBeerRequest(beers.get(1));
+            var postResponse = postRequestAuth("user", "user", "/api/beer", request);
+
+            String json = postResponse.getBody();
+
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer");
+        }
+
+        @Test
+        @DisplayName("USER: update beer")
+        public void whenUserUpdatesBeer_thenReturn404Test() {
+            BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+            var putResponse = putRequestAuth("user", "user", "/api/beer/{id}", request, 1L);
+
+            String json = putResponse.getBody();
+
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer/1");
+        }
+
+        @Test
+        @DisplayName("USER: delete beer (ID)")
+        public void whenUserDeletesBeer_thenReturn404Test() {
+            var deleteResponse = deleteRequestAuth("user", "user",
+                    "/api/beer/{id}", 1L);
+
+            String json = deleteResponse.getBody();
+
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer/1");
+        }
+
+        @Test
+        @DisplayName("USER: delete beer (fields)")
+        public void whenUserDeletesBeerByFields_thenReturn404Test() {
+            BeerRequestDTO request = createBeerRequest(beers.get(1));
+            var deleteResponse = deleteRequestAuth("user", "user",
+                    request,
+                    "/api/beer");
+
+            String json = deleteResponse.getBody();
+
+            assertIsError(json,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer");
+        }
 
         //        @Test
 //        @DisplayName("ACCOUNTANT: get beers")
+        @Test
+        @DisplayName("ACCOUNTANT: creates beer")
+        public void whenAccountantCreatesBeer_thenReturn404Test() {
 
+        }
         //        @Test
 //        @DisplayName("ACCOUNTANT: update beer")
 
@@ -94,11 +209,15 @@ public class SecuredEndpointTests {
 //        @DisplayName("ACCOUNTANT: delete beer (ID)")
 
         //        @Test
-//        @DisplayName("ADMIN: delete beer (fields)")
+//        @DisplayName("ACCOUNTANT: delete beer (fields)")
 
         //        @Test
 //        @DisplayName("ADMIN: get beers")
+        @Test
+        @DisplayName("ADMIN: creates beer")
+        public void whenAdminCreatesBeer_thenReturn404Test() {
 
+        }
         //        @Test
 //        @DisplayName("ADMIN: update beer")
 
@@ -224,6 +343,7 @@ public class SecuredEndpointTests {
         @Test
         @DisplayName("ANONYMOUS: delete price")
         public void whenAnonDeletesPrice_thenReturn404Test() {
+
             var deleteResponse = deleteRequestAuth("user", "user",
                     "/api/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
 
@@ -236,7 +356,6 @@ public class SecuredEndpointTests {
                     "/api/beer-price"
             );
         }
-
 
 
         //        @Test

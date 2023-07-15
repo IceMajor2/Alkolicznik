@@ -33,7 +33,7 @@ public class TestConfig {
     private static Map<Long, Beer> beers = new HashMap<>();
     private static Map<Long, Store> stores = new HashMap<>();
     private static Map<Long, User> users = new HashMap<>();
-//    private static Map<Long, Image> images = new HashMap<>();
+//    private static Map<Long, ImageModel> images = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -73,10 +73,10 @@ public class TestConfig {
     }
 
 //    @Bean
-//    public List<Image> images() {
+//    public List<ImageModel> images() {
 //        String sql = "SELECT * FROM image";
-//        List<Image> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
-//        for (Image image : initializedImages) {
+//        List<ImageModel> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
+//        for (ImageModel image : initializedImages) {
 //            images.put(image.getId(), image);
 //        }
 //        return initializedImages;
@@ -160,9 +160,9 @@ public class TestConfig {
                 beer.setVolume(rs.getDouble("volume"));
                 String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
                 System.out.println(sql);
-                Image image = jdbcTemplate.query(sql, new ResultSetExtractor<Image>() {
+                ImageModel image = jdbcTemplate.query(sql, new ResultSetExtractor<ImageModel>() {
                     @Override
-                    public Image extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    public ImageModel extractData(ResultSet rs) throws SQLException, DataAccessException {
                         // at beginning ResultSet is pointed *BEFORE* the 1st row
                         // due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
                         // we move the pointer to the next row with rs.next() command
@@ -171,7 +171,7 @@ public class TestConfig {
                         if(!rs.next()) {
                             return null;
                         }
-                        Image image = new Image();
+                        ImageModel image = new ImageModel();
                         image.setImageUrl(rs.getString("url"));
                         image.setId(rs.getLong("beer_id"));
                         return image;
@@ -186,11 +186,11 @@ public class TestConfig {
         };
     }
 
-//    private RowMapper<Image> mapToImage() {
-//        return new RowMapper<Image>() {
+//    private RowMapper<ImageModel> mapToImage() {
+//        return new RowMapper<ImageModel>() {
 //            @Override
-//            public Image mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                Image image = new Image();
+//            public ImageModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                ImageModel image = new ImageModel();
 //                image.setId(rs.getLong("beer_id"));
 //                image.setImageUrl(rs.getString("image_address"));
 //                return image;

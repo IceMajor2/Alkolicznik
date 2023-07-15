@@ -51,14 +51,14 @@ public class JsonUtils {
         return createStoreResponse(store.getId(), store.getName(), store.getCity(), store.getStreet());
     }
 
-    public static BeerResponseDTO createBeerResponse(Long id, String brand, String type, Double volume, Image image) {
+    public static BeerResponseDTO createBeerResponse(Long id, String brand, String type, Double volume, ImageModel image) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
         response.setBrand(brand);
         response.setType(type);
         response.setVolume(volume);
         if(image != null) {
-            response.setImage(new ImageResponseDTO(image));
+            response.setImage(new ImageModelResponseDTO(image));
         }
         return response;
     }
@@ -68,11 +68,11 @@ public class JsonUtils {
     }
 
     public static BeerResponseDTO createBeerResponse(Beer beer) {
-        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(), beer.getImage());
+        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(), beer.getImage().get());
     }
 
-    public static ImageResponseDTO createImageResponse(Image image) {
-        ImageResponseDTO response = new ImageResponseDTO();
+    public static ImageModelResponseDTO createImageResponse(ImageModel image) {
+        ImageModelResponseDTO response = new ImageModelResponseDTO();
         response.setImageUrl(image.getImageUrl());
         return response;
     }

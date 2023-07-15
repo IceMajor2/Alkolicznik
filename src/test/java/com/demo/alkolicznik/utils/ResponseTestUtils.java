@@ -73,15 +73,17 @@ public class ResponseTestUtils {
      * @param pathVariables url variables
      * @return {@ResponseEntity<String>}
      */
-    public static ResponseEntity<String> postRequest(String url, Object requestObject, Object... pathVariables) {
+    public static ResponseEntity<String> postRequestAuth(String username, String password, String url, Object requestObject, Object... pathVariables) {
         ResponseEntity<String> postResponse = restTemplate
+                .withBasicAuth(username, password)
                 .postForEntity(url, requestObject, String.class, pathVariables);
         return postResponse;
     }
 
-    public static ResponseEntity<String> postRequest(String url, Map<String, ?> parameters, Object... pathVariables) {
+    public static ResponseEntity<String> postRequest(String username, String password, String url, Map<String, ?> parameters, Object... pathVariables) {
         String urlTemplate = buildURI(url, parameters);
         ResponseEntity<String> postResponse = restTemplate
+                .withBasicAuth(username, password)
                 .postForEntity(urlTemplate, null, String.class, pathVariables);
         return postResponse;
     }
@@ -116,6 +118,13 @@ public class ResponseTestUtils {
         ResponseEntity<String> deleteResponse = restTemplate
                 .withBasicAuth(username, password)
                 .exchange(urlTemplate, HttpMethod.DELETE, HttpEntity.EMPTY, String.class, pathVariables);
+        return deleteResponse;
+    }
+
+    public static ResponseEntity<String> deleteRequestAuth(String username, String password, Object request, String url) {
+        ResponseEntity<String> deleteResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(url, HttpMethod.DELETE, new HttpEntity<>(request), String.class);
         return deleteResponse;
     }
 

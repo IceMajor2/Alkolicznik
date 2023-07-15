@@ -53,8 +53,8 @@ public class TestUtils {
         return null;
     }
 
-    public static Image getImage(Long beerId, List<Beer> beers) {
-        return getBeer(beerId, beers).getImage();
+    public static ImageModel getImage(Long beerId, List<Beer> beers) {
+        return getBeer(beerId, beers).getImage().get();
     }
 
     public static User fetchUser(Long id) {

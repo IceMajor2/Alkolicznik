@@ -95,7 +95,8 @@ public class StoreTests {
         @DisplayName("Create and get valid store")
         @DirtiesContext
         public void createStoreTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Dwojka", "Krakow", "ul. Powstancow 9"));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -121,7 +122,8 @@ public class StoreTests {
         @DisplayName("Create invalid store: NAME null")
         // @DirtiesContext
         public void createStoreNameNullTest() {
-            var postResponse = postRequest("/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
 
             String json = postResponse.getBody();
 
@@ -132,13 +134,15 @@ public class StoreTests {
         @DisplayName("Create invalid store: NAME blank & NAME empty")
         // @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() {
-            var postResponse = postRequest("/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Name was not specified", "/api/store");
 
-            postResponse = postRequest("/api/store", createStoreRequest("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store", createStoreRequest("\t \t   \n", "Sopot", "ul. Olsztynska 1"));
 
             json = postResponse.getBody();
 
@@ -149,7 +153,8 @@ public class StoreTests {
         @DisplayName("Create invalid store: CITY null")
         // @DirtiesContext
         public void createStoreCityNullTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Lubi", null, "ul. Kwiatkowa 3"));
 
             String json = postResponse.getBody();
@@ -161,14 +166,16 @@ public class StoreTests {
         @DisplayName("Create invalid store: CITY blank & empty")
         // @DirtiesContext
         public void createStoreCityBlankAndEmptyTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Lubi", "", "ul. Kwiatkowa 3"));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified", "/api/store");
 
-            postResponse = postRequest("/api/store",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Lubi", "\t \n", "ul. Brzozowa 31"));
 
             json = postResponse.getBody();
@@ -180,7 +187,8 @@ public class StoreTests {
         @DisplayName("Create invalid store: STREET null")
         // @DirtiesContext
         public void createStoreStreetNullTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Primo", "Olsztyn", null));
 
             String json = postResponse.getBody();
@@ -192,14 +200,16 @@ public class StoreTests {
         @DisplayName("Create invalid store: STREET blank & empty")
         // @DirtiesContext
         public void createStoreStreetBlankAndEmptyTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Primo", "Olsztyn", ""));
 
             String json = postResponse.getBody();
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "Street was not specified", "/api/store");
 
-            postResponse = postRequest("/api/store",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest("Primo", "Olsztyn", "\t     "));
 
             json = postResponse.getBody();
@@ -211,7 +221,8 @@ public class StoreTests {
         @DisplayName("Create invalid store: ALREADY_EXISTS")
         // @DirtiesContext
         public void createStoreAlreadyExistsTest() {
-            var postResponse = postRequest("/api/store", createStoreRequest("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store", createStoreRequest("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
 
             String json = postResponse.getBody();
 
@@ -222,7 +233,8 @@ public class StoreTests {
         @DisplayName("Create invalid store: NAME blank, CITY null, STREET empty")
         // @DirtiesContext
         public void createStoreNameBlankCityNullStreetEmptyTest() {
-            var postResponse = postRequest("/api/store",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store",
                     createStoreRequest(" \t", null, ""));
 
             String json = postResponse.getBody();

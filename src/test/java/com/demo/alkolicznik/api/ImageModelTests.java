@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
-import com.demo.alkolicznik.dto.responses.ImageResponseDTO;
+import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
 //@AutoConfigureMockMvc
-public class ImageTests {
+public class ImageModelTests {
 
     @Autowired
     private List<Beer> beers;
@@ -29,7 +29,7 @@ public class ImageTests {
 //
 //    @Autowired
 //    public void setMockMvc(MockMvc mockMvc) {
-//        ImageTests.mockMvc = mockMvc;
+//        ImageModelTests.mockMvc = mockMvc;
 //    }
 
     @Nested
@@ -38,13 +38,13 @@ public class ImageTests {
         @Test
         @DisplayName("Get beer image as accountant")
         public void whenUserGetsBeerImage_returnOKTest() {
-            ImageResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage());
+            ImageModelResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage().get());
             String expectedJson = toJsonString(expected);
 
             var response = getRequest("/api/beer/{id}/image", 5L);
 
             String actualJson = response.getBody();
-            ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
+            ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
             assertThat(actualJson).isEqualTo(expectedJson);
             assertThat(actual).isEqualTo(expected);

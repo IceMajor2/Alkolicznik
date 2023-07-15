@@ -294,7 +294,8 @@ public class BeerPriceTests {
         @DisplayName("Add valid beer price (ID) to store")
         @DirtiesContext
         public void addBeerPriceIdTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 3L, "beer_price", 4.19),
                     1L);
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -324,7 +325,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price (ID) to store: STORE_NOT_EXISTS")
         public void addBeerPriceIdStoreNotExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 3L, "beer_price", 4.19),
                     9999L);
 
@@ -339,7 +341,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price (ID) to store: PRICE negative and zero")
         public void addBeerPriceIdVolumeNegativeAndZeroTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 5L, "beer_price", 0d),
                     2L);
 
@@ -350,7 +353,8 @@ public class BeerPriceTests {
                     "Price must be a positive number",
                     "/api/store/2/beer-price");
 
-            postResponse = postRequest("/api/store/{id}/beer-price",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 5L, "beer_price", -5.213),
                     2L);
 
@@ -365,7 +369,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS")
         public void addBeerPriceIdBeerNotExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 999L, "beer_price", 6.69),
                     1L);
 
@@ -380,7 +385,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price (ID) to store: BEER_PRICE_ALREADY_EXISTS")
         public void addBeerPriceIdAlreadyExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     Map.of("beer_id", 2, "beer_price", 6.69),
                     1L);
 
@@ -400,7 +406,8 @@ public class BeerPriceTests {
         @DisplayName("Add valid beer price to store: ALL")
         @DirtiesContext
         public void addBeerPriceToStoreTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69),
                     2);
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -431,7 +438,8 @@ public class BeerPriceTests {
         @DisplayName("Add valid beer price to store: ALL (1-piece name)")
         @DirtiesContext
         public void addBeerPriceToStoreTest2() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Zubr", 0.5, 2.79),
                     1L);
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -462,7 +470,8 @@ public class BeerPriceTests {
         @DisplayName("Add valid beer price to store: VOLUME not specified")
         @DirtiesContext
         public void addBeerPriceToStoreDefaultVolumeTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69),
                     7);
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -491,7 +500,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BEER_PRICE_ALREADY_EXISTS")
         public void addBeerPriceAlreadyExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Komes Porter Malinowy", 0.33, 8.09),
                     1L);
 
@@ -506,7 +516,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Zubr", 0.6, 3.19),
                     2L);
 
@@ -521,7 +532,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
         public void createBeerPriceNegativeAndZeroVolumeTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09),
                     6L);
 
@@ -532,7 +544,8 @@ public class BeerPriceTests {
                     "Volume must be a positive number",
                     "/api/store/6/beer-price");
 
-            postResponse = postRequest("/api/store/{id}/beer-price",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Tyskie Gronie", 0d, 3.09),
                     6L);
 
@@ -547,7 +560,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BRAND null")
         public void createBeerPriceBrandNullTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest(null, 0.5, 3.09),
                     5L);
 
@@ -562,7 +576,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BRAND blank and empty")
         public void createBeerPriceBrandBlankAndEmptyTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("", 0.5, 3.09),
                     5L);
 
@@ -573,7 +588,8 @@ public class BeerPriceTests {
                     "Beer was not specified",
                     "/api/store/5/beer-price");
 
-            postResponse = postRequest("/api/store/{id}/beer-price",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest(" \t \n\n \t", 1d, 7.99),
                     3L);
 
@@ -588,7 +604,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: PRICE null")
         public void createBeerPriceNegativeAndZeroPriceTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Kormoran Miodne", 0.5, -1d),
                     2L);
 
@@ -599,7 +616,8 @@ public class BeerPriceTests {
                     "Price must be a positive number",
                     "/api/store/2/beer-price");
 
-            postResponse = postRequest("/api/store/{id}/beer-price",
+            postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Kormoran Miodne", 0.5, 0d),
                     2L);
 
@@ -614,7 +632,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BRAND null, VOLUME zero, PRICE negative")
         public void createBeerPricePriceNullTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest(null, 0d, -9.4),
                     2L);
 
@@ -629,7 +648,8 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS")
         public void createBeerPriceBeerNotExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Kormoran Miodne", 0.5, 7.99),
                     4L);
 
@@ -645,7 +665,8 @@ public class BeerPriceTests {
         @DisplayName("Add valid beer price to invalid store: STORE_NOT_EXISTS")
         @DirtiesContext
         public void createBeerPriceStoresNotExistsTest() {
-            var postResponse = postRequest("/api/store/{id}/beer-price",
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/store/{id}/beer-price",
                     createBeerPriceRequest("Ksiazece Zlote pszeniczne", 0.5, 3.79),
                     9999L);
 
