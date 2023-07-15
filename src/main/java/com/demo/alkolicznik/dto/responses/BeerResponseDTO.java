@@ -1,10 +1,7 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.Image;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import java.util.Objects;
@@ -22,13 +19,14 @@ public class BeerResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     private Double volume;
-    private Image image;
+    private ImageResponseDTO image;
 
     public BeerResponseDTO(Beer beer) {
         this.id = beer.getId();
         this.brand = beer.getBrand();
         this.type = beer.getType();
         this.volume = beer.getVolume();
+        this.image = new ImageResponseDTO(beer.getImage());
     }
 
     @JsonIgnore

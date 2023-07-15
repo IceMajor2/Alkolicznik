@@ -1,5 +1,10 @@
 package com.demo.alkolicznik.api.services;
 
+import com.demo.alkolicznik.dto.responses.ImageResponseDTO;
+import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Image;
+import com.demo.alkolicznik.repositories.BeerRepository;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.models.FileCreateRequest;
@@ -17,17 +22,20 @@ import java.nio.file.Paths;
 @Service
 public class ImageService {
 
-    @SneakyThrows
-    public static void main(String[] args) {
-        ImageService imageService = new ImageService();
-        imageService.uploadImage("C:\\Users\\IceMajor\\Downloads\\Zubr.png");
-    }
-
+    private BeerRepository beerRepository;
     private ImageKit imageKit;
 
-    public ImageService() {
+    public ImageService(BeerRepository beerRepository) {
+        this.beerRepository = beerRepository;
         this.imageKit = ImageKit.getInstance();
-        readConfig();
+        setConfig();
+    }
+
+    public ImageResponseDTO getBeerImage(Long beerId) {
+        Beer beer = beerRepository.findById(beerId)
+                .orElseThrow(() -> new BeerNotFoundException(beerId));
+        Image image = beer.getImage();
+        return new ImageResponseDTO(image);
     }
 
     @SneakyThrows
@@ -42,7 +50,7 @@ public class ImageService {
         return result;
     }
 
-    private void readConfig() {
+    private void setConfig() {
         String endpoint = "https://ik.imagekit.io/icemajor";
         String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
         try {
