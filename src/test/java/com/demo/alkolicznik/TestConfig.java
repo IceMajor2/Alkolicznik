@@ -7,7 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
@@ -31,7 +33,7 @@ public class TestConfig {
     private static Map<Long, Beer> beers = new HashMap<>();
     private static Map<Long, Store> stores = new HashMap<>();
     private static Map<Long, User> users = new HashMap<>();
-    private static Map<Long, Image> images = new HashMap<>();
+//    private static Map<Long, Image> images = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -70,15 +72,15 @@ public class TestConfig {
         return initializedBeers;
     }
 
-    @Bean
-    public List<Image> images() {
-        String sql = "SELECT * FROM image";
-        List<Image> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
-        for (Image image : initializedImages) {
-            images.put(image.getId(), image);
-        }
-        return initializedImages;
-    }
+//    @Bean
+//    public List<Image> images() {
+//        String sql = "SELECT * FROM image";
+//        List<Image> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
+//        for (Image image : initializedImages) {
+//            images.put(image.getId(), image);
+//        }
+//        return initializedImages;
+//    }
 
     @Bean
     @DependsOn({"stores", "beers"})
@@ -129,6 +131,7 @@ public class TestConfig {
                         .addScript("classpath:data_sql/store-data.sql")
                         .addScript("classpath:data_sql/beer-price-data.sql")
                         .addScript("classpath:data_sql/user-data.sql")
+                        .addScript("classpath:data_sql/image-data.sql")
                         .build();
     }
 
@@ -155,22 +158,45 @@ public class TestConfig {
                 beer.setBrand(rs.getString("brand"));
                 beer.setType(rs.getString("type"));
                 beer.setVolume(rs.getDouble("volume"));
+                String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
+                System.out.println(sql);
+                Image image = jdbcTemplate.query(sql, new ResultSetExtractor<Image>() {
+                    @Override
+                    public Image extractData(ResultSet rs) throws SQLException, DataAccessException {
+                        // at beginning ResultSet is pointed *BEFORE* the 1st row
+                        // due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
+                        // we move the pointer to the next row with rs.next() command
+                        // if it returns false, then there's no image assigned to the beer
+                        // thus returning null below
+                        if(!rs.next()) {
+                            return null;
+                        }
+                        Image image = new Image();
+                        image.setImageUrl(rs.getString("url"));
+                        image.setId(rs.getLong("beer_id"));
+                        return image;
+                    }
+                });
+                if(image != null) {
+                    beer.setImage(image);
+                    image.setBeer(beer);
+                }
                 return beer;
             }
         };
     }
 
-    private RowMapper<Image> mapToImage() {
-        return new RowMapper<Image>() {
-            @Override
-            public Image mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Image image = new Image();
-                image.setId(rs.getLong("beer_id"));
-                image.setImageAddress(rs.getString("image_address"));
-                return image;
-            }
-        };
-    }
+//    private RowMapper<Image> mapToImage() {
+//        return new RowMapper<Image>() {
+//            @Override
+//            public Image mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                Image image = new Image();
+//                image.setId(rs.getLong("beer_id"));
+//                image.setImageUrl(rs.getString("image_address"));
+//                return image;
+//            }
+//        };
+//    }
 
     private RowMapper<BeerPrice> mapToBeerPrice() {
         return new RowMapper<BeerPrice>() {
