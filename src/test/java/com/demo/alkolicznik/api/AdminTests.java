@@ -329,7 +329,7 @@ public class AdminTests {
 
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/beer/4", request),
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         expectedJson
                 );
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
@@ -350,7 +350,7 @@ public class AdminTests {
         class DeleteRequests {
 
             @Test
-            @DisplayName("DELETE: '/api/admin/{beer_id}'")
+            @DisplayName("DELETE: '/api/beer/{beer_id}'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerByIdTest() {
@@ -376,7 +376,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("DELETE: '/api/admin'")
+            @DisplayName("DELETE: '/api/beer'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerByPropertiesTest() {
@@ -398,7 +398,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("DELETE: '/api/admin/{beer_id}' [BEER_NOT_FOUND]")
+            @DisplayName("DELETE: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
             public void deleteBeerNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/beer/0");
