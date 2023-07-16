@@ -3,11 +3,10 @@ package com.demo.alkolicznik.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.component.html.Image;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
+
+import java.util.Objects;
 
 @Entity(name = "ImageModel")
 @Table(name = "image")
@@ -32,4 +31,21 @@ public class ImageModel {
     @MapsId
     @JoinColumn(name = "beer_id")
     private Beer beer;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || !(o instanceof ImageModel)) {
+            return false;
+        }
+        ImageModel that = (ImageModel) o;
+        return Objects.equals(imageUrl, that.imageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(imageUrl);
+    }
 }

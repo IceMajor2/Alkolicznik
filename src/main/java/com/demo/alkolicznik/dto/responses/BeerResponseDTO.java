@@ -1,11 +1,12 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.Beer;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 @JsonPropertyOrder({"id", "brand", "type", "volume"})
 @AllArgsConstructor
@@ -13,6 +14,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class BeerResponseDTO {
 
     private Long id;
@@ -20,6 +22,7 @@ public class BeerResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     private Double volume;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ImageModelResponseDTO image;
 
     public BeerResponseDTO(Beer beer) {
@@ -29,7 +32,8 @@ public class BeerResponseDTO {
         this.volume = beer.getVolume();
         try {
             this.image = new ImageModelResponseDTO(beer.getImage().get());
-        } catch(NoSuchElementException e) {}
+        } catch (NoSuchElementException e) {
+        }
     }
 
     @JsonIgnore
@@ -40,18 +44,5 @@ public class BeerResponseDTO {
             sb.append(this.type);
         }
         return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BeerResponseDTO that = (BeerResponseDTO) o;
-        return Double.compare(that.volume, volume) == 0 && Objects.equals(id, that.id) && Objects.equals(brand, that.brand) && Objects.equals(type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, brand, type, volume);
     }
 }

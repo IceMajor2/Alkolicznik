@@ -52,7 +52,7 @@ public class Store {
         for (Iterator<BeerPrice> iterator = prices.iterator();
              iterator.hasNext(); ) {
             BeerPrice beerPrice = iterator.next();
-            beer.equals(beerPrice.getBeer());
+
             if (beerPrice.getStore().equals(this) &&
                     beerPrice.getBeer().equals(beer)) {
                 BeerPrice copy = beerPrice.clone();

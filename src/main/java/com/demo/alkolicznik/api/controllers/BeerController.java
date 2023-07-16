@@ -32,14 +32,14 @@ public class BeerController {
     }
 
     @GetMapping(params = "city")
-    public List<BeerResponseDTO> getBeersInCity(@RequestParam("city") String city) {
+    public List<BeerResponseDTO> getAllInCity(@RequestParam("city") String city) {
         return beerService.getBeers(city);
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
-    public List<BeerResponseDTO> getAllBeers() {
+    public List<BeerResponseDTO> getAll() {
         return beerService.getBeers();
     }
 
