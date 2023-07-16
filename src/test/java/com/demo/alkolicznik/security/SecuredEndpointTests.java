@@ -195,7 +195,7 @@ public class SecuredEndpointTests {
         public void whenAccountantUpdatesBeer_thenReturn204Test() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
             var putResponse = putRequestAuth("accountant", "accountant", "/api/beer/1", request);
-            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         }
 
         @Test

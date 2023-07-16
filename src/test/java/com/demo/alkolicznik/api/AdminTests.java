@@ -97,7 +97,7 @@ public class AdminTests {
                 System.out.println(expectedJson);
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/beer/3", request),
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         expectedJson
                 );
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
@@ -125,7 +125,7 @@ public class AdminTests {
 
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/beer/3", request),
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         expectedJson
                 );
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
@@ -153,7 +153,7 @@ public class AdminTests {
 
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/beer/2", request),
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         expectedJson
                 );
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
@@ -285,7 +285,7 @@ public class AdminTests {
 
                 String actualJson = assertMockRequest(
                         mockPutRequest("/api/beer/6", request),
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         expectedJson
                 );
                 BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
