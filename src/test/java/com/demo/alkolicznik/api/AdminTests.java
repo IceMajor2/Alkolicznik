@@ -64,7 +64,7 @@ public class AdminTests {
         class GetRequests {
 
             @Test
-            @DisplayName("Get all stored beers in array")
+            @DisplayName("GET: '/api/beer'")
             @WithUserDetails("admin")
             public void getBeerAllArrayAuthorizedTest() {
                 List<BeerResponseDTO> expected = beers.stream()
@@ -85,7 +85,7 @@ public class AdminTests {
         class PutRequests {
 
             @Test
-            @DisplayName("Update beer: VOLUME")
+            @DisplayName("PUT: '/api/beer/{beer_id}' volume update")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerVolumeTest() {
@@ -114,7 +114,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update beer: BRAND")
+            @DisplayName("PUT: '/api/beer/{beer_id}' brand update")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerBrandTest() {
@@ -142,7 +142,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update beer: TYPE")
+            @DisplayName("PUT: '/api/beer/{beer_id}' type update")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerTypeTest() {
@@ -170,7 +170,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: request EMPTY")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [NO_PROPERTY_SPECIFIED]")
             public void updateBeerEmptyRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
@@ -186,7 +186,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: VOLUME negative and zero")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [VOLUME_NON_POSITIVE]")
             public void updateBeerVolumeNegativeAndZeroRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
@@ -214,7 +214,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: BEER_NOT_EXISTS")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
             public void updateBeerNotExistsRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/321", request);
@@ -230,7 +230,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: BRAND blank")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [BRAND_BLANK]")
             public void updateBeerBrandBlankRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
@@ -258,7 +258,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid beer update: PROPERTIES_SAME")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME]")
             public void updateBeerUnchangedTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
@@ -274,7 +274,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update beer: remove TYPE")
+            @DisplayName("PUT: '/api/beer/{beer_id}' remove type")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerSetTypeToNullTest() {
@@ -302,7 +302,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update beer: PROPERTIES_SAME (2)")
+            @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME] (2)")
             public void updateBeerUnchangedTwoTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
                 var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
@@ -318,7 +318,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update beer: previously TYPE null")
+            @DisplayName("PUT: '/api/beer/{beer_id}' add type")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerWithTypeNullTest() {
@@ -350,7 +350,7 @@ public class AdminTests {
         class DeleteRequests {
 
             @Test
-            @DisplayName("Delete beer by id")
+            @DisplayName("DELETE: '/api/admin/{beer_id}'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerByIdTest() {
@@ -376,7 +376,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Delete beer by properties (except id)")
+            @DisplayName("DELETE: '/api/admin'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerByPropertiesTest() {
@@ -398,7 +398,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete beer: BEER_NOT_EXISTS")
+            @DisplayName("DELETE: '/api/admin/{beer_id}' [BEER_NOT_FOUND]")
             public void deleteBeerNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/beer/0");
@@ -422,7 +422,7 @@ public class AdminTests {
         class GetRequests {
 
             @Test
-            @DisplayName("Get all stores")
+            @DisplayName("GET: '/api/store'")
             @WithUserDetails("admin")
             public void getStoresAllTest() {
                 List<StoreResponseDTO> expected = stores.stream()
@@ -442,7 +442,7 @@ public class AdminTests {
         class PutRequests {
 
             @Test
-            @DisplayName("Update store: NAME")
+            @DisplayName("PUT: '/api/store/{store_id}' update name")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateStoreNameTest() {
@@ -468,7 +468,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update store: CITY")
+            @DisplayName("PUT: '/api/store/{store_id}' update city")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateStoreCityTest() {
@@ -494,7 +494,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Update store: STREET")
+            @DisplayName("PUT: '/api/store/{store_id}' update street")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateStoreStreetTest() {
@@ -520,7 +520,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update store: NAME blank")
+            @DisplayName("PUT: '/api/store/{store_id}' [NAME_BLANK]")
             public void updateStoreNameBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest("", null, null);
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
@@ -548,7 +548,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update store: SAME_PROPERTIES")
+            @DisplayName("PUT: '/api/store/{store_id}' [PROPERTIES_SAME]")
             public void updateStorePropertiesSameTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest("Lubi", "Warszawa", "ul. Nowaka 5");
                 var putResponse = putRequestAuth("admin", "admin",
@@ -563,7 +563,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update store: STREET blank")
+            @DisplayName("PUT: '/api/store/{store_id}' [STREET_BLANK]")
             public void updateStoreStreetBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest(null, null, "");
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
@@ -591,7 +591,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update store: CITY blank")
+            @DisplayName("PUT: '/api/store/{store_id}' [CITY_BLANK]")
             public void updateStoreCityBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest(null, "", null);
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
@@ -623,7 +623,7 @@ public class AdminTests {
         class DeleteRequests {
 
             @Test
-            @DisplayName("Delete store")
+            @DisplayName("DELETE: '/api/store/{store_id}'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteStoreTest() {
@@ -649,7 +649,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete store: STORE_NOT_EXISTS")
+            @DisplayName("DELETE: '/api/store/{store_id}' [STORE_NOT_FOUND]")
             public void deleteStoreNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/store/0");
@@ -673,7 +673,7 @@ public class AdminTests {
         class GetRequests {
 
             @Test
-            @DisplayName("Get all stored beer prices in array")
+            @DisplayName("GET: '/api/beer-price'")
             @WithUserDetails("admin")
             public void getBeerPricesAllArrayTest() {
                 List<BeerPriceResponseDTO> expected = new ArrayList<>();
@@ -696,7 +696,7 @@ public class AdminTests {
         class PutRequests {
 
             @Test
-            @DisplayName("Update beer price: PRICE")
+            @DisplayName("PUT: '/api/beer-price'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void updateBeerPricePriceTest() {
@@ -728,7 +728,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update beer price: PRICE negative and zero")
+            @DisplayName("PUT: '/api/beer-price' [PRICE_NON_POSITIVE]")
             public void updateBeerPricePriceNegativeAndZeroTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(0d);
                 var putResponse = putRequestAuth("admin", "admin",
@@ -752,7 +752,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update beer price: PRICE missing")
+            @DisplayName("PUT: '/api/beer-price' [PROPERTIES_NOT_SPECIFIED]")
             public void updateBeerPricePriceNullTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(null);
                 var putResponse = putRequestAuth("admin", "admin",
@@ -767,7 +767,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid update beer price: SAME_PROPERTIES")
+            @DisplayName("PUT: '/api/beer-price' [PROPERTIES_SAME]")
             public void updateBeerPricePropertiesSameTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(2.89);
                 var putResponse = putRequestAuth("admin", "admin",
@@ -786,7 +786,7 @@ public class AdminTests {
         class DeleteRequests {
 
             @Test
-            @DisplayName("Delete beer price")
+            @DisplayName("DELETE: '/api/beer-price'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void deleteBeerPriceTest() {
@@ -815,7 +815,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete beer price: STORE_NOT_EXISTS")
+            @DisplayName("DELETE: '/api/beer-price' [STORE_NOT_FOUND]")
             public void deleteBeerPriceStoreNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
@@ -831,7 +831,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete beer price: BEER_NOT_EXISTS")
+            @DisplayName("DELETE: '/api/beer-price' [BEER_NOT_FOUND]")
             public void deleteBeerPriceBeerNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
@@ -847,7 +847,7 @@ public class AdminTests {
             }
 
             @Test
-            @DisplayName("Invalid delete beer price: BEER_PRICE_NOT_EXISTS")
+            @DisplayName("DELETE: '/api/beer-price' [BEER_PRICE_NOT_FOUND]")
             public void deleteBeerPricePriceNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
                         "/api/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
