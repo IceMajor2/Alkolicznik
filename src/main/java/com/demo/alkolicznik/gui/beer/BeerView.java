@@ -128,37 +128,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     }
 
     private void deleteBeer(BeerForm.DeleteEvent event) {
-        if (!validate(event)) {
-            return;
-        }
-        try {
-            beerService.delete(event.getBeer());
-        } catch (BeerNotFoundException e) {
-            Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
-
-    private boolean validate(BeerForm.BeerEditFormEvent event) {
         var request = event.getBeer();
-        String errorMessage = getErrorMessage(request);
-        System.out.println(errorMessage);
-        if (!errorMessage.isEmpty()) {
-            showError(errorMessage);
-            return false;
-        }
-        return true;
-    }
-
-    private void createBeer(BeerForm.CreateEvent event) {
-        if (!validate(event)) {
+        if (!validate(request)) {
             return;
         }
         try {
-            beerService.add(event.getBeer());
-        } catch (BeerAlreadyExistsException e) {
+            beerService.delete(request);
+        } catch (BeerNotFoundException e) {
             showError(e.getMessage());
             return;
         }
@@ -166,8 +142,20 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         closeEditor();
     }
 
-    private void showError(String message) {
-        Notification.show(message, 4000, Notification.Position.BOTTOM_END);
+
+    private void createBeer(BeerForm.CreateEvent event) {
+        var request = event.getBeer();
+        if (!validate(request)) {
+            return;
+        }
+        try {
+            beerService.add(request);
+        } catch (BeerAlreadyExistsException e) {
+            showError(e.getMessage());
+            return;
+        }
+        updateList();
+        closeEditor();
     }
 
     private void updateBeer(BeerForm.UpdateEvent event) {
@@ -177,12 +165,12 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             return;
         }
         Long beerToUpdateId = selection.get().getId();
-        BeerUpdateDTO newItem = convertToUpdate(event.getBeer());
-        if (!validate(event)) {
+        BeerUpdateDTO request = convertToUpdate(event.getBeer());
+        if (!validate(request)) {
             return;
         }
         try {
-            beerService.update(beerToUpdateId, newItem);
+            beerService.update(beerToUpdateId, request);
         } catch (ObjectsAreEqualException e) {
             showError(e.getMessage());
             return;
@@ -197,6 +185,19 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         } catch (ImageNotFoundException e) {
             return null;
         }
+    }
+
+    private boolean validate(Object object) {
+        String errorMessage = getErrorMessage(object);
+        if (!errorMessage.isEmpty()) {
+            showError(errorMessage);
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String message) {
+        Notification.show(message, 4000, Notification.Position.BOTTOM_END);
     }
 
     private String getErrorMessage(Object object) {
