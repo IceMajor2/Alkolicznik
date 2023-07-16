@@ -35,6 +35,14 @@ public class AuthenticatedRequests {
         return postResponse;
     }
 
+    public static ResponseEntity<String> postRequestAuth(String username, String password, String url,
+                                                         Map<String, ?> parameters) {
+        String urlTemplate = buildURI(url, parameters);
+        return restTemplate
+                .withBasicAuth(username, password)
+                .postForEntity(urlTemplate, null, String.class);
+    }
+
     public static ResponseEntity<String> putRequestAuth(String username, String password, String url, Object request) {
         ResponseEntity<String> putResponse = restTemplate
                 .withBasicAuth(username, password)
@@ -69,7 +77,7 @@ public class AuthenticatedRequests {
         return deleteResponse;
     }
 
-    public static ResponseEntity<String> deleteRequestAuth(String username, String password, Object request, String url) {
+    public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url, Object request) {
         ResponseEntity<String> deleteResponse = restTemplate
                 .withBasicAuth(username, password)
                 .exchange(url, HttpMethod.DELETE, new HttpEntity<>(request), String.class);

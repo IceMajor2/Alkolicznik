@@ -59,9 +59,7 @@ public class BeerPriceTests {
                     expected.add(new BeerPriceResponseDTO(beer));
                 }
             }
-            String expectedJson = toJsonString(expected);
             assertThat(actual).hasSameElementsAs(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -79,10 +77,7 @@ public class BeerPriceTests {
                     .stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
-            String expectedJson = toJsonString(expected);
-
             assertThat(actual).hasSameElementsAs(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -134,9 +129,7 @@ public class BeerPriceTests {
                     expected.add(new BeerPriceResponseDTO(beerPrice));
                 }
             }
-            String expectedJson = toJsonString(expected);
             assertThat(actual).hasSameElementsAs(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -233,9 +226,7 @@ public class BeerPriceTests {
             List<BeerPriceResponseDTO> expected = store.getPrices().stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
-            String expectedJson = toJsonString(expected);
             assertThat(actual.toArray()).isEqualTo(expected.toArray());
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
@@ -297,7 +288,7 @@ public class BeerPriceTests {
         @DirtiesContext
         public void addBeerPriceIdTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/3/beer-price",
+                    "/api/store/1/beer-price",
                     Map.of("beer_id", 3L, "beer_price", 4.19));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 

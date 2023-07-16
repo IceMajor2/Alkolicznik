@@ -165,9 +165,7 @@ public class SecuredEndpointTests {
         @DisplayName("USER: delete beer (fields)")
         public void whenUserDeletesBeerByFields_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
-            var deleteResponse = deleteRequestAuth("user", "user",
-                    request,
-                    "/api/beer");
+            var deleteResponse = deleteRequestAuth("user", "user", "/api/beer", request);
 
             String json = deleteResponse.getBody();
 
@@ -195,8 +193,8 @@ public class SecuredEndpointTests {
         @Test
         @DisplayName("ACCOUNTANT: update beer")
         public void whenAccountantUpdatesBeer_thenReturn204Test() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "Export", null);
-            var putResponse = postRequestAuth("accountant", "accountant", "/api/beer/1", request);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
+            var putResponse = putRequestAuth("accountant", "accountant", "/api/beer/1", request);
             assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         }
 
@@ -211,7 +209,7 @@ public class SecuredEndpointTests {
         @DisplayName("ACCOUNTANT: delete beer (fields)")
         public void whenAccountantDeletesBeerByFields_thenReturn200Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
-            var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer");
+            var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer", request);
             assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         }
 

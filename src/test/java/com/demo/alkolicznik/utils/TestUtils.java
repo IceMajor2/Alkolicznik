@@ -58,7 +58,7 @@ public class TestUtils {
         return getBeer(beerId, beers).getImage().get();
     }
 
-    public static User fetchUser(Long id) {
+    public static User fetchUser(int id) {
         var handler = new UserRowCallbackHandler();
 
         String sql = "SELECT * FROM users u WHERE u.id = " + id;

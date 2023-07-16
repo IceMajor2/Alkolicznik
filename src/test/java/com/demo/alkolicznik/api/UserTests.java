@@ -52,7 +52,7 @@ public class UserTests {
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // Fetch user directly from the HSQL database.
-        User userInDb = TestUtils.fetchUser(6L);
+        User userInDb = TestUtils.fetchUser(users.size() + 1);
         assertThat(userInDb)
                 .withFailMessage("User was not saved in database")
                 .isNotNull();
@@ -78,7 +78,7 @@ public class UserTests {
                 createUserRequest("george", pass));
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        User userInDb = TestUtils.fetchUser(6L);
+        User userInDb = TestUtils.fetchUser(users.size() + 1);
 
         assertPasswordHashed(pass, userInDb.getPassword());
     }
