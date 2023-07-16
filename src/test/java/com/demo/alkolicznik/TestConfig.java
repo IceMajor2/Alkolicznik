@@ -33,7 +33,6 @@ public class TestConfig {
     private static Map<Long, Beer> beers = new HashMap<>();
     private static Map<Long, Store> stores = new HashMap<>();
     private static Map<Long, User> users = new HashMap<>();
-//    private static Map<Long, ImageModel> images = new HashMap<>();
 
     @Bean
     public void setJdbcTemplate() {
@@ -71,16 +70,6 @@ public class TestConfig {
         }
         return initializedBeers;
     }
-
-//    @Bean
-//    public List<ImageModel> images() {
-//        String sql = "SELECT * FROM image";
-//        List<ImageModel> initializedImages = jdbcTemplate.query(sql, this.mapToImage());
-//        for (ImageModel image : initializedImages) {
-//            images.put(image.getId(), image);
-//        }
-//        return initializedImages;
-//    }
 
     @Bean
     @DependsOn({"stores", "beers"})
@@ -159,7 +148,6 @@ public class TestConfig {
                 beer.setType(rs.getString("type"));
                 beer.setVolume(rs.getDouble("volume"));
                 String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
-                System.out.println(sql);
                 ImageModel image = jdbcTemplate.query(sql, new ResultSetExtractor<ImageModel>() {
                     @Override
                     public ImageModel extractData(ResultSet rs) throws SQLException, DataAccessException {
