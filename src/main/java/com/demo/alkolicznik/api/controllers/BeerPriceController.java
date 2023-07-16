@@ -35,41 +35,41 @@ public class BeerPriceController {
         return beerPriceService.get(storeId, beerId);
     }
 
-    @GetMapping("/store/{store_id}/beer-price")
-    public Set<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
-        return beerPriceService.getBeerPricesOnStoreId(storeId);
-    }
-
-    @GetMapping(value = "/beer-price", params = "city")
-    public Set<BeerPriceResponseDTO> getAllByCity(@RequestParam("city") String city) {
-        return beerPriceService.getBeerPrices(city);
-    }
-
-    @GetMapping("/beer/{beer_id}/beer-price")
-    public Set<BeerPriceResponseDTO> getAllByBeerId(@PathVariable("beer_id") Long beerId) {
-        return beerPriceService.getBeerPricesOnBeerId(beerId);
-    }
-
-    @GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
-    public Set<BeerPriceResponseDTO> getAllByBeerAndCity(@PathVariable("beer_id") Long beerId,
-                                            @RequestParam("city") String city) {
-        return beerPriceService.getBeerPrices(beerId, city);
-    }
-
     @GetMapping("/beer-price")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
     public Set<BeerPriceResponseDTO> getAll() {
-        return beerPriceService.getBeerPrices();
+        return beerPriceService.getAll();
+    }
+
+    @GetMapping("/store/{store_id}/beer-price")
+    public Set<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
+        return beerPriceService.getAllByStoreId(storeId);
+    }
+
+    @GetMapping(value = "/beer-price", params = "city")
+    public Set<BeerPriceResponseDTO> getAllByCity(@RequestParam("city") String city) {
+        return beerPriceService.getAllByCity(city);
+    }
+
+    @GetMapping("/beer/{beer_id}/beer-price")
+    public Set<BeerPriceResponseDTO> getAllByBeerId(@PathVariable("beer_id") Long beerId) {
+        return beerPriceService.getAllByBeerId(beerId);
+    }
+
+    @GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
+    public Set<BeerPriceResponseDTO> getAllByBeerIdAndCity(@PathVariable("beer_id") Long beerId,
+                                                           @RequestParam("city") String city) {
+        return beerPriceService.getAllByBeerIdAndCity(beerId, city);
     }
 
     @PostMapping("/store/{store_id}/beer-price")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
-    public ResponseEntity<BeerPriceResponseDTO> add(
+    public ResponseEntity<BeerPriceResponseDTO> addByObject(
             @PathVariable("store_id") Long storeId,
             @RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
-        BeerPriceResponseDTO beerPrice = beerPriceService.add(storeId, beerPriceRequestDTO);
+        BeerPriceResponseDTO beerPrice = beerPriceService.addByObject(storeId, beerPriceRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -83,11 +83,11 @@ public class BeerPriceController {
     @PostMapping(value = "/store/{store_id}/beer-price", params = {"beer_id", "beer_price"})
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
-    public ResponseEntity<BeerPriceResponseDTO> add(
+    public ResponseEntity<BeerPriceResponseDTO> addByParam(
             @PathVariable("store_id") Long storeId,
             @RequestParam("beer_id") Long beerId,
             @RequestParam("beer_price") @Positive(message = "Price must be a positive number") double price) {
-        BeerPriceResponseDTO beerPrice = beerPriceService.add(storeId, beerId, price);
+        BeerPriceResponseDTO beerPrice = beerPriceService.addByParam(storeId, beerId, price);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
