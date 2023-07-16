@@ -13,24 +13,16 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.getRequest;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
-//@AutoConfigureMockMvc
 public class ImageModelTests {
 
     @Autowired
     private List<Beer> beers;
-
-//    public static MockMvc mockMvc;
-//
-//    @Autowired
-//    public void setMockMvc(MockMvc mockMvc) {
-//        ImageModelTests.mockMvc = mockMvc;
-//    }
 
     @Nested
     class GetRequests {
@@ -41,7 +33,7 @@ public class ImageModelTests {
             ImageModelResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage().get());
             String expectedJson = toJsonString(expected);
 
-            var response = getRequest("/api/beer/{id}/image", 5L);
+            var response = getRequest("/api/beer/5/image");
 
             String actualJson = response.getBody();
             ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);

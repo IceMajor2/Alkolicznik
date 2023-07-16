@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -92,5 +93,15 @@ public class TestUtils {
         public Map<Long, User> getResults() {
             return results;
         }
+    }
+
+    public static String buildURI(String uriString, Map<String, ?> parameters) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
+        for (var entry : parameters.entrySet()) {
+            builder
+                    .queryParam(entry.getKey(), entry.getValue());
+        }
+        String urlTemplate = builder.encode().toUriString();
+        return urlTemplate;
     }
 }

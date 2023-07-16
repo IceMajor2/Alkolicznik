@@ -30,6 +30,7 @@ CREATE TABLE beer_price (
 CREATE TABLE IF NOT EXISTS image (
     beer_id BIGINT NOT NULL,
     url VARCHAR(255),
+    image_component BLOB(1024),
     PRIMARY KEY (beer_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
@@ -42,4 +43,4 @@ CREATE TABLE users (
     roles VARCHAR(255) ARRAY
 );
 
-CREATE SEQUENCE user_id_seq START WITH 6 INCREMENT BY 1;
+CREATE SEQUENCE user_id_seq START WITH 7 INCREMENT BY 1;

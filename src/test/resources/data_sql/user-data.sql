@@ -8,3 +8,5 @@ INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "kacpro
     VALUES (4, 'kacprox07', '$2y$13$8gz4b5kwgWQ2t6a.SY3lk.Uct6zySI1blvdh6MF.8EmEMDd1ufulu', true, ARRAY['ACCOUNTANT']);
 INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "heckler", "Gaziwubalu66"
     VALUES (5, 'heckler', '$2y$13$z951BviP1jqU7jfpJ7j8g.jISs7hOcZxJH/dTqzy/NSfaGcT0/vNu', false, ARRAY['USER']);
+INSERT INTO users (ID, USERNAME, PASSWORD, ACCOUNT_NON_LOCKED, ROLES) -- "accountant", "accountant"
+    VALUES (6, 'accountant', '$2a$13$5N9imk4bqMeSw1HJoxGgS.KIi.rbG0PxgnrJXmLaaNkNWbSowP5yK', true, ARRAY['ACCOUNTANT']);

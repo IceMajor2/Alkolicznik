@@ -57,7 +57,7 @@ public class JsonUtils {
         response.setBrand(brand);
         response.setType(type);
         response.setVolume(volume);
-        if(image != null) {
+        if (image != null) {
             response.setImage(new ImageModelResponseDTO(image));
         }
         return response;
@@ -68,7 +68,7 @@ public class JsonUtils {
     }
 
     public static BeerResponseDTO createBeerResponse(Beer beer) {
-        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(), beer.getImage().get());
+        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(), beer.getImage().orElse(null));
     }
 
     public static ImageModelResponseDTO createImageResponse(ImageModel image) {

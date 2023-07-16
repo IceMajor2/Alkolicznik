@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -23,8 +20,10 @@ import java.util.Map;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
@@ -35,9 +34,6 @@ public class SecuredEndpointTests {
 
     @Autowired
     private List<Store> stores;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
 
     @Nested
     class BeerController {
@@ -56,8 +52,7 @@ public class SecuredEndpointTests {
         @DisplayName("ANONYMOUS: creates beer")
         public void whenAnonCreatesBeer_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
-            var postResponse = restTemplate
-                    .postForEntity("/api/beer", request, String.class);
+            var postResponse = postRequest("/api/beer", request);
 
             String json = postResponse.getBody();
 
@@ -68,11 +63,7 @@ public class SecuredEndpointTests {
         @DisplayName("ANONYMOUS: update beer")
         public void whenAnonUpdatesBeer_thenReturn404Test() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-            var putResponse = restTemplate.exchange("/api/beer/{id}",
-                    HttpMethod.PUT,
-                    new HttpEntity<>(request),
-                    String.class,
-                    2L);
+            var putResponse = putRequest("/api/beer/2", request);
 
             String jsonResponse = putResponse.getBody();
 
@@ -87,11 +78,7 @@ public class SecuredEndpointTests {
         @Test
         @DisplayName("ANONYMOUS: delete beer (id)")
         public void whenAnonDeletesBeer_thenReturn404Test() {
-            var deleteResponse = restTemplate.exchange("/api/beer/{id}",
-                    HttpMethod.DELETE,
-                    HttpEntity.EMPTY,
-                    String.class,
-                    2L);
+            var deleteResponse = deleteRequest("/api/beer/2");
 
             String jsonResponse = deleteResponse.getBody();
 
@@ -107,10 +94,7 @@ public class SecuredEndpointTests {
         @DisplayName("ANONYMOUS: delete beer (fields)")
         public void whenAnonDeletesBeerByFields_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(getBeer(3L, beers));
-            var deleteResponse = restTemplate.exchange("/api/beer",
-                    HttpMethod.DELETE,
-                    new HttpEntity<>(request),
-                    String.class);
+            var deleteResponse = deleteRequest("/api/beer", request);
 
             String jsonResponse = deleteResponse.getBody();
 
@@ -125,9 +109,7 @@ public class SecuredEndpointTests {
         @Test
         @DisplayName("USER: get beers")
         public void whenUserGetsBeers_thenReturn404Test() {
-            var getResponse = restTemplate
-                    .withBasicAuth("user", "user")
-                    .getForEntity("/api/beer", String.class);
+            var getResponse = getRequestAuth("user", "user", "/api/beer");
 
             String json = getResponse.getBody();
 
@@ -155,7 +137,7 @@ public class SecuredEndpointTests {
         @DisplayName("USER: update beer")
         public void whenUserUpdatesBeer_thenReturn404Test() {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
-            var putResponse = putRequestAuth("user", "user", "/api/beer/{id}", request, 1L);
+            var putResponse = putRequestAuth("user", "user", "/api/beer/1", request);
 
             String json = putResponse.getBody();
 
@@ -169,7 +151,7 @@ public class SecuredEndpointTests {
         @DisplayName("USER: delete beer (ID)")
         public void whenUserDeletesBeer_thenReturn404Test() {
             var deleteResponse = deleteRequestAuth("user", "user",
-                    "/api/beer/{id}", 1L);
+                    "/api/beer/1");
 
             String json = deleteResponse.getBody();
 
@@ -195,29 +177,51 @@ public class SecuredEndpointTests {
                     "/api/beer");
         }
 
-        //        @Test
-//        @DisplayName("ACCOUNTANT: get beers")
+        @Test
+        @DisplayName("ACCOUNTANT: get beers")
+        public void whenAccountantGetsBeers_thenReturn200Test() {
+            var getResponse = getRequestAuth("accountant", "accountant", "/api/beer");
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        }
+
         @Test
         @DisplayName("ACCOUNTANT: creates beer")
-        public void whenAccountantCreatesBeer_thenReturn404Test() {
-
+        public void whenAccountantCreatesBeer_thenReturn201Test() {
+            BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", null);
+            var postResponse = postRequestAuth("accountant", "accountant", "/api/beer", request);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         }
-        //        @Test
-//        @DisplayName("ACCOUNTANT: update beer")
 
-        //        @Test
-//        @DisplayName("ACCOUNTANT: delete beer (ID)")
+        @Test
+        @DisplayName("ACCOUNTANT: update beer")
+        public void whenAccountantUpdatesBeer_thenReturn204Test() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "Export", null);
+            var putResponse = postRequestAuth("accountant", "accountant", "/api/beer/1", request);
+            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        }
 
-        //        @Test
-//        @DisplayName("ACCOUNTANT: delete beer (fields)")
+        @Test
+        @DisplayName("ACCOUNTANT: delete beer (ID)")
+        public void whenAccountantDeletesBeer_thenReturn200Test() {
+            var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer/6");
+            assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        }
+
+        @Test
+        @DisplayName("ACCOUNTANT: delete beer (fields)")
+        public void whenAccountantDeletesBeerByFields_thenReturn200Test() {
+            BeerRequestDTO request = createBeerRequest(beers.get(1));
+            var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer");
+            assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        }
 
         //        @Test
 //        @DisplayName("ADMIN: get beers")
-        @Test
-        @DisplayName("ADMIN: creates beer")
-        public void whenAdminCreatesBeer_thenReturn404Test() {
-
-        }
+//        @Test
+//        @DisplayName("ADMIN: creates beer")
+//        public void whenAdminCreatesBeer_thenReturn404Test() {
+//
+//        }
         //        @Test
 //        @DisplayName("ADMIN: update beer")
 
@@ -245,7 +249,7 @@ public class SecuredEndpointTests {
         @DisplayName("ANONYMOUS: update store")
         public void whenAnonUpdatesStore_thenReturn404Test() {
             StoreUpdateDTO request = createStoreUpdateRequest("Lubi", null, null);
-            var putResponse = putRequestAuth("user", "user", "/api/store/{id}", request, 4L);
+            var putResponse = putRequestAuth("user", "user", "/api/store/4", request);
 
             String jsonResponse = putResponse.getBody();
 
@@ -261,7 +265,7 @@ public class SecuredEndpointTests {
         @DisplayName("ANONYMOUS: delete store")
         public void whenAnonDeletesStore_thenReturn404Test() {
             var deleteResponse = deleteRequestAuth("user", "user",
-                    "/api/store/{id}", 2L);
+                    "/api/store/2");
 
             String jsonResponse = deleteResponse.getBody();
 

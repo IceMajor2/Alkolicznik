@@ -15,10 +15,11 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,7 +38,7 @@ public class BeerTests {
         @Test
         @DisplayName("Get beer of valid id")
         public void getBeerTest() {
-            var getResponse = getRequest("/api/beer/{id}", 1L);
+            var getResponse = getRequest("/api/beer/1");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -52,7 +53,7 @@ public class BeerTests {
         @Test
         @DisplayName("Get beer of invalid id")
         public void getBeerNotExistingStatusCheckTest() {
-            var getResponse = getRequest("/api/beer/{id}", 9999L);
+            var getResponse = getRequest("/api/beer/9999");
 
             String jsonResponse = getResponse.getBody();
 
@@ -84,7 +85,7 @@ public class BeerTests {
             assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
-            var getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/7");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, BeerResponseDTO.class);
@@ -111,7 +112,7 @@ public class BeerTests {
             assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
-            var getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/7");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, BeerResponseDTO.class);
@@ -139,7 +140,7 @@ public class BeerTests {
             assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
-            var getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/7");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, BeerResponseDTO.class);
@@ -167,7 +168,7 @@ public class BeerTests {
             assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
-            var getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/7");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, BeerResponseDTO.class);
@@ -195,7 +196,7 @@ public class BeerTests {
             assertThat(actualJson).isEqualTo(expectedJson);
 
             // Fetch the newly-created beer.
-            var getResponse = getRequest("/api/beer/{id}", 7L);
+            var getResponse = getRequest("/api/beer/7");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, BeerResponseDTO.class);

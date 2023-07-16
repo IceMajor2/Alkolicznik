@@ -15,9 +15,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 import java.util.Map;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,7 +34,7 @@ public class StoreTests {
         @Test
         @DisplayName("Get store of valid id")
         public void getStoreTest() {
-            var getResponse = getRequest("/api/store/{id}", 3L);
+            var getResponse = getRequest("/api/store/3");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -48,7 +49,7 @@ public class StoreTests {
         @Test
         @DisplayName("Get store of invalid id")
         public void getStoreNotExistingTest() {
-            var getResponse = getRequest("/api/store/{id}", 9999L);
+            var getResponse = getRequest("/api/store/9999");
 
             String json = getResponse.getBody();
 
@@ -109,7 +110,7 @@ public class StoreTests {
             assertThat(actualJson).isEqualTo(expectedJson);
             assertThat(actual).isEqualTo(expected);
 
-            var getResponse = getRequest("/api/store/{id}", 8L);
+            var getResponse = getRequest("/api/store/8");
 
             actualJson = getResponse.getBody();
             actual = toModel(actualJson, StoreResponseDTO.class);

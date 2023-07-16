@@ -33,8 +33,10 @@ import java.util.Map;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
+import static com.demo.alkolicznik.utils.requests.MockRequests.*;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -70,7 +72,7 @@ public class AdminTests {
                         .toList();
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer"),
+                String actualJson = assertMockRequest(mockGetRequest("/api/beer"),
                         HttpStatus.OK,
                         expectedJson);
                 List<BeerResponseDTO> actual = toModelList(actualJson, BeerResponseDTO.class);
@@ -94,7 +96,7 @@ public class AdminTests {
                 String expectedJson = toJsonString(expected);
                 System.out.println(expectedJson);
                 String actualJson = assertMockRequest(
-                        mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                        mockPutRequest("/api/beer/3", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson
                 );
@@ -102,7 +104,7 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/beer/{id}", 3L);
+                var getResponse = getRequest("/api/beer/3");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, BeerResponseDTO.class);
@@ -122,7 +124,7 @@ public class AdminTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
-                        mockPutRequest("/api/admin/beer/{id}", request, 3L),
+                        mockPutRequest("/api/beer/3", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson
                 );
@@ -130,7 +132,7 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/beer/{id}", 3L);
+                var getResponse = getRequest("/api/beer/3");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, BeerResponseDTO.class);
@@ -150,7 +152,7 @@ public class AdminTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
-                        mockPutRequest("/api/admin/beer/{id}", request, 2L),
+                        mockPutRequest("/api/beer/2", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson
                 );
@@ -158,7 +160,7 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/beer/{id}", 2L);
+                var getResponse = getRequest("/api/beer/2");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, BeerResponseDTO.class);
@@ -171,7 +173,7 @@ public class AdminTests {
             @DisplayName("Invalid beer update: request EMPTY")
             public void updateBeerEmptyRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 6L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -179,7 +181,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "No property to update was specified",
-                        "/api/admin/beer/6"
+                        "/api/beer/6"
                 );
             }
 
@@ -187,7 +189,7 @@ public class AdminTests {
             @DisplayName("Invalid beer update: VOLUME negative and zero")
             public void updateBeerVolumeNegativeAndZeroRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -195,11 +197,11 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Volume must be a positive number",
-                        "/api/admin/beer/4"
+                        "/api/beer/4"
                 );
 
                 request = createBeerUpdateRequest(null, null, -5.1d);
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+                putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
                 jsonResponse = putResponse.getBody();
 
@@ -207,7 +209,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Volume must be a positive number",
-                        "/api/admin/beer/4"
+                        "/api/beer/4"
                 );
             }
 
@@ -215,7 +217,7 @@ public class AdminTests {
             @DisplayName("Invalid beer update: BEER_NOT_EXISTS")
             public void updateBeerNotExistsRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 321L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/321", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -223,7 +225,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Unable to find beer of '321' id",
-                        "/api/admin/beer/321"
+                        "/api/beer/321"
                 );
             }
 
@@ -231,7 +233,7 @@ public class AdminTests {
             @DisplayName("Invalid beer update: BRAND blank")
             public void updateBeerBrandBlankRequestTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -239,11 +241,11 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Brand was not specified",
-                        "/api/admin/beer/5"
+                        "/api/beer/5"
                 );
 
                 request = createBeerUpdateRequest("", null, null);
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+                putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
                 jsonResponse = putResponse.getBody();
 
@@ -251,7 +253,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Brand was not specified",
-                        "/api/admin/beer/5"
+                        "/api/beer/5"
                 );
             }
 
@@ -259,7 +261,7 @@ public class AdminTests {
             @DisplayName("Invalid beer update: PROPERTIES_SAME")
             public void updateBeerUnchangedTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 5L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -267,7 +269,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.OK,
                         "Objects are the same: nothing to update",
-                        "/api/admin/beer/5"
+                        "/api/beer/5"
                 );
             }
 
@@ -278,11 +280,11 @@ public class AdminTests {
             public void updateBeerSetTypeToNullTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
 
-                BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5);
+                BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5, getImage(6L, beers));
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
-                        mockPutRequest("/api/admin/beer/{id}", request, 6L),
+                        mockPutRequest("/api/beer/6", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson
                 );
@@ -290,7 +292,7 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/beer/{id}", 6L);
+                var getResponse = getRequest("/api/beer/6");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, BeerResponseDTO.class);
@@ -303,7 +305,7 @@ public class AdminTests {
             @DisplayName("Invalid update beer: PROPERTIES_SAME (2)")
             public void updateBeerUnchangedTwoTest() {
                 BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/beer/{id}", request, 4L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -311,7 +313,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.OK,
                         "Objects are the same: nothing to update",
-                        "/api/admin/beer/4"
+                        "/api/beer/4"
                 );
             }
 
@@ -326,7 +328,7 @@ public class AdminTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(
-                        mockPutRequest("/api/admin/beer/{id}", request, 4L),
+                        mockPutRequest("/api/beer/4", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson
                 );
@@ -334,7 +336,7 @@ public class AdminTests {
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/beer/{id}", 4L);
+                var getResponse = getRequest("/api/beer/4");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, BeerResponseDTO.class);
@@ -358,12 +360,12 @@ public class AdminTests {
                 );
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer/{id}", 6L),
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/beer/6"),
                         HttpStatus.OK,
                         expectedJson);
                 assertThat(actualJson).isEqualTo(expectedJson);
 
-                var getRequest = getRequest("/api/beer/{id}", 6);
+                var getRequest = getRequest("/api/beer/6");
 
                 String jsonResponse = getRequest.getBody();
 
@@ -386,7 +388,7 @@ public class AdminTests {
 
                 BeerRequestDTO requestDTO = createBeerRequest(getBeer(3L, beers));
                 String actualJson = assertMockRequest(
-                        mockDeleteRequest("/api/admin/beer", requestDTO),
+                        mockDeleteRequest(requestDTO, "/api/beer"),
                         HttpStatus.OK,
                         expectedJson
                 );
@@ -399,7 +401,7 @@ public class AdminTests {
             @DisplayName("Invalid delete beer: BEER_NOT_EXISTS")
             public void deleteBeerNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
-                        "/api/admin/beer/{id}", 0L);
+                        "/api/beer/0");
 
                 String jsonResponse = deleteResponse.getBody();
 
@@ -407,7 +409,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Unable to find beer of '0' id",
-                        "/api/admin/beer/0"
+                        "/api/beer/0"
                 );
             }
         }
@@ -428,7 +430,7 @@ public class AdminTests {
                         .toList();
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockGetRequest("/api/admin/store"),
+                String actualJson = assertMockRequest(mockGetRequest("/api/store"),
                         HttpStatus.OK, expectedJson);
                 List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
@@ -449,14 +451,14 @@ public class AdminTests {
                 StoreResponseDTO expected = createStoreResponse(1L, "Carrefour Express", "Olsztyn", "ul. Barcza 4");
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 1L),
+                String actualJson = assertMockRequest(mockPutRequest("/api/store/1", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/store/{id}", 1L);
+                var getResponse = getRequest("/api/store/1");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, StoreResponseDTO.class);
@@ -475,14 +477,14 @@ public class AdminTests {
                 StoreResponseDTO expected = createStoreResponse(7L, "Tesco", "Gdynia", "ul. Morska 22");
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 7L),
+                String actualJson = assertMockRequest(mockPutRequest("/api/store/7", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/store/{id}", 7L);
+                var getResponse = getRequest("/api/store/7");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, StoreResponseDTO.class);
@@ -501,14 +503,14 @@ public class AdminTests {
                 StoreResponseDTO expected = createStoreResponse(4L, "ABC", "Warszawa", "ul. Zeromskiego 4");
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockPutRequest("/api/admin/store/{id}", request, 4L),
+                String actualJson = assertMockRequest(mockPutRequest("/api/store/4", request),
                         HttpStatus.NO_CONTENT,
                         expectedJson);
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
                 assertThat(actual).isEqualTo(expected);
 
-                var getResponse = getRequest("/api/store/{id}", 4L);
+                var getResponse = getRequest("/api/store/4");
 
                 actualJson = getResponse.getBody();
                 actual = toModel(actualJson, StoreResponseDTO.class);
@@ -521,7 +523,7 @@ public class AdminTests {
             @DisplayName("Invalid update store: NAME blank")
             public void updateStoreNameBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest("", null, null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -529,11 +531,11 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Name was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
 
                 request = createStoreUpdateRequest("\t\n ", null, null);
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 jsonResponse = putResponse.getBody();
 
@@ -541,7 +543,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Name was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
             }
 
@@ -550,21 +552,21 @@ public class AdminTests {
             public void updateStorePropertiesSameTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest("Lubi", "Warszawa", "ul. Nowaka 5");
                 var putResponse = putRequestAuth("admin", "admin",
-                        "/api/admin/store/{id}", request, 5L);
+                        "/api/store/5", request);
 
                 String jsonResponse = putResponse.getBody();
 
                 assertIsError(jsonResponse,
                         HttpStatus.OK,
                         "Objects are the same: nothing to update",
-                        "/api/admin/store/5");
+                        "/api/store/5");
             }
 
             @Test
             @DisplayName("Invalid update store: STREET blank")
             public void updateStoreStreetBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest(null, null, "");
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -572,11 +574,11 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Street was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
 
                 request = createStoreUpdateRequest(null, null, "\t\n ");
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 jsonResponse = putResponse.getBody();
 
@@ -584,7 +586,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Street was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
             }
 
@@ -592,7 +594,7 @@ public class AdminTests {
             @DisplayName("Invalid update store: CITY blank")
             public void updateStoreCityBlankTest() {
                 StoreUpdateDTO request = createStoreUpdateRequest(null, "", null);
-                var putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 String jsonResponse = putResponse.getBody();
 
@@ -600,11 +602,11 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "City was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
 
                 request = createStoreUpdateRequest(null, "\t\n ", null);
-                putResponse = putRequestAuth("admin", "admin", "/api/admin/store/{id}", request, 4L);
+                putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
 
                 jsonResponse = putResponse.getBody();
 
@@ -612,7 +614,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "City was not specified",
-                        "/api/admin/store/4"
+                        "/api/store/4"
                 );
             }
         }
@@ -631,12 +633,12 @@ public class AdminTests {
                 );
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/store/{id}", 6L),
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/store/6"),
                         HttpStatus.OK,
                         expectedJson);
                 assertThat(actualJson).isEqualTo(expectedJson);
 
-                var getRequest = getRequest("/api/store/{id}", 6);
+                var getRequest = getRequest("/api/store/6");
 
                 String jsonResponse = getRequest.getBody();
 
@@ -650,7 +652,7 @@ public class AdminTests {
             @DisplayName("Invalid delete store: STORE_NOT_EXISTS")
             public void deleteStoreNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
-                        "/api/admin/store/{id}", 0L);
+                        "/api/store/0");
 
                 String jsonResponse = deleteResponse.getBody();
 
@@ -658,7 +660,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Unable to find store of '0' id",
-                        "/api/admin/store/0"
+                        "/api/store/0"
                 );
             }
         }
@@ -682,7 +684,7 @@ public class AdminTests {
                 }
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockGetRequest("/api/admin/beer-price"),
+                String actualJson = assertMockRequest(mockGetRequest("/api/beer-price"),
                         HttpStatus.OK, expectedJson);
                 List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
@@ -709,7 +711,7 @@ public class AdminTests {
                 String expectedJson = toJsonString(expected);
 
                 String actualJson = assertMockRequest(mockPutRequest(
-                                "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L)
+                                "/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L), request
                         ),
                         HttpStatus.NO_CONTENT,
                         expectedJson);
@@ -731,23 +733,23 @@ public class AdminTests {
             public void updateBeerPricePriceNegativeAndZeroTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(0d);
                 var putResponse = putRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+                        "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
 
                 String jsonResponse = putResponse.getBody();
                 assertIsError(jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Price must be a positive number",
-                        "/api/admin/beer-price");
+                        "/api/beer-price");
 
                 request = createBeerPriceUpdateRequest(-5.9);
                 putResponse = putRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+                        "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
 
                 jsonResponse = putResponse.getBody();
                 assertIsError(jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Price must be a positive number",
-                        "/api/admin/beer-price");
+                        "/api/beer-price");
             }
 
             @Test
@@ -755,13 +757,14 @@ public class AdminTests {
             public void updateBeerPricePriceNullTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(null);
                 var putResponse = putRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+                        "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
 
                 String jsonResponse = putResponse.getBody();
+
                 assertIsError(jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "No property to update was specified",
-                        "/api/admin/beer-price");
+                        "/api/beer-price");
             }
 
             @Test
@@ -769,14 +772,14 @@ public class AdminTests {
             public void updateBeerPricePropertiesSameTest() {
                 BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(2.89);
                 var putResponse = putRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", request, Map.of("beer_id", 4L, "store_id", 2L));
+                        "/api/beer-price", request, Map.of("beer_id", 4L, "store_id", 2L));
 
                 String jsonResponse = putResponse.getBody();
 
                 assertIsError(jsonResponse,
                         HttpStatus.OK,
                         "Objects are the same: nothing to update",
-                        "/api/admin/beer-price");
+                        "/api/beer-price");
             }
         }
 
@@ -796,7 +799,7 @@ public class AdminTests {
                 );
                 String expectedJson = toJsonString(expected);
 
-                String actualJson = assertMockRequest(mockDeleteRequest("/api/admin/beer-price",
+                String actualJson = assertMockRequest(mockDeleteRequest("/api/beer-price",
                                 Map.of("beer_id", 2L, "store_id", 5L)),
                         HttpStatus.OK,
                         expectedJson);
@@ -816,7 +819,7 @@ public class AdminTests {
             @DisplayName("Invalid delete beer price: STORE_NOT_EXISTS")
             public void deleteBeerPriceStoreNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
+                        "/api/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
 
                 String jsonResponse = deleteResponse.getBody();
 
@@ -824,7 +827,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Unable to find store of '913' id",
-                        "/api/admin/beer-price"
+                        "/api/beer-price"
                 );
             }
 
@@ -832,7 +835,7 @@ public class AdminTests {
             @DisplayName("Invalid delete beer price: BEER_NOT_EXISTS")
             public void deleteBeerPriceBeerNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
+                        "/api/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
 
                 String jsonResponse = deleteResponse.getBody();
 
@@ -840,7 +843,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Unable to find beer of '433' id",
-                        "/api/admin/beer-price"
+                        "/api/beer-price"
                 );
             }
 
@@ -848,7 +851,7 @@ public class AdminTests {
             @DisplayName("Invalid delete beer price: BEER_PRICE_NOT_EXISTS")
             public void deleteBeerPricePriceNotExistsTest() {
                 var deleteResponse = deleteRequestAuth("admin", "admin",
-                        "/api/admin/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
+                        "/api/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
 
                 String jsonResponse = deleteResponse.getBody();
 
@@ -856,7 +859,7 @@ public class AdminTests {
                         jsonResponse,
                         HttpStatus.NOT_FOUND,
                         "Store does not currently sell this beer",
-                        "/api/admin/beer-price"
+                        "/api/beer-price"
                 );
             }
         }

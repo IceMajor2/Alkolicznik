@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.*;
-import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.ResponseTestUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getStore;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -65,7 +67,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices of beer")
         public void getBeerPricesOfBeerTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", 3L);
+            var getResponse = getRequest("/api/beer/3/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -86,7 +88,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices of beer: BEER_NOT_EXISTS")
         public void getBeerPricesOfBeerNotExistsTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", 333L);
+            var getResponse = getRequest("/api/beer/333/beer-price");
 
             String jsonResponse = getResponse.getBody();
 
@@ -119,7 +121,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer price of defined beer in a city")
         public void getBeersPriceInCityTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Warszawa"), 2L);
+            var getResponse = getRequest("/api/beer/2/beer-price", Map.of("city", "Warszawa"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -140,7 +142,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get invalid beer price of defined beer in a city: BEER_NOT_EXISTS")
         public void getBeersPriceInCityBeerNotExistsTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Gdansk"), 10L);
+            var getResponse = getRequest("/api/beer/10/beer-price", Map.of("city", "Gdansk"));
 
             String jsonResponse = getResponse.getBody();
 
@@ -153,7 +155,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get invalid beer price of defined beer in a city: CITY_NOT_EXISTS")
         public void getBeersPriceInCityCityNotExistsTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Ciechocinek"), 5);
+            var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", "Ciechocinek"));
 
             String jsonResponse = getResponse.getBody();
 
@@ -166,7 +168,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get valid beer price of defined beer in a city: city EXISTS but EMPTY")
         public void getBeersPriceInCityCityEmptyTest() {
-            var getResponse = getRequest("/api/beer/{id}/beer-price", Map.of("city", "Gdansk"), 4L);
+            var getResponse = getRequest("/api/beer/4/beer-price", Map.of("city", "Gdansk"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -221,7 +223,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices from store")
         public void getBeerPricesFromStoreTest() {
-            var getResponse = getRequest("/api/store/{id}/beer-price", 3L);
+            var getResponse = getRequest("/api/store/3/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -239,7 +241,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices from non-existing store")
         public void getBeerPricesFromStoreNotExistsTest() {
-            var getResponse = getRequest("/api/store/{id}/beer-price", 8L);
+            var getResponse = getRequest("/api/store/8/beer-price");
 
             String jsonResponse = getResponse.getBody();
 
@@ -252,7 +254,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices of empty store")
         public void getBeerPricesFromStoreEmptyTest() {
-            var getResponse = getRequest("/api/store/{id}/beer-price", 7);
+            var getResponse = getRequest("/api/store/7/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String actualJson = getResponse.getBody();
@@ -295,9 +297,8 @@ public class BeerPriceTests {
         @DirtiesContext
         public void addBeerPriceIdTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 3L, "beer_price", 4.19),
-                    1L);
+                    "/api/store/3/beer-price",
+                    Map.of("beer_id", 3L, "beer_price", 4.19));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
@@ -326,9 +327,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price (ID) to store: STORE_NOT_EXISTS")
         public void addBeerPriceIdStoreNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 3L, "beer_price", 4.19),
-                    9999L);
+                    "/api/store/9999/beer-price",
+                    Map.of("beer_id", 3L, "beer_price", 4.19));
 
             String jsonResponse = postResponse.getBody();
 
@@ -342,9 +342,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price (ID) to store: PRICE negative and zero")
         public void addBeerPriceIdVolumeNegativeAndZeroTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 5L, "beer_price", 0d),
-                    2L);
+                    "/api/store/2/beer-price",
+                    Map.of("beer_id", 5L, "beer_price", 0d));
 
             String jsonResponse = postResponse.getBody();
 
@@ -354,9 +353,8 @@ public class BeerPriceTests {
                     "/api/store/2/beer-price");
 
             postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 5L, "beer_price", -5.213),
-                    2L);
+                    "/api/store/2/beer-price",
+                    Map.of("beer_id", 5L, "beer_price", -5.213));
 
             jsonResponse = postResponse.getBody();
 
@@ -370,9 +368,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS")
         public void addBeerPriceIdBeerNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 999L, "beer_price", 6.69),
-                    1L);
+                    "/api/store/1/beer-price",
+                    Map.of("beer_id", 999L, "beer_price", 6.69));
 
             String jsonResponse = postResponse.getBody();
 
@@ -386,9 +383,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price (ID) to store: BEER_PRICE_ALREADY_EXISTS")
         public void addBeerPriceIdAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    Map.of("beer_id", 2, "beer_price", 6.69),
-                    1L);
+                    "/api/store/1/beer-price",
+                    Map.of("beer_id", 2, "beer_price", 6.69));
 
             String jsonResponse = postResponse.getBody();
 
@@ -407,9 +403,8 @@ public class BeerPriceTests {
         @DirtiesContext
         public void addBeerPriceToStoreTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69),
-                    2);
+                    "/api/store/2/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
@@ -439,9 +434,8 @@ public class BeerPriceTests {
         @DirtiesContext
         public void addBeerPriceToStoreTest2() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Zubr", 0.5, 2.79),
-                    1L);
+                    "/api/store/1/beer-price",
+                    createBeerPriceRequest("Zubr", 0.5, 2.79));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
@@ -471,9 +465,8 @@ public class BeerPriceTests {
         @DirtiesContext
         public void addBeerPriceToStoreDefaultVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69),
-                    7);
+                    "/api/store/7/beer-price",
+                    createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69));
             assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             String actualJson = postResponse.getBody();
@@ -501,9 +494,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BEER_PRICE_ALREADY_EXISTS")
         public void addBeerPriceAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Komes Porter Malinowy", 0.33, 8.09),
-                    1L);
+                    "/api/store/1/beer-price",
+                    createBeerPriceRequest("Komes Porter Malinowy", 0.33, 8.09));
 
             String jsonResponse = postResponse.getBody();
 
@@ -517,9 +509,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Zubr", 0.6, 3.19),
-                    2L);
+                    "/api/store/2/beer-price",
+                    createBeerPriceRequest("Zubr", 0.6, 3.19));
 
             String jsonResponse = postResponse.getBody();
 
@@ -533,9 +524,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
         public void createBeerPriceNegativeAndZeroVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09),
-                    6L);
+                    "/api/store/6/beer-price",
+                    createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09));
 
             String jsonResponse = postResponse.getBody();
 
@@ -545,9 +535,8 @@ public class BeerPriceTests {
                     "/api/store/6/beer-price");
 
             postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Tyskie Gronie", 0d, 3.09),
-                    6L);
+                    "/api/store/6/beer-price",
+                    createBeerPriceRequest("Tyskie Gronie", 0d, 3.09));
 
             jsonResponse = postResponse.getBody();
 
@@ -561,9 +550,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BRAND null")
         public void createBeerPriceBrandNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest(null, 0.5, 3.09),
-                    5L);
+                    "/api/store/5/beer-price",
+                    createBeerPriceRequest(null, 0.5, 3.09));
 
             String jsonResponse = postResponse.getBody();
 
@@ -577,9 +565,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BRAND blank and empty")
         public void createBeerPriceBrandBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("", 0.5, 3.09),
-                    5L);
+                    "/api/store/5/beer-price",
+                    createBeerPriceRequest("", 0.5, 3.09));
 
             String jsonResponse = postResponse.getBody();
 
@@ -589,9 +576,8 @@ public class BeerPriceTests {
                     "/api/store/5/beer-price");
 
             postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest(" \t \n\n \t", 1d, 7.99),
-                    3L);
+                    "/api/store/3/beer-price",
+                    createBeerPriceRequest(" \t \n\n \t", 1d, 7.99));
 
             jsonResponse = postResponse.getBody();
 
@@ -605,9 +591,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: PRICE null")
         public void createBeerPriceNegativeAndZeroPriceTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Kormoran Miodne", 0.5, -1d),
-                    2L);
+                    "/api/store/2/beer-price",
+                    createBeerPriceRequest("Kormoran Miodne", 0.5, -1d));
 
             String jsonResponse = postResponse.getBody();
 
@@ -617,9 +602,8 @@ public class BeerPriceTests {
                     "/api/store/2/beer-price");
 
             postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Kormoran Miodne", 0.5, 0d),
-                    2L);
+                    "/api/store/2/beer-price",
+                    createBeerPriceRequest("Kormoran Miodne", 0.5, 0d));
 
             jsonResponse = postResponse.getBody();
 
@@ -633,9 +617,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BRAND null, VOLUME zero, PRICE negative")
         public void createBeerPricePriceNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest(null, 0d, -9.4),
-                    2L);
+                    "/api/store/2/beer-price",
+                    createBeerPriceRequest(null, 0d, -9.4));
 
             String jsonResponse = postResponse.getBody();
 
@@ -649,9 +632,8 @@ public class BeerPriceTests {
         @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS")
         public void createBeerPriceBeerNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Kormoran Miodne", 0.5, 7.99),
-                    4L);
+                    "/api/store/4/beer-price",
+                    createBeerPriceRequest("Kormoran Miodne", 0.5, 7.99));
 
             String jsonResponse = postResponse.getBody();
 
@@ -666,9 +648,8 @@ public class BeerPriceTests {
         @DirtiesContext
         public void createBeerPriceStoresNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
-                    "/api/store/{id}/beer-price",
-                    createBeerPriceRequest("Ksiazece Zlote pszeniczne", 0.5, 3.79),
-                    9999L);
+                    "/api/store/9999/beer-price",
+                    createBeerPriceRequest("Ksiazece Zlote pszeniczne", 0.5, 3.79));
 
             String jsonResponse = postResponse.getBody();
 
