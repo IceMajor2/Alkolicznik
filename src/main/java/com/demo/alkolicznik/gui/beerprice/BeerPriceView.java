@@ -90,7 +90,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             return;
         }
         try {
-            var prices = beerPriceService.getBeerPrices(city);
+            var prices = beerPriceService.getAllByCity(city);
             this.grid.setItems(prices);
         } catch (NoSuchCityException e) {
             this.grid.setItems(Collections.EMPTY_LIST);
@@ -101,7 +101,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
     @Override
     protected void updateList() {
         if (!loggedUser.isUser()) {
-            var prices = beerPriceService.getBeerPrices();
+            var prices = beerPriceService.getAll();
             this.grid.setItems(prices);
             updateDisplayText("cała Polska");
         } else {
@@ -146,7 +146,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
     private void createPrice(BeerPriceForm.CreateEvent event) {
         BeerPriceParamRequestDTO request = event.getPrice();
         try {
-            beerPriceService.add(request.getStoreId().longValue(),
+            beerPriceService.addByParam(request.getStoreId().longValue(),
                     request.getBeerId().longValue(),
                     request.getPrice());
         } catch (BeerPriceAlreadyExistsException e) {

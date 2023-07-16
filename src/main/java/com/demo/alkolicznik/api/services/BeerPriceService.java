@@ -32,7 +32,7 @@ public class BeerPriceService {
         this.beerRepository = beerRepository;
     }
 
-    public BeerPriceResponseDTO add(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
+    public BeerPriceResponseDTO addByObject(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
         // Fetch both store and beer from repositories.
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
@@ -59,7 +59,7 @@ public class BeerPriceService {
 
     // No annotation throws Hibernation lazy-loading exception (on GUI)
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
-    public BeerPriceResponseDTO add(Long storeId, Long beerId, double price) {
+    public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, double price) {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new StoreNotFoundException(storeId)
         );
@@ -74,7 +74,7 @@ public class BeerPriceService {
         return new BeerPriceResponseDTO(store.getBeer(beerId).get());
     }
 
-    public Set<BeerPriceResponseDTO> getBeerPricesOnStoreId(Long storeId) {
+    public Set<BeerPriceResponseDTO> getAllByStoreId(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
         Set<BeerPrice> prices = store.getPrices();
@@ -93,7 +93,7 @@ public class BeerPriceService {
         ));
     }
 
-    public Set<BeerPriceResponseDTO> getBeerPrices() {
+    public Set<BeerPriceResponseDTO> getAll() {
         List<Store> stores = storeRepository.findAll();
         Set<BeerPrice> prices = new LinkedHashSet<>();
         for (Store store : stores) {
@@ -106,7 +106,7 @@ public class BeerPriceService {
         return pricesDTO;
     }
 
-    public Set<BeerPriceResponseDTO> getBeerPrices(String city) {
+    public Set<BeerPriceResponseDTO> getAllByCity(String city) {
         List<Store> cityStores = storeRepository.findAllByCity(city);
 
         if (cityStores.isEmpty()) {
@@ -120,7 +120,7 @@ public class BeerPriceService {
         return this.mapToDto(prices);
     }
 
-    public Set<BeerPriceResponseDTO> getBeerPricesOnBeerId(Long beerId) {
+    public Set<BeerPriceResponseDTO> getAllByBeerId(Long beerId) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );
@@ -133,7 +133,7 @@ public class BeerPriceService {
         return this.mapToDto(prices);
     }
 
-    public Set<BeerPriceResponseDTO> getBeerPrices(Long beerId, String city) {
+    public Set<BeerPriceResponseDTO> getAllByBeerIdAndCity(Long beerId, String city) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
         );

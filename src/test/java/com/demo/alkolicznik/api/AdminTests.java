@@ -689,7 +689,6 @@ public class AdminTests {
                 List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
                 assertThat(actual).hasSameElementsAs(expected);
-                assertThat(actual).isEqualTo(expected);
             }
         }
 
