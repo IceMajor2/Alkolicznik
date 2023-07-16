@@ -9,6 +9,7 @@ import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -52,46 +53,6 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         return wizard;
     }
 
-    private void deleteBeer(BeerForm.DeleteEvent event) {
-        try {
-            beerService.delete(event.getBeer());
-        } catch (BeerNotFoundException e) {
-            Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
-
-    private void createBeer(BeerForm.CreateEvent event) {
-        try {
-            beerService.add(event.getBeer());
-        } catch (BeerAlreadyExistsException e) {
-            Notification.show("Piwo już istnieje", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
-
-    private void updateBeer(BeerForm.UpdateEvent event) {
-        Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
-        if (selection.isEmpty()) {
-            Notification.show("Nie zaznaczyłeś piwa do aktualizacji", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        Long beerToUpdateId = selection.get().getId();
-        BeerUpdateDTO newItem = convertToUpdate(event.getBeer());
-        try {
-            beerService.update(beerToUpdateId, newItem);
-        } catch (ObjectsAreEqualException e) {
-            Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
-
     @Override
     protected Grid getGrid() {
         this.grid = new Grid<>();
@@ -100,14 +61,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         if (!loggedUser.isUser()) {
             grid.addColumn(beer -> beer.getId()).setHeader("Id");
         }
-        grid.addComponentColumn(beer -> {
-            try {
-
-                return beer.getImage().getImageComponent();
-            } catch (Exception e) {
-                return null;
-            }
-        }).setHeader("Zdjęcie");
+        grid.addComponentColumn(beer -> this.getImage(beer)).setHeader("Zdjęcie");
         grid.addColumn(beer -> beer.getBrand()).setHeader("Marka");
         grid.addColumn(beer -> beer.getType()).setHeader("Typ");
         grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");
@@ -115,7 +69,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
         if (!loggedUser.isUser()) {
             grid.asSingleSelect().addValueChangeListener(event -> {
-                if (!(wizard instanceof BeerForm)) {
+                if (wizard == null) {
                     wizard = new BeerForm();
                 }
                 editModel(event.getValue());
@@ -165,6 +119,54 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         } else {
             updateList("Olsztyn");
             updateDisplayText("Olsztyn");
+        }
+    }
+
+    private void deleteBeer(BeerForm.DeleteEvent event) {
+        try {
+            beerService.delete(event.getBeer());
+        } catch (BeerNotFoundException e) {
+            Notification.show("Nie znaleziono takiego piwa", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private void createBeer(BeerForm.CreateEvent event) {
+        try {
+            beerService.add(event.getBeer());
+        } catch (BeerAlreadyExistsException e) {
+            Notification.show("Piwo już istnieje", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private void updateBeer(BeerForm.UpdateEvent event) {
+        Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
+        if (selection.isEmpty()) {
+            Notification.show("Nie zaznaczyłeś piwa do aktualizacji", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        Long beerToUpdateId = selection.get().getId();
+        BeerUpdateDTO newItem = convertToUpdate(event.getBeer());
+        try {
+            beerService.update(beerToUpdateId, newItem);
+        } catch (ObjectsAreEqualException e) {
+            Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
+            return;
+        }
+        updateList();
+        closeEditor();
+    }
+
+    private Image getImage(BeerResponseDTO beer) {
+        try {
+            return beerService.getImageComponent(beer.getId());
+        } catch (ImageNotFoundException e) {
+            return null;
         }
     }
 }

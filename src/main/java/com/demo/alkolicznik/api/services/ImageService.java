@@ -6,6 +6,7 @@ import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.repositories.BeerRepository;
+import com.demo.alkolicznik.repositories.ImageRepository;
 import com.vaadin.flow.component.html.Image;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
@@ -25,9 +26,11 @@ import java.nio.file.Paths;
 public class ImageService {
 
     private BeerRepository beerRepository;
+    private ImageRepository imageRepository;
     private ImageKit imageKit;
 
-    public ImageService(BeerRepository beerRepository) {
+    public ImageService(ImageRepository imageRepository, BeerRepository beerRepository) {
+        this.imageRepository = imageRepository;
         this.beerRepository = beerRepository;
         this.imageKit = ImageKit.getInstance();
         setConfig();
@@ -46,14 +49,29 @@ public class ImageService {
                 .orElseThrow(() -> new BeerNotFoundException(beerId));
         ImageModel image = beer.getImage()
                 .orElseThrow(() -> new ImageNotFoundException());
-        Image component = image.getImageComponent();
-        return component;
+
+        if (image.getImageComponent() == null) {
+            saveBeerImageComponent(beer);
+        }
+        return beer.getImage().get().getImageComponent();
+    }
+
+    private Image createImageComponent(ImageModel image) {
+        Image imageComponent = new Image(image.getImageUrl(), "No image");
+        return imageComponent;
+    }
+
+    private void saveBeerImageComponent(Beer beer) {
+        ImageModel imageModel = beer.getImage().get();
+        Image imageComponent = createImageComponent(imageModel);
+        imageModel.setImageComponent(imageComponent);
+        imageRepository.save(imageModel);
     }
 
     @SneakyThrows
     public Result uploadImage(String path) {
         BufferedImage image = ImageIO.read(new File(path));
-        if(!areImageProportionsOk(image)) {
+        if (!areImageProportionsOk(image)) {
             throw new RuntimeException("Image's proportions are invalid");
         }
         byte[] bytes = Files.readAllBytes(Paths.get(path));
@@ -81,10 +99,10 @@ public class ImageService {
         double widthScaled = (double) width / 3;
         double heightScaled = (double) height / 3;
 
-        double heightExact = (widthScaled  * 700) / 300;
-        double heightVicinity = ((widthScaled  * 700) / 300) * 0.1;
+        double heightExact = (widthScaled * 7) / 3;
+        double heightVicinity = heightExact * 0.2;
 
-        if(heightScaled >= heightExact - heightVicinity && heightScaled <= heightExact + heightVicinity) {
+        if (heightScaled >= heightExact - heightVicinity && heightScaled <= heightExact + heightVicinity) {
             return true;
         }
         return false;

@@ -32,15 +32,4 @@ public class ImageModel {
     @MapsId
     @JoinColumn(name = "beer_id")
     private Beer beer;
-
-    public Image getImageComponent() {
-        if(imageComponent == null) {
-            setImageComponent();
-        }
-        return imageComponent;
-    }
-
-    public void setImageComponent() {
-        this.imageComponent = new Image(this.imageUrl, "No image");
-    }
 }
