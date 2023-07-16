@@ -226,7 +226,7 @@ public class BeerPriceTests {
             List<BeerPriceResponseDTO> expected = store.getPrices().stream()
                     .map(BeerPriceResponseDTO::new)
                     .toList();
-            assertThat(actual.toArray()).isEqualTo(expected.toArray());
+            assertThat(actual).hasSameElementsAs(expected);
         }
 
         @Test
