@@ -6,7 +6,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 
 public abstract class FormTemplate<REQUEST> extends FormLayout {
@@ -27,7 +26,7 @@ public abstract class FormTemplate<REQUEST> extends FormLayout {
 
     protected FormTemplate(Class<REQUEST> type) {
         this.type = type;
-        binder = new BeanValidationBinder<>(type);
+        binder = new Binder<>(type);
     }
 
     protected Component createButtonLayout() {

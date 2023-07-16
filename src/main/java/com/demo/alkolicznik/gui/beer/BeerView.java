@@ -14,6 +14,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -22,6 +25,8 @@ import java.util.Optional;
 @PageTitle("Baza piw | Alkolicznik")
 @PermitAll
 public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
+
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     private BeerService beerService;
     private BeerForm wizard;
@@ -123,6 +128,9 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     }
 
     private void deleteBeer(BeerForm.DeleteEvent event) {
+        if (!validate(event)) {
+            return;
+        }
         try {
             beerService.delete(event.getBeer());
         } catch (BeerNotFoundException e) {
@@ -133,29 +141,50 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         closeEditor();
     }
 
+    private boolean validate(BeerForm.BeerEditFormEvent event) {
+        var request = event.getBeer();
+        String errorMessage = getErrorMessage(request);
+        System.out.println(errorMessage);
+        if (!errorMessage.isEmpty()) {
+            showError(errorMessage);
+            return false;
+        }
+        return true;
+    }
+
     private void createBeer(BeerForm.CreateEvent event) {
+        if (!validate(event)) {
+            return;
+        }
         try {
             beerService.add(event.getBeer());
         } catch (BeerAlreadyExistsException e) {
-            Notification.show("Piwo już istnieje", 4000, Notification.Position.BOTTOM_END);
+            showError(e.getMessage());
             return;
         }
         updateList();
         closeEditor();
     }
 
+    private void showError(String message) {
+        Notification.show(message, 4000, Notification.Position.BOTTOM_END);
+    }
+
     private void updateBeer(BeerForm.UpdateEvent event) {
         Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
         if (selection.isEmpty()) {
-            Notification.show("Nie zaznaczyłeś piwa do aktualizacji", 4000, Notification.Position.BOTTOM_END);
+            showError("First select the beer to update from the grid");
             return;
         }
         Long beerToUpdateId = selection.get().getId();
         BeerUpdateDTO newItem = convertToUpdate(event.getBeer());
+        if (!validate(event)) {
+            return;
+        }
         try {
             beerService.update(beerToUpdateId, newItem);
         } catch (ObjectsAreEqualException e) {
-            Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
+            showError(e.getMessage());
             return;
         }
         updateList();
@@ -168,5 +197,14 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         } catch (ImageNotFoundException e) {
             return null;
         }
+    }
+
+    private String getErrorMessage(Object object) {
+        var errors = validator.validate(object);
+        ConstraintViolation violation = errors.stream().findFirst().orElse(null);
+        if (violation == null) {
+            return "";
+        }
+        return violation.getMessage();
     }
 }
