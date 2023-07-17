@@ -25,6 +25,7 @@ import java.util.Set;
 public class JsonUtils {
 
     private static ObjectMapper mapper = new ObjectMapper();
+    private static final String EXTERNAL_IMG_URL = "https://ik.imagekit.io/icemajor/test/tr:n-get_beer/";
 
     public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
@@ -51,37 +52,53 @@ public class JsonUtils {
         return createStoreResponse(store.getId(), store.getName(), store.getCity(), store.getStreet());
     }
 
-    public static BeerResponseDTO createBeerResponse(Long id, String brand, String type, Double volume, ImageModel image) {
+    public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageModelResponseDTO imageDTO) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
         response.setBrand(brand);
         response.setType(type);
         response.setVolume(volume);
-        if (image != null) {
-            response.setImage(new ImageModelResponseDTO(image));
-        }
+        response.setImage(imageDTO);
         return response;
     }
 
-    public static BeerResponseDTO createBeerResponse(Long id, String brand, String type, Double volume) {
+    public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume) {
         return createBeerResponse(id, brand, type, volume, null);
     }
 
     public static BeerResponseDTO createBeerResponse(Beer beer) {
-        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(), beer.getImage().orElse(null));
+        return createBeerResponse(
+                beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(),
+                createImageResponse(beer.getImage().orElse(null))
+        );
+    }
+
+    /**
+     * Specify only uploaded filename without the path.
+     */
+    public static ImageModelResponseDTO createImageResponse(String imgName) {
+        return new ImageModelResponseDTO(EXTERNAL_IMG_URL + imgName);
     }
 
     public static ImageModelResponseDTO createImageResponse(ImageModel image) {
-        ImageModelResponseDTO response = new ImageModelResponseDTO();
-        response.setImageUrl(image.getImageUrl());
-        return response;
+        if (image != null) {
+            ImageModelResponseDTO response = new ImageModelResponseDTO();
+            response.setImageUrl(image.getImageUrl());
+            return response;
+        }
+        return null;
     }
 
     public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
+        return createBeerRequest(brand, type, volume, null);
+    }
+
+    public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume, String imagePath) {
         BeerRequestDTO request = new BeerRequestDTO();
         request.setBrand(brand);
         request.setType(type);
         request.setVolume(volume);
+        request.setImagePath(imagePath);
         return request;
     }
 

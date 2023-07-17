@@ -2,6 +2,7 @@ package com.demo.alkolicznik.utils.requests;
 
 import com.demo.alkolicznik.api.BeerPriceTests;
 import com.demo.alkolicznik.api.BeerTests;
+import com.demo.alkolicznik.api.ImageModelTests;
 import com.demo.alkolicznik.api.StoreTests;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,10 @@ public class MockRequests {
     private static MockMvc mockMvc;
 
     private static void initMockMvc() {
+        if(ImageModelTests.mockMvc != null) {
+            mockMvc = ImageModelTests.mockMvc;
+            return;
+        }
         if (StoreTests.mockMvc != null) {
             mockMvc = StoreTests.mockMvc;
             return;
@@ -53,6 +58,19 @@ public class MockRequests {
         try {
             return mockMvc.perform(
                     put(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJsonString(request))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ResultActions mockPostRequest(String url, Object request) {
+        initMockMvc();
+        try {
+            return mockMvc.perform(
+                    post(url)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(toJsonString(request))
             );

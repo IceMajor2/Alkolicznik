@@ -146,7 +146,7 @@ public class BeerTests {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
             BeerResponseDTO expected = createBeerResponse(
-                    3L, "Tyskie", "Gronie", 0.5, getImage(3L, beers));
+                    3L, "Tyskie", "Gronie", 0.5, createImageResponse(getImage(3L, beers)));
             String expectedJson = toJsonString(expected);
 
             String actualJson = assertMockRequest(
@@ -174,7 +174,8 @@ public class BeerTests {
         public void updateBrandTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
-            BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.65, getImage(3L, beers));
+            BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.65,
+                    createImageResponse(getImage(3L, beers)));
             String expectedJson = toJsonString(expected);
 
             String actualJson = assertMockRequest(
@@ -230,7 +231,8 @@ public class BeerTests {
         public void updateRemoveTypeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null);
 
-            BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5, getImage(6L, beers));
+            BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5,
+                    createImageResponse(getImage(6L, beers)));
             String expectedJson = toJsonString(expected);
 
             String actualJson = assertMockRequest(
@@ -258,7 +260,8 @@ public class BeerTests {
         public void updateAddTypeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
 
-            BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5, getImage(4L, beers));
+            BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5,
+                    createImageResponse(getImage(4L, beers)));
             String expectedJson = toJsonString(expected);
 
             String actualJson = assertMockRequest(
