@@ -142,7 +142,7 @@ public class BeerTests {
         @DisplayName("PUT: '/api/beer/{beer_id}' volume update")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerVolumeTest() {
+        public void updateVolumeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
             BeerResponseDTO expected = createBeerResponse(
@@ -171,7 +171,7 @@ public class BeerTests {
         @DisplayName("PUT: '/api/beer/{beer_id}' brand update")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerBrandTest() {
+        public void updateBrandTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 
             BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.65, getImage(3L, beers));
@@ -199,7 +199,7 @@ public class BeerTests {
         @DisplayName("PUT: '/api/beer/{beer_id}' type update")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void updateBeerTypeTest() {
+        public void updateTypeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
 
             BeerResponseDTO expected = createBeerResponse(2L, "Ksiazece", "IPA", 0.5);
@@ -224,8 +224,64 @@ public class BeerTests {
         }
 
         @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' remove type")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateRemoveTypeTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null);
+
+            BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5, getImage(6L, beers));
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/beer/6", request),
+                    HttpStatus.OK,
+                    expectedJson
+            );
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+
+            var getResponse = getRequest("/api/beer/6");
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' add type")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateAddTypeTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
+
+            BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5, getImage(4L, beers));
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/beer/4", request),
+                    HttpStatus.OK,
+                    expectedJson
+            );
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+
+            var getResponse = getRequest("/api/beer/4");
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [NO_PROPERTY_SPECIFIED]")
-        public void updateBeerEmptyRequestTest() {
+        public void updateWithEmptyBodyTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
 
@@ -241,7 +297,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [VOLUME_NON_POSITIVE]")
-        public void updateBeerVolumeNegativeAndZeroRequestTest() {
+        public void updateVolumeNonPositiveTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
@@ -269,7 +325,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
-        public void updateBeerNotExistsRequestTest() {
+        public void updateBeerNotFoundTest() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/321", request);
 
@@ -285,7 +341,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [BRAND_BLANK]")
-        public void updateBeerBrandBlankRequestTest() {
+        public void updateBrandBlankTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
@@ -313,7 +369,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME]")
-        public void updateBeerUnchangedTest() {
+        public void updateNothingToChangeTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
@@ -328,36 +384,8 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("PUT: '/api/beer/{beer_id}' remove type")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void updateBeerSetTypeToNullTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
-
-            BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5, getImage(6L, beers));
-            String expectedJson = toJsonString(expected);
-
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/beer/6", request),
-                    HttpStatus.OK,
-                    expectedJson
-            );
-            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-
-            var getResponse = getRequest("/api/beer/6");
-
-            actualJson = getResponse.getBody();
-            actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
-        }
-
-        @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME] (2)")
-        public void updateBeerUnchangedTwoTest() {
+        public void updateNothingWasChangedTest() {
             BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
@@ -372,31 +400,19 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("PUT: '/api/beer/{beer_id}' add type")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void updateBeerWithTypeNullTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
+        @DisplayName("PUT: '/api/beer/{beer_id}' [BEER_EXISTS]")
+        public void updateBeerAlreadyExistsTest() {
+            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer/3", request);
 
-            BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5, getImage(4L, beers));
-            String expectedJson = toJsonString(expected);
+            String jsonResponse = putResponse.getBody();
 
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/beer/4", request),
+            assertIsError(
+                    jsonResponse,
                     HttpStatus.OK,
-                    expectedJson
+                    "Such beer already exists",
+                    "/api/beer/3"
             );
-            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-
-            var getResponse = getRequest("/api/beer/4");
-
-            actualJson = getResponse.getBody();
-            actual = toModel(actualJson, BeerResponseDTO.class);
-
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
         }
     }
 
