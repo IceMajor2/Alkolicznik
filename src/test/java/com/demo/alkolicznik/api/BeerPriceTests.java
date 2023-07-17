@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
@@ -35,7 +35,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConfig.class)
+@Import(DisabledVaadinContext.class)
 @AutoConfigureMockMvc
 public class BeerPriceTests {
 

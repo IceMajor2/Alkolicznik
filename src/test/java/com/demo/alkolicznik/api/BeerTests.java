@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
@@ -32,7 +32,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConfig.class)
+@Import(DisabledVaadinContext.class)
 @AutoConfigureMockMvc
 public class BeerTests {
 
@@ -723,7 +723,7 @@ public class BeerTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
-                    "Brand was not specified Volume must be a positive number",
+                    "Brand was not specified; Volume must be a positive number",
                     "/api/beer");
         }
     }

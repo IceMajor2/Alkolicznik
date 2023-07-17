@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -26,7 +24,6 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConfig.class)
 public class SecuredEndpointTests {
 
     @Autowired

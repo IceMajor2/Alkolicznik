@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConfig.class)
+@Import(DisabledVaadinContext.class)
 public class ImageModelTests {
 
     @Autowired

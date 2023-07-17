@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.TestConfig;
 import com.demo.alkolicznik.dto.responses.UserResponseDTO;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -24,7 +22,6 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequ
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConfig.class)
 public class UserTests {
 
     @Autowired
@@ -72,6 +69,7 @@ public class UserTests {
     @DisplayName("Assert password encoding")
     @DirtiesContext
     public void whenCreateUser_thenPasswordMustBeEncodedTest() {
+        // no need to create new user: just fetch already existing from db. [FIX_HERE]
         String pass = getRandomPassword();
         var postResponse = postRequestAuth("admin", "admin",
                 "/api/auth/signup",
@@ -86,6 +84,7 @@ public class UserTests {
     @Test
     @DisplayName("Assert password conditions constraints")
     @DirtiesContext
+    // no need to create new user: just fetch already existing from db. [FIX_HERE]
     public void whenCreateUser_thenCheckPasswordIsStrongEnoughTest() {
         String pass = "stringstrin";
         var postResponse = postRequestAuth("admin", "admin",
