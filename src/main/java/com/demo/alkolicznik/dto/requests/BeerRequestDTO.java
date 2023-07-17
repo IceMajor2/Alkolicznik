@@ -17,10 +17,11 @@ public class BeerRequestDTO {
 
     @NotBlank(message = "Brand was not specified")
     private String brand;
-//    @NotBlankIfExists(message = "Type was not specified")
     private String type;
     @Positive(message = "Volume must be a positive number")
     private Double volume = 0.5;
+    // TODO: Add regex
+    private String imagePath;
 
     public Beer convertToModel() {
         Beer beer = new Beer();
