@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.dto.requests;
 
-import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +17,7 @@ public class BeerRequestDTO {
 
     @NotBlank(message = "Brand was not specified")
     private String brand;
-    @NotBlankIfExists(message = "Type was not specified")
+//    @NotBlankIfExists(message = "Type was not specified")
     private String type;
     @Positive(message = "Volume must be a positive number")
     private Double volume = 0.5;
@@ -45,5 +44,13 @@ public class BeerRequestDTO {
             sb.append(this.type);
         }
         return sb.toString();
+    }
+
+    public void setType(String type) {
+        if(type != null && type.isBlank()) {
+            this.type = null;
+            return;
+        }
+        this.type = type;
     }
 }
