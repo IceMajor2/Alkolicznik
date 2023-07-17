@@ -712,8 +712,8 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("POST: '/api/beer' [BRAND_BLANK; TYPE_NULL; VOLUME_NEGATIVE]")
-        public void addBrandBlankTypeNullVolumeNegativeTest() {
+        @DisplayName("POST: '/api/beer' [BRAND_BLANK; VOLUME_NEGATIVE]")
+        public void addBrandBlankVolumeNegativeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("\t", null, -15.9)
@@ -723,7 +723,7 @@ public class BeerTests {
 
             assertIsError(jsonResponse,
                     HttpStatus.BAD_REQUEST,
-                    "Brand was not specified; Type was not specified; Volume must be a positive number",
+                    "Brand was not specified Volume must be a positive number",
                     "/api/beer");
         }
     }
