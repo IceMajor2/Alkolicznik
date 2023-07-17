@@ -28,7 +28,7 @@ public class ImageModelTests {
     class GetRequests {
 
         @Test
-        @DisplayName("GET: '/api/beer/{beer_id}/image")
+        @DisplayName("GET: '/api/beer/{beer_id}/image'")
         public void whenUserGetsBeerImage_returnOKTest() {
             ImageModelResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage().get());
             String expectedJson = toJsonString(expected);

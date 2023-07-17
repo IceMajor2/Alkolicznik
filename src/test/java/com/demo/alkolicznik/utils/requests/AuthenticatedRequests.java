@@ -27,12 +27,16 @@ public class AuthenticatedRequests {
                 .getForEntity(url, String.class);
     }
 
+    public static ResponseEntity<String> getRequestAuth(String username, String password, String url, Map<String, ?> parameters) {
+        String urlTemplate = buildURI(url, parameters);
+        return getRequestAuth(username, password, urlTemplate);
+    }
+
     public static ResponseEntity<String> postRequestAuth(String username, String password, String url,
                                                          Object requestObject) {
-        ResponseEntity<String> postResponse = restTemplate
+        return restTemplate
                 .withBasicAuth(username, password)
                 .postForEntity(url, requestObject, String.class);
-        return postResponse;
     }
 
     public static ResponseEntity<String> postRequestAuth(String username, String password, String url,
@@ -44,43 +48,32 @@ public class AuthenticatedRequests {
     }
 
     public static ResponseEntity<String> putRequestAuth(String username, String password, String url, Object request) {
-        ResponseEntity<String> putResponse = restTemplate
+        return restTemplate
                 .withBasicAuth(username, password)
                 .exchange(url, HttpMethod.PUT, new HttpEntity(request), String.class);
-        return putResponse;
     }
 
     public static ResponseEntity<String> putRequestAuth(String username, String password, String url,
                                                         Object request, Map<String, ?> parameters) {
         String urlTemplate = buildURI(url, parameters);
-
-        ResponseEntity<String> putResponse = restTemplate
-                .withBasicAuth(username, password)
-                .exchange(urlTemplate, HttpMethod.PUT, new HttpEntity(request), String.class);
-        return putResponse;
+        return putRequestAuth(username, password, urlTemplate, request);
     }
 
     public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url) {
-        ResponseEntity<String> deleteResponse = restTemplate
+        return restTemplate
                 .withBasicAuth(username, password)
                 .exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
-        return deleteResponse;
     }
 
     public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url,
                                                            Map<String, ?> parameters) {
         String urlTemplate = buildURI(url, parameters);
-
-        ResponseEntity<String> deleteResponse = restTemplate
-                .withBasicAuth(username, password)
-                .exchange(urlTemplate, HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
-        return deleteResponse;
+        return deleteRequestAuth(username, password, urlTemplate);
     }
 
     public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url, Object request) {
-        ResponseEntity<String> deleteResponse = restTemplate
+        return restTemplate
                 .withBasicAuth(username, password)
                 .exchange(url, HttpMethod.DELETE, new HttpEntity<>(request), String.class);
-        return deleteResponse;
     }
 }

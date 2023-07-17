@@ -114,11 +114,9 @@ public class BeerTests {
         @DisplayName("GET: '/api/beer?city' city empty")
         @WithUserDetails("admin")
         public void getAllInCityEmptyTest() {
-            var response = assertMockRequest(
-                    mockGetRequest("/api/beer", Map.of("city", "Gdansk")),
-                    HttpStatus.OK,
-                    "{}"
-            );
+            var response = getRequestAuth("admin", "admin", "/api/beer", Map.of("city", "Gdansk"));
+
+            assertThat(response.getBody()).isEqualTo("[]");
         }
 
         @Test
