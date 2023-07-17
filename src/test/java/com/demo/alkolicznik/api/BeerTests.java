@@ -20,12 +20,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getImage;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -54,7 +54,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("GET: '/api/beer/{beer_id}")
-        public void getBeerTest() {
+        public void getTest() {
             var getResponse = getRequest("/api/beer/1");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -69,7 +69,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("GET: '/api/beer/{beer_id} [BEER_NOT_FOUND]")
-        public void getBeerNotExistingStatusCheckTest() {
+        public void getNotExistingTest() {
             var getResponse = getRequest("/api/beer/9999");
 
             String jsonResponse = getResponse.getBody();
@@ -81,12 +81,51 @@ public class BeerTests {
         }
 
         @Test
+        @DisplayName("GET: '/api/beer?city'")
+        public void getAllInCityTest() {
+            var beersInCity = getBeersInCity("Olsztyn", beers);
+            var response = mapToDTO(beersInCity);
+            String expectedJson = toJsonString(response);
+
+            assertMockRequest(mockGetRequest("/api/beer",
+                            Map.of("city", "Olsztyn")
+                    ),
+                    HttpStatus.OK,
+                    expectedJson);
+        }
+
+        @Test
+        @DisplayName("GET: '/api/beer?city' [CITY_NOT_FOUND]")
+        @WithUserDetails("admin")
+        public void getAllInCityNotExistsTest() {
+            var getResponse = getRequest("/api/beer", Map.of("city", "Jerzwald"));
+
+            String jsonResponse = getResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "No such city: 'Jerzwald'",
+                    "/api/beer"
+            );
+        }
+
+        @Test
+        @DisplayName("GET: '/api/beer?city' city empty")
+        @WithUserDetails("admin")
+        public void getAllInCityEmptyTest() {
+            var response = assertMockRequest(
+                    mockGetRequest("/api/beer", Map.of("city", "Gdansk")),
+                    HttpStatus.OK,
+                    "{}"
+            );
+        }
+
+        @Test
         @DisplayName("GET: '/api/beer'")
         @WithUserDetails("admin")
-        public void getBeerAllArrayAuthorizedTest() {
-            List<BeerResponseDTO> expected = beers.stream()
-                    .map(BeerResponseDTO::new)
-                    .toList();
+        public void getAllTest() {
+            List<BeerResponseDTO> expected = mapToDTO(beers);
             String expectedJson = toJsonString(expected);
 
             String actualJson = assertMockRequest(mockGetRequest("/api/beer"),
@@ -737,6 +776,12 @@ public class BeerTests {
                     "/api/beer/0"
             );
         }
+    }
+
+    private List<BeerResponseDTO> mapToDTO(List<Beer> beers) {
+        return beers.stream()
+                .map(BeerResponseDTO::new)
+                .toList();
     }
 }
 
