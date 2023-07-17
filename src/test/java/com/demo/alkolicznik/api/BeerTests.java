@@ -36,7 +36,7 @@ public class BeerTests {
     class GetRequests {
 
         @Test
-        @DisplayName("Get beer of valid id")
+        @DisplayName("GET: '/api/beer/{beer_id}")
         public void getBeerTest() {
             var getResponse = getRequest("/api/beer/1");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -51,7 +51,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Get beer of invalid id")
+        @DisplayName("GET: '/api/beer/{beer_id} [BEER_NOT_FOUND]")
         public void getBeerNotExistingStatusCheckTest() {
             var getResponse = getRequest("/api/beer/9999");
 
@@ -68,7 +68,7 @@ public class BeerTests {
     class PostRequests {
 
         @Test
-        @DisplayName("Create and get valid beer: BRAND")
+        @DisplayName("POST: '/api/beer'")
         @DirtiesContext
         public void createBeerTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -95,7 +95,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create and get valid beer: BRAND, VOLUME")
+        @DisplayName("POST: '/api/beer' brand and volume only")
         @DirtiesContext
         public void createBeerWithCustomVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -122,7 +122,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create and get valid beer: BRAND, TYPE")
+        @DisplayName("POST: '/api/beer' brand and type only")
         @DirtiesContext
         public void createBeerWithTypePresentTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -150,7 +150,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create and get valid beer: BRAND, TYPE, VOLUME")
+        @DisplayName("POST: '/api/beer' everything specified")
         @DirtiesContext
         public void createBeerWithCustomVolumeAndTypePresentTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -178,7 +178,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create and get valid beer: ALREADY_EXISTS but different VOLUME")
+        @DisplayName("POST: '/api/beer' brand & type existing, volume unique")
         @DirtiesContext
         public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -206,7 +206,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: TYPE present but blank")
+        @DisplayName("POST: '/api/beer' [TYPE_BLANK]")
         // @DirtiesContext
         public void createBeerWithPresentButBlankTypeStatusCheckTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -222,7 +222,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: VOLUME negative and equal to zero")
+        @DisplayName("POST: '/api/beer' [VOLUME_NON_POSITIVE]")
         // @DirtiesContext
         public void createBeerWithNegativeVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -251,7 +251,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: BRAND null")
+        @DisplayName("POST: '/api/beer' [BRAND_NULL]")
         // @DirtiesContext
         public void createBeerWithNoBrandTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -268,7 +268,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: BRAND blank")
+        @DisplayName("POST: '/api/beer' [BRAND_BLANK]")
         // @DirtiesContext
         public void createBeerWithBlankBrandTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -297,7 +297,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: TYPE blank")
+        @DisplayName("POST: '/api/beer' [TYPE_BLANK]")
         // @DirtiesContext
         public void createBeerWithBlankType() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -326,7 +326,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: ALREADY_EXISTS")
+        @DisplayName("POST: '/api/beer' [BEER_EXISTS]")
         // @DirtiesContext
         public void createBeerAlreadyPresentTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -355,7 +355,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("Create invalid beer: BRAND null, TYPE blank, VOLUME negative")
+        @DisplayName("POST: '/api/beer' [BRAND_NULL; TYPE_BLANK; VOLUME_NEGATIVE]")
         // @DirtiesContext
         public void createBeerBrandNullTypeBlankVolumeNegativeTest() {
             var postResponse = postRequestAuth("admin", "admin",

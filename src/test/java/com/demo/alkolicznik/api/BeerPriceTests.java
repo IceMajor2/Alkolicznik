@@ -41,7 +41,7 @@ public class BeerPriceTests {
     class GetRequests {
 
         @Test
-        @DisplayName("Get beer prices of city")
+        @DisplayName("GET: '/api/beer-price' of city")
         public void getBeerPricesFromCityTest() {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -63,7 +63,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices of beer")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' of beer")
         public void getBeerPricesOfBeerTest() {
             var getResponse = getRequest("/api/beer/3/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -81,7 +81,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices of beer: BEER_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' [BEER_NOT_FOUND]")
         public void getBeerPricesOfBeerNotExistsTest() {
             var getResponse = getRequest("/api/beer/333/beer-price");
 
@@ -94,7 +94,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer price")
+        @DisplayName("GET: '/api/beer-price'")
         public void getBeerPriceTest() {
             var getResponse = getRequest("/api/beer-price",
                     Map.of("store_id", 3L, "beer_id", 3L));
@@ -114,7 +114,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer price of defined beer in a city")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city")
         public void getBeersPriceInCityTest() {
             var getResponse = getRequest("/api/beer/2/beer-price", Map.of("city", "Warszawa"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -133,7 +133,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get invalid beer price of defined beer in a city: BEER_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city [BEER_NOT_FOUND]")
         public void getBeersPriceInCityBeerNotExistsTest() {
             var getResponse = getRequest("/api/beer/10/beer-price", Map.of("city", "Gdansk"));
 
@@ -146,7 +146,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get invalid beer price of defined beer in a city: CITY_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city [CITY_NOT_FOUND]")
         public void getBeersPriceInCityCityNotExistsTest() {
             var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", "Ciechocinek"));
 
@@ -159,7 +159,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get valid beer price of defined beer in a city: city EXISTS but EMPTY")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' of empty city")
         public void getBeersPriceInCityCityEmptyTest() {
             var getResponse = getRequest("/api/beer/4/beer-price", Map.of("city", "Gdansk"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -172,7 +172,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer price: STORE_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer/{beer_id}/beer-price' [STORE_NOT_FOUND]")
         public void getBeerPriceStoreNotExistsTest() {
             var getResponse = getRequest("/api/beer-price",
                     Map.of("store_id", 95L, "beer_id", 3L));
@@ -186,7 +186,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer price: BEER_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer-price' [BEER_NOT_FOUND]")
         public void getBeerPriceBeerNotExistsTest() {
             var getResponse = getRequest("/api/beer-price",
                     Map.of("store_id", 5L, "beer_id", 35L));
@@ -200,7 +200,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer price: BEER_PRICE_NOT_EXISTS")
+        @DisplayName("GET: '/api/beer-price' [STORE_NOT_SELL]")
         public void getBeerPriceNotExistsTest() {
             var getResponse = getRequest("/api/beer-price",
                     Map.of("store_id", 3L, "beer_id", 4L));
@@ -214,7 +214,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices from store")
+        @DisplayName("GET: '/api/store/{store_id}/beer-price'")
         public void getBeerPricesFromStoreTest() {
             var getResponse = getRequest("/api/store/3/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -232,7 +232,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices from non-existing store")
         public void getBeerPricesFromStoreNotExistsTest() {
-            var getResponse = getRequest("/api/store/8/beer-price");
+            var getResponse = getRequest("GET: '/api/store/{store_id}/beer-price' [STORE_NOT_FOUND]");
 
             String jsonResponse = getResponse.getBody();
 
@@ -243,7 +243,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices of empty store")
+        @DisplayName("GET: '/api/store/{store_id}/beer-price' of store empty")
         public void getBeerPricesFromStoreEmptyTest() {
             var getResponse = getRequest("/api/store/7/beer-price");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -255,7 +255,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices of empty city")
+        @DisplayName("GET: '/api/beer-price' of empty city")
         public void getBeerPricesFromCityEmptyTest() {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -267,7 +267,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Get beer prices of non-existing city")
+        @DisplayName("GET: '/api/beer-price' [CITY_NOT_FOUND]")
         public void getBeerPricesFromCityNotExistsTest() {
             var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
 
@@ -284,7 +284,7 @@ public class BeerPriceTests {
     class PostRequestsParam {
 
         @Test
-        @DisplayName("Add valid beer price (ID) to store")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (params)")
         @DirtiesContext
         public void addBeerPriceIdTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -315,7 +315,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price (ID) to store: STORE_NOT_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [STORE_NOT_EXISTS]")
         public void addBeerPriceIdStoreNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/9999/beer-price",
@@ -330,7 +330,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price (ID) to store: PRICE negative and zero")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [VOLUME_NON_POSITIVE]")
         public void addBeerPriceIdVolumeNegativeAndZeroTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/2/beer-price",
@@ -356,7 +356,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price (ID) to store: BEER_NOT_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [BEER_NOT_FOUND]")
         public void addBeerPriceIdBeerNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/1/beer-price",
@@ -371,7 +371,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price (ID) to store: BEER_PRICE_ALREADY_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [BEER_PRICE_EXISTS]")
         public void addBeerPriceIdAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/1/beer-price",
@@ -390,7 +390,7 @@ public class BeerPriceTests {
     class PostRequestsObject {
 
         @Test
-        @DisplayName("Add valid beer price to store: ALL")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto)")
         @DirtiesContext
         public void addBeerPriceToStoreTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -421,7 +421,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add valid beer price to store: ALL (1-piece name)")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) (2)")
         @DirtiesContext
         public void addBeerPriceToStoreTest2() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -452,7 +452,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add valid beer price to store: VOLUME not specified")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) with no volume")
         @DirtiesContext
         public void addBeerPriceToStoreDefaultVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -482,7 +482,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BEER_PRICE_ALREADY_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_PRICE_EXISTS]")
         public void addBeerPriceAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/1/beer-price",
@@ -497,7 +497,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS (different volume)")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_OF_DIFFERENT_VOL]")
         public void createBeerPriceBeerExistsButDifferentVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/2/beer-price",
@@ -512,7 +512,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: VOLUME negative and equal to zero")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [VOLUME_NON_POSITIIVE]")
         public void createBeerPriceNegativeAndZeroVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/6/beer-price",
@@ -538,7 +538,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BRAND null")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BRAND_NULL]")
         public void createBeerPriceBrandNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/5/beer-price",
@@ -553,7 +553,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BRAND blank and empty")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BRAND_BLANK]")
         public void createBeerPriceBrandBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/5/beer-price",
@@ -579,7 +579,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: PRICE null")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [PRICE_NULL]")
         public void createBeerPriceNegativeAndZeroPriceTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/2/beer-price",
@@ -605,7 +605,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BRAND null, VOLUME zero, PRICE negative")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_NOT_SPECIFIED; PRICE_ZERO, VOLUME_NEGATIVE]")
         public void createBeerPricePriceNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/2/beer-price",
@@ -620,7 +620,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add invalid beer price to store: BEER_NOT_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_NOT_FOUND]")
         public void createBeerPriceBeerNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store/4/beer-price",
@@ -635,7 +635,7 @@ public class BeerPriceTests {
         }
 
         @Test
-        @DisplayName("Add valid beer price to invalid store: STORE_NOT_EXISTS")
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [STORE_NOT_FOUND]")
         @DirtiesContext
         public void createBeerPriceStoresNotExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",

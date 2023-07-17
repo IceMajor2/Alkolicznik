@@ -32,7 +32,7 @@ public class StoreTests {
     class GetRequests {
 
         @Test
-        @DisplayName("Get store of valid id")
+        @DisplayName("GET: '/api/store/{store_id}'")
         public void getStoreTest() {
             var getResponse = getRequest("/api/store/3");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -47,7 +47,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Get store of invalid id")
+        @DisplayName("GET: '/api/store/{store_id}' [STORE_NOT_FOUND]")
         public void getStoreNotExistingTest() {
             var getResponse = getRequest("/api/store/9999");
 
@@ -60,7 +60,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Get stores of city in array")
+        @DisplayName("GET: '/api/store' of city")
         public void getStoreFromCityArrayTest() {
             var getResponse = getRequest("/api/store", Map.of("city", "Warszawa"));
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -76,7 +76,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Get stores of non-existing city in array")
+        @DisplayName("GET: '/api/store/{store_id}' of city [CITY_NOT_FOUND]")
         public void getStoreFromCityNotExistsArrayTest() {
             var getResponse = getRequest("/api/store", Map.of("city", "Ciechanow"));
 
@@ -93,7 +93,7 @@ public class StoreTests {
     class PostRequests {
 
         @Test
-        @DisplayName("Create and get valid store")
+        @DisplayName("POST: '/api/store'")
         @DirtiesContext
         public void createStoreTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -120,7 +120,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: NAME null")
+        @DisplayName("POST: '/api/store' [NAME_NULL]")
         // @DirtiesContext
         public void createStoreNameNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -132,7 +132,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: NAME blank & NAME empty")
+        @DisplayName("POST: '/api/store' [NAME_BLANK]")
         // @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -151,7 +151,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: CITY null")
+        @DisplayName("POST: '/api/store' [CITY_NULL]")
         // @DirtiesContext
         public void createStoreCityNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -164,7 +164,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: CITY blank & empty")
+        @DisplayName("POST: '/api/store' [CITY_BLANK]")
         // @DirtiesContext
         public void createStoreCityBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -185,7 +185,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: STREET null")
+        @DisplayName("POST: '/api/store' [STREET_NULL]")
         // @DirtiesContext
         public void createStoreStreetNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -198,7 +198,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: STREET blank & empty")
+        @DisplayName("POST: '/api/store' [STREET_BLANK]")
         // @DirtiesContext
         public void createStoreStreetBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -219,7 +219,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: ALREADY_EXISTS")
+        @DisplayName("POST: '/api/store' [STORE_EXISTS]")
         // @DirtiesContext
         public void createStoreAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
@@ -231,7 +231,7 @@ public class StoreTests {
         }
 
         @Test
-        @DisplayName("Create invalid store: NAME blank, CITY null, STREET empty")
+        @DisplayName("POST: '/api/store' [NAME_BLANK; STREET_NULL; STREET_EMPTY]")
         // @DirtiesContext
         public void createStoreNameBlankCityNullStreetEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",

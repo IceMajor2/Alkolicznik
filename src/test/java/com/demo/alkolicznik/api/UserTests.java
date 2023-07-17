@@ -42,7 +42,7 @@ public class UserTests {
     }
 
     @Test
-    @DisplayName("Create a user")
+    @DisplayName("POST: '/api/auth/signup'")
     @DirtiesContext
     public void whenCreateValidUser_thenSuccessTest() {
         String pass = getRandomPassword();
@@ -107,7 +107,7 @@ public class UserTests {
     }
 
     @Test
-    @DisplayName("Invalid create user: USER_ALREADY_EXISTS")
+    @DisplayName("POST: '/api/auth/signup' [USER_EXISTS]")
     public void whenCreateUserThatAlreadyExists_thenThrowExceptionTest() {
         String pass = getRandomPassword();
         var postResponse = postRequestAuth("admin", "admin",

@@ -39,7 +39,7 @@ public class SecuredEndpointTests {
     class BeerController {
 
         @Test
-        @DisplayName("ANONYMOUS: get beers")
+        @DisplayName("ANONYMOUS: GET '/api/beer'")
         public void whenAnonGetsBeers_thenReturn404Test() {
             var getResponse = getRequest("/api/beer");
 
@@ -49,7 +49,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: creates beer")
+        @DisplayName("ANONYMOUS: POST '/api/beer'")
         public void whenAnonCreatesBeer_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
             var postResponse = postRequest("/api/beer", request);
@@ -60,7 +60,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: update beer")
+        @DisplayName("ANONYMOUS: PUT '/api/beer/{beer_id}'")
         public void whenAnonUpdatesBeer_thenReturn404Test() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
             var putResponse = putRequest("/api/beer/2", request);
@@ -76,7 +76,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: delete beer (id)")
+        @DisplayName("ANONYMOUS: DELETE '/api/beer/{beer_id}' (params)")
         public void whenAnonDeletesBeer_thenReturn404Test() {
             var deleteResponse = deleteRequest("/api/beer/2");
 
@@ -91,7 +91,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: delete beer (fields)")
+        @DisplayName("ANONYMOUS: DELETE '/api/beer' (object)")
         public void whenAnonDeletesBeerByFields_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(getBeer(3L, beers));
             var deleteResponse = deleteRequest("/api/beer", request);
@@ -107,7 +107,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("USER: get beers")
+        @DisplayName("USER: GET '/api/beer'")
         public void whenUserGetsBeers_thenReturn404Test() {
             var getResponse = getRequestAuth("user", "user", "/api/beer");
 
@@ -120,7 +120,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("USER: creates beer")
+        @DisplayName("USER: POST '/api/beer'")
         public void whenUserCreatesBeers_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
             var postResponse = postRequestAuth("user", "user", "/api/beer", request);
@@ -134,7 +134,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("USER: update beer")
+        @DisplayName("USER: PUT '/api/beer/{beer_id}'")
         public void whenUserUpdatesBeer_thenReturn404Test() {
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
             var putResponse = putRequestAuth("user", "user", "/api/beer/1", request);
@@ -148,7 +148,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("USER: delete beer (ID)")
+        @DisplayName("USER: DELETE '/api/beer/{beer_id}' (params)")
         public void whenUserDeletesBeer_thenReturn404Test() {
             var deleteResponse = deleteRequestAuth("user", "user",
                     "/api/beer/1");
@@ -162,7 +162,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("USER: delete beer (fields)")
+        @DisplayName("USER: DELETE '/api/beer' (object)")
         public void whenUserDeletesBeerByFields_thenReturn404Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
             var deleteResponse = deleteRequestAuth("user", "user", "/api/beer", request);
@@ -176,14 +176,14 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ACCOUNTANT: get beers")
+        @DisplayName("ACCOUNTANT: GET '/api/beer'")
         public void whenAccountantGetsBeers_thenReturn200Test() {
             var getResponse = getRequestAuth("accountant", "accountant", "/api/beer");
             assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         }
 
         @Test
-        @DisplayName("ACCOUNTANT: creates beer")
+        @DisplayName("ACCOUNTANT: POST '/api/beer'")
         public void whenAccountantCreatesBeer_thenReturn201Test() {
             BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", null);
             var postResponse = postRequestAuth("accountant", "accountant", "/api/beer", request);
@@ -191,7 +191,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ACCOUNTANT: update beer")
+        @DisplayName("ACCOUNTANT: PUT '/api/beer/{beer_id}'")
         public void whenAccountantUpdatesBeer_thenReturn204Test() {
             BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
             var putResponse = putRequestAuth("accountant", "accountant", "/api/beer/1", request);
@@ -199,14 +199,14 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ACCOUNTANT: delete beer (ID)")
+        @DisplayName("ACCOUNTANT: DELETE '/api/beer/{beer_id}' (params)")
         public void whenAccountantDeletesBeer_thenReturn200Test() {
             var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer/6");
             assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         }
 
         @Test
-        @DisplayName("ACCOUNTANT: delete beer (fields)")
+        @DisplayName("ACCOUNTANT: DELETE '/api/beer' (object)")
         public void whenAccountantDeletesBeerByFields_thenReturn200Test() {
             BeerRequestDTO request = createBeerRequest(beers.get(1));
             var deleteResponse = deleteRequestAuth("accountant", "accountant", "/api/beer", request);
@@ -234,7 +234,7 @@ public class SecuredEndpointTests {
     class StoreController {
 
         @Test
-        @DisplayName("ANONYMOUS: get stores")
+        @DisplayName("ANONYMOUS: GET '/api/store'")
         public void whenAnonGetsStores_thenReturn404Test() {
             var getResponse = getRequest("/api/store");
 
@@ -244,7 +244,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: update store")
+        @DisplayName("ANONYMOUS: PUT '/api/store/{store_id}'")
         public void whenAnonUpdatesStore_thenReturn404Test() {
             StoreUpdateDTO request = createStoreUpdateRequest("Lubi", null, null);
             var putResponse = putRequestAuth("user", "user", "/api/store/4", request);
@@ -260,7 +260,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: delete store")
+        @DisplayName("ANONYMOUS: DELETE '/api/store/{store_id}'")
         public void whenAnonDeletesStore_thenReturn404Test() {
             var deleteResponse = deleteRequestAuth("user", "user",
                     "/api/store/2");
@@ -307,7 +307,7 @@ public class SecuredEndpointTests {
     class BeerPriceController {
 
         @Test
-        @DisplayName("ANONYMOUS: get prices")
+        @DisplayName("ANONYMOUS: GET '/api/beer-price'")
         public void whenAnonGetsPrices_thenReturn404Test() {
             var getResponse = getRequest("/api/beer-price");
 
@@ -326,7 +326,7 @@ public class SecuredEndpointTests {
 //        @DisplayName("ANONYMOUS: create price by URL parameters")
 
         @Test
-        @DisplayName("ANONYMOUS: update price")
+        @DisplayName("ANONYMOUS: PUT '/api/beer-price'")
         public void whenAnonUpdatesPrice_thenReturn404Test() {
             BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(7.89);
             var putResponse = putRequestAuth("user", "user",
@@ -343,7 +343,7 @@ public class SecuredEndpointTests {
         }
 
         @Test
-        @DisplayName("ANONYMOUS: delete price")
+        @DisplayName("ANONYMOUS: DELETE '/api/beer-price'")
         public void whenAnonDeletesPrice_thenReturn404Test() {
 
             var deleteResponse = deleteRequestAuth("user", "user",
