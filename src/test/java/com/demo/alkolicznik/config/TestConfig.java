@@ -1,4 +1,4 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.config;
 
 import com.demo.alkolicznik.models.*;
 import com.demo.alkolicznik.utils.TestUtils;
