@@ -1,12 +1,15 @@
 package com.demo.alkolicznik.utils.requests;
 
+import com.demo.alkolicznik.api.BeerPriceTests;
+import com.demo.alkolicznik.api.BeerTests;
+import com.demo.alkolicznik.api.StoreTests;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Map;
 
-import static com.demo.alkolicznik.api.AdminTests.mockMvc;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.TestUtils.buildURI;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -14,7 +17,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Component
 public class MockRequests {
 
+    private static MockMvc mockMvc;
+
+    private static void initMockMvc() {
+        if (BeerTests.mockMvc != null) {
+            mockMvc = BeerTests.mockMvc;
+            return;
+        }
+        if (BeerPriceTests.mockMvc != null) {
+            mockMvc = BeerPriceTests.mockMvc;
+            return;
+        }
+        if (StoreTests.mockMvc != null) {
+            mockMvc = StoreTests.mockMvc;
+            return;
+        }
+    }
+
     public static ResultActions mockGetRequest(String url) {
+        initMockMvc();
         try {
             return mockMvc.perform(get(url));
         } catch (Exception e) {
@@ -23,6 +44,7 @@ public class MockRequests {
     }
 
     public static ResultActions mockPutRequest(String url, Object request) {
+        initMockMvc();
         try {
             return mockMvc.perform(
                     put(url)
@@ -35,6 +57,7 @@ public class MockRequests {
     }
 
     public static ResultActions mockPutRequest(String url, Map<String, ?> parameters, Object request) {
+        initMockMvc();
         String urlTemplate = buildURI(url, parameters);
         try {
             return mockMvc.perform(
@@ -48,6 +71,7 @@ public class MockRequests {
     }
 
     public static ResultActions mockDeleteRequest(String url, Map<String, ?> parameters) {
+        initMockMvc();
         String urlTemplate = buildURI(url, parameters);
         try {
             return mockMvc.perform(
@@ -59,6 +83,7 @@ public class MockRequests {
     }
 
     public static ResultActions mockDeleteRequest(Object request, String url) {
+        initMockMvc();
         try {
             return mockMvc.perform(
                     delete(url)
@@ -71,6 +96,7 @@ public class MockRequests {
     }
 
     public static ResultActions mockDeleteRequest(String url) {
+        initMockMvc();
         try {
             return mockMvc.perform(
                     delete(url)

@@ -1,6 +1,8 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.TestConfig;
+import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -9,10 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +25,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
+import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
+@AutoConfigureMockMvc
 public class BeerPriceTests {
 
     @Autowired
@@ -36,6 +44,13 @@ public class BeerPriceTests {
 
     @Autowired
     private List<Beer> beers;
+
+    public static MockMvc mockMvc;
+
+    @Autowired
+    public void setMockMvc(MockMvc mockMvc) {
+        BeerPriceTests.mockMvc = mockMvc;
+    }
 
     @Nested
     class GetRequests {
@@ -277,6 +292,25 @@ public class BeerPriceTests {
                     HttpStatus.NOT_FOUND,
                     "No such city: 'Bydgoszcz'",
                     "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("GET: '/api/beer-price'")
+        @WithUserDetails("admin")
+        public void getBeerPricesAllArrayTest() {
+            List<BeerPriceResponseDTO> expected = new ArrayList<>();
+            for (Store store : stores) {
+                for (BeerPrice beerPrice : store.getPrices()) {
+                    expected.add(new BeerPriceResponseDTO(beerPrice));
+                }
+            }
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(mockGetRequest("/api/beer-price"),
+                    HttpStatus.OK, expectedJson);
+            List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).hasSameElementsAs(expected);
         }
     }
 
@@ -648,6 +682,177 @@ public class BeerPriceTests {
                     HttpStatus.NOT_FOUND,
                     "Unable to find store of '9999' id",
                     "/api/store/9999/beer-price");
+        }
+    }
+
+    @Nested
+    class PutRequests {
+
+        @Test
+        @DisplayName("PUT: '/api/beer-price'")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void updateBeerPricePriceTest() {
+            BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(4.59);
+
+            BeerPriceResponseDTO expected = createBeerPriceResponse(
+                    createBeerResponse(getBeer(3L, beers)),
+                    createStoreResponse(getStore(3L, stores)),
+                    "PLN 4.59"
+            );
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(mockPutRequest(
+                            "/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L), request
+                    ),
+                    HttpStatus.NO_CONTENT,
+                    expectedJson);
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+
+            var getResponse = getRequest("/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L));
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer-price' [PRICE_NON_POSITIVE]")
+        public void updateBeerPricePriceNegativeAndZeroTest() {
+            BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(0d);
+            var putResponse = putRequestAuth("admin", "admin",
+                    "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+            String jsonResponse = putResponse.getBody();
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/beer-price");
+
+            request = createBeerPriceUpdateRequest(-5.9);
+            putResponse = putRequestAuth("admin", "admin",
+                    "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+            jsonResponse = putResponse.getBody();
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Price must be a positive number",
+                    "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer-price' [PROPERTIES_NOT_SPECIFIED]")
+        public void updateBeerPricePriceNullTest() {
+            BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(null);
+            var putResponse = putRequestAuth("admin", "admin",
+                    "/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "No property to update was specified",
+                    "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer-price' [PROPERTIES_SAME]")
+        public void updateBeerPricePropertiesSameTest() {
+            BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(2.89);
+            var putResponse = putRequestAuth("admin", "admin",
+                    "/api/beer-price", request, Map.of("beer_id", 4L, "store_id", 2L));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.OK,
+                    "Objects are the same: nothing to update",
+                    "/api/beer-price");
+        }
+    }
+
+    @Nested
+    class DeleteRequests {
+
+        @Test
+        @DisplayName("DELETE: '/api/beer-price'")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void deleteBeerPriceTest() {
+            BeerPriceDeleteDTO expected = createBeerPriceDeleteResponse(
+                    getBeer(2L, beers),
+                    getStore(5L, stores),
+                    "5.49 PLN",
+                    "Beer price was deleted successfully!"
+            );
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(mockDeleteRequest("/api/beer-price",
+                            Map.of("beer_id", 2L, "store_id", 5L)),
+                    HttpStatus.OK,
+                    expectedJson);
+            assertThat(actualJson).isEqualTo(expectedJson);
+
+            var getRequest = getRequest("/api/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
+
+            String jsonResponse = getRequest.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Store does not currently sell this beer",
+                    "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("DELETE: '/api/beer-price' [STORE_NOT_FOUND]")
+        public void deleteBeerPriceStoreNotExistsTest() {
+            var deleteResponse = deleteRequestAuth("admin", "admin",
+                    "/api/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find store of '913' id",
+                    "/api/beer-price"
+            );
+        }
+
+        @Test
+        @DisplayName("DELETE: '/api/beer-price' [BEER_NOT_FOUND]")
+        public void deleteBeerPriceBeerNotExistsTest() {
+            var deleteResponse = deleteRequestAuth("admin", "admin",
+                    "/api/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Unable to find beer of '433' id",
+                    "/api/beer-price"
+            );
+        }
+
+        @Test
+        @DisplayName("DELETE: '/api/beer-price' [BEER_PRICE_NOT_FOUND]")
+        public void deleteBeerPricePriceNotExistsTest() {
+            var deleteResponse = deleteRequestAuth("admin", "admin",
+                    "/api/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Store does not currently sell this beer",
+                    "/api/beer-price"
+            );
         }
     }
 }
