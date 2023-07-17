@@ -53,11 +53,31 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
 
     @JsonIgnore
     public String getFullName() {
+        if (this.brand == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder(this.brand);
         if (this.type != null) {
             sb.append(" ");
             sb.append(this.type);
         }
         return sb.toString();
+    }
+
+    public Beer convertToModel() {
+        Beer beer = new Beer();
+        if (this.brand == null) {
+            return null;
+        }
+        beer.setBrand(this.brand);
+        if (this.type != null) {
+            beer.setType(this.type);
+        }
+        if (this.volume == null) {
+            beer.setVolume(0.5);
+            return beer;
+        }
+        beer.setVolume(this.volume);
+        return beer;
     }
 }

@@ -78,20 +78,14 @@ public class BeerService {
         if (!updateDTO.anythingToUpdate(beer)) {
             throw new ObjectsAreEqualException();
         }
-        if(alreadyExists(updateDTO.getFullName(), updateDTO.getVolume())) {
+        Beer converted = updateDTO.convertToModel();
+        if (converted != null && beerRepository.exists(updateDTO.convertToModel())) {
+            System.out.println("Here's the problem?");
+            System.out.println(converted);
             throw new BeerAlreadyExistsException();
         }
-        beerRepository.findByFullnameAndVolume(updateDTO.getFullName(), updateDTO.getVolume())
-                        .orElseThrow(() -> new BeerAlreadyExistsException());
-        setFieldsWhenValidated(beer, updateDTO);
+        updateFields(beer, updateDTO);
         return new BeerResponseDTO(beerRepository.save(beer));
-    }
-
-    private boolean alreadyExists(String fullname, Double volume) {
-        if(volume == null) {
-            return beerRepository.existsByFullnameAndVolume(fullname, 0.5);
-        }
-        return beerRepository.existsByFullnameAndVolume(fullname, volume);
     }
 
     public BeerDeleteDTO delete(Long beerId) {
@@ -108,7 +102,7 @@ public class BeerService {
         return new BeerDeleteDTO(toDelete);
     }
 
-    private void setFieldsWhenValidated(Beer beer, BeerUpdateDTO updateDTO) {
+    private void updateFields(Beer beer, BeerUpdateDTO updateDTO) {
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
@@ -117,7 +111,7 @@ public class BeerService {
             beer.setBrand(updatedBrand);
         }
         if (updatedType != null) {
-            if ("".equals(updatedType)) {
+            if (updatedType.isBlank()) {
                 beer.setType(null);
             } else {
                 beer.setType(updatedType);
