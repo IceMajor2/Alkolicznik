@@ -27,19 +27,19 @@ public class StoreController {
     }
 
     @GetMapping("/{store_id}")
-    public StoreResponseDTO getStore(@PathVariable("store_id") Long id) {
+    public StoreResponseDTO get(@PathVariable("store_id") Long id) {
         return storeService.get(id);
     }
 
     @GetMapping(params = "city")
-    public List<StoreResponseDTO> getStoresInCity(@RequestParam("city") String city) {
+    public List<StoreResponseDTO> getAllInCity(@RequestParam("city") String city) {
         return storeService.getStores(city);
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
-    public List<StoreResponseDTO> getStores() {
+    public List<StoreResponseDTO> getAll() {
         return storeService.getStores();
     }
 
