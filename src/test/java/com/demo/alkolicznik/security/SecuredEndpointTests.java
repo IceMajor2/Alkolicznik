@@ -110,6 +110,7 @@ public class SecuredEndpointTests {
             }
         }
 
+        @Nested
         class User {
 
             @Test

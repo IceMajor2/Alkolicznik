@@ -11,10 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class TestUtils {
@@ -54,6 +51,21 @@ public class TestUtils {
         return null;
     }
 
+    public static List<Beer> getBeersInCity(String city, List<Beer> beers) {
+        List<Beer> beersInCity = new ArrayList<>();
+
+        one:
+        for (Beer beer : beers) {
+            for (BeerPrice beerPrice : beer.getPrices()) {
+                if (beerPrice.getStore().getCity().equals(city)) {
+                    beersInCity.add(beer);
+                    continue one;
+                }
+            }
+        }
+        return beersInCity;
+    }
+
     public static ImageModel getImage(Long beerId, List<Beer> beers) {
         return getBeer(beerId, beers).getImage().get();
     }
@@ -83,7 +95,7 @@ public class TestUtils {
             Array rolesSqlArray = rs.getArray("roles");
             Object[] roles = (Object[]) rolesSqlArray.getArray();
 
-            for(Object role : roles) {
+            for (Object role : roles) {
                 user.getRoles().add(Roles.valueOf(role.toString()));
             }
 

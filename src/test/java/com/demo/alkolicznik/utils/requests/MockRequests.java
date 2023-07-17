@@ -20,16 +20,16 @@ public class MockRequests {
     private static MockMvc mockMvc;
 
     private static void initMockMvc() {
+        if (StoreTests.mockMvc != null) {
+            mockMvc = StoreTests.mockMvc;
+            return;
+        }
         if (BeerTests.mockMvc != null) {
             mockMvc = BeerTests.mockMvc;
             return;
         }
         if (BeerPriceTests.mockMvc != null) {
             mockMvc = BeerPriceTests.mockMvc;
-            return;
-        }
-        if (StoreTests.mockMvc != null) {
-            mockMvc = StoreTests.mockMvc;
             return;
         }
     }
@@ -41,6 +41,11 @@ public class MockRequests {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ResultActions mockGetRequest(String url, Map<String, ?> parameters) {
+        String urlTemplate = buildURI(url, parameters);
+        return mockGetRequest(urlTemplate);
     }
 
     public static ResultActions mockPutRequest(String url, Object request) {
