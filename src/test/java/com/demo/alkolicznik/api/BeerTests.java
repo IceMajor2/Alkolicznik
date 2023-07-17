@@ -422,7 +422,7 @@ public class BeerTests {
         @Test
         @DisplayName("POST: '/api/beer'")
         @DirtiesContext
-        public void createBeerTest() {
+        public void addBrandTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Lech", null, null));
@@ -449,7 +449,7 @@ public class BeerTests {
         @Test
         @DisplayName("POST: '/api/beer' brand and volume only")
         @DirtiesContext
-        public void createBeerWithCustomVolumeTest() {
+        public void addBrandAndVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Karmi", null, 0.6));
@@ -476,7 +476,7 @@ public class BeerTests {
         @Test
         @DisplayName("POST: '/api/beer' brand and type only")
         @DirtiesContext
-        public void createBeerWithTypePresentTest() {
+        public void addBrandAndTypeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Ksiazece", "Wisnia", null)
@@ -504,7 +504,7 @@ public class BeerTests {
         @Test
         @DisplayName("POST: '/api/beer' everything specified")
         @DirtiesContext
-        public void createBeerWithCustomVolumeAndTypePresentTest() {
+        public void addEverythingSpecifiedTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Zywiec", "Jasne", 0.33)
@@ -530,9 +530,9 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("POST: '/api/beer' brand & type existing, volume unique")
+        @DisplayName("POST: '/api/beer' exists by fullname, volume unique")
         @DirtiesContext
-        public void createBeerAlreadyPresentButWithDifferentVolumeTest() {
+        public void addFullnameExistsVolumeUniqueTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Perla", "Chmielowa Pils", 0.33)
@@ -558,25 +558,62 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("POST: '/api/beer' [TYPE_BLANK]")
-        // @DirtiesContext
-        public void createBeerWithPresentButBlankTypeStatusCheckTest() {
+        @DisplayName("POST: '/api/beer' type blank")
+        @DirtiesContext
+        public void addWithTypeBlankTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
-                    createBeerRequest("Heineken", " ", null));
+                    createBeerRequest("Heineken", " \t\t \t", null));
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            String jsonResponse = postResponse.getBody();
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Type was not specified",
-                    "/api/beer");
+            BeerResponseDTO expected = createBeerResponse(7L, "Heineken", null, 0.5);
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+
+            // Fetch the newly-created beer.
+            var getResponse = getRequest("/api/beer/7");
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("POST: '/api/beer' empty type")
+        @DirtiesContext
+        public void addWithTypeEmptyTest() {
+            var postResponse = postRequestAuth("admin", "admin",
+                    "/api/beer",
+                    createBeerRequest("Heineken", "", null));
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            BeerResponseDTO expected = createBeerResponse(7L, "Heineken", null, 0.5);
+            String expectedJson = toJsonString(expected);
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+
+            // Fetch the newly-created beer.
+            var getResponse = getRequest("/api/beer/7");
+
+            actualJson = getResponse.getBody();
+            actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
         @DisplayName("POST: '/api/beer' [VOLUME_NON_POSITIVE]")
-        // @DirtiesContext
-        public void createBeerWithNegativeVolumeTest() {
+        public void addVolumeNegativeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Pilsner Urquell", null, -0.5)
@@ -604,8 +641,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' [BRAND_NULL]")
-        // @DirtiesContext
-        public void createBeerWithNoBrandTest() {
+        public void addBrandNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest(null, "Jasne Okocimskie", null)
@@ -621,8 +657,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' [BRAND_BLANK]")
-        // @DirtiesContext
-        public void createBeerWithBlankBrandTest() {
+        public void addBrandBlankTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest(" \t \t  \t\t ", "Cerny", null)
@@ -649,38 +684,8 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("POST: '/api/beer' [TYPE_BLANK]")
-        // @DirtiesContext
-        public void createBeerWithBlankType() {
-            var postResponse = postRequestAuth("admin", "admin",
-                    "/api/beer",
-                    createBeerRequest("Miloslaw", "  \t\t ", 0.6)
-            );
-
-            String jsonResponse = postResponse.getBody();
-
-            assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Type was not specified",
-                    "/api/beer");
-
-            postResponse = postRequestAuth("admin", "admin",
-                    "/api/beer",
-                    createBeerRequest("Miloslaw", "", null)
-            );
-
-            jsonResponse = postResponse.getBody();
-
-            assertIsError(jsonResponse,
-                    HttpStatus.BAD_REQUEST,
-                    "Type was not specified",
-                    "/api/beer");
-        }
-
-        @Test
         @DisplayName("POST: '/api/beer' [BEER_EXISTS]")
-        // @DirtiesContext
-        public void createBeerAlreadyPresentTest() {
+        public void addBeerExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
                     createBeerRequest("Perla", "Chmielowa Pils", null)
@@ -707,12 +712,11 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("POST: '/api/beer' [BRAND_NULL; TYPE_BLANK; VOLUME_NEGATIVE]")
-        // @DirtiesContext
-        public void createBeerBrandNullTypeBlankVolumeNegativeTest() {
+        @DisplayName("POST: '/api/beer' [BRAND_BLANK; TYPE_NULL; VOLUME_NEGATIVE]")
+        public void addBrandBlankTypeNullVolumeNegativeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
-                    createBeerRequest(null, " \t", -15.9)
+                    createBeerRequest("\t", null, -15.9)
             );
 
             String jsonResponse = postResponse.getBody();
@@ -731,7 +735,7 @@ public class BeerTests {
         @DisplayName("DELETE: '/api/beer/{beer_id}'")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void deleteBeerByIdTest() {
+        public void deleteByIdTest() {
             BeerDeleteDTO expected = createBeerDeleteResponse(
                     getBeer(6L, beers),
                     "Beer was deleted successfully!"
@@ -757,7 +761,7 @@ public class BeerTests {
         @DisplayName("DELETE: '/api/beer'")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void deleteBeerByPropertiesTest() {
+        public void deleteByObjectTest() {
             BeerDeleteDTO expected = createBeerDeleteResponse(
                     getBeer(3L, beers),
                     "Beer was deleted successfully!"
@@ -777,7 +781,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("DELETE: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
-        public void deleteBeerNotExistsTest() {
+        public void deleteBeerNotFoundTest() {
             var deleteResponse = deleteRequestAuth("admin", "admin",
                     "/api/beer/0");
 
