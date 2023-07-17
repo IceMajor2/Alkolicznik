@@ -409,8 +409,8 @@ public class BeerTests {
 
             assertIsError(
                     jsonResponse,
-                    HttpStatus.OK,
-                    "Such beer already exists",
+                    HttpStatus.CONFLICT,
+                    "Beer already exists",
                     "/api/beer/3"
             );
         }
