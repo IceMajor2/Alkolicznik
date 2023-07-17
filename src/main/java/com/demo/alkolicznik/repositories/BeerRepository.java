@@ -16,9 +16,6 @@ public interface BeerRepository extends CrudRepository<Beer, Long> {
     @Query(value = "SELECT * FROM beer b WHERE concat_ws(' ', brand, type) = ?1 AND volume = ?2", nativeQuery = true)
     Optional<Beer> findByFullnameAndVolume(String fullname, Double volume);
 
-//    @Query(value = "SELECT b.id FROM beer b WHERE concat_ws(' ', brand, type) = ?1 AND volume = ?2", nativeQuery = true)
-//    Long findIdByFullnameAndVolume(String fullname, Double volume);
-
     @Query(value = "SELECT count(*) > 0 FROM beer b WHERE concat_ws(' ', brand, type) = ?1", nativeQuery = true)
     boolean existsByFullname(String fullname);
 
