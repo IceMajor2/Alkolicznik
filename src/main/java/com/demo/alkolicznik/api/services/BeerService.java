@@ -78,8 +78,20 @@ public class BeerService {
         if (!updateDTO.anythingToUpdate(beer)) {
             throw new ObjectsAreEqualException();
         }
+        if(alreadyExists(updateDTO.getFullName(), updateDTO.getVolume())) {
+            throw new BeerAlreadyExistsException();
+        }
+        beerRepository.findByFullnameAndVolume(updateDTO.getFullName(), updateDTO.getVolume())
+                        .orElseThrow(() -> new BeerAlreadyExistsException());
         setFieldsWhenValidated(beer, updateDTO);
         return new BeerResponseDTO(beerRepository.save(beer));
+    }
+
+    private boolean alreadyExists(String fullname, Double volume) {
+        if(volume == null) {
+            return beerRepository.existsByFullnameAndVolume(fullname, 0.5);
+        }
+        return beerRepository.existsByFullnameAndVolume(fullname, volume);
     }
 
     public BeerDeleteDTO delete(Long beerId) {
