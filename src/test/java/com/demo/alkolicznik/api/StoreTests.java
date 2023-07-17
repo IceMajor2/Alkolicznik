@@ -334,7 +334,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [NAME_NULL]")
-        // @DirtiesContext
         public void createStoreNameNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store", createStoreRequest(null, "Mragowo", "ul. Wyspianskiego 17"));
@@ -346,7 +345,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [NAME_BLANK]")
-        // @DirtiesContext
         public void createStoreNameBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store", createStoreRequest("", "Gdansk", "ul. Hallera 120"));
@@ -365,7 +363,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [CITY_NULL]")
-        // @DirtiesContext
         public void createStoreCityNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store",
@@ -378,7 +375,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [CITY_BLANK]")
-        // @DirtiesContext
         public void createStoreCityBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store",
@@ -399,7 +395,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [STREET_NULL]")
-        // @DirtiesContext
         public void createStoreStreetNullTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store",
@@ -412,7 +407,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [STREET_BLANK]")
-        // @DirtiesContext
         public void createStoreStreetBlankAndEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store",
@@ -433,7 +427,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [STORE_EXISTS]")
-        // @DirtiesContext
         public void createStoreAlreadyExistsTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store", createStoreRequest("Lidl", "Olsztyn", "ul. Iwaszkiewicza 1"));
@@ -445,7 +438,6 @@ public class StoreTests {
 
         @Test
         @DisplayName("POST: '/api/store' [NAME_BLANK; STREET_NULL; STREET_EMPTY]")
-        // @DirtiesContext
         public void createStoreNameBlankCityNullStreetEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/store",

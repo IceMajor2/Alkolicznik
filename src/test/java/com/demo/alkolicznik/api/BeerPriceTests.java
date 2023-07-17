@@ -247,7 +247,7 @@ public class BeerPriceTests {
         @Test
         @DisplayName("Get beer prices from non-existing store")
         public void getBeerPricesFromStoreNotExistsTest() {
-            var getResponse = getRequest("GET: '/api/store/{store_id}/beer-price' [STORE_NOT_FOUND]");
+            var getResponse = getRequest("/api/store/8/beer-price");
 
             String jsonResponse = getResponse.getBody();
 
