@@ -13,9 +13,7 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import com.vaadin.flow.component.html.Image;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class BeerService {
@@ -47,7 +45,7 @@ public class BeerService {
         }
         List<Store> cityStores = storeRepository.findAllByCityOrderByIdAsc(city);
 
-        List<Beer> beersInCity = new ArrayList<>();
+        Set<Beer> beersInCity = new TreeSet<>(Comparator.comparing(Beer::getId));
         for (Store store : cityStores) {
             beersInCity.addAll(
                     store.getPrices().stream()
@@ -55,7 +53,6 @@ public class BeerService {
                             .toList()
             );
         }
-        beersInCity.sort(Comparator.comparing(Beer::getId));
         return this.mapToDto(beersInCity);
     }
 
@@ -119,7 +116,7 @@ public class BeerService {
         }
     }
 
-    private List<BeerResponseDTO> mapToDto(List<Beer> beers) {
+    private List<BeerResponseDTO> mapToDto(Collection<Beer> beers) {
         return beers.stream()
                 .map(BeerResponseDTO::new)
                 .toList();
