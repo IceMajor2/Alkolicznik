@@ -7,6 +7,7 @@ import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
@@ -60,10 +61,22 @@ public class BeerService {
         return this.mapToDto(beerRepository.findAllByOrderByIdAsc());
     }
 
+    // TODO: probably should be a transaction
     public BeerResponseDTO add(BeerRequestDTO beerRequestDTO) {
         Beer beer = beerRequestDTO.convertToModel();
+
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
+        }
+
+        // After beer's validation, we can begin (if passed)
+        // the uploading of image and attaching it to beer object.
+        String imagePath = beerRequestDTO.getImagePath();
+        if (imagePath != null) {
+            ImageModel imageModel = imageService.upload(imagePath);
+            beer.setImage(imageModel);
+            imageModel.setBeer(beer);
+            imageService.save(imageModel);
         }
         return new BeerResponseDTO(beerRepository.save(beer));
     }

@@ -32,6 +32,10 @@ public class ImageModel {
     @JoinColumn(name = "beer_id")
     private Beer beer;
 
+    public ImageModel(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

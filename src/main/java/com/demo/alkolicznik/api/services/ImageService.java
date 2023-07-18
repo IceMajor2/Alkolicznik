@@ -68,28 +68,30 @@ public class ImageService {
         imageRepository.save(imageModel);
     }
 
+    /**
+     * This procedure reads the file from a {@code path}, converts it into
+     * an ImageKit-library-uploadable and sends it to an external image hosting.
+     *
+     * @param path path to an image
+     * @return saved {@code ImageModel} entity
+     */
     @SneakyThrows
-    public Result uploadImage(String path) {
-        BufferedImage image = ImageIO.read(new File(path));
-        if (!areImageProportionsOk(image)) {
-            throw new RuntimeException("Image's proportions are invalid");
+    public ImageModel upload(String path) {
+        // instantiate BufferedImage and check its proportions
+        if (areImageProportionsOk(ImageIO.read(new File(path)))) {
+            throw new RuntimeException("Image proportions are invalid");
+
         }
+        // send to server
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, "sample_image.jpg");
         Result result = this.imageKit.upload(fileCreateRequest);
-        return result;
+
+        return new ImageModel(result.getUrl());
     }
 
-    private void setConfig() {
-        String endpoint = "https://ik.imagekit.io/icemajor";
-        String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
-        try {
-            imageKit.setConfig(new Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
-                    endpoint));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read secured file");
-        }
+    public ImageModel save(ImageModel imageModel) {
+        return imageRepository.save(imageModel);
     }
 
     private boolean areImageProportionsOk(BufferedImage image) {
@@ -106,5 +108,17 @@ public class ImageService {
             return true;
         }
         return false;
+    }
+
+    private void setConfig() {
+        String endpoint = "https://ik.imagekit.io/icemajor";
+        String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
+        try {
+            imageKit.setConfig(new Configuration(publicKey,
+                    Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
+                    endpoint));
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read secured file");
+        }
     }
 }
