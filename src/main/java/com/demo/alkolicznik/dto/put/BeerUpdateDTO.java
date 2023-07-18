@@ -28,11 +28,15 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
 
     @Override
     public boolean propertiesMissing() {
-        return brand == null && type == null && volume == null;
+        return brand == null && type == null && volume == null && imagePath == null;
     }
 
     @Override
     public boolean anythingToUpdate(Beer beer) {
+        // for now: not going to compare external image with the new, requested one
+        if(this.imagePath != null) {
+            return true;
+        }
         String currBrand = beer.getBrand();
         String currType = beer.getType();
         Double currVolume = beer.getVolume();
@@ -66,7 +70,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         return sb.toString();
     }
 
-    public Beer convertToModel() {
+    public Beer convertToModelNoImage() {
         Beer beer = new Beer();
         if (this.brand == null) {
             return null;

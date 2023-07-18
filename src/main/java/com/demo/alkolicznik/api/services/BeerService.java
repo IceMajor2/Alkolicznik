@@ -91,11 +91,21 @@ public class BeerService {
         if (!updateDTO.anythingToUpdate(beer)) {
             throw new ObjectsAreEqualException();
         }
-        Beer converted = updateDTO.convertToModel();
-        if (converted != null && beerRepository.exists(updateDTO.convertToModel())) {
+        Beer converted = updateDTO.convertToModelNoImage();
+        if (converted != null && beerRepository.exists(converted)) {
             throw new BeerAlreadyExistsException();
         }
         updateFields(beer, updateDTO);
+
+        // Now, updating an image (if present)
+        String imagePath = updateDTO.getImagePath();
+        if (imagePath != null) {
+            ImageModel imageModel = imageService.upload(imagePath,
+                    imageService.createImageFilename(beer, imageService.extractExtensionFromPath(imagePath)));
+            beer.setImage(imageModel);
+            imageModel.setBeer(beer);
+            imageService.save(imageModel);
+        }
         return new BeerResponseDTO(beerRepository.save(beer));
     }
 
