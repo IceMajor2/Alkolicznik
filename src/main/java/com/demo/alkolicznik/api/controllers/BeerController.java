@@ -43,7 +43,6 @@ public class BeerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<BeerResponseDTO> add(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
         BeerResponseDTO savedDTO = beerService.add(beerRequestDTO);
@@ -58,7 +57,6 @@ public class BeerController {
     }
 
     @PutMapping("/{beer_id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
     public BeerResponseDTO update(@PathVariable("beer_id") Long beerId,
                                                   @RequestBody @Valid BeerUpdateDTO updateDTO) {
@@ -73,7 +71,6 @@ public class BeerController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
     @SecurityRequirement(name = "Basic Authentication")
     public BeerDeleteDTO delete(@RequestBody @Valid BeerRequestDTO requestDTO) {
         return beerService.delete(requestDTO);
