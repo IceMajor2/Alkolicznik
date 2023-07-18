@@ -134,8 +134,8 @@ public class ImageModelTests {
 
                 assertIsError(jsonResponse,
                         HttpStatus.BAD_REQUEST,
-                        "/api/beer",
-                        "Proportions are invalid");
+                        "Image proportions are invalid",
+                        "/api/beer");
             }
         }
     }
