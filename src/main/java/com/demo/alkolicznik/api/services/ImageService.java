@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ImageService {
@@ -76,7 +80,7 @@ public class ImageService {
      * @return saved {@code ImageModel} entity
      */
     @SneakyThrows
-    public ImageModel upload(String path) {
+    public ImageModel upload(String path, String filename) {
         // instantiate BufferedImage and check its proportions
         if (areImageProportionsOk(ImageIO.read(new File(path)))) {
             throw new RuntimeException("Image proportions are invalid");
@@ -84,10 +88,21 @@ public class ImageService {
         }
         // send to server
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, "sample_image.jpg");
+        FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, filename);
+        // prevent adding a random string to the end of the filename
+        fileCreateRequest.setUseUniqueFileName(false);
+        // set folder into which image will be uploaded
+        fileCreateRequest.setFolder("/test/beer");
+
         Result result = this.imageKit.upload(fileCreateRequest);
 
-        return new ImageModel(result.getUrl());
+        // get link with transformation 'get_beer'
+        List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
+        Map<String, Object> options = new HashMap<>();
+        options.put("path", result.getFilePath());
+        options.put("transformation", transformation);
+
+        return new ImageModel(imageKit.getUrl(options));
     }
 
     public ImageModel save(ImageModel imageModel) {
@@ -120,5 +135,20 @@ public class ImageService {
         } catch (IOException e) {
             throw new RuntimeException("Could not read secured file");
         }
+    }
+
+    public String createImageFilename(Beer beer, String extension) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        stringBuilder
+                .append(beer.getFullName().toLowerCase().replace(' ', '-'))
+                .append('-')
+                .append(beer.getVolume())
+                .append('.')
+                .append(extension);
+        return stringBuilder.toString();
+    }
+
+    public String extractExtensionFromPath(String path) {
+        return path.substring(path.lastIndexOf('.') + 1);
     }
 }

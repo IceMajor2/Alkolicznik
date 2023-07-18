@@ -68,12 +68,12 @@ public class BeerService {
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
         }
-
         // After beer's validation, we can begin (if passed)
         // the uploading of image and attaching it to beer object.
         String imagePath = beerRequestDTO.getImagePath();
         if (imagePath != null) {
-            ImageModel imageModel = imageService.upload(imagePath);
+            ImageModel imageModel = imageService.upload(imagePath,
+                    imageService.createImageFilename(beer, imageService.extractExtensionFromPath(imagePath)));
             beer.setImage(imageModel);
             imageModel.setBeer(beer);
             imageService.save(imageModel);
@@ -93,8 +93,6 @@ public class BeerService {
         }
         Beer converted = updateDTO.convertToModel();
         if (converted != null && beerRepository.exists(updateDTO.convertToModel())) {
-            System.out.println("Here's the problem?");
-            System.out.println(converted);
             throw new BeerAlreadyExistsException();
         }
         updateFields(beer, updateDTO);
