@@ -29,6 +29,7 @@ import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -417,6 +418,22 @@ public class BeerTests {
                     "/api/beer/3"
             );
         }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var putResponse = putRequestAuth("user", "user", "/api/beer/5",
+                    createBeerUpdateRequest(" ", "Porter Malinowy", -1d));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer/5"
+            );
+        }
     }
 
     @Nested
@@ -729,6 +746,19 @@ public class BeerTests {
                     "Brand was not specified; Volume must be a positive number",
                     "/api/beer");
         }
+
+        @Test
+        @DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
+        public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
+            var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer");
+        }
     }
 
     @Nested
@@ -795,6 +825,22 @@ public class BeerTests {
                     HttpStatus.NOT_FOUND,
                     "Unable to find beer of '0' id",
                     "/api/beer/0"
+            );
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var deleteResponse = deleteRequestAuth("user", "user", "/api/beer",
+                    createBeerRequest(" ", "Porter Malinowy", -1d));
+
+            String jsonResponse = deleteResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer"
             );
         }
     }
