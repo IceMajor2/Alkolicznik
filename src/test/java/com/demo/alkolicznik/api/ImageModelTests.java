@@ -68,7 +68,7 @@ public class ImageModelTests {
 
     @Nested
     class PostRequests {
-
+        // TODO: Make a stub / mock of service that sends the images to hosting (so that they are not actually sent).
         @Test
         @DisplayName("POST: '/api/beer/'")
         @DirtiesContext
