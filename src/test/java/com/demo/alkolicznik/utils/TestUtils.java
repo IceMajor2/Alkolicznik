@@ -3,11 +3,15 @@ package com.demo.alkolicznik.utils;
 import com.demo.alkolicznik.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,11 +20,17 @@ import java.util.*;
 @Component
 public class TestUtils {
 
+    private static ResourceLoader resourceLoader;
     private static JdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setJdbcTemplate(ApplicationContext context) {
         jdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplate");
+    }
+
+    @Autowired
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        TestUtils.resourceLoader = resourceLoader;
     }
 
     public static Beer getBeer(Long beerId, List<Beer> beers) {
@@ -115,5 +125,21 @@ public class TestUtils {
         }
         String urlTemplate = builder.encode().toUriString();
         return urlTemplate;
+    }
+
+    public static String getRawPathToImage(String imageFilename) {
+        URI uri = null;
+        try {
+            uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
+        } catch (IOException e) {
+            try {
+                uri = resourceLoader.getResource("classpath:data_img").getURI();
+                return Paths.get(uri).toAbsolutePath().toString() + '/' + imageFilename;
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        String rawPath = Paths.get(uri).toAbsolutePath().toString();
+        return rawPath;
     }
 }

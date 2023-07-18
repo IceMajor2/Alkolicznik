@@ -17,21 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -44,16 +41,13 @@ public class ImageModelTests {
 
     public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/";
 
-    @Autowired
-    private List<Beer> beers;
-
-    @Autowired
-    private ResourceLoader resourceLoader;
-
-    public static MockMvc mockMvc;
-
     private final List<String> imageFilenameBeanList = List.of("tyskie-gronie-0.65.png", "zubr-0.5.png",
             "komes-porter-malinowy-0.33.png", "miloslaw-biale-0.5.png");
+    
+    @Autowired
+    private List<Beer> beers;
+    public static MockMvc mockMvc;
+
 
     @Autowired
     public void setMockMvc(MockMvc mockMvc) {
@@ -155,19 +149,5 @@ public class ImageModelTests {
         }
     }
 
-    private String getRawPathToImage(String imageFilename) {
-        URI uri = null;
-        try {
-            uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
-        } catch (IOException e) {
-            try {
-                uri = resourceLoader.getResource("classpath:data_img").getURI();
-                return Paths.get(uri).toAbsolutePath().toString() + '/' + imageFilename;
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        String rawPath = Paths.get(uri).toAbsolutePath().toString();
-        return rawPath;
-    }
+
 }
