@@ -31,6 +31,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
+import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +44,7 @@ public class ImageModelTests {
 
     private final List<String> imageFilenameBeanList = List.of("tyskie-gronie-0.65.png", "zubr-0.5.png",
             "komes-porter-malinowy-0.33.png", "miloslaw-biale-0.5.png");
-    
+
     @Autowired
     private List<Beer> beers;
     public static MockMvc mockMvc;
@@ -107,7 +108,7 @@ public class ImageModelTests {
                 );
                 var expectedJson = toJsonString(expected);
                 var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
-                        null, getRawPathToImage("kasztelan-niepasteryzowane.png"));
+                        null, getRawPathToImage("kasztelan-niepasteryzowane-0.5.png"));
                 var actualJson = assertMockRequest(mockPostRequest("/api/beer", request),
                         HttpStatus.CREATED,
                         expectedJson);
@@ -149,5 +150,29 @@ public class ImageModelTests {
         }
     }
 
+    @Nested
+    class PutRequests {
 
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}'")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void givenBeerWithNoImage_whenUpdatingBeerImage_thenReturnOKTest() {
+            String filename = "perla-chmielowa-pils-0.5.webp";
+            var expected = createBeerResponse(1, "Perla", "Chmielowa Pils", 0.5d,
+                    createImageResponse(filename));
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/beer/1",
+                            createBeerUpdateRequest(null, null, null, getRawPathToImage(filename))
+                    ),
+                    HttpStatus.OK,
+                    expectedJson);
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+    }
 }

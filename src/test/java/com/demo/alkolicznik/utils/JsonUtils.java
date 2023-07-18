@@ -139,10 +139,15 @@ public class JsonUtils {
     }
 
     public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume) {
+        return createBeerUpdateRequest(brand, type, volume, null);
+    }
+
+    public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume, String pathToImage) {
         BeerUpdateDTO request = new BeerUpdateDTO();
         request.setBrand(brand);
         request.setType(type);
         request.setVolume(volume);
+        request.setImagePath(pathToImage);
         return request;
     }
 

@@ -144,7 +144,7 @@ public class BeerTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void updateVolumeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5, null);
 
             BeerResponseDTO expected = createBeerResponse(
                     3L, "Tyskie", "Gronie", 0.5, createImageResponse(getImage(3L, beers)));
@@ -173,7 +173,7 @@ public class BeerTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void updateBrandTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+            BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null, null);
 
             BeerResponseDTO expected = createBeerResponse(3L, "Ksiazece", "Gronie", 0.65,
                     createImageResponse(getImage(3L, beers)));
@@ -202,7 +202,7 @@ public class BeerTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void updateTypeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "IPA", null, null);
 
             BeerResponseDTO expected = createBeerResponse(2L, "Ksiazece", "IPA", 0.5);
             String expectedJson = toJsonString(expected);
@@ -230,7 +230,7 @@ public class BeerTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void updateRemoveTypeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null, null);
 
             BeerResponseDTO expected = createBeerResponse(6L, "Miloslaw", null, 0.5,
                     createImageResponse(getImage(6L, beers)));
@@ -259,7 +259,7 @@ public class BeerTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void updateAddTypeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
+            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5, null);
 
             BeerResponseDTO expected = createBeerResponse(4L, "Zubr", "Ciemnozloty", 0.5,
                     createImageResponse(getImage(4L, beers)));
@@ -286,7 +286,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [NO_PROPERTY_SPECIFIED]")
         public void updateWithEmptyBodyTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
 
             String jsonResponse = putResponse.getBody();
@@ -302,7 +302,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [VOLUME_NON_POSITIVE]")
         public void updateVolumeNonPositiveTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
             String jsonResponse = putResponse.getBody();
@@ -314,7 +314,7 @@ public class BeerTests {
                     "/api/beer/4"
             );
 
-            request = createBeerUpdateRequest(null, null, -5.1d);
+            request = createBeerUpdateRequest(null, null, -5.1d, null);
             putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
             jsonResponse = putResponse.getBody();
@@ -330,7 +330,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
         public void updateBeerNotFoundTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+            BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/321", request);
 
             String jsonResponse = putResponse.getBody();
@@ -346,7 +346,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [BRAND_BLANK]")
         public void updateBrandBlankTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null);
+            BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
             String jsonResponse = putResponse.getBody();
@@ -358,7 +358,7 @@ public class BeerTests {
                     "/api/beer/5"
             );
 
-            request = createBeerUpdateRequest("", null, null);
+            request = createBeerUpdateRequest("", null, null, null);
             putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
             jsonResponse = putResponse.getBody();
@@ -374,7 +374,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME]")
         public void updateNothingToChangeTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33);
+            BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 
             String jsonResponse = putResponse.getBody();
@@ -390,7 +390,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [PROPERTIES_SAME] (2)")
         public void updateNothingWasChangedTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
+            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
 
             String jsonResponse = putResponse.getBody();
@@ -406,7 +406,7 @@ public class BeerTests {
         @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [BEER_EXISTS]")
         public void updateBeerAlreadyExistsTest() {
-            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5);
+            BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5, null);
             var putResponse = putRequestAuth("admin", "admin", "/api/beer/3", request);
 
             String jsonResponse = putResponse.getBody();
@@ -423,7 +423,7 @@ public class BeerTests {
         @DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
         public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
             var putResponse = putRequestAuth("user", "user", "/api/beer/5",
-                    createBeerUpdateRequest(" ", "Porter Malinowy", -1d));
+                    createBeerUpdateRequest(" ", "Porter Malinowy", -1d, null));
 
             String jsonResponse = putResponse.getBody();
 

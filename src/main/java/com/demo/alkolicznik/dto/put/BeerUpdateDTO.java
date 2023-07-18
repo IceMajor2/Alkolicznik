@@ -23,6 +23,8 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
     private String type;
     @Positive(message = "Volume must be a positive number")
     private Double volume;
+    // TODO: Add regex
+    private String imagePath;
 
     @Override
     public boolean propertiesMissing() {

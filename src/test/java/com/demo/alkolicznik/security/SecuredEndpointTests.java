@@ -62,7 +62,7 @@ public class SecuredEndpointTests {
             @Test
             @DisplayName("ANONYMOUS: PUT '/api/beer/{beer_id}'")
             public void whenAnonUpdatesBeer_thenReturn404Test() {
-                BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
+                BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null, null);
                 var putResponse = putRequest("/api/beer/2", request);
 
                 String jsonResponse = putResponse.getBody();
@@ -140,7 +140,7 @@ public class SecuredEndpointTests {
             @Test
             @DisplayName("USER: PUT '/api/beer/{beer_id}'")
             public void whenUserUpdatesBeer_thenReturn404Test() {
-                BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
+                BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null, null);
                 var putResponse = putRequestAuth("user", "user", "/api/beer/1", request);
 
                 String json = putResponse.getBody();
