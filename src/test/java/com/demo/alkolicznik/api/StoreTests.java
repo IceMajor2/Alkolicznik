@@ -27,6 +27,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -300,6 +301,22 @@ public class StoreTests {
                     "/api/store/4"
             );
         }
+
+        @Test
+        @DisplayName("PUT: '/api/store/{store_id}' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var postResponse = putRequest("/api/store/3",
+                    createStoreUpdateRequest(" ", null, ""));
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/store/3"
+            );
+        }
     }
 
     @Nested
@@ -447,6 +464,22 @@ public class StoreTests {
 
             assertIsError(json, HttpStatus.BAD_REQUEST, "City was not specified;" +
                     " Name was not specified; Street was not specified", "/api/store");
+        }
+
+        @Test
+        @DisplayName("POST: '/api/store' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var postResponse = postRequestAuth("user", "user", "/api/store",
+                    createStoreRequest(" ", null, ""));
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/store"
+            );
         }
     }
 

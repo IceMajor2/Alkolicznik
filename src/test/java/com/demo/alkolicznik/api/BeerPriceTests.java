@@ -32,6 +32,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -683,6 +684,22 @@ public class BeerPriceTests {
                     "Unable to find store of '9999' id",
                     "/api/store/9999/beer-price");
         }
+
+        @Test
+        @DisplayName("POST: '/api/store/{store_id}/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var postResponse = postRequestAuth("user", "user", "/api/store/3/beer-price",
+                    createBeerPriceRequest("\t", 0d, -5d));
+
+            String jsonResponse = postResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/store/3/beer-price"
+            );
+        }
     }
 
     @Nested
@@ -772,6 +789,23 @@ public class BeerPriceTests {
                     HttpStatus.OK,
                     "Objects are the same: nothing to update",
                     "/api/beer-price");
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
+        public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+            var putResponse = putRequest("/api/beer-price",
+                    createBeerPriceUpdateRequest(-5d),
+                    Map.of("store_id", 2, "beer_id", 2));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(
+                    jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found",
+                    "/api/beer-price"
+            );
         }
     }
 

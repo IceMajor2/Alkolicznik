@@ -44,6 +44,11 @@ public class SimpleRequests {
                 .exchange(url, HttpMethod.PUT, new HttpEntity<>(request), String.class);
     }
 
+    public static ResponseEntity<String> putRequest(String url, Object request, Map<String, ?> parameters) {
+        String urlTemplate = buildURI(url, parameters);
+        return putRequest(urlTemplate, request);
+    }
+
     public static ResponseEntity<String> deleteRequest(String url) {
         return restTemplate
                 .exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
