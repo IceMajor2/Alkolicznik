@@ -43,6 +43,7 @@ public class BeerController {
     }
 
     @PostMapping
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<BeerResponseDTO> add(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
         BeerResponseDTO savedDTO = beerService.add(beerRequestDTO);
@@ -57,6 +58,7 @@ public class BeerController {
     }
 
     @PutMapping("/{beer_id}")
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public BeerResponseDTO update(@PathVariable("beer_id") Long beerId,
                                                   @RequestBody @Valid BeerUpdateDTO updateDTO) {
@@ -71,6 +73,7 @@ public class BeerController {
     }
 
     @DeleteMapping
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public BeerDeleteDTO delete(@RequestBody @Valid BeerRequestDTO requestDTO) {
         return beerService.delete(requestDTO);

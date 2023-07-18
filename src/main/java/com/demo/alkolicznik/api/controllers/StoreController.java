@@ -44,7 +44,7 @@ public class StoreController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<StoreResponseDTO> add(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
         StoreResponseDTO saved = storeService.add(storeRequestDTO);
@@ -59,7 +59,7 @@ public class StoreController {
     }
 
     @PutMapping("/{store_id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<StoreResponseDTO> update(@PathVariable("store_id") Long storeId,
                                                    @RequestBody @Valid StoreUpdateDTO updateDTO) {

@@ -64,7 +64,7 @@ public class BeerPriceController {
     }
 
     @PostMapping("/store/{store_id}/beer-price")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<BeerPriceResponseDTO> addByObject(
             @PathVariable("store_id") Long storeId,
@@ -99,7 +99,7 @@ public class BeerPriceController {
     }
 
     @PutMapping("/beer-price")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+    // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
     public ResponseEntity<BeerPriceResponseDTO> update(@RequestParam("store_id") Long storeId,
                                                        @RequestParam("beer_id") Long beerId,

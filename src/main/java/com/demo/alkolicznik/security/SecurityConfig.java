@@ -18,6 +18,8 @@ public class SecurityConfig {
 
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
+    private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
+
     public SecurityConfig(RestAuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
@@ -37,9 +39,13 @@ public class SecurityConfig {
                         .permitAll())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(HttpMethod.PUT, "/api/beer/*").hasAnyAuthority("ADMIN", "ACCOUNTANT")
-                        .requestMatchers(HttpMethod.DELETE, "/api/beer").hasAnyAuthority("ADMIN", "ACCOUNTANT")
-                        .requestMatchers(HttpMethod.POST, "/api/beer").hasAnyAuthority("ADMIN", "ACCOUNTANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/beer/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.DELETE, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.POST, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.PUT, "/api/store/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.POST, "/api/store").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.PUT, "/api/beer-price").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+                        .requestMatchers(HttpMethod.POST, "/api/store/*/beer-price").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .anyRequest().permitAll()
                 );
         return http.build();
