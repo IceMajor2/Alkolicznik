@@ -3,6 +3,7 @@ package com.demo.alkolicznik.api.services;
 import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.repositories.BeerRepository;
@@ -82,9 +83,8 @@ public class ImageService {
     @SneakyThrows
     public ImageModel upload(String path, String filename) {
         // instantiate BufferedImage and check its proportions
-        if (areImageProportionsOk(ImageIO.read(new File(path)))) {
-            throw new RuntimeException("Image proportions are invalid");
-
+        if (!areImageProportionsOk(ImageIO.read(new File(path)))) {
+            throw new ImageProportionsInvalidException();
         }
         // send to server
         byte[] bytes = Files.readAllBytes(Paths.get(path));
