@@ -829,7 +829,7 @@ public class BeerTests {
         }
 
         @Test
-        @DisplayName("DELETE: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
+        @DisplayName("DELETE: '/api/beer' [INVALID_REQUEST; UNAUTHORIZED]")
         public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
             var deleteResponse = deleteRequestAuth("user", "user", "/api/beer",
                     createBeerRequest(" ", "Porter Malinowy", -1d));
