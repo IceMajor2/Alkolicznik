@@ -28,12 +28,14 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
@@ -82,7 +84,7 @@ public class ImageModelTests {
         // TODO: Make a stub / mock of service that sends the images to hosting (so that they are not actually sent).
 
         @Nested
-        class ImageDirtiesContext {
+        class TestsInNeedOfDirtiesContext {
 
             @AfterEach
             // TODO: create annotation from the method below. @ImageDirtiesContext
@@ -103,7 +105,7 @@ public class ImageModelTests {
             @DisplayName("POST: '/api/beer/'")
             @DirtiesContext
             @WithUserDetails("admin")
-            public void whenAddingBeerWithImage_thenReturnOKTest() throws IOException {
+            public void whenAddingBeerWithImage_thenReturnOKTest() {
                 var expected = createBeerResponse(
                         beers.size() + 1, "Kasztelan",
                         "Niepasteryzowane", 0.5,
@@ -120,11 +122,31 @@ public class ImageModelTests {
                 assertThat(actual).isEqualTo(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
             }
+
+            @Test
+            @DisplayName("POST: '/api/beer' [INVALID_PROPORTIONS]")
+            public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test() {
+                var postResponse = postRequestAuth("admin", "admin", "/api/beer",
+                        createBeerRequest("Heineken", null, 0.33,
+                                getRawPathToImage("heineken-0.33_proportions.webp")));
+
+                String jsonResponse = postResponse.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.BAD_REQUEST,
+                        "/api/beer",
+                        "Proportions are invalid");
+            }
         }
     }
 
-    private String getRawPathToImage(String imageFilename) throws IOException {
-        URI uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
+    private String getRawPathToImage(String imageFilename) {
+        URI uri = null;
+        try {
+            uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         String rawPath = Paths.get(uri).toAbsolutePath().toString();
         return rawPath;
     }
