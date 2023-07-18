@@ -32,10 +32,10 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
@@ -149,7 +149,7 @@ public class ImageModelTests {
 
                 assertIsError(jsonResponse,
                         HttpStatus.NOT_FOUND,
-                        "File was not found (Path: %s)".formatted(imgPath),
+                        "File was not found (Path: '%s')".formatted(imgPath),
                         "/api/beer");
             }
         }
@@ -160,7 +160,12 @@ public class ImageModelTests {
         try {
             uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                uri = resourceLoader.getResource("classpath:data_img").getURI();
+                return Paths.get(uri).toAbsolutePath().toString() + '/' + imageFilename;
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         String rawPath = Paths.get(uri).toAbsolutePath().toString();
         return rawPath;
