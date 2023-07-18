@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.utils;
 
+import com.demo.alkolicznik.api.ImageModelTests;
 import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
 import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
@@ -25,7 +26,6 @@ import java.util.Set;
 public class JsonUtils {
 
     private static ObjectMapper mapper = new ObjectMapper();
-    private static final String EXTERNAL_IMG_URL = "https://ik.imagekit.io/icemajor/test/tr:n-get_beer/";
 
     public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
@@ -77,7 +77,7 @@ public class JsonUtils {
      * Specify only uploaded filename without the path.
      */
     public static ImageModelResponseDTO createImageResponse(String imgName) {
-        return new ImageModelResponseDTO(EXTERNAL_IMG_URL + imgName);
+        return new ImageModelResponseDTO(ImageModelTests.IMG_TRANSFORMED_URL + imgName);
     }
 
     public static ImageModelResponseDTO createImageResponse(ImageModel image) {

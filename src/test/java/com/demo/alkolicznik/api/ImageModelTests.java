@@ -34,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 public class ImageModelTests {
 
+    public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/";
+
     @Autowired
     private List<Beer> beers;
 
@@ -76,8 +78,8 @@ public class ImageModelTests {
         public void whenAddingBeerWithImage_thenReturnOKTest() throws IOException {
             var expected = createBeerResponse(
                     beers.size() + 1, "Kasztelan",
-                    "Niepasteryzowane", null,
-                    createImageResponse("kasztelan-niepasteryzowane.png")
+                    "Niepasteryzowane", 0.5,
+                    createImageResponse("kasztelan-niepasteryzowane-0.5.png")
             );
             var expectedJson = toJsonString(expected);
             var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
