@@ -21,12 +21,12 @@ public class MockRequests {
     private static MockMvc mockMvc;
 
     private static void initMockMvc() {
-        if(ImageModelTests.mockMvc != null) {
-            mockMvc = ImageModelTests.mockMvc;
-            return;
-        }
         if (StoreTests.mockMvc != null) {
             mockMvc = StoreTests.mockMvc;
+            return;
+        }
+        if (ImageModelTests.mockMvc != null) {
+            mockMvc = ImageModelTests.mockMvc;
             return;
         }
         if (BeerTests.mockMvc != null) {

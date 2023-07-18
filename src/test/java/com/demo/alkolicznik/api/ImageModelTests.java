@@ -11,18 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.List;
 
+import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
-import static com.demo.alkolicznik.utils.CustomAssertions.*;
-import static com.demo.alkolicznik.utils.requests.MockRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,6 +36,9 @@ public class ImageModelTests {
 
     @Autowired
     private List<Beer> beers;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     public static MockMvc mockMvc;
 
@@ -66,16 +73,15 @@ public class ImageModelTests {
         @DisplayName("POST: '/api/beer/'")
         @DirtiesContext
         @WithUserDetails("admin")
-        public void whenAddingBeerWithImage_thenReturnOKTest() {
+        public void whenAddingBeerWithImage_thenReturnOKTest() throws IOException {
             var expected = createBeerResponse(
                     beers.size() + 1, "Kasztelan",
                     "Niepasteryzowane", null,
-                    createImageResponse("https://ik.imagekit.io/icemajor/test/tr:n-get_beer/kasztelan-niepasteryzowane.png")
+                    createImageResponse("kasztelan-niepasteryzowane.png")
             );
             var expectedJson = toJsonString(expected);
-
             var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
-                    null, "classpath:data_img/kasztelan-niepasteryzowane.png");
+                    null, getRawPathToImage("kasztelan-niepasteryzowane.png"));
             var actualJson = assertMockRequest(mockPostRequest("/api/beer", request),
                     HttpStatus.CREATED,
                     expectedJson);
@@ -84,5 +90,11 @@ public class ImageModelTests {
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
         }
+    }
+
+    private String getRawPathToImage(String imageFilename) throws IOException {
+        URI uri = resourceLoader.getResource("classpath:data_img/" + imageFilename).getURI();
+        String rawPath = Paths.get(uri).toAbsolutePath().toString();
+        return rawPath;
     }
 }
