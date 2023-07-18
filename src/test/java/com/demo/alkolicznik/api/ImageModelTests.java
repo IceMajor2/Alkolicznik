@@ -102,7 +102,7 @@ public class ImageModelTests {
             }
 
             @Test
-            @DisplayName("POST: '/api/beer/'")
+            @DisplayName("POST: '/api/beer'")
             @DirtiesContext
             @WithUserDetails("admin")
             public void whenAddingBeerWithImage_thenReturnOKTest() {
@@ -135,6 +135,21 @@ public class ImageModelTests {
                 assertIsError(jsonResponse,
                         HttpStatus.BAD_REQUEST,
                         "Image proportions are invalid",
+                        "/api/beer");
+            }
+
+            @Test
+            @DisplayName("POST: '/api/beer' [FILE_NOT_FOUND]")
+            public void givenInvalidPath_whenAddingBeerImage_thenReturn404Test() {
+                String imgPath = getRawPathToImage("lomza-0.5.png");
+                var postResponse = postRequestAuth("admin", "admin", "/api/beer",
+                        createBeerRequest("Lomza", null, null, imgPath));
+
+                String jsonResponse = postResponse.getBody();
+
+                assertIsError(jsonResponse,
+                        HttpStatus.NOT_FOUND,
+                        "File was not found (Path: %s)".formatted(imgPath),
                         "/api/beer");
             }
         }
