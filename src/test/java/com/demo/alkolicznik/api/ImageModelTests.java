@@ -4,6 +4,12 @@ import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
 import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
+import io.imagekit.sdk.ImageKit;
+import io.imagekit.sdk.exceptions.*;
+import io.imagekit.sdk.models.BaseFile;
+import io.imagekit.sdk.models.GetFileListRequest;
+import io.imagekit.sdk.models.results.ResultList;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +50,9 @@ public class ImageModelTests {
 
     public static MockMvc mockMvc;
 
+    private final List<String> imageFilenameBeanList = List.of("tyskie-gronie-0.65.png", "zubr-0.5.png",
+            "komes-porter-malinowy-0.33.png", "miloslaw-biale-0.5.png");
+
     @Autowired
     public void setMockMvc(MockMvc mockMvc) {
         ImageModelTests.mockMvc = mockMvc;
@@ -71,26 +80,46 @@ public class ImageModelTests {
     @Nested
     class PostRequests {
         // TODO: Make a stub / mock of service that sends the images to hosting (so that they are not actually sent).
-        @Test
-        @DisplayName("POST: '/api/beer/'")
-        @DirtiesContext
-        @WithUserDetails("admin")
-        public void whenAddingBeerWithImage_thenReturnOKTest() throws IOException {
-            var expected = createBeerResponse(
-                    beers.size() + 1, "Kasztelan",
-                    "Niepasteryzowane", 0.5,
-                    createImageResponse("kasztelan-niepasteryzowane-0.5.png")
-            );
-            var expectedJson = toJsonString(expected);
-            var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
-                    null, getRawPathToImage("kasztelan-niepasteryzowane.png"));
-            var actualJson = assertMockRequest(mockPostRequest("/api/beer", request),
-                    HttpStatus.CREATED,
-                    expectedJson);
-            var actual = toModel(actualJson, BeerResponseDTO.class);
 
-            assertThat(actual).isEqualTo(expected);
-            assertThat(actualJson).isEqualTo(expectedJson);
+        @Nested
+        class ImageDirtiesContext {
+
+            @AfterEach
+            // TODO: create annotation from the method below. @ImageDirtiesContext
+            public void imagesDirtiesContext() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
+                GetFileListRequest getFileListRequest = new GetFileListRequest();
+                getFileListRequest.setPath("/test/beer");
+                ResultList resultList = ImageKit.getInstance().getFileList(getFileListRequest);
+
+                for (BaseFile baseFile : resultList.getResults()) {
+                    if (imageFilenameBeanList.contains(baseFile.getName())) {
+                        continue;
+                    }
+                    ImageKit.getInstance().deleteFile(baseFile.getFileId());
+                }
+            }
+
+            @Test
+            @DisplayName("POST: '/api/beer/'")
+            @DirtiesContext
+            @WithUserDetails("admin")
+            public void whenAddingBeerWithImage_thenReturnOKTest() throws IOException {
+                var expected = createBeerResponse(
+                        beers.size() + 1, "Kasztelan",
+                        "Niepasteryzowane", 0.5,
+                        createImageResponse("kasztelan-niepasteryzowane-0.5.png")
+                );
+                var expectedJson = toJsonString(expected);
+                var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
+                        null, getRawPathToImage("kasztelan-niepasteryzowane.png"));
+                var actualJson = assertMockRequest(mockPostRequest("/api/beer", request),
+                        HttpStatus.CREATED,
+                        expectedJson);
+                var actual = toModel(actualJson, BeerResponseDTO.class);
+
+                assertThat(actual).isEqualTo(expected);
+                assertThat(actualJson).isEqualTo(expectedJson);
+            }
         }
     }
 
