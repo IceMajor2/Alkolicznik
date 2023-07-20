@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -23,7 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.demo.alkolicznik.config.ImageKitConfig.extractFilenameFromUrl;
+import static com.demo.alkolicznik.config.ImageKitConfig.getExternalId;
+
 @Configuration
+@Profile({"main", "image"})
 public class TestConfig {
 
     @Autowired
@@ -63,6 +68,7 @@ public class TestConfig {
 
     @Bean
     public List<Beer> beers() {
+        setJdbcTemplate();
         String sql = "SELECT * FROM beer";
         List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
         for (Beer beer : initializedBeers) {
@@ -111,7 +117,7 @@ public class TestConfig {
         }
     }
 
-    @Bean
+    @Bean("dataSource")
     public DataSource dataSource() {
         return
                 (new EmbeddedDatabaseBuilder())
@@ -156,16 +162,24 @@ public class TestConfig {
                         // we move the pointer to the next row with rs.next() command
                         // if it returns false, then there's no image assigned to the beer
                         // thus returning null below
-                        if(!rs.next()) {
+                        if (!rs.next()) {
                             return null;
                         }
                         ImageModel image = new ImageModel();
-                        image.setImageUrl(rs.getString("url"));
-                        image.setId(rs.getLong("beer_id"));
+                        String url = rs.getString("url");
+                        Long beerId = rs.getLong("beer_id");
+                        String externalId = getExternalId(extractFilenameFromUrl(url));
+
+                        image.setImageUrl(url);
+                        image.setId(beerId);
+                        // update image table with ImageKit's external id of this image
+                        String updateQuery = "UPDATE image SET external_id = ? where beer_id = ?";
+                        jdbcTemplate.update(updateQuery, externalId, beerId);
+                        image.setExternalId(externalId);
                         return image;
                     }
                 });
-                if(image != null) {
+                if (image != null) {
                     beer.setImage(image);
                     image.setBeer(beer);
                 }
@@ -173,18 +187,6 @@ public class TestConfig {
             }
         };
     }
-
-//    private RowMapper<ImageModel> mapToImage() {
-//        return new RowMapper<ImageModel>() {
-//            @Override
-//            public ImageModel mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                ImageModel image = new ImageModel();
-//                image.setId(rs.getLong("beer_id"));
-//                image.setImageUrl(rs.getString("image_address"));
-//                return image;
-//            }
-//        };
-//    }
 
     private RowMapper<BeerPrice> mapToBeerPrice() {
         return new RowMapper<BeerPrice>() {

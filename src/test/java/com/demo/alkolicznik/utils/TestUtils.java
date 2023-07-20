@@ -127,6 +127,16 @@ public class TestUtils {
         return urlTemplate;
     }
 
+    public static String getRawPathToClassPathResource(String resource) {
+        URI uri = null;
+        try {
+            uri = resourceLoader.getResource("classpath:" + resource).getURI();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Paths.get(uri).toAbsolutePath().toString();
+    }
+
     public static String getRawPathToImage(String imageFilename) {
         URI uri = null;
         try {
