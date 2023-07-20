@@ -177,6 +177,37 @@ public class ImageModelTests {
         }
 
         @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' contained img previously")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void givenBeerWithImage_whenUpdatingBeerImage_thenReturnOKTest() {
+            String filename = "perla-chmielowa-pils_2.webp";
+            var expected = createBeerResponse(1, "Perla", "Chmielowa Pils", 0.5d,
+                    createImageResponse("perla-chmielowa-pils-0.5.webp"));
+            String expectedJson = toJsonString(expected);
+
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/beer/1",
+                            createBeerUpdateRequest(null, null, null, getRawPathToImage(filename))
+                    ),
+                    HttpStatus.OK,
+                    expectedJson
+            );
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' assert changing brand deletes image")
+        @DirtiesContext
+        @WithUserDetails("admin")
+        public void whenUpdatingBeerBrand_thenImageShouldBeDeletedTest() {
+
+        }
+
+        @Test
         @DisplayName("PUT: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
         public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
             String path = getRawPathToImage("karpackie-0.5.jpg");
@@ -204,6 +235,18 @@ public class ImageModelTests {
                     HttpStatus.BAD_REQUEST,
                     "Image proportions are invalid",
                     "/api/beer/2");
+        }
+    }
+
+    @Nested
+    class DeleteRequests {
+
+        @Test
+        @DisplayName("DELETE: '/api/beer/{beer_id}/image'")
+        @WithUserDetails("admin")
+        @DirtiesContext
+        public void whenDeletingBeerImage_thenReturnOKTest() {
+
         }
     }
 }
