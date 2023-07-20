@@ -204,7 +204,19 @@ public class ImageModelTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void whenUpdatingBeerBrand_thenImageShouldBeDeletedTest() {
+            var expected = createBeerResponse(6, "Browar Polczyn", "Zdrojowe", 0.5d, null);
+            String expectedJson = toJsonString(expected);
 
+            String actualJson = assertMockRequest(
+                    mockPutRequest("/api/beer/6",
+                            createBeerUpdateRequest("Browar Polczyn", "Zdrojowe", null, null)),
+                    HttpStatus.OK,
+                    expectedJson
+            );
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
         }
 
         @Test
