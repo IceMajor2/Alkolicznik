@@ -124,7 +124,10 @@ public class ImageService {
         double heightExact = (widthScaled * 7) / 3;
         double heightVicinity = heightExact * 0.2;
 
-        if (heightScaled >= heightExact - heightVicinity && heightScaled <= heightExact + heightVicinity) {
+        double lowerBound = heightVicinity;
+        double upperBound = heightVicinity * 3;
+
+        if (heightScaled >= heightExact - lowerBound && heightScaled <= heightExact + upperBound) {
             return true;
         }
         return false;
