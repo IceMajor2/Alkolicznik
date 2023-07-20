@@ -29,6 +29,7 @@ CREATE TABLE beer_price (
 
 CREATE TABLE IF NOT EXISTS image (
     beer_id BIGINT NOT NULL,
+    external_id VARCHAR(255),
     url VARCHAR(255),
     image_component BLOB(1024),
     PRIMARY KEY (beer_id),

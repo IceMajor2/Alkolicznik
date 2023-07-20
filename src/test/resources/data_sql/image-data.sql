@@ -1,4 +1,4 @@
-INSERT INTO image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/tyskie-gronie-0.65.png');
-INSERT INTO image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/zubr-0.5.png');
-INSERT INTO image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/komes-porter-malinowy-0.33.png');
-INSERT INTO image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/miloslaw-biale-0.5.png');
+INSERT INTO image (BEER_ID, EXTERNAL_ID, URL) VALUES (3, '64b68b3b8b3de511f4b03682', 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/tyskie-gronie-0.65.png');
+INSERT INTO image (BEER_ID, EXTERNAL_ID, URL) VALUES (4, '64b68b358b3de511f4b0343d', 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/zubr-0.5.png');
+INSERT INTO image (BEER_ID, EXTERNAL_ID, URL) VALUES (5, '64b90e6706370748f265546d', 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/komes-porter-malinowy-0.33.png');
+INSERT INTO image (BEER_ID, EXTERNAL_ID, URL) VALUES (6, '64b90d1e06370748f2617d44', 'https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/miloslaw-biale-0.5.png');
