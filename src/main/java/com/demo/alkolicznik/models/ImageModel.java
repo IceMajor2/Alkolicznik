@@ -20,6 +20,8 @@ public class ImageModel {
     @Column(name = "beer_id")
     private Long id;
 
+    private String externalId;
+
     @Column(name = "url")
     @URL
     private String imageUrl;

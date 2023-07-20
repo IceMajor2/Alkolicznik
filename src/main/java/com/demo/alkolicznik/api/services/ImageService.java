@@ -110,6 +110,17 @@ public class ImageService {
         return new ImageModel(imageKit.getUrl(options));
     }
 
+    @SneakyThrows
+    public void delete(Beer beer) {
+        if(beer.getImage().isEmpty()) {
+            return;
+        }
+        ImageModel beerImage = beer.getImage().get();
+        imageKit.deleteFile(beerImage.getExternalId());
+        beerImage.setBeer(null);
+        beer.setImage(null);
+    }
+
     public ImageModel save(ImageModel imageModel) {
         return imageRepository.save(imageModel);
     }

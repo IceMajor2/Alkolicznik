@@ -102,9 +102,12 @@ public class BeerService {
         if (imagePath != null) {
             ImageModel imageModel = imageService.upload(imagePath,
                     imageService.createImageFilename(beer, imageService.extractExtensionFromPath(imagePath)));
+            imageService.delete(beer);
             beer.setImage(imageModel);
             imageModel.setBeer(beer);
             imageService.save(imageModel);
+        } else if(updateDTO.imageToDelete()) {
+            imageService.delete(beer);
         }
         return new BeerResponseDTO(beerRepository.save(beer));
     }

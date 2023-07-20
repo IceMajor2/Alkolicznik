@@ -57,6 +57,10 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         return false;
     }
 
+    public boolean imageToDelete() {
+        return this.brand != null || this.type != null;
+    }
+
     @JsonIgnore
     public String getFullName() {
         if (this.brand == null) {
