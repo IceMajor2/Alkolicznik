@@ -30,6 +30,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -173,6 +174,36 @@ public class ImageModelTests {
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
+        public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
+            String path = getRawPathToImage("karpackie-0.5.jpg");
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer/5",
+                    createBeerUpdateRequest("Karpackie", null, 0.5, path));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.NOT_FOUND,
+                    "File was not found (Path: '%s')".formatted(path),
+                    "/api/beer/5");
+        }
+
+        @Test
+        @DisplayName("PUT: '/api/beer/{beer_id}' [PROPORTIONS_INVALID]")
+        public void givenInvalidProportions_whenUpdatingBeerImage_thenReturn400Test() {
+            String path = getRawPathToImage("heineken-0.33_proportions.webp");
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer/2",
+                    createBeerUpdateRequest("Heineken", null, 0.33, path));
+
+            String jsonResponse = putResponse.getBody();
+
+            assertIsError(jsonResponse,
+                    HttpStatus.BAD_REQUEST,
+                    "Image proportions are invalid",
+                    "/api/beer/2");
         }
     }
 }
