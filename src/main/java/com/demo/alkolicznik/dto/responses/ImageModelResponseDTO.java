@@ -1,8 +1,8 @@
 package com.demo.alkolicznik.dto.responses;
 
 import com.demo.alkolicznik.models.ImageModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jakarta.persistence.Column;
 import lombok.*;
 
 @JsonPropertyOrder({"url", "image_component"})
@@ -14,10 +14,10 @@ import lombok.*;
 @EqualsAndHashCode
 public class ImageModelResponseDTO {
 
-    @Column(name = "url")
+    @JsonProperty("url")
     private String imageUrl;
 
-    @Column(name = "external_id")
+    @JsonProperty("external_id")
     private String externalId;
 
     public ImageModelResponseDTO(ImageModel image) {
