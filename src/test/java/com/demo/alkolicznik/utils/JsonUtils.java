@@ -73,11 +73,13 @@ public class JsonUtils {
         );
     }
 
-    /**
-     * Specify only uploaded filename without the path.
-     */
-    public static ImageModelResponseDTO createImageResponse(String imgName) {
-        return new ImageModelResponseDTO(ImageModelTests.IMG_TRANSFORMED_URL + imgName);
+    public static ImageModelResponseDTO createImageResponse(String expectedImageName, ImageModelResponseDTO actual) {
+        ImageModelResponseDTO response = new ImageModelResponseDTO();
+        response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + expectedImageName);
+        if(actual.getExternalId() != null) {
+            response.setExternalId(actual.getExternalId());
+        }
+        return response;
     }
 
     public static ImageModelResponseDTO createImageResponse(ImageModel image) {
