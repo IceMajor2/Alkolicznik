@@ -1,8 +1,3 @@
--- DROP TABLE IF EXISTS beer_price;
--- DROP TABLE IF EXISTS store;
--- DROP TABLE IF EXISTS beer;
--- DROP TABLE IF EXISTS users;
-
 CREATE TABLE IF NOT EXISTS beer (
     id SERIAL PRIMARY KEY,
     brand VARCHAR(30) NOT NULL,
@@ -27,7 +22,9 @@ CREATE TABLE IF NOT EXISTS beer_price (
 
 CREATE TABLE IF NOT EXISTS image (
     beer_id BIGINT NOT NULL,
-    url VARCHAR(255),
+    url VARCHAR(255) NOT NULL,
+    external_id VARCHAR(255),
+    image_component BYTEA,
     PRIMARY KEY (beer_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
