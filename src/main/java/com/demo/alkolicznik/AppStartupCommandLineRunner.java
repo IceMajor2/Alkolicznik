@@ -15,7 +15,7 @@ import java.util.Map;
 public class AppStartupCommandLineRunner implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppStartupCommandLineRunner.class);
-    private boolean turnOn = false;
+    private boolean turnOn = true;
     private ImageService imageService;
 
     public AppStartupCommandLineRunner(ImageService imageService) {
@@ -36,6 +36,10 @@ public class AppStartupCommandLineRunner implements CommandLineRunner {
 
                 String externalId = keyBaseFile.getFileId();
                 ImageModel modelToUpdate = imageService.findByUrl(mappedURL);
+
+                if(modelToUpdate.getExternalId() == null) {
+                    imageService.updateExternalId(modelToUpdate, externalId);
+                }
             }
             LOG.info("External ids were successfully saved in the database");
         }
