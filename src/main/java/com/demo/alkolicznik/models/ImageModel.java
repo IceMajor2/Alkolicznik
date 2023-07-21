@@ -34,8 +34,9 @@ public class ImageModel {
     @JoinColumn(name = "beer_id")
     private Beer beer;
 
-    public ImageModel(String imageUrl) {
+    public ImageModel(String imageUrl, String externalId) {
         this.imageUrl = imageUrl;
+        this.externalId = externalId;
     }
 
     @Override

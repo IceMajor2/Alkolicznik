@@ -17,7 +17,11 @@ public class ImageModelResponseDTO {
     @Column(name = "url")
     private String imageUrl;
 
+    @Column(name = "external_id")
+    private String externalId;
+
     public ImageModelResponseDTO(ImageModel image) {
         this.imageUrl = image.getImageUrl();
+        this.externalId = image.getExternalId();
     }
 }
