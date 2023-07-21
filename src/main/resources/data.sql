@@ -20,13 +20,13 @@ ON CONFLICT DO NOTHING;
 INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (6, 'Miloslaw', 'Biale', 0.5)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/test/tr:n-get_beer/tyskie-gronie.png')
+INSERT INTO image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/tyskie-gronie-0.65.png')
 ON CONFLICT DO NOTHING;
-INSERT INTO image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/test/tr:n-get_beer/zubr.png')
+INSERT INTO image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/zubr-0.5.png')
 ON CONFLICT DO NOTHING;
-INSERT INTO image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/test/tr:n-get_beer/komes-porter-malinowy-0.33.png')
+INSERT INTO image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/komes-porter-malinowy-0.33.jpg')
 ON CONFLICT DO NOTHING;
-INSERT INTO image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/test/tr:n-get_beer/miloslaw-biale.png')
+INSERT INTO image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/miloslaw-biale-0.5.jpg')
 ON CONFLICT DO NOTHING;
 
 -- store equipment
