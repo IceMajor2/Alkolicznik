@@ -20,6 +20,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (6, 'Miloslaw', 'Biale', 0.5)
 ON CONFLICT DO NOTHING;
 
+-- images
 INSERT INTO image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/tyskie-gronie-0.65.png')
 ON CONFLICT DO NOTHING;
 INSERT INTO image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/zubr-0.5.png')
