@@ -20,7 +20,7 @@ public class ImageController {
     @GetMapping("/beer/{beer_id}/image")
     @SecurityRequirement(name = "Basic Authentication")
     public ImageModelResponseDTO get(@PathVariable("beer_id") Long beerId) {
-        return imageService.getBeerImageLink(beerId);
+        return imageService.getBeerImage(beerId);
     }
 
     @PostMapping("/beer/image/{beer_id}")

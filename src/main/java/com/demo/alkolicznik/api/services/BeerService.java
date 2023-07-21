@@ -37,7 +37,7 @@ public class BeerService {
     }
 
     public Image getImageComponent(Long beerId) {
-        return imageService.getBeerImageComponent(beerId);
+        return imageService.getVaadinBeerImage(beerId);
     }
 
     public List<BeerResponseDTO> getBeers(String city) {
@@ -73,7 +73,7 @@ public class BeerService {
         String imagePath = beerRequestDTO.getImagePath();
         if (imagePath != null) {
             ImageModel imageModel = imageService.upload(imagePath,
-                    imageService.createImageFilename(beer, imageService.extractExtensionFromPath(imagePath)));
+                    imageService.createImageFilename(beer, imageService.extractFileExtensionFromPath(imagePath)));
             beer.setImage(imageModel);
             imageModel.setBeer(beer);
             imageService.save(imageModel);
@@ -101,13 +101,13 @@ public class BeerService {
         String imagePath = updateDTO.getImagePath();
         if (imagePath != null) {
             ImageModel imageModel = imageService.upload(imagePath,
-                    imageService.createImageFilename(beer, imageService.extractExtensionFromPath(imagePath)));
-            imageService.delete(beer);
+                    imageService.createImageFilename(beer, imageService.extractFileExtensionFromPath(imagePath)));
+            imageService.deleteBeerImage(beer);
             beer.setImage(imageModel);
             imageModel.setBeer(beer);
             imageService.save(imageModel);
         } else if(updateDTO.imageToDelete()) {
-            imageService.delete(beer);
+            imageService.deleteBeerImage(beer);
         }
         return new BeerResponseDTO(beerRepository.save(beer));
     }
