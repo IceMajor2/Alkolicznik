@@ -5,7 +5,7 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @Theme(value = "style")
@@ -21,4 +21,8 @@ public class AlkolicznikApplication implements AppShellConfigurator {
         SpringApplication.run(AlkolicznikApplication.class, args);
     }
 
+    @Bean
+    public String imageKitPath() {
+        return "/beer";
+    }
 }

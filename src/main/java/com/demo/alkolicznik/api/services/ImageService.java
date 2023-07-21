@@ -36,11 +36,15 @@ public class ImageService {
 
     private BeerRepository beerRepository;
     private ImageRepository imageRepository;
+    private String imageKitPath;
+
     private ImageKit imageKit;
 
-    public ImageService(ImageRepository imageRepository, BeerRepository beerRepository) {
+    public ImageService(ImageRepository imageRepository, BeerRepository beerRepository, String imageKitPath) {
         this.imageRepository = imageRepository;
         this.beerRepository = beerRepository;
+        this.imageKitPath = imageKitPath;
+
         this.imageKit = ImageKit.getInstance();
         setConfig();
     }
@@ -65,7 +69,7 @@ public class ImageService {
         // prevent adding a random string to the end of the filename
         fileCreateRequest.setUseUniqueFileName(false);
         // set folder into which image will be uploaded
-        fileCreateRequest.setFolder("/test/beer");
+        fileCreateRequest.setFolder(imageKitPath);
 
         Result result = this.imageKit.upload(fileCreateRequest);
 
@@ -138,6 +142,15 @@ public class ImageService {
         imageRepository.delete(beerImage);
         imageKit.deleteFile(beerImage.getExternalId());
         beer.setImage(null);
+    }
+
+    @SneakyThrows
+    public void deleteAllExternal(String relativePath) {
+        var deleteIds = getExternalFiles(relativePath).stream().map(BaseFile::getFileId).toList();
+        if(deleteIds.isEmpty()) {
+            return;
+        }
+        imageKit.bulkDeleteFiles(deleteIds);
     }
 
     public ImageModel findByUrl(String url) {
