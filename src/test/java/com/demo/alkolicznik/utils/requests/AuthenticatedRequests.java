@@ -59,6 +59,13 @@ public class AuthenticatedRequests {
         return putRequestAuth(username, password, urlTemplate, request);
     }
 
+    public static ResponseEntity<String> patchRequestAuth(String username, String password, String url,
+                                                        Object request) {
+        return restTemplate
+                .withBasicAuth(username, password)
+                .exchange(url, HttpMethod.PATCH, new HttpEntity(request), String.class);
+    }
+
     public static ResponseEntity<String> deleteRequestAuth(String username, String password, String url) {
         return restTemplate
                 .withBasicAuth(username, password)

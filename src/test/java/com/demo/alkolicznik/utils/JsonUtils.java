@@ -1,17 +1,21 @@
 package com.demo.alkolicznik.utils;
 
 import com.demo.alkolicznik.api.ImageModelTests;
-import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
-import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
-import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.dto.requests.UserRequestDTO;
-import com.demo.alkolicznik.dto.responses.*;
+import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.user.UserRequestDTO;
+import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,12 +77,24 @@ public class JsonUtils {
         );
     }
 
-    public static ImageModelResponseDTO createImageResponse(String expectedImageName, ImageModelResponseDTO actual) {
+    public static BeerResponseDTO createBeerResponse(Beer beer, ImageModelResponseDTO image) {
+        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(),
+                image);
+    }
+
+    public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual) {
         ImageModelResponseDTO response = new ImageModelResponseDTO();
-        response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + expectedImageName);
+        response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + filename);
         if(actual.getExternalId() != null) {
             response.setExternalId(actual.getExternalId());
         }
+        return response;
+    }
+
+    public static ImageModelResponseDTO createImageResponse(String filename, String remoteId) {
+        ImageModelResponseDTO response = new ImageModelResponseDTO();
+        response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + filename);
+        response.setExternalId(remoteId);
         return response;
     }
 
@@ -86,6 +102,7 @@ public class JsonUtils {
         if (image != null) {
             ImageModelResponseDTO response = new ImageModelResponseDTO();
             response.setImageUrl(image.getImageUrl());
+            response.setExternalId(image.getExternalId());
             return response;
         }
         return null;

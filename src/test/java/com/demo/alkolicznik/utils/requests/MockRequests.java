@@ -18,19 +18,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Component
 public class MockRequests {
 
-    private static MockMvc mockMvc;
+    public static MockMvc mockMvc;
 
     private static void initMockMvc() {
+        if (BeerTests.mockMvc != null) {
+            mockMvc = BeerTests.mockMvc;
+            return;
+        }
         if (StoreTests.mockMvc != null) {
             mockMvc = StoreTests.mockMvc;
             return;
         }
         if (ImageModelTests.mockMvc != null) {
             mockMvc = ImageModelTests.mockMvc;
-            return;
-        }
-        if (BeerTests.mockMvc != null) {
-            mockMvc = BeerTests.mockMvc;
             return;
         }
         if (BeerPriceTests.mockMvc != null) {
