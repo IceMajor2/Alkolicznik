@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.requests;
+package com.demo.alkolicznik.dto.beer;
 
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,11 +23,12 @@ public class BeerRequestDTO {
     // TODO: Add regex
     private String imagePath;
 
-    public Beer convertToModel() {
+    public Beer convertToModelNoImage() {
         Beer beer = new Beer();
         beer.setBrand(this.brand);
         if (this.type != null) {
-            beer.setType(this.type);
+            if(this.type.isBlank()) beer.setType(null);
+            else beer.setType(this.type);
         }
         if (this.volume == null) {
             beer.setVolume(0.5);

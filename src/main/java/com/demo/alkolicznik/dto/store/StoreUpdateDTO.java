@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.dto.put;
+package com.demo.alkolicznik.dto.store;
 
+import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Store;
 import lombok.Getter;

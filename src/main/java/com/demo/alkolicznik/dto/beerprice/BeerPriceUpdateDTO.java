@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.dto.put;
+package com.demo.alkolicznik.dto.beerprice;
 
+import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.models.BeerPrice;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;

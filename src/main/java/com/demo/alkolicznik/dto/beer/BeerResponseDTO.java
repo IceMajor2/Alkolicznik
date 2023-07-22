@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.dto.responses;
+package com.demo.alkolicznik.dto.beer;
 
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

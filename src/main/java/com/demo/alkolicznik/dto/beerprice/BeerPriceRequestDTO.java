@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.requests;
+package com.demo.alkolicznik.dto.beerprice;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.delete;
+package com.demo.alkolicznik.dto.beer;
 
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonProperty;

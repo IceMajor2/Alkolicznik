@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.delete;
+package com.demo.alkolicznik.dto.store;
 
 import com.demo.alkolicznik.models.Store;
 import lombok.AllArgsConstructor;

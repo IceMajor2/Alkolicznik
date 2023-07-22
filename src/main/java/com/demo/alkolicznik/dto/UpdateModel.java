@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.put;
+package com.demo.alkolicznik.dto;
 
 public interface UpdateModel<T> {
 

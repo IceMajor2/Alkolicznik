@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.requests;
+package com.demo.alkolicznik.dto.beerprice;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

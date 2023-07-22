@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.responses;
+package com.demo.alkolicznik.dto.user;
 
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;

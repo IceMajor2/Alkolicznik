@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.responses;
+package com.demo.alkolicznik.dto.store;
 
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

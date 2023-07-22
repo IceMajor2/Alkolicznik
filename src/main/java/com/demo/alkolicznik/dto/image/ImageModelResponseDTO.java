@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.responses;
+package com.demo.alkolicznik.dto.image;
 
 import com.demo.alkolicznik.models.ImageModel;
 import com.fasterxml.jackson.annotation.JsonProperty;

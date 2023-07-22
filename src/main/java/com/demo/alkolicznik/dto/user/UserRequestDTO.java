@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.dto.requests;
+package com.demo.alkolicznik.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

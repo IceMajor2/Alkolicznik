@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.dto.put;
+package com.demo.alkolicznik.dto.beer;
 
+import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,6 +26,13 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
     private Double volume;
     // TODO: Add regex
     private String imagePath;
+
+    public BeerUpdateDTO(BeerRequestDTO requestDTO) {
+        this.brand = requestDTO.getBrand();
+        this.type = requestDTO.getType();
+        this.volume = requestDTO.getVolume();
+        this.imagePath = requestDTO.getImagePath();
+    }
 
     @Override
     public boolean propertiesMissing() {
