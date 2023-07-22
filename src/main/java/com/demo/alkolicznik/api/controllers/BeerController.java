@@ -1,10 +1,10 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.dto.delete.BeerDeleteDTO;
-import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
-import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -60,8 +60,14 @@ public class BeerController {
     @PutMapping("/{beer_id}")
     // secured in SecurityConfig
     @SecurityRequirement(name = "Basic Authentication")
+    public BeerResponseDTO replace(@PathVariable("beer_id") Long beerId,
+                                                  @RequestBody @Valid BeerRequestDTO requestDTO) {
+        return beerService.replace(beerId, requestDTO);
+    }
+
+    @PatchMapping("/{beer_id}")
     public BeerResponseDTO update(@PathVariable("beer_id") Long beerId,
-                                                  @RequestBody @Valid BeerUpdateDTO updateDTO) {
+                                  @RequestBody @Valid BeerUpdateDTO updateDTO) {
         return beerService.update(beerId, updateDTO);
     }
 

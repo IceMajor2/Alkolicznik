@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
@@ -139,9 +139,9 @@ public class ImageService {
     public void deleteBeerImage(Beer beer) {
         ImageModel beerImage = beer.getImage().orElseThrow(() ->
                 new ImageNotFoundException());
-        imageRepository.delete(beerImage);
         imageKit.deleteFile(beerImage.getExternalId());
         beer.setImage(null);
+        imageRepository.deleteById(beerImage.getId());
     }
 
     @SneakyThrows
