@@ -1,8 +1,9 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.responses.BeerResponseDTO;
-import com.demo.alkolicznik.dto.responses.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +27,6 @@ import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
-import static com.demo.alkolicznik.utils.requests.MockRequests.mockPostRequest;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("image")
+@ActiveProfiles({"main", "image"})
 public class ImageModelTests {
 
     public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/";
@@ -76,18 +76,20 @@ public class ImageModelTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void whenAddingBeerWithImage_thenReturnOKTest() {
-            var expected = createBeerResponse(
-                    beers.size() + 1, "Kasztelan",
-                    "Niepasteryzowane", 0.5,
-                    createImageResponse("kasztelan-niepasteryzowane-0.5.png")
-            );
-            var expectedJson = toJsonString(expected);
-            var request = createBeerRequest("Kasztelan", "Niepasteryzowane",
-                    null, getRawPathToImage("kasztelan-niepasteryzowane-0.5.png"));
-            var actualJson = assertMockRequest(mockPostRequest("/api/beer", request),
-                    HttpStatus.CREATED,
-                    expectedJson);
-            var actual = toModel(actualJson, BeerResponseDTO.class);
+            // given
+            String filename = "kasztelan-niepasteryzowane-0.5.png";
+            BeerRequestDTO request = createBeerRequest("Kasztelan", "Niepasteryzowane", null, getRawPathToImage(filename));
+
+            // when
+            var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
+            assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            String actualJson = postResponse.getBody();
+            BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            // then
+            BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Kasztelan", "Niepasteryzowane", 0.5d,
+                    createImageResponse(filename, actual.getImage()));
+            String expectedJson = toJsonString(expected);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -132,18 +134,20 @@ public class ImageModelTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void givenBeerWithNoImage_whenUpdatingBeerImage_thenReturnOKTest() {
+            // given
             String filename = "perla-chmielowa-pils-0.5.webp";
-            var expected = createBeerResponse(1, "Perla", "Chmielowa Pils", 0.5d,
-                    createImageResponse(filename));
-            String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/beer/1",
-                            createBeerUpdateRequest(null, null, null, getRawPathToImage(filename))
-                    ),
-                    HttpStatus.OK,
-                    expectedJson);
+            // when
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer/1",
+                    createBeerUpdateRequest(null, null, null, getRawPathToImage(filename)));
+            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            String actualJson = putResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            // then
+            BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5,
+                    createImageResponse(filename, actual.getImage()));
+            String expectedJson = toJsonString(expected);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -154,19 +158,20 @@ public class ImageModelTests {
         @DirtiesContext
         @WithUserDetails("admin")
         public void givenBeerWithImage_whenUpdatingBeerImage_thenReturnOKTest() {
+            // given
             String filename = "perla-chmielowa-pils_2.webp";
-            var expected = createBeerResponse(1, "Perla", "Chmielowa Pils", 0.5d,
-                    createImageResponse("perla-chmielowa-pils-0.5.webp"));
-            String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(
-                    mockPutRequest("/api/beer/1",
-                            createBeerUpdateRequest(null, null, null, getRawPathToImage(filename))
-                    ),
-                    HttpStatus.OK,
-                    expectedJson
-            );
+            // when
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer/1",
+                    createBeerUpdateRequest(null, null, null, getRawPathToImage(filename)));
+            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            String actualJson = putResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+            // then
+            BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5,
+                    createImageResponse(filename, actual.getImage()));
+            String expectedJson = toJsonString(expected);
 
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
