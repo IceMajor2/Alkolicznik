@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.dto.responses.UserResponseDTO;
+import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.utils.TestUtils;

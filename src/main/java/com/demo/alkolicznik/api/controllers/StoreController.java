@@ -1,10 +1,10 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

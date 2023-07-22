@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;

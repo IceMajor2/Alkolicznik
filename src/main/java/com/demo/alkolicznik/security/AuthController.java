@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.dto.requests.UserRequestDTO;
-import com.demo.alkolicznik.dto.responses.UserResponseDTO;
+import com.demo.alkolicznik.dto.user.UserRequestDTO;
+import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

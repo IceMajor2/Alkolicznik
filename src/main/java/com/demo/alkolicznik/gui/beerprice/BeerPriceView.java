@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.gui.beerprice;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerPriceParamRequestDTO;
-import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;

@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.delete.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

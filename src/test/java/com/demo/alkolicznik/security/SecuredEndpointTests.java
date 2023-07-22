@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.put.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerRequestDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;

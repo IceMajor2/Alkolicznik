@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.models;
 
-import com.demo.alkolicznik.dto.requests.UserRequestDTO;
+import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

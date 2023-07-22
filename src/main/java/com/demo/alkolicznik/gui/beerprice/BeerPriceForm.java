@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.beerprice;
 
-import com.demo.alkolicznik.dto.requests.BeerPriceParamRequestDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;

@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.store;
 
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;

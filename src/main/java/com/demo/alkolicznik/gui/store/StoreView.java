@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.gui.store;
 
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.put.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;

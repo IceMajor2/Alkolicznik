@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.dto.requests.UserRequestDTO;
+import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;

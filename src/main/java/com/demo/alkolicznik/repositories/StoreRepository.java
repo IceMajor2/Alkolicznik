@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.repositories;
 
-import com.demo.alkolicznik.dto.requests.StoreRequestDTO;
-import com.demo.alkolicznik.dto.responses.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.models.Store;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
