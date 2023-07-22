@@ -1,9 +1,9 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
-import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getStore;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
-import static com.demo.alkolicznik.utils.requests.MockRequests.*;
+import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
+import static com.demo.alkolicznik.utils.requests.MockRequests.mockGetRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -470,7 +470,8 @@ public class BeerPriceTests {
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(getBeer(4L, beers)),
+                    createBeerResponse(getBeer(4L, beers),
+                            createImageResponse(getImage(4L, beers))),
                     createStoreResponse(getStore(1L, stores)),
                     "PLN 2.79"
             );
@@ -710,25 +711,30 @@ public class BeerPriceTests {
         @Test
         @DisplayName("PUT: '/api/beer-price'")
         @DirtiesContext
-        @WithUserDetails("admin")
         public void updateBeerPricePriceTest() {
+            // given
             BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(4.59);
 
+            // when
+            var putResponse = putRequestAuth("admin", "admin", "/api/beer-price",
+                    request, Map.of("beer_id", 3L, "store_id", 3L));
+            assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            String actualJson = putResponse.getBody();
+            System.out.println(actualJson);
+            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+            // then
             BeerPriceResponseDTO expected = createBeerPriceResponse(
-                    createBeerResponse(getBeer(3L, beers)),
+                    createBeerResponse(getBeer(3L, beers),
+                            createImageResponse(getImage(3L, beers))),
                     createStoreResponse(getStore(3L, stores)),
                     "PLN 4.59"
             );
+
             String expectedJson = toJsonString(expected);
 
-            String actualJson = assertMockRequest(mockPutRequest(
-                            "/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L), request
-                    ),
-                    HttpStatus.NO_CONTENT,
-                    expectedJson);
-            BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
             assertThat(actual).isEqualTo(expected);
+            assertThat(actualJson).isEqualTo(expectedJson);
 
             var getResponse = getRequest("/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L));
 
