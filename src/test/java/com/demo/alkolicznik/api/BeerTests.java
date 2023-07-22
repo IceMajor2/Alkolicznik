@@ -65,7 +65,7 @@ public class BeerTests {
             String actualJson = getResponse.getBody();
             BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-            BeerResponseDTO expected = createBeerResponse(getBeer(1L, beers));
+            BeerResponseDTO expected = createBeerResponse(1l, "Perla", "Chmielowa Pils", 0.5);
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
             assertThat(actualJson).isEqualTo(expectedJson);
@@ -145,7 +145,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' volume update")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void updateVolumeTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5, null);
@@ -177,7 +177,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' brand update")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void updateBrandTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null, null);
@@ -208,7 +208,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' type update")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void updateTypeTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Potrojny zloty", null, null);
@@ -239,7 +239,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' changing brand removes prices")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void changingBrandRemovesPricesTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest("Harnas", null, null);
@@ -264,7 +264,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' changing type removes prices")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void changingTypeRemovesPricesTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest(null, "Ciemnozloty", null);
@@ -289,7 +289,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' changing volume does not remove prices")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void changingVolumeDoesNotRemovePricesTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.33);
@@ -319,7 +319,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' changing image does not remove prices")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void changingImageDoesNotRemovePricesTest() {
             // given
             String filename = "perla-chmielowa-pils-0.5.webp";
@@ -357,7 +357,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' remove type")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void updateRemoveTypeTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null, null);
@@ -388,7 +388,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' add type")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void updateAddTypeTest() {
             // given
             BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5, null);
@@ -568,6 +568,7 @@ public class BeerTests {
             );
         }
 
+        // TODO: move to 'SecuredEndpointsTests'
         @Test
         @DisplayName("PATCH: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
         public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
@@ -591,7 +592,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' brand")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceWithBrandTest() {
             BeerRequestDTO request = createBeerRequest("Lech", null, null, null);
 
@@ -608,7 +609,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' brand & type")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceWithBrandAndTypeTest() {
             BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null, null);
 
@@ -625,7 +626,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' brand, type & volume")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceWithBrandTypeAndVolumeTest() {
             BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33, null);
 
@@ -642,7 +643,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' brand, volume & image")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceWithBrandTypeVolumeAndImageTest() {
             BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne",
                     0.33, getRawPathToImage("zywiec-jasne-0.33.jpg"));
@@ -661,7 +662,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' replace beer with image")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceBeerWithImageTest() {
             BeerRequestDTO request = createBeerRequest("Okocim", null, null, null);
 
@@ -681,7 +682,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("PUT: '/api/beer' replace beer with prices")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void replaceBeerWithPrices() {
             BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null, null);
 
@@ -745,7 +746,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer'")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addBrandTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -772,7 +773,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' brand and volume only")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addBrandAndVolumeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -799,7 +800,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' brand and type only")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addBrandAndTypeTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -827,7 +828,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' everything specified")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addEverythingSpecifiedTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -855,7 +856,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' exists by fullname, volume unique")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addFullnameExistsVolumeUniqueTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -883,7 +884,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' type blank")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addWithTypeBlankTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -910,7 +911,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("POST: '/api/beer' empty type")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         public void addWithTypeEmptyTest() {
             var postResponse = postRequestAuth("admin", "admin",
                     "/api/beer",
@@ -1070,7 +1071,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("DELETE: '/api/beer/{beer_id}'")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         @WithUserDetails("admin")
         public void deleteByIdTest() {
             BeerDeleteDTO expected = createBeerDeleteResponse(
@@ -1096,7 +1097,7 @@ public class BeerTests {
 
         @Test
         @DisplayName("DELETE: '/api/beer'")
-        @DirtiesContext
+        @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
         @WithUserDetails("admin")
         public void deleteByObjectTest() {
             BeerDeleteDTO expected = createBeerDeleteResponse(
