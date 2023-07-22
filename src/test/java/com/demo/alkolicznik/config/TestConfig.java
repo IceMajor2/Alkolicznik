@@ -4,10 +4,7 @@ import com.demo.alkolicznik.models.*;
 import com.demo.alkolicznik.utils.TestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -28,7 +25,7 @@ import static com.demo.alkolicznik.config.ImageKitConfig.extractFilenameFromUrl;
 import static com.demo.alkolicznik.config.ImageKitConfig.getExternalId;
 
 @Configuration
-@Profile({"main", "image"})
+@Profile("main")
 public class TestConfig {
 
     @Autowired
@@ -75,6 +72,12 @@ public class TestConfig {
             beers.put(beer.getId(), beer);
         }
         return initializedBeers;
+    }
+
+    @Bean
+    @Primary
+    public String imageKitPath2() {
+        return "/test/beer";
     }
 
     @Bean
