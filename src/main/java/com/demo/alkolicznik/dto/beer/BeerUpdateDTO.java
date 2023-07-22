@@ -42,7 +42,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
     @Override
     public boolean anythingToUpdate(Beer beer) {
         // for now: not going to compare external image with the new, requested one
-        if(this.imagePath != null) {
+        if (this.imagePath != null) {
             return true;
         }
         String currBrand = beer.getBrand();
@@ -65,10 +65,6 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         return false;
     }
 
-    public boolean imageToDelete() {
-        return this.brand != null || this.type != null;
-    }
-
     @JsonIgnore
     public String getFullName() {
         if (this.brand == null) {
@@ -80,6 +76,10 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
             sb.append(this.type);
         }
         return sb.toString();
+    }
+
+    public boolean imageToDelete() {
+        return this.brand != null || this.type != null;
     }
 
     public Beer convertToModelNoImage() {
