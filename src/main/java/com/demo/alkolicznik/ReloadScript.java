@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
@@ -39,8 +40,9 @@ public class ReloadScript implements CommandLineRunner {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReloadScript.class);
-    private ImageService imageService;
     private static boolean turnOn = false;
+
+    private ImageService imageService;
 
     public ReloadScript(ImageService imageService) {
         this.imageService = imageService;
@@ -48,7 +50,7 @@ public class ReloadScript implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(turnOn) {
+        if (turnOn) {
             LOGGER.info("Reloading ImageKit directory");
             bulkDeleteRemoteImages();
             bulkSendImagesToRemote();
@@ -58,16 +60,20 @@ public class ReloadScript implements CommandLineRunner {
     }
 
     @Bean
+    @ConditionalOnClass(ReloadScript.class)
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
-        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-        resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
-        resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
-        resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
+        if (turnOn) {
+            ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+            resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
+            resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
+            resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
 
-        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-        dataSourceInitializer.setDataSource(dataSource);
-        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-        return dataSourceInitializer;
+            DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+            dataSourceInitializer.setDataSource(dataSource);
+            dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+            return dataSourceInitializer;
+        }
+        return null;
     }
 
     private void bulkDeleteRemoteImages() {
