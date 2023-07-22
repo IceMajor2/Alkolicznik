@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name = "Beer")
 @Table(name = "beer")
@@ -104,5 +101,17 @@ public class Beer {
     @Override
     public int hashCode() {
         return Objects.hash(brand, type, volume, image);
+    }
+
+    public boolean deletePrices() {
+        for (Iterator<BeerPrice> iterator = prices.iterator();
+             iterator.hasNext(); ) {
+            BeerPrice beerPrice = iterator.next();
+            iterator.remove();
+            beerPrice.getStore().getPrices().remove(beerPrice);
+            beerPrice.setStore(null);
+            beerPrice.setBeer(null);
+        }
+        return true;
     }
 }
