@@ -1,10 +1,10 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.delete.BeerPriceDeleteDTO;
-import com.demo.alkolicznik.dto.put.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.requests.BeerPriceRequestDTO;
-import com.demo.alkolicznik.dto.responses.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -105,7 +105,7 @@ public class BeerPriceController {
                                                        @RequestParam("beer_id") Long beerId,
                                                        @RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.OK)
                 .body(beerPriceService.update(storeId, beerId, updateDTO));
     }
 
