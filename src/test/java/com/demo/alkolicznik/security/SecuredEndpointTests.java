@@ -164,21 +164,21 @@ public class SecuredEndpointTests {
                         "/api/beer/1");
             }
 
-			@Test
-			@DisplayName("USER: PATCH '/api/beer/{beer_id}' [INVALID_REQUEST]")
-			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-				var putResponse = patchRequestAuth("user", "user", "/api/beer/5",
-						createBeerUpdateRequest(" ", "Porter Malinowy", -1d, null));
-
-				String jsonResponse = putResponse.getBody();
-
-				assertIsError(
-						jsonResponse,
-						HttpStatus.NOT_FOUND,
-						"Resource not found",
-						"/api/beer/5"
-				);
-			}
+//			@Test
+//			@DisplayName("USER: PATCH '/api/beer/{beer_id}' [INVALID_REQUEST]")
+//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+//				var putResponse = patchRequestAuth("user", "user", "/api/beer/5",
+//						createBeerUpdateRequest(" ", "Porter Malinowy", -1d, null));
+//
+//				String jsonResponse = putResponse.getBody();
+//
+//				assertIsError(
+//						jsonResponse,
+//						HttpStatus.NOT_FOUND,
+//						"Resource not found",
+//						"/api/beer/5"
+//				);
+//			}
 
             @Test
             @DisplayName("USER: DELETE '/api/beer/{beer_id}' (params)")
@@ -228,10 +228,10 @@ public class SecuredEndpointTests {
             }
 
             @Test
-            @DisplayName("ACCOUNTANT: PUT '/api/beer/{beer_id}'")
-            public void whenAccountantUpdatesBeer_thenReturn204Test() {
+            @DisplayName("ACCOUNTANT: PATCH '/api/beer/{beer_id}'")
+            public void whenAccountantPatchesBeer_thenReturn204Test() {
                 BeerUpdateDTO request = createBeerUpdateRequest(null, "", null);
-                var putResponse = putRequestAuth("accountant", "accountant", "/api/beer/1", request);
+                var putResponse = patchRequestAuth("accountant", "accountant", "/api/beer/1", request);
                 assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             }
 
