@@ -16,8 +16,9 @@ public class BeerDeleteDTO {
     private Long id;
     @JsonProperty("name")
     private String fullName;
-    private double volume;
+    private Double volume;
     private String status = "Beer was deleted successfully!";
+	// TODO: Add image
 
     public BeerDeleteDTO(Beer beer) {
         this.id = beer.getId();
