@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.BadRequestException;
@@ -65,8 +67,8 @@ public class ImageKitConfig {
 
 		for (BaseFile baseFile : resultList.getResults()) {
 			if (expectedBeerImages.contains(baseFile.getName())) {
-				LOGGER.info("'%s' was found. Not to be DELETED"
-						.formatted(baseFile.getName()));
+				LOGGER.info("'%s' was found (ID: %s). Not to be DELETED"
+						.formatted(baseFile.getName(), baseFile.getFileId()));
 				continue;
 			}
 			LOGGER.info("Deleting '%s'... (ID: %s)"
@@ -79,18 +81,17 @@ public class ImageKitConfig {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
 		getFileListRequest.setPath(imageKitPath);
 
-		List<String> remoteDir = this.imageKit.getFileList(getFileListRequest)
+		Map<String, String> baseFiles = this.imageKit.getFileList(getFileListRequest)
 				.getResults()
 				.stream()
-				.map(BaseFile::getName)
-				.toList();
+				.collect(Collectors.toMap(BaseFile::getName, BaseFile::getFileId));
 		File[] testDir =
 				new File(getRawPathToClassPathResource("/data_img/init_data")).listFiles();
 
 		for (File image : testDir) {
-			if (remoteDir.contains(image.getName())) {
-				LOGGER.info("'%s' was found. Not to be SENT"
-						.formatted(image.getName()));
+			if (baseFiles.containsKey(image.getName())) {
+				LOGGER.info("'%s' was found (ID: %s). Not to be SENT"
+						.formatted(image.getName(), baseFiles.get(image.getName())));
 				continue;
 			}
 			byte[] bytes = Files.readAllBytes(image.toPath());
