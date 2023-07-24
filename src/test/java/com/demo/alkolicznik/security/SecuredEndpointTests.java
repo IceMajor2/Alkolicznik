@@ -1,27 +1,38 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import java.util.List;
+import java.util.Map;
+
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-import java.util.Map;
-
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
-import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceUpdateRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreUpdateRequest;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
-import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.deleteRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -152,6 +163,22 @@ public class SecuredEndpointTests {
                         "Resource not found",
                         "/api/beer/1");
             }
+
+			@Test
+			@DisplayName("USER: PATCH '/api/beer/{beer_id}' [INVALID_REQUEST]")
+			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+				var putResponse = patchRequestAuth("user", "user", "/api/beer/5",
+						createBeerUpdateRequest(" ", "Porter Malinowy", -1d, null));
+
+				String jsonResponse = putResponse.getBody();
+
+				assertIsError(
+						jsonResponse,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						"/api/beer/5"
+				);
+			}
 
             @Test
             @DisplayName("USER: DELETE '/api/beer/{beer_id}' (params)")
