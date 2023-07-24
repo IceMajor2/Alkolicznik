@@ -1,19 +1,5 @@
 package com.demo.alkolicznik.config;
 
-import com.demo.alkolicznik.models.*;
-import com.demo.alkolicznik.utils.TestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.*;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-
-import javax.money.Monetary;
-import javax.money.MonetaryAmount;
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,14 +7,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
+import javax.sql.DataSource;
+
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.utils.TestUtils;
+import org.junit.jupiter.api.Order;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+
 import static com.demo.alkolicznik.config.ImageKitConfig.extractFilenameFromUrl;
 import static com.demo.alkolicznik.config.ImageKitConfig.getExternalId;
 
 @Configuration
 @Profile("main")
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class TestConfig {
 
-    @Autowired
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestConfig.class);
+
+	@Autowired
     private ApplicationContext context;
 
     private static JdbcTemplate jdbcTemplate;
@@ -65,6 +82,7 @@ public class TestConfig {
 
     @Bean
     public List<Beer> beers() {
+		LOGGER.info("Reloading 'beer' table");
         setJdbcTemplate();
         String sql = "SELECT * FROM beer";
         List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
@@ -88,14 +106,6 @@ public class TestConfig {
         updateStoresWithPrices(initializedPrices);
         updateBeersWithPrices(initializedPrices);
         return initializedPrices;
-    }
-
-    @Bean
-    public List<String> randomPasswordsRight() {
-        List<String> randomPasswords = List.of("kl;jdvba;gbirjea",
-                "3rt90qw4gmkvsvr", "ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
-                "dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK");
-        return randomPasswords;
     }
 
     private void updateBeersWithPrices(List<BeerPrice> prices) {
