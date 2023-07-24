@@ -1,19 +1,29 @@
 package com.demo.alkolicznik.api.controllers;
 
-import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
-import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
-import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.util.List;
+
+import com.demo.alkolicznik.api.services.BeerService;
+import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/beer")
@@ -66,6 +76,7 @@ public class BeerController {
     }
 
     @PatchMapping("/{beer_id}")
+	@SecurityRequirement(name = "Basic Authentication")
     public BeerResponseDTO update(@PathVariable("beer_id") Long beerId,
                                   @RequestBody @Valid BeerUpdateDTO updateDTO) {
         return beerService.update(beerId, updateDTO);
