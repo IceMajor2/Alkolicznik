@@ -5,6 +5,8 @@ INSERT INTO store (ID, NAME, CITY, STREET) VALUES (2, 'Biedronka', 'Olsztyn', 'u
 ON CONFLICT DO NOTHING;
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (3, 'Grosik', 'Gdansk', 'ul. Marianskiego 9')
 ON CONFLICT DO NOTHING;
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (4, 'Dwojka', 'Warszawa', 'al. Wojska Polskiego 123')
+ON CONFLICT DO NOTHING;
 
 -- beers
 INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (1, 'Perla', 'Chmielowa Pils', 0.5)
