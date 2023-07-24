@@ -48,7 +48,6 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchReq
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
-import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -476,20 +475,6 @@ public class BeerTests {
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
 					"Brand was not specified; Volume must be a positive number",
-					"/api/beer");
-		}
-
-		// TODO: Move to 'SecurityEndpointTests'
-		@Test
-		@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
-		public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
-			var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Resource not found",
 					"/api/beer");
 		}
 	}
