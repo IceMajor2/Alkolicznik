@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -54,19 +52,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles("main")
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestClassOrder(ClassOrderer.Random.class)
 public class BeerTests {
-
-	@Autowired
-	private List<Beer> beers;
-
-	@Autowired
-	private List<Store> stores;
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class GetRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public GetRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@Test
 		@DisplayName("GET: '/api/beer/{beer_id}")
@@ -143,7 +142,6 @@ public class BeerTests {
 		@DisplayName("GET: '/api/beer'")
 		public void getAllTest() {
 			// when
-			System.out.println(Arrays.toString(beers.toArray()));
 			var getResponse = getRequestAuth("admin", "admin", "/api/beer");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = getResponse.getBody();
@@ -161,6 +159,13 @@ public class BeerTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public PostRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@Test
 		@DisplayName("POST: '/api/beer'")
@@ -470,6 +475,7 @@ public class BeerTests {
 					"/api/beer");
 		}
 
+		// TODO: Move to 'SecurityEndpointTests'
 		@Test
 		@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
 		public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
@@ -489,6 +495,13 @@ public class BeerTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PutRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public PutRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@Test
 		@DisplayName("PUT: '/api/beer' brand")
@@ -646,6 +659,13 @@ public class BeerTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	public class PatchRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public PatchRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@Test
 		@DisplayName("PATCH: '/api/beer/{beer_id}' volume update")
@@ -830,7 +850,6 @@ public class BeerTests {
 			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/1", request);
-			System.out.println(patchResponse.getBody());
 			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = patchResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
@@ -1077,6 +1096,13 @@ public class BeerTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public DeleteRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@Test
 		@DisplayName("DELETE: '/api/beer/{beer_id}'")
