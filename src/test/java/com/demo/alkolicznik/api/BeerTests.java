@@ -11,9 +11,11 @@ import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles("main")
+@TestClassOrder(ClassOrderer.Random.class)
 public class BeerTests {
 
 	@Autowired
@@ -143,6 +146,486 @@ public class BeerTests {
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).hasSameElementsAs(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+	}
+
+	@Nested
+	class PostRequests {
+
+		@Test
+		@DisplayName("POST: '/api/beer'")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addBrandTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Lech", null, null));
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Lech", null, 0.5);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' brand and volume only")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addBrandAndVolumeTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Karmi", null, 0.6));
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Karmi", null, 0.6);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' brand and type only")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addBrandAndTypeTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Ksiazece", "Wisnia", null)
+			);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Ksiazece", "Wisnia", 0.5);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' everything specified")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addEverythingSpecifiedTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Zywiec", "Jasne", 0.33)
+			);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Zywiec", "Jasne", 0.33);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' exists by fullname, volume unique")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addFullnameExistsVolumeUniqueTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Perla", "Chmielowa Pils", 0.33)
+			);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Perla", "Chmielowa Pils", 0.33);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' type blank")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addWithTypeBlankTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Heineken", " \t\t \t", null));
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' empty type")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void addWithTypeEmptyTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Heineken", "", null));
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+			String actualJson = postResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// Fetch the newly-created beer.
+			var getResponse = getRequest("/api/beer/8");
+
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, BeerResponseDTO.class);
+
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [VOLUME_NON_POSITIVE]")
+		public void addVolumeNegativeTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Pilsner Urquell", null, -0.5)
+			);
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Volume must be a positive number",
+					"/api/beer");
+
+			postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Lomza", null, 0d)
+			);
+
+			jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Volume must be a positive number",
+					"/api/beer");
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [BRAND_NULL]")
+		public void addBrandNullTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest(null, "Jasne Okocimskie", null)
+			);
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified",
+					"/api/beer");
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [BRAND_BLANK]")
+		public void addBrandBlankTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest(" \t \t  \t\t ", "Cerny", null)
+			);
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified",
+					"/api/beer");
+
+			postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("", "Cerny", null)
+			);
+
+			jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified",
+					"/api/beer");
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [BEER_EXISTS]")
+		public void addBeerExistsTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Perla", "Chmielowa Pils", null)
+			);
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.CONFLICT,
+					"Beer already exists",
+					"/api/beer");
+
+			postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("Zubr", null, null)
+			);
+
+			jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.CONFLICT,
+					"Beer already exists",
+					"/api/beer");
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [BRAND_BLANK; VOLUME_NEGATIVE]")
+		public void addBrandBlankVolumeNegativeTest() {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/beer",
+					createBeerRequest("\t", null, -15.9)
+			);
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified; Volume must be a positive number",
+					"/api/beer");
+		}
+
+		@Test
+		@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
+		public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
+			var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					"/api/beer");
+		}
+	}
+
+	@Nested
+	@ActiveProfiles({ "main", "image" })
+	class PutRequests {
+
+		@Test
+		@DisplayName("PUT: '/api/beer' brand")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceWithBrandTest() {
+			BeerRequestDTO request = createBeerRequest("Lech", null, null, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(1L, "Lech", null, 0.5d);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' brand & type")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceWithBrandAndTypeTest() {
+			BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(2L, "Perla", "Miodowa", 0.5d);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' brand, type & volume")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceWithBrandTypeAndVolumeTest() {
+			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(2L, "Zywiec", "Jasne", 0.33);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' brand, volume & image")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceWithBrandTypeVolumeAndImageTest() {
+			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne",
+					0.33, getRawPathToImage("zywiec-jasne-0.33.jpg"));
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(6L, "Zywiec", "Jasne", 0.33,
+					createImageResponse("zywiec-jasne-0.33.jpg", actual.getImage()));
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' replace beer with image")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceBeerWithImageTest() {
+			BeerRequestDTO request = createBeerRequest("Okocim", null, null, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(4L, "Okocim", null, 0.5d);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+
+			var getResponse = getRequest("/api/beer/4/image");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' replace beer with prices")
+		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+		public void replaceBeerWithPrices() {
+			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			BeerResponseDTO expected = createBeerResponse(5L, "Manufaktura Piwna", "Piwo na miodzie gryczanym", 0.5d);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
+
+			var getResponse = getRequest("/api/beer/5/beer-price");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(getResponse.getBody()).isEqualTo("[]");
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' [BEERS_EQUAL]")
+		public void replaceWithSameValuesTest() {
+			BeerRequestDTO request = createBeerRequest("Zubr", null, null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
+
+			assertIsError(putResponse.getBody(),
+					HttpStatus.OK,
+					"Objects are the same: nothing to update",
+					"/api/beer/4");
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
+		public void replaceWithAlreadyExistingTest() {
+			BeerRequestDTO request = createBeerRequest("Perla", "Chmielowa Pils", null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
+
+			assertIsError(putResponse.getBody(),
+					HttpStatus.CONFLICT,
+					"Beer already exists",
+					"/api/beer/6");
+		}
+
+		@Test
+		@DisplayName("PUT: '/api/beer' [BEER_NOT_FOUND]")
+		public void replaceNonExistingTest() {
+			BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", 0.6);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2000", request);
+
+			assertIsError(putResponse.getBody(),
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '2000' id",
+					"/api/beer/2000");
 		}
 	}
 
@@ -574,503 +1057,6 @@ public class BeerTests {
 					"/api/beer/3"
 			);
 		}
-
-		// TODO: move to 'SecuredEndpointsTests'
-		@Test
-		@DisplayName("PATCH: '/api/beer/{beer_id}' [INVALID_REQUEST; UNAUTHORIZED]")
-		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-			var putResponse = patchRequestAuth("user", "user", "/api/beer/5",
-					createBeerUpdateRequest(" ", "Porter Malinowy", -1d, null));
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Resource not found",
-					"/api/beer/5"
-			);
-		}
-	}
-
-	@Nested
-	@ActiveProfiles({ "main", "image" })
-	class PutRequests {
-
-		@Test
-		@DisplayName("PUT: '/api/beer' brand")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceWithBrandTest() {
-			BeerRequestDTO request = createBeerRequest("Lech", null, null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(1L, "Lech", null, 0.5d);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' brand & type")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceWithBrandAndTypeTest() {
-			BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(2L, "Perla", "Miodowa", 0.5d);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' brand, type & volume")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceWithBrandTypeAndVolumeTest() {
-			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(2L, "Zywiec", "Jasne", 0.33);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' brand, volume & image")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceWithBrandTypeVolumeAndImageTest() {
-			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne",
-					0.33, getRawPathToImage("zywiec-jasne-0.33.jpg"));
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(6L, "Zywiec", "Jasne", 0.33,
-					createImageResponse("zywiec-jasne-0.33.jpg", actual.getImage()));
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' replace beer with image")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceBeerWithImageTest() {
-			BeerRequestDTO request = createBeerRequest("Okocim", null, null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(4L, "Okocim", null, 0.5d);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/beer/4/image");
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' replace beer with prices")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void replaceBeerWithPrices() {
-			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(5L, "Manufaktura Piwna", "Piwo na miodzie gryczanym", 0.5d);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/beer/5/beer-price");
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			assertThat(getResponse.getBody()).isEqualTo("[]");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' [BEERS_EQUAL]")
-		public void replaceWithSameValuesTest() {
-			BeerRequestDTO request = createBeerRequest("Zubr", null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
-
-			assertIsError(putResponse.getBody(),
-					HttpStatus.OK,
-					"Objects are the same: nothing to update",
-					"/api/beer/4");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
-		public void replaceWithAlreadyExistingTest() {
-			BeerRequestDTO request = createBeerRequest("Perla", "Chmielowa Pils", null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
-
-			assertIsError(putResponse.getBody(),
-					HttpStatus.CONFLICT,
-					"Beer already exists",
-					"/api/beer/6");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' [BEER_NOT_FOUND]")
-		public void replaceNonExistingTest() {
-			BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", 0.6);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2000", request);
-
-			assertIsError(putResponse.getBody(),
-					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '2000' id",
-					"/api/beer/2000");
-		}
-	}
-
-	@Nested
-	class PostRequests {
-
-		@Test
-		@DisplayName("POST: '/api/beer'")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addBrandTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Lech", null, null));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Lech", null, 0.5);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' brand and volume only")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addBrandAndVolumeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Karmi", null, 0.6));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Karmi", null, 0.6);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' brand and type only")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addBrandAndTypeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Ksiazece", "Wisnia", null)
-			);
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Ksiazece", "Wisnia", 0.5);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' everything specified")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addEverythingSpecifiedTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Zywiec", "Jasne", 0.33)
-			);
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Zywiec", "Jasne", 0.33);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' exists by fullname, volume unique")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addFullnameExistsVolumeUniqueTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Perla", "Chmielowa Pils", 0.33)
-			);
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Perla", "Chmielowa Pils", 0.33);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' type blank")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addWithTypeBlankTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Heineken", " \t\t \t", null));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' empty type")
-		@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-		public void addWithTypeEmptyTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Heineken", "", null));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [VOLUME_NON_POSITIVE]")
-		public void addVolumeNegativeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Pilsner Urquell", null, -0.5)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Volume must be a positive number",
-					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Lomza", null, 0d)
-			);
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Volume must be a positive number",
-					"/api/beer");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [BRAND_NULL]")
-		public void addBrandNullTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest(null, "Jasne Okocimskie", null)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [BRAND_BLANK]")
-		public void addBrandBlankTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest(" \t \t  \t\t ", "Cerny", null)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("", "Cerny", null)
-			);
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [BEER_EXISTS]")
-		public void addBeerExistsTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Perla", "Chmielowa Pils", null)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.CONFLICT,
-					"Beer already exists",
-					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Zubr", null, null)
-			);
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.CONFLICT,
-					"Beer already exists",
-					"/api/beer");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [BRAND_BLANK; VOLUME_NEGATIVE]")
-		public void addBrandBlankVolumeNegativeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("\t", null, -15.9)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified; Volume must be a positive number",
-					"/api/beer");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
-		public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
-			var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Resource not found",
-					"/api/beer");
-		}
 	}
 
 	@Nested
@@ -1159,6 +1145,7 @@ public class BeerTests {
 			);
 		}
 
+		// TODO: Move to 'SecuredEndpointTests'
 		@Test
 		@DisplayName("DELETE: '/api/beer' [INVALID_REQUEST; UNAUTHORIZED]")
 		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
