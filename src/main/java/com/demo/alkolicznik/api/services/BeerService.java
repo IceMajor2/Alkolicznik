@@ -45,6 +45,7 @@ public class BeerService {
         return new BeerResponseDTO(beer);
     }
 
+	// TODO: Let's put more responsibility on repository class
     public List<BeerResponseDTO> getBeers(String city) {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
