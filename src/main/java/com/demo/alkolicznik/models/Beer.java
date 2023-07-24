@@ -1,14 +1,28 @@
 package com.demo.alkolicznik.models;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.*;
 
 @Entity(name = "Beer")
 @Table(name = "beer")
@@ -80,7 +94,13 @@ public class Beer {
 
     @Override
     public String toString() {
-        return this.getBrand() + " " + this.getType() + " (" + this.id + ") [" + this.volume + "l]";
+		StringBuilder sb = new StringBuilder(this.getFullName());
+		sb.append(" [%.2f]".formatted(this.volume));
+		sb.append(" (ID: %d)".formatted(this.id));
+		if(this.getImage().isPresent()) {
+			sb.append(" ").append(this.image.getExternalId());
+		}
+		return sb.toString();
     }
 
     @Override
