@@ -1,10 +1,20 @@
 package com.demo.alkolicznik.api.services;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
-import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.*;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.exceptions.classes.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
+import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.ImageModel;
@@ -12,9 +22,8 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.vaadin.flow.component.html.Image;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BeerService {
@@ -110,7 +119,7 @@ public class BeerService {
             imageService.save(imageModel);
         }
         // ...or deleting if the brand / type was changed
-        else if (updateDTO.imageToDelete()) {
+        else if (updateDTO.imageToDelete() && beer.getImage().isPresent()) {
             imageService.deleteBeerImage(beer);
         }
         return new BeerResponseDTO(beerRepository.save(beer));
