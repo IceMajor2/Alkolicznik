@@ -17,7 +17,6 @@ import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.utils.TestUtils;
-import org.junit.jupiter.api.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -40,185 +38,199 @@ import static com.demo.alkolicznik.config.ImageKitConfig.getExternalId;
 
 @Configuration
 @Profile("main")
-@Order(Ordered.LOWEST_PRECEDENCE)
 public class TestConfig {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestConfig.class);
 
 	@Autowired
-    private ApplicationContext context;
+	private ApplicationContext context;
 
-    private static JdbcTemplate jdbcTemplate;
-    private static Map<Long, Beer> beers = new HashMap<>();
-    private static Map<Long, Store> stores = new HashMap<>();
-    private static Map<Long, User> users = new HashMap<>();
+	private static JdbcTemplate jdbcTemplate;
 
-    @Bean
-    public void setJdbcTemplate() {
-        TestConfig.jdbcTemplate = new JdbcTemplate(dataSource());
-    }
+	private static Map<Long, Beer> beers = new HashMap<>();
 
-    @Bean
-    public List<Store> stores() {
-        String sql = "SELECT * FROM store";
-        List<Store> initializedStores = jdbcTemplate.query(sql, this.mapToStore());
-        for (Store store : initializedStores) {
-            stores.put(store.getId(), store);
-        }
-        return initializedStores;
-    }
+	private static Map<Long, Store> stores = new HashMap<>();
 
-    @Bean
-    public List<User> users() {
-        String sql = "SELECT * FROM users";
-        var handler = new TestUtils.UserRowCallbackHandler();
-        jdbcTemplate.query(sql, handler);
-        List<User> initializedUsers = new ArrayList<>(handler.getResults().values());
-        for (User user : initializedUsers) {
-            users.put(user.getId(), user);
-        }
-        return initializedUsers;
-    }
+	private static Map<Long, User> users = new HashMap<>();
 
-    @Bean
-    public List<Beer> beers() {
-		LOGGER.info("Reloading 'beer' table");
-        setJdbcTemplate();
-        String sql = "SELECT * FROM beer";
-        List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
-        for (Beer beer : initializedBeers) {
-            beers.put(beer.getId(), beer);
-        }
-        return initializedBeers;
-    }
+	@Bean
+	public void setJdbcTemplate() {
+		TestConfig.jdbcTemplate = new JdbcTemplate(dataSource());
+	}
 
-    @Bean
-    @Primary
-    public String imageKitPath2() {
-        return "/test/beer";
-    }
+	@Bean
+	public List<Store> stores() {
+		String sql = "SELECT * FROM store";
+		List<Store> initializedStores = jdbcTemplate.query(sql, this.mapToStore());
+		for (Store store : initializedStores) {
+			stores.put(store.getId(), store);
+		}
+		return initializedStores;
+	}
 
-    @Bean
-    @DependsOn({"stores", "beers"})
-    public List<BeerPrice> beerPrice() {
-        String sql = "SELECT * FROM beer_price";
-        List<BeerPrice> initializedPrices = jdbcTemplate.query(sql, this.mapToBeerPrice());
-        updateStoresWithPrices(initializedPrices);
-        updateBeersWithPrices(initializedPrices);
-        return initializedPrices;
-    }
+	@Bean
+	public List<User> users() {
+		String sql = "SELECT * FROM users";
+		var handler = new TestUtils.UserRowCallbackHandler();
+		jdbcTemplate.query(sql, handler);
+		List<User> initializedUsers = new ArrayList<>(handler.getResults().values());
+		for (User user : initializedUsers) {
+			users.put(user.getId(), user);
+		}
+		return initializedUsers;
+	}
 
-    private void updateBeersWithPrices(List<BeerPrice> prices) {
-        List<Beer> beers = (List<Beer>) context.getBean("beers");
-        for (Beer beer : beers) {
-            for (BeerPrice price : prices) {
-                if (price.getBeer().equals(beer)) {
-                    beer.getPrices().add(price);
-                }
-            }
-        }
-    }
+	@Bean
+	public List<Beer> beers() {
+//		LOGGER.info("Reloading 'beer' table");
+		setJdbcTemplate();
+		String sql = "SELECT * FROM beer";
+		List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
+//		LOGGER.info("Beer table consists of the following:");
+//		LOGGER.info("===");
+		for (Beer beer : initializedBeers) {
+			beers.put(beer.getId(), beer);
+//			LOGGER.info(beer.toString());
+		}
+//		LOGGER.info("===");
+		return initializedBeers;
+	}
 
-    private void updateStoresWithPrices(List<BeerPrice> prices) {
-        List<Store> stores = (List<Store>) context.getBean("stores");
-        for (Store store : stores) {
-            for (BeerPrice price : prices) {
-                if (price.getStore().equals(store)) {
-                    store.addBeer(price.getBeer(), price.getPrice());
-                }
-            }
-        }
-    }
+	@Bean
+	@Primary
+	public String imageKitPath2() {
+		return "/test/beer";
+	}
 
-    @Bean("dataSource")
-    public DataSource dataSource() {
-        return
-                (new EmbeddedDatabaseBuilder())
-                        .addScript("classpath:data_sql/schema.sql")
-                        .addScript("classpath:data_sql/beer-data.sql")
-                        .addScript("classpath:data_sql/store-data.sql")
-                        .addScript("classpath:data_sql/beer-price-data.sql")
-                        .addScript("classpath:data_sql/user-data.sql")
-                        .addScript("classpath:data_sql/image-data.sql")
-                        .build();
-    }
+	@Bean
+	@DependsOn({ "stores", "beers" })
+	public List<BeerPrice> beerPrice() {
+		String sql = "SELECT * FROM beer_price";
+		List<BeerPrice> initializedPrices = jdbcTemplate.query(sql, this.mapToBeerPrice());
+		updateStoresWithPrices(initializedPrices);
+		updateBeersWithPrices(initializedPrices);
+		return initializedPrices;
+	}
 
-    private RowMapper<Store> mapToStore() {
-        return new RowMapper<Store>() {
-            @Override
-            public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Store store = new Store();
-                store.setId(rs.getLong("id"));
-                store.setName(rs.getString("name"));
-                store.setCity(rs.getString("city"));
-                store.setStreet(rs.getString("street"));
-                return store;
-            }
-        };
-    }
+	private void updateBeersWithPrices(List<BeerPrice> prices) {
+		List<Beer> beers = (List<Beer>) context.getBean("beers");
+		for (Beer beer : beers) {
+			for (BeerPrice price : prices) {
+				if (price.getBeer().equals(beer)) {
+					beer.getPrices().add(price);
+				}
+			}
+		}
+	}
 
-    private RowMapper<Beer> mapToBeer() {
-        return new RowMapper<Beer>() {
-            @Override
-            public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Beer beer = new Beer();
-                beer.setId(rs.getLong("id"));
-                beer.setBrand(rs.getString("brand"));
-                beer.setType(rs.getString("type"));
-                beer.setVolume(rs.getDouble("volume"));
-                String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
-                ImageModel image = jdbcTemplate.query(sql, new ResultSetExtractor<ImageModel>() {
-                    @Override
-                    public ImageModel extractData(ResultSet rs) throws SQLException, DataAccessException {
-                        // at beginning ResultSet is pointed *BEFORE* the 1st row
-                        // due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
-                        // we move the pointer to the next row with rs.next() command
-                        // if it returns false, then there's no image assigned to the beer
-                        // thus returning null below
-                        if (!rs.next()) {
-                            return null;
-                        }
-                        ImageModel image = new ImageModel();
-                        String url = rs.getString("url");
-                        Long beerId = rs.getLong("beer_id");
-                        String externalId = getExternalId(extractFilenameFromUrl(url));
+	private void updateStoresWithPrices(List<BeerPrice> prices) {
+		List<Store> stores = (List<Store>) context.getBean("stores");
+		for (Store store : stores) {
+			for (BeerPrice price : prices) {
+				if (price.getStore().equals(store)) {
+					store.addBeer(price.getBeer(), price.getPrice());
+				}
+			}
+		}
+	}
 
-                        image.setImageUrl(url);
-                        image.setId(beerId);
-                        // update image table with ImageKit's external id of this image
-                        String updateQuery = "UPDATE image SET external_id = ? where beer_id = ?";
-                        jdbcTemplate.update(updateQuery, externalId, beerId);
-                        image.setExternalId(externalId);
-                        return image;
-                    }
-                });
-                if (image != null) {
-                    beer.setImage(image);
-                    image.setBeer(beer);
-                }
-                return beer;
-            }
-        };
-    }
+	@Bean("dataSource")
+	public DataSource dataSource() {
+		return
+				(new EmbeddedDatabaseBuilder())
+						.addScript("classpath:data_sql/schema.sql")
+						.addScript("classpath:data_sql/beer-data.sql")
+						.addScript("classpath:data_sql/store-data.sql")
+						.addScript("classpath:data_sql/beer-price-data.sql")
+						.addScript("classpath:data_sql/user-data.sql")
+						.addScript("classpath:data_sql/image-data.sql")
+						.build();
+	}
 
-    private RowMapper<BeerPrice> mapToBeerPrice() {
-        return new RowMapper<BeerPrice>() {
-            @Override
-            public BeerPrice mapRow(ResultSet rs, int rowNum) throws SQLException {
-                BeerPrice beerPrice = new BeerPrice();
+	@Bean("correctPasswords")
+	public String[] correctPasswords() {
+		String[] randomPasswords = new String[]{"kl;jdvba;gbirjea",
+				"3rt90qw4gmkvsvr", "ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
+				"dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK"};
+		return randomPasswords;
+	}
 
-                Beer beer = beers.get(rs.getLong("beer_id"));
-                beerPrice.setBeer(beer);
+	private RowMapper<Store> mapToStore() {
+		return new RowMapper<Store>() {
+			@Override
+			public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Store store = new Store();
+				store.setId(rs.getLong("id"));
+				store.setName(rs.getString("name"));
+				store.setCity(rs.getString("city"));
+				store.setStreet(rs.getString("street"));
+				return store;
+			}
+		};
+	}
 
-                Store store = stores.get(rs.getLong("store_id"));
-                beerPrice.setStore(store);
+	private RowMapper<Beer> mapToBeer() {
+		return new RowMapper<Beer>() {
+			@Override
+			public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Beer beer = new Beer();
+				beer.setId(rs.getLong("id"));
+				beer.setBrand(rs.getString("brand"));
+				beer.setType(rs.getString("type"));
+				beer.setVolume(rs.getDouble("volume"));
+				String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
+				ImageModel image = jdbcTemplate.query(sql, new ResultSetExtractor<ImageModel>() {
+					@Override
+					public ImageModel extractData(ResultSet rs) throws SQLException, DataAccessException {
+						// at beginning ResultSet is pointed *BEFORE* the 1st row
+						// due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
+						// we move the pointer to the next row with rs.next() command
+						// if it returns false, then there's no image assigned to the beer
+						// thus returning null below
+						if (!rs.next()) {
+							return null;
+						}
+						ImageModel image = new ImageModel();
+						String url = rs.getString("url");
+						Long beerId = rs.getLong("beer_id");
+						String externalId = getExternalId(extractFilenameFromUrl(url));
 
-                MonetaryAmount price = Monetary.getDefaultAmountFactory()
-                        .setCurrency(rs.getString("price_currency"))
-                        .setNumber(rs.getBigDecimal("price_amount")).create();
-                beerPrice.setPrice(price);
-                return beerPrice;
-            }
-        };
-    }
+						image.setImageUrl(url);
+						image.setId(beerId);
+						// update image table with ImageKit's external id of this image
+						String updateQuery = "UPDATE image SET external_id = ? where beer_id = ?";
+						jdbcTemplate.update(updateQuery, externalId, beerId);
+						image.setExternalId(externalId);
+						return image;
+					}
+				});
+				if (image != null) {
+					beer.setImage(image);
+					image.setBeer(beer);
+				}
+				return beer;
+			}
+		};
+	}
+
+	private RowMapper<BeerPrice> mapToBeerPrice() {
+		return new RowMapper<BeerPrice>() {
+			@Override
+			public BeerPrice mapRow(ResultSet rs, int rowNum) throws SQLException {
+				BeerPrice beerPrice = new BeerPrice();
+
+				Beer beer = beers.get(rs.getLong("beer_id"));
+				beerPrice.setBeer(beer);
+
+				Store store = stores.get(rs.getLong("store_id"));
+				beerPrice.setStore(store);
+
+				MonetaryAmount price = Monetary.getDefaultAmountFactory()
+						.setCurrency(rs.getString("price_currency"))
+						.setNumber(rs.getBigDecimal("price_amount")).create();
+				beerPrice.setPrice(price);
+				return beerPrice;
+			}
+		};
+	}
 }
