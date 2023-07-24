@@ -1,31 +1,35 @@
 package com.demo.alkolicznik.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import com.demo.alkolicznik.api.ImageModelTests;
 import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
-import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
-import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.dto.user.UserResponseDTO;
-import com.demo.alkolicznik.models.*;
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.Roles;
+import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class JsonUtils {
 
@@ -122,8 +126,12 @@ public class JsonUtils {
     }
 
     public static BeerRequestDTO createBeerRequest(Beer beer) {
-        return createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
-    }
+		BeerRequestDTO request = createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
+		if(beer.getImage().isPresent()) {
+			request.setImagePath(beer.getImage().get().getImageUrl());
+		}
+		return request;
+	}
 
     public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
         BeerPriceRequestDTO request = new BeerPriceRequestDTO();
