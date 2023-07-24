@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
@@ -96,7 +98,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer?city'")
+		@DisplayName("GET: '/api/beer?city' sorted id asc")
 		public void getAllInCityTest() {
 			// given
 			String city = "Olsztyn";
@@ -109,9 +111,10 @@ public class BeerTests {
 
 			// then
 			List<BeerResponseDTO> expected = mapToDTO(getBeersInCity(city, beers));
+			expected.sort(Comparator.comparing(BeerResponseDTO::getId));
 			String expectedJson = toJsonString(expected);
 
-			assertThat(actual).hasSameElementsAs(expected);
+			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
@@ -149,8 +152,9 @@ public class BeerTests {
 
 			// then
 			List<BeerResponseDTO> expected = mapToDTO(beers);
+			expected.sort(Comparator.comparing(BeerResponseDTO::getId));
 			String expectedJson = toJsonString(expected);
-			assertThat(actual).hasSameElementsAs(expected);
+			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 	}
@@ -1208,7 +1212,7 @@ public class BeerTests {
 	private List<BeerResponseDTO> mapToDTO(List<Beer> beers) {
 		return beers.stream()
 				.map(BeerResponseDTO::new)
-				.toList();
+				.collect(Collectors.toList());
 	}
 }
 
