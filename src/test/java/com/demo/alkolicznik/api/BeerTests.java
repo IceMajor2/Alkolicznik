@@ -19,6 +19,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -544,7 +548,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' brand, volume & image")
+		@DisplayName("PUT: '/api/beer' brand, type, volume & image")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTypeVolumeAndImageTest() {
 			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne",
@@ -563,7 +567,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' replace beer with image")
+		@DisplayName("PUT: '/api/beer' check image after replacing")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceBeerWithImageTest() {
 			BeerRequestDTO request = createBeerRequest("Okocim", null, null, null);
@@ -583,7 +587,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' replace beer with prices")
+		@DisplayName("PUT: '/api/beer' check prices after replacing")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceBeerWithPrices() {
 			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null, null);
@@ -603,43 +607,72 @@ public class BeerTests {
 			assertThat(getResponse.getBody()).isEqualTo("[]");
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"2, Ksiazece, Zlote pszeniczne, null",
+				"4, Zubr, null, null",
+				"5, Komes, Porter Malinowy, 0.33",
+				"7, Guinness, \t, null"
+		},
+				nullValues = { "null" })
 		@DisplayName("PUT: '/api/beer' [BEERS_EQUAL]")
-		public void replaceWithSameValuesTest() {
-			BeerRequestDTO request = createBeerRequest("Zubr", null, null);
+		public void replaceWithSameValuesTest(Long id, String brand, String type, Double volume) {
+			BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + id, request);
 
 			assertIsError(putResponse.getBody(),
 					HttpStatus.OK,
 					"Objects are the same: nothing to update",
-					"/api/beer/4");
+					"/api/beer/" + id);
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"Perla, Chmielowa Pils, null",
+				"Tyskie, Gronie, 0.65",
+				"Zubr, null, null"
+		},
+				nullValues = { "null" })
 		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
-		public void replaceWithAlreadyExistingTest() {
-			BeerRequestDTO request = createBeerRequest("Perla", "Chmielowa Pils", null);
+		public void replaceWithAlreadyExistingTest(String brand, String type, Double volume) {
+			BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
 
 			assertIsError(putResponse.getBody(),
 					HttpStatus.CONFLICT,
 					"Beer already exists",
-					"/api/beer/6");
+					"/api/beer/2");
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { -5, 0, 9999 })
 		@DisplayName("PUT: '/api/beer' [BEER_NOT_FOUND]")
-		public void replaceNonExistingTest() {
+		public void replaceNonExistingTest(Long id) {
 			BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", 0.6);
 
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2000", request);
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + id, request);
 
 			assertIsError(putResponse.getBody(),
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '2000' id",
-					"/api/beer/2000");
+					"Unable to find beer of '" + id + "' id",
+					"/api/beer/" + id);
+		}
+
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "", " \t" })
+		@DisplayName("PUT: '/api/beer' [BRAND_BLANK]")
+		public void replaceBrandBlankTest(String brand) {
+			BeerRequestDTO brandBlank = createBeerRequest(brand, "Cerny", null);
+
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1", brandBlank);
+
+			assertIsError(putResponse.getBody(),
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified",
+					"/api/beer/1");
 		}
 	}
 
