@@ -957,7 +957,7 @@ public class BeerTests {
 
 			// then
 			assertIsError(patchResponse.getBody(),
-					HttpStatus.CONFLICT,
+					HttpStatus.OK,
 					"Objects are the same: nothing to update",
 					"/api/beer/" + toUpdateId);
 		}
