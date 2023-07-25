@@ -631,7 +631,8 @@ public class BeerTests {
 		@CsvSource(value = {
 				"Perla, Chmielowa Pils, null",
 				"Tyskie, Gronie, 0.65",
-				"Zubr, null, null"
+				"Zubr, null, null",
+				"Guinness, \t, null"
 		},
 				nullValues = { "null" })
 		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
