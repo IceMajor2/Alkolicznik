@@ -942,26 +942,31 @@ public class BeerTests {
 			);
 		}
 
-		@Test
-		@DisplayName("PATCH: '/api/beer/{beer_id}' [REMOVE_NULL_TYPE]")
-		public void updateRemoveTypeWhenTypeIsNullTest() {
+		@ParameterizedTest
+		@CsvSource(value = {
+				"4, ''",
+				"7, '\n  \t'"
+		})
+		@DisplayName("PATCH: '/api/beer/{beer_id}' [REMOVE_TYPE_ALREADY_NULL]")
+		public void updateRemoveTypeWhenTypeIsNullTest(Long toUpdateId, String type) {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, type, null);
 
 			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/7", request);
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + toUpdateId, request);
 
 			// then
 			assertIsError(patchResponse.getBody(),
 					HttpStatus.CONFLICT,
 					"Objects are the same: nothing to update",
-					"/api/beer/7");
+					"/api/beer/" + toUpdateId);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(doubles = { -0.9, 0d, -15d })
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [VOLUME_NON_POSITIVE]")
-		public void updateVolumeNonPositiveTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0d, null);
+		public void updateVolumeNonPositiveTest(Double volume) {
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume, null);
 			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/4", request);
 
 			String jsonResponse = putResponse.getBody();
@@ -972,40 +977,30 @@ public class BeerTests {
 					"Volume must be a positive number",
 					"/api/beer/4"
 			);
-
-			request = createBeerUpdateRequest(null, null, -5.1d, null);
-			putResponse = patchRequestAuth("admin", "admin", "/api/beer/4", request);
-
-			jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Volume must be a positive number",
-					"/api/beer/4"
-			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { 0, -23, 9998 })
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
-		public void updateBeerNotFoundTest() {
+		public void updateBeerNotFoundTest(Long id) {
 			BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null, null);
-			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/321", request);
+			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/" + id, request);
 
 			String jsonResponse = putResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '321' id",
-					"/api/beer/321"
+					"Unable to find beer of '" + id + "' id",
+					"/api/beer/" + id
 			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "", "  ", "\t", "\n" })
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [BRAND_BLANK]")
-		public void updateBrandBlankTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest("\t \t \n\n\n", null, null, null);
+		public void updateBrandBlankTest(String brand) {
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, null, null);
 			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
 
 			String jsonResponse = putResponse.getBody();
@@ -1016,41 +1011,20 @@ public class BeerTests {
 					"Brand was not specified",
 					"/api/beer/5"
 			);
-
-			request = createBeerUpdateRequest("", null, null, null);
-			putResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
-
-			jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer/5"
-			);
 		}
 
-		@Test
-		@DisplayName("PATCH: '/api/beer/{beer_id}' [PROPERTIES_SAME]")
-		public void updateNothingToChangeTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest("Komes", "Porter Malinowy", 0.33, null);
-			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.OK,
-					"Objects are the same: nothing to update",
-					"/api/beer/5"
-			);
-		}
-
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, Perla, Chmielowa Pils, null",
+				"4, Zubr, \t, null, null",
+				"6, Miloslaw, Biale, 0.5",
+				"7, Guinness, null, 0.5"
+		},
+				nullValues = "null")
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [PROPERTIES_SAME] (2)")
-		public void updateNothingWasChangedTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5, null);
-			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/4", request);
+		public void updateNothingWasChangedTest(Long toUpdateId, String brand, String type, Double volume) {
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
+			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/" + toUpdateId, request);
 
 			String jsonResponse = putResponse.getBody();
 
@@ -1058,15 +1032,21 @@ public class BeerTests {
 					jsonResponse,
 					HttpStatus.OK,
 					"Objects are the same: nothing to update",
-					"/api/beer/4"
+					"/api/beer/" + toUpdateId
 			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, Zubr, null, null, null",
+				"2, Guinness, \t, null, null",
+				"5, Tyskie, Gronie, 0.65"
+		},
+				nullValues = "null")
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [BEER_EXISTS]")
-		public void updateBeerAlreadyExistsTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest("Zubr", null, 0.5, null);
-			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/3", request);
+		public void updateBeerAlreadyExistsTest(Long toUpdateId, String brand, String type, Double volume) {
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
+			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/" + toUpdateId, request);
 
 			String jsonResponse = putResponse.getBody();
 
@@ -1074,7 +1054,7 @@ public class BeerTests {
 					jsonResponse,
 					HttpStatus.CONFLICT,
 					"Beer already exists",
-					"/api/beer/3"
+					"/api/beer/" + toUpdateId
 			);
 		}
 	}
