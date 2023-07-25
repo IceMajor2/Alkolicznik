@@ -366,12 +366,13 @@ public class BeerTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(doubles = { 0d, -5d, -2.5 })
 		@DisplayName("POST: '/api/beer' [VOLUME_NON_POSITIVE]")
-		public void addVolumeNegativeTest() {
+		public void addVolumeNegativeTest(Double volume) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/beer",
-					createBeerRequest("Pilsner Urquell", null, -0.5)
+					createBeerRequest("Pilsner Urquell", null, volume)
 			);
 
 			String jsonResponse = postResponse.getBody();
@@ -380,57 +381,19 @@ public class BeerTests {
 					HttpStatus.BAD_REQUEST,
 					"Volume must be a positive number",
 					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Lomza", null, 0d)
-			);
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Volume must be a positive number",
-					"/api/beer");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/beer' [BRAND_NULL]")
-		public void addBrandNullTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest(null, "Jasne Okocimskie", null)
-			);
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer");
-		}
-
-		@Test
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "", "\t \n " })
 		@DisplayName("POST: '/api/beer' [BRAND_BLANK]")
-		public void addBrandBlankTest() {
+		public void addBrandNullTest(String brand) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/beer",
-					createBeerRequest(" \t \t  \t\t ", "Cerny", null)
+					createBeerRequest(brand, "Jasne Okocimskie", null)
 			);
 
 			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Brand was not specified",
-					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("", "Cerny", null)
-			);
-
-			jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
@@ -438,27 +401,21 @@ public class BeerTests {
 					"/api/beer");
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"Perla, Chmielowa Pils, null",
+				"Zubr, null, null",
+				"Tyskie, Gronie, 0.65"
+		},
+				nullValues = "null")
 		@DisplayName("POST: '/api/beer' [BEER_EXISTS]")
-		public void addBeerExistsTest() {
+		public void addBeerExistsTest(String brand, String type, Double volume) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/beer",
-					createBeerRequest("Perla", "Chmielowa Pils", null)
+					createBeerRequest(brand, type, volume)
 			);
 
 			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.CONFLICT,
-					"Beer already exists",
-					"/api/beer");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/beer",
-					createBeerRequest("Zubr", null, null)
-			);
-
-			jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.CONFLICT,
