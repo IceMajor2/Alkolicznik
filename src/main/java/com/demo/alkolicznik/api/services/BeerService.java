@@ -91,6 +91,9 @@ public class BeerService {
 
 		updateFieldsOnPut(toOverwrite, newBeer);
 
+		// for each PUT request all the previous
+		// beer prices for this beer MUST be deleted
+		toOverwrite.deleteAllPrices();
 		// for each PUT request the previous image MUST be deleted/replaced
 		if (toOverwrite.getImage().isPresent()) {
 			imageService.deleteBeerImage(toOverwrite);
@@ -100,9 +103,6 @@ public class BeerService {
 		if (requestDTO.getImagePath() != null) {
 			addImage(toOverwrite, requestDTO.getImagePath());
 		}
-		// for each PUT request all the previous
-		// beer prices for this beer MUST be deleted
-		toOverwrite.deletePrices();
 		return new BeerResponseDTO(beerRepository.save(toOverwrite));
 	}
 
@@ -110,20 +110,17 @@ public class BeerService {
 		Beer beer = checkForPatchConditions(beerId, updateDTO);
 		updateFieldsOnPatch(beer, updateDTO);
 
-		// updating an image (if present)...
+		// deleting image and prices if brand and/or type were changed
+		if (updateDTO.imageAndPricesToDelete()) {
+			if (beer.getImage().isPresent()) {
+				imageService.deleteBeerImage(beer);
+			}
+			beer.deleteAllPrices();
+		}
+		// uploading an image (if present in patch request)...
 		String imagePath = updateDTO.getImagePath();
 		if (imagePath != null) {
-			if (beer.getImage().isPresent()) imageService.deleteBeerImage(beer);
-			ImageModel imageModel = imageService.upload(imagePath,
-					imageService.createImageFilename(beer, imageService.extractFileExtensionFromPath(imagePath)));
-			//imageService.deleteBeerImage(beer);
-			beer.setImage(imageModel);
-			imageModel.setBeer(beer);
-			imageService.save(imageModel);
-		}
-		// ...or deleting if the brand / type was changed
-		else if (updateDTO.imageToDelete() && beer.getImage().isPresent()) {
-			imageService.deleteBeerImage(beer);
+			updateImage(beer, imagePath);
 		}
 		return new BeerResponseDTO(beerRepository.save(beer));
 	}
@@ -146,6 +143,17 @@ public class BeerService {
 
 	public Image getImageComponent(Long beerId) {
 		return imageService.getVaadinBeerImage(beerId);
+	}
+
+	private void updateImage(Beer beer, String imagePath) {
+		if (beer.getImage().isPresent()) {
+			imageService.deleteBeerImage(beer);
+		}
+		ImageModel imageModel = imageService.upload(imagePath,
+				imageService.createImageFilename(beer, imageService.extractFileExtensionFromPath(imagePath)));
+		beer.setImage(imageModel);
+		imageModel.setBeer(beer);
+		imageService.save(imageModel);
 	}
 
 	private void updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
