@@ -1060,6 +1060,7 @@ public class BeerTests {
 	}
 
 	@Nested
+	@ActiveProfiles({ "main", "image" })
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
@@ -1107,13 +1108,12 @@ public class BeerTests {
 		@Test
 		@DisplayName("DELETE: '/api/beer'")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-
 		public void deleteByObjectTest() {
 			// given
 			BeerRequestDTO request = createBeerRequest(getBeer(3L, beers));
 
 			// when
-			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/3", request);
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = deleteResponse.getBody();
 			BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
@@ -1139,34 +1139,75 @@ public class BeerTests {
 		}
 
 		@Test
+		@DisplayName("DELETE: '/api/beer/{beer_id}' also removes prices")
+		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		public void deleteBeerAlsoRemovesPricesTest() {
+			// given
+			Long beerId = 5L;
+
+			// when
+			var getResponse = getRequestAuth("admin", "admin", "/api/beer/" + beerId + "/beer-price");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			// when
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
+			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = deleteResponse.getBody();
+			BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
+
+			// then
+			BeerDeleteDTO expected = createBeerDeleteResponse(
+					getBeer(beerId, beers),
+					"Beer was deleted successfully!"
+			);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// when
+			getResponse = getRequestAuth("admin", "admin", "/api/beer/" + beerId + "/beer-price");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { -2, 0, 5555 })
 		@DisplayName("DELETE: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
-		public void deleteBeerNotFoundTest() {
+		public void deleteBeerNotFoundTest(Long id) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
-					"/api/beer/0");
+					"/api/beer/" + id);
 
 			String jsonResponse = deleteResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '0' id",
-					"/api/beer/0"
+					"Unable to find beer of '" + id + "' id",
+					"/api/beer/" + id
 			);
 		}
 
-		// TODO: Move to 'SecuredEndpointTests'
-		@Test
-		@DisplayName("DELETE: '/api/beer' [INVALID_REQUEST; UNAUTHORIZED]")
-		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-			var deleteResponse = deleteRequestAuth("user", "user", "/api/beer",
-					createBeerRequest(" ", "Porter Malinowy", -1d));
+		@ParameterizedTest
+		@CsvSource(value = {
+				"Perla, Miodowa, 0.5",
+				"Lech, null, null",
+				"Tyskie, Gronie, null",
+				"Zubr, null, 0.33",
+				"Komes, Porter Malinowy, null"
+		},
+				nullValues = "null")
+		@DisplayName("DELETE: '/api/beer' [BEER_NOT_FOUND]")
+		public void deleteBeerByObjectNotFoundTest(String brand, String type, Double volume) {
+			BeerRequestDTO request = createBeerRequest(brand, type, volume);
+			System.out.println(request);
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 
 			String jsonResponse = deleteResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Resource not found",
+					"Unable to find beer '%s' of '%.2f' volume"
+							.formatted(request.getFullName(), request.getVolume()),
 					"/api/beer"
 			);
 		}
