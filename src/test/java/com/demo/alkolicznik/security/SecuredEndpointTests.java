@@ -61,7 +61,7 @@ public class SecuredEndpointTests {
 				assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/beer");
 			}
 
-//			@Test
+			//			@Test
 //			@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
 //			public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
 //				var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
@@ -73,7 +73,22 @@ public class SecuredEndpointTests {
 //						"Resource not found",
 //						"/api/beer");
 //			}
-
+// TODO: Move to 'SecuredEndpointTests'
+//@Test
+//@DisplayName("DELETE: '/api/beer' [INVALID_REQUEST; UNAUTHORIZED]")
+//public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+//	var deleteResponse = deleteRequestAuth("user", "user", "/api/beer",
+//			createBeerRequest(" ", "Porter Malinowy", -1d));
+//
+//	String jsonResponse = deleteResponse.getBody();
+//
+//	assertIsError(
+//			jsonResponse,
+//			HttpStatus.NOT_FOUND,
+//			"Resource not found",
+//			"/api/beer"
+//	);
+//}
 			@Test
 			@DisplayName("ANONYMOUS: POST '/api/beer'")
 			public void whenAnonCreatesBeer_thenReturn404Test() {
