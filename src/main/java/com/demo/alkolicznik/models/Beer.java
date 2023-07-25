@@ -123,7 +123,11 @@ public class Beer {
         return Objects.hash(brand, type, volume, image);
     }
 
-    public boolean deletePrices() {
+	/**
+	 * Removes all entities from 'beer_price' table that are associated with
+	 * this beer's id. The stores are also made to drop all references to this beer object.
+	 */
+    public boolean deleteAllPrices() {
         for (Iterator<BeerPrice> iterator = prices.iterator();
              iterator.hasNext(); ) {
             BeerPrice beerPrice = iterator.next();
