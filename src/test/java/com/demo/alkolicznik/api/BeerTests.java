@@ -72,40 +72,45 @@ public class BeerTests {
 			this.beers = beers;
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, Perla, Chmielowa Pils, 0.5",
+				"3, Tyskie, Gronie, 0.65",
+				"7, Guinness, null, 0.5"
+		},
+				nullValues = "null")
 		@DisplayName("GET: '/api/beer/{beer_id}")
-		public void getTest() {
-			var getResponse = getRequest("/api/beer/1");
+		public void getTest(Long id, String brand, String type, Double volume) {
+			var getResponse = getRequest("/api/beer/" + id);
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 			String actualJson = getResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(1l, "Perla", "Chmielowa Pils", 0.5);
+			BeerResponseDTO expected = createBeerResponse(id, brand, type, volume, actual.getImage());
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { -5, 0, 9999 })
 		@DisplayName("GET: '/api/beer/{beer_id} [BEER_NOT_FOUND]")
-		public void getNotExistingTest() {
-			var getResponse = getRequest("/api/beer/9999");
+		public void getNotExistingTest(Long id) {
+			var getResponse = getRequest("/api/beer/" + id);
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '9999' id",
-					"/api/beer/9999");
+					"Unable to find beer of '" + id + "' id",
+					"/api/beer/" + id);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "Olsztyn", "Gdansk" })
 		@DisplayName("GET: '/api/beer?city' sorted id asc")
-		public void getAllInCityTest() {
-			// given
-			String city = "Olsztyn";
-
+		public void getAllInCityTest(String city) {
 			// when
 			var getResponse = getRequest("/api/beer", Map.of("city", city));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -121,17 +126,18 @@ public class BeerTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "Olsztynek", "Jerzwald", "Piecki" })
 		@DisplayName("GET: '/api/beer?city' [CITY_NOT_FOUND]")
-		public void getAllInCityNotExistsTest() {
-			var getResponse = getRequest("/api/beer", Map.of("city", "Jerzwald"));
+		public void getAllInCityNotExistsTest(String city) {
+			var getResponse = getRequest("/api/beer", Map.of("city", city));
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"No such city: 'Jerzwald'",
+					"No such city: '" + city + "'",
 					"/api/beer"
 			);
 		}
@@ -139,7 +145,8 @@ public class BeerTests {
 		@Test
 		@DisplayName("GET: '/api/beer?city' city empty")
 		public void getAllInCityEmptyTest() {
-			var response = getRequestAuth("admin", "admin", "/api/beer", Map.of("city", "Gdansk"));
+			var response = getRequestAuth("admin", "admin", "/api/beer",
+					Map.of("city", "Gdansk"));
 
 			assertThat(response.getBody()).isEqualTo("[]");
 		}
