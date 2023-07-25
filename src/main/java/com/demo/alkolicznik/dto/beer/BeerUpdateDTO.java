@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.dto.beer;
 
+import java.util.Objects;
+
 import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
@@ -9,8 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
@@ -56,12 +56,15 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         if (upBrand != null && !Objects.equals(currBrand, upBrand)) {
             return true;
         }
-        if (upType != null && !Objects.equals(currType, upType)) {
-            return true;
-        }
         if (upVolume != null && !Objects.equals(currVolume, upVolume)) {
             return true;
         }
+		if (upType != null && !Objects.equals(currType, upType)) {
+			if("".equals(upType.trim()) && currType == null) {
+				return false;
+			}
+			return true;
+		}
         return false;
     }
 
@@ -78,7 +81,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         return sb.toString();
     }
 
-    public boolean imageToDelete() {
+    public boolean imageAndPricesToDelete() {
         return this.brand != null || this.type != null;
     }
 
