@@ -30,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -62,7 +61,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BeerTests {
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class GetRequests {
 
@@ -171,7 +169,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequests {
 
@@ -449,7 +446,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PutRequests {
 
@@ -620,7 +616,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	public class PatchRequests {
 
@@ -1037,7 +1032,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
 
