@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -26,6 +24,12 @@ public class BeerDeleteRequestDTO {
 	@Positive(message = "Volume must be a positive number")
 	private Double volume = 0.5;
 
+	public BeerDeleteRequestDTO(String brand, String type, Double volume) {
+		this.brand = brand;
+		setType(type);
+		setVolume(volume);
+	}
+
 	@JsonIgnore
 	public String getFullName() {
 		if (this.brand == null) {
@@ -37,5 +41,21 @@ public class BeerDeleteRequestDTO {
 			sb.append(this.type);
 		}
 		return sb.toString();
+	}
+
+	public void setType(String type) {
+		if (type != null && type.isBlank()) {
+			this.type = null;
+			return;
+		}
+		this.type = type;
+	}
+
+	public void setVolume(Double volume) {
+		if (volume == null) {
+			this.volume = 0.5;
+			return;
+		}
+		this.volume = volume;
 	}
 }
