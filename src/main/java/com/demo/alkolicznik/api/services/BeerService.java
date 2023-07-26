@@ -130,7 +130,6 @@ public class BeerService {
 		Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
 				new BeerNotFoundException(beerId));
 		BeerDeleteResponseDTO deleteResponse = new BeerDeleteResponseDTO(toDelete);
-		System.out.println(deleteResponse);
 		beerRepository.delete(toDelete);
 		if (toDelete.getImage().isPresent()) {
 			imageService.deleteBeerImage(toDelete);
