@@ -89,6 +89,21 @@ public class SecuredEndpointTests {
 //			"/api/beer"
 //	);
 //}
+//			@Test
+//			@DisplayName("POST: '/api/store' [INVALID_REQUEST; UNAUTHORIZED]")
+//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+//				var postResponse = postRequestAuth("user", "user", "/api/store",
+//						createStoreRequest(" ", null, ""));
+//
+//				String jsonResponse = postResponse.getBody();
+//
+//				assertIsError(
+//						jsonResponse,
+//						HttpStatus.NOT_FOUND,
+//						"Resource not found",
+//						"/api/store"
+//				);
+//			}
 			@Test
 			@DisplayName("ANONYMOUS: POST '/api/beer'")
 			public void whenAnonCreatesBeer_thenReturn404Test() {
