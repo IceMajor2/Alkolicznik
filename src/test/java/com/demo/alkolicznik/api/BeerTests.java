@@ -1108,39 +1108,6 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("DELETE: '/api/beer'")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-		public void deleteByObjectTest() {
-			// given
-			BeerDeleteRequestDTO request = createBeerDeleteRequest(getBeer(3L, beers));
-
-			// when
-			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
-			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = deleteResponse.getBody();
-			BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
-
-			// then
-			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
-					getBeer(3L, beers),
-					"Beer was deleted successfully!"
-			);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// when
-			var getResponse = getRequest("/api/beer/3");
-			actualJson = getResponse.getBody();
-
-			// then
-			assertIsError(actualJson,
-					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '3' id",
-					"/api/beer/3");
-		}
-
-		@Test
 		@DisplayName("DELETE: '/api/beer/{beer_id}' also removes prices")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void deleteBeerAlsoRemovesPricesTest() {
@@ -1188,6 +1155,39 @@ public class BeerTests {
 			);
 		}
 
+		@Test
+		@DisplayName("DELETE: '/api/beer'")
+		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		public void deleteByObjectTest() {
+			// given
+			BeerDeleteRequestDTO request = createBeerDeleteRequest(getBeer(3L, beers));
+
+			// when
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
+			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = deleteResponse.getBody();
+			BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
+
+			// then
+			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+					getBeer(3L, beers),
+					"Beer was deleted successfully!"
+			);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// when
+			var getResponse = getRequest("/api/beer/3");
+			actualJson = getResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '3' id",
+					"/api/beer/3");
+		}
+
 		@ParameterizedTest
 		@CsvSource(value = {
 				"Perla, Miodowa, 0.5",
@@ -1200,7 +1200,6 @@ public class BeerTests {
 		@DisplayName("DELETE: '/api/beer' [BEER_NOT_FOUND]")
 		public void deleteBeerByObjectNotFoundTest(String brand, String type, Double volume) {
 			BeerRequestDTO request = createBeerRequest(brand, type, volume);
-			System.out.println(request);
 			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 
 			String jsonResponse = deleteResponse.getBody();
@@ -1210,6 +1209,43 @@ public class BeerTests {
 					HttpStatus.NOT_FOUND,
 					"Unable to find beer '%s' of '%.2f' volume"
 							.formatted(request.getFullName(), request.getVolume()),
+					"/api/beer"
+			);
+		}
+
+		@ParameterizedTest
+		@ValueSource(doubles = { -53.2, -0.5, 0d })
+		@DisplayName("DELETE: '/api/beer' [VOLUME_NON_POSITIVE]")
+		public void deleteBeerByObjectVolumeNonPositiveTest(Double volume) {
+			BeerDeleteRequestDTO request = createBeerDeleteRequest
+					("Komes", "Porter Malinowy", volume);
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
+
+			String jsonResponse = deleteResponse.getBody();
+
+			assertIsError(
+					jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Volume must be a positive number",
+					"/api/beer"
+			);
+		}
+
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "   ", "", "\t" })
+		@DisplayName("DELETE: '/api/beer' [BRAND_BLANK]")
+		public void deleteBeerByObjectBrandBlankTest(String brand) {
+			BeerDeleteRequestDTO request = createBeerDeleteRequest
+					(brand, null, 0.5);
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
+
+			String jsonResponse = deleteResponse.getBody();
+
+			assertIsError(
+					jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"Brand was not specified",
 					"/api/beer"
 			);
 		}
