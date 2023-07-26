@@ -1040,8 +1040,8 @@ public class BeerTests {
 
 		@ParameterizedTest
 		@CsvSource(value = {
-				"1, Zubr, null, null, null",
-				"2, Guinness, '\t', null, null",
+				"1, Zubr, null, null",
+				"2, Guinness, ' \t', null",
 				"5, Tyskie, Gronie, 0.65"
 		},
 				nullValues = "null")

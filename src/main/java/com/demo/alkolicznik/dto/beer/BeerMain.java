@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 
@@ -8,12 +8,12 @@ import lombok.Getter;
 public abstract class BeerMain {
 
 	//	protected String brand;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String type;
 
 	@Positive(message = "Volume must be a positive number")
 	protected Double volume;
 
-	@JsonIgnore
 	abstract String getFullName();
 
 	public void setType(String type) {

@@ -24,7 +24,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
     private String type;
     @Positive(message = "Volume must be a positive number")
     private Double volume;
-    // TODO: Add regex
+
     private String imagePath;
 
     public BeerUpdateDTO(BeerRequestDTO requestDTO) {
@@ -75,8 +75,7 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         }
         StringBuilder sb = new StringBuilder(this.brand);
         if (this.type != null) {
-            sb.append(" ");
-            sb.append(this.type);
+            sb.append(" ").append(this.type);
         }
         return sb.toString();
     }
@@ -92,7 +91,8 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         }
         beer.setBrand(this.brand);
         if (this.type != null) {
-            beer.setType(this.type);
+			if("".equals(this.type.trim())) this.type = null;
+            else beer.setType(this.type);
         }
         if (this.volume == null) {
             beer.setVolume(0.5);
