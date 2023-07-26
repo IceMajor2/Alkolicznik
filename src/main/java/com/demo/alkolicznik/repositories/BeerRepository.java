@@ -28,10 +28,8 @@ public interface BeerRepository extends CrudRepository<Beer, Long> {
     List<Beer> findAllByOrderByIdAsc();
 
     default boolean exists(Beer beer) {
-        String brand = beer.getBrand();
-        String type = beer.getType();
-        Double volume = beer.getVolume();
-        return existsByBrandAndTypeAndVolume(brand, type, volume);
+        return existsByBrandAndTypeAndVolume
+				(beer.getBrand(), beer.getType(), beer.getVolume());
     }
 
     boolean existsByBrandAndTypeAndVolume(String brand, String type, Double volume);
