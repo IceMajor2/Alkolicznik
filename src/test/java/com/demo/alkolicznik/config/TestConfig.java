@@ -82,17 +82,12 @@ public class TestConfig {
 
 	@Bean
 	public List<Beer> beers() {
-//		LOGGER.info("Reloading 'beer' table");
 		setJdbcTemplate();
 		String sql = "SELECT * FROM beer";
 		List<Beer> initializedBeers = jdbcTemplate.query(sql, this.mapToBeer());
-//		LOGGER.info("Beer table consists of the following:");
-//		LOGGER.info("===");
 		for (Beer beer : initializedBeers) {
 			beers.put(beer.getId(), beer);
-//			LOGGER.info(beer.toString());
 		}
-//		LOGGER.info("===");
 		return initializedBeers;
 	}
 
@@ -143,7 +138,7 @@ public class TestConfig {
 						.addScript("classpath:data_sql/store-data.sql")
 						.addScript("classpath:data_sql/beer-price-data.sql")
 						.addScript("classpath:data_sql/user-data.sql")
-						.addScript("classpath:data_sql/image-data.sql")
+					//	.addScript("classpath:data_sql/image-data.sql")
 						.build();
 	}
 
