@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.demo.alkolicznik.api.BeerPriceTests;
 import com.demo.alkolicznik.api.ImageModelTests;
-import com.demo.alkolicznik.api.StoreTests;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,10 +23,6 @@ public class MockRequests {
     public static MockMvc mockMvc;
 
     private static void initMockMvc() {
-        if (StoreTests.mockMvc != null) {
-            mockMvc = StoreTests.mockMvc;
-            return;
-        }
         if (ImageModelTests.mockMvc != null) {
             mockMvc = ImageModelTests.mockMvc;
             return;
