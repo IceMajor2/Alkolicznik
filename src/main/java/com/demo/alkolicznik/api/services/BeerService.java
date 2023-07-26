@@ -195,7 +195,6 @@ public class BeerService {
 			throw new ObjectsAreEqualException();
 		}
 		Beer converted = updateDTO.convertToModelNoImage();
-		System.out.println(converted);
 		if (converted != null && beerRepository.exists(converted)) {
 			throw new BeerAlreadyExistsException();
 		}
