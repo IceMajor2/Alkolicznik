@@ -48,9 +48,9 @@ public class JsonUtils {
 		return createStoreRequest(store.getName(), store.getCity(), store.getStreet());
 	}
 
-	public static StoreResponseDTO createStoreResponse(Long id, String name, String city, String street) {
+	public static StoreResponseDTO createStoreResponse(Integer id, String name, String city, String street) {
 		StoreResponseDTO store = new StoreResponseDTO();
-		store.setId(id);
+		store.setId(id.longValue());
 		store.setName(name);
 		store.setCity(city);
 		store.setStreet(street);
@@ -58,7 +58,7 @@ public class JsonUtils {
 	}
 
 	public static StoreResponseDTO createStoreResponse(Store store) {
-		return createStoreResponse(store.getId(), store.getName(), store.getCity(), store.getStreet());
+		return createStoreResponse(store.getId().intValue(), store.getName(), store.getCity(), store.getStreet());
 	}
 
 	public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageModelResponseDTO imageDTO) {
