@@ -578,7 +578,7 @@ public class BeerTests {
 				"2, Ksiazece, Zlote pszeniczne, null",
 				"4, Zubr, null, null",
 				"5, Komes, Porter Malinowy, 0.33",
-				"7, Guinness, \t, null"
+				"7, Guinness, '\n  \t', null"
 		},
 				nullValues = { "null" })
 		@DisplayName("PUT: '/api/beer' [BEERS_EQUAL]")
@@ -598,7 +598,7 @@ public class BeerTests {
 				"Perla, Chmielowa Pils, null",
 				"Tyskie, Gronie, 0.65",
 				"Zubr, null, null",
-				"Guinness, \t, null"
+				"Guinness, '\n  \t', null"
 		},
 				nullValues = { "null" })
 		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
@@ -1018,9 +1018,9 @@ public class BeerTests {
 		@ParameterizedTest
 		@CsvSource(value = {
 				"1, Perla, Chmielowa Pils, null",
-				"4, Zubr, \t, null, null",
+				"4, Zubr, , null",
 				"6, Miloslaw, Biale, 0.5",
-				"7, Guinness, null, 0.5"
+				"7, Guinness, ' ', 0.5"
 		},
 				nullValues = "null")
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [PROPERTIES_SAME] (2)")
@@ -1041,7 +1041,7 @@ public class BeerTests {
 		@ParameterizedTest
 		@CsvSource(value = {
 				"1, Zubr, null, null, null",
-				"2, Guinness, \t, null, null",
+				"2, Guinness, '\t', null, null",
 				"5, Tyskie, Gronie, 0.65"
 		},
 				nullValues = "null")
@@ -1155,12 +1155,18 @@ public class BeerTests {
 			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"3, Tyskie, Gronie, 0.65",
+				"4, Zubr, ' ', null",
+				"1, Perla, Chmielowa Pils, null",
+				"7, Guinness, null, null"
+		}, nullValues = "null")
 		@DisplayName("DELETE: '/api/beer'")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-		public void deleteByObjectTest() {
+		public void deleteByObjectTest(Long id, String brand, String type, Double volume) {
 			// given
-			BeerDeleteRequestDTO request = createBeerDeleteRequest(getBeer(3L, beers));
+			BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
 
 			// when
 			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
@@ -1170,7 +1176,7 @@ public class BeerTests {
 
 			// then
 			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
-					getBeer(3L, beers),
+					getBeer(id, beers),
 					"Beer was deleted successfully!"
 			);
 			String expectedJson = toJsonString(expected);
@@ -1178,14 +1184,14 @@ public class BeerTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// when
-			var getResponse = getRequest("/api/beer/3");
+			var getResponse = getRequest("/api/beer/" + id);
 			actualJson = getResponse.getBody();
 
 			// then
 			assertIsError(actualJson,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '3' id",
-					"/api/beer/3");
+					"Unable to find beer of '" + id + "' id",
+					"/api/beer/" + id);
 		}
 
 		@ParameterizedTest
