@@ -46,7 +46,6 @@ import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeersInCity;
-import static com.demo.alkolicznik.utils.TestUtils.getImage;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
@@ -450,7 +449,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@ActiveProfiles({ "main", "image" })
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PutRequests {
@@ -466,7 +464,7 @@ public class BeerTests {
 		@DisplayName("PUT: '/api/beer' brand")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTest() {
-			BeerRequestDTO request = createBeerRequest("Lech", null, null, null);
+			BeerRequestDTO request = createBeerRequest("Lech", null, null);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -483,7 +481,7 @@ public class BeerTests {
 		@DisplayName("PUT: '/api/beer' brand & type")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandAndTypeTest() {
-			BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null, null);
+			BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -500,7 +498,7 @@ public class BeerTests {
 		@DisplayName("PUT: '/api/beer' brand, type & volume")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTypeAndVolumeTest() {
-			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33, null);
+			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -517,46 +515,24 @@ public class BeerTests {
 		@DisplayName("PUT: '/api/beer' brand, type, volume & image")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTypeVolumeAndImageTest() {
-			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne",
-					0.33, getRawPathToImage("zywiec-jasne-0.33.jpg"));
+			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/6", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = putResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(6L, "Zywiec", "Jasne", 0.33,
-					createImageResponse("zywiec-jasne-0.33.jpg", actual.getImage()));
+			BeerResponseDTO expected = createBeerResponse(6L, "Zywiec", "Jasne", 0.33);
 			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer' check image after replacing")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-		public void replaceBeerWithImageTest() {
-			BeerRequestDTO request = createBeerRequest("Okocim", null, null, null);
-
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/4", request);
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			BeerResponseDTO expected = createBeerResponse(4L, "Okocim", null, 0.5d);
-			String expectedJson = toJsonString(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/beer/4/image");
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		}
 
 		@Test
 		@DisplayName("PUT: '/api/beer' check prices after replacing")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceBeerWithPrices() {
-			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null, null);
+			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -644,7 +620,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@ActiveProfiles({ "main", "image" })
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	public class PatchRequests {
@@ -661,7 +636,7 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void updateVolumeTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.5);
 
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/3", request);
@@ -671,7 +646,7 @@ public class BeerTests {
 
 			// then
 			BeerResponseDTO expected = createBeerResponse(
-					3L, "Tyskie", "Gronie", 0.5, createImageResponse(getImage(3L, beers))
+					3L, "Tyskie", "Gronie", 0.5
 			);
 			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
@@ -693,7 +668,7 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void updateBrandTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null, null);
+			BeerUpdateDTO request = createBeerUpdateRequest("Ksiazece", null, null);
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/6", request);
 			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -724,7 +699,7 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void updateTypeTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, "Potrojny zloty", null, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, "Potrojny zloty", null);
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
 			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -903,7 +878,7 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void updateAddTypeTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5, null);
+			BeerUpdateDTO request = createBeerUpdateRequest("Zubr", "Ciemnozloty", 0.5);
 
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/4", request);
@@ -1062,7 +1037,6 @@ public class BeerTests {
 	}
 
 	@Nested
-	@ActiveProfiles({ "main", "image" })
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
