@@ -617,7 +617,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	public class PatchRequests {
+	class PatchRequests {
 
 		private List<Beer> beers;
 
