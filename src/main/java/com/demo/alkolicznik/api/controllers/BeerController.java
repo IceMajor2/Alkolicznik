@@ -4,7 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import com.demo.alkolicznik.api.services.BeerService;
-import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -154,7 +155,7 @@ public class BeerController {
 	@DeleteMapping("/{beer_id}")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
-	public BeerDeleteDTO delete(@PathVariable("beer_id") Long beerId) {
+	public BeerDeleteResponseDTO delete(@PathVariable("beer_id") Long beerId) {
 		return beerService.delete(beerId);
 	}
 
@@ -170,9 +171,7 @@ public class BeerController {
 	})
 	@DeleteMapping
 	@SecurityRequirement(name = "Basic Authentication")
-	// TODO: change BeerRequestDTO to new DTO because 'BeerRequestDTO' contains
-	//		 unnecessary image path
-	public BeerDeleteDTO delete(@RequestBody @Valid BeerRequestDTO requestDTO) {
+	public BeerDeleteResponseDTO delete(@RequestBody @Valid BeerDeleteRequestDTO requestDTO) {
 		return beerService.delete(requestDTO);
 	}
 }

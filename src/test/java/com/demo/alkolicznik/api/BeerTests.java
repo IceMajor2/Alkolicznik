@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -34,6 +35,7 @@ import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
@@ -1083,10 +1085,10 @@ public class BeerTests {
 			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/6");
 			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = deleteResponse.getBody();
-			BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
+			BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
 
 			// then
-			BeerDeleteDTO expected = createBeerDeleteResponse(
+			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
 					getBeer(6L, beers),
 					"Beer was deleted successfully!"
 			);
@@ -1110,16 +1112,16 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void deleteByObjectTest() {
 			// given
-			BeerRequestDTO request = createBeerRequest(getBeer(3L, beers));
+			BeerDeleteRequestDTO request = createBeerDeleteRequest(getBeer(3L, beers));
 
 			// when
 			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = deleteResponse.getBody();
-			BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
+			BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
 
 			// then
-			BeerDeleteDTO expected = createBeerDeleteResponse(
+			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
 					getBeer(3L, beers),
 					"Beer was deleted successfully!"
 			);
@@ -1153,10 +1155,10 @@ public class BeerTests {
 			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
 			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = deleteResponse.getBody();
-			BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
+			BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
 
 			// then
-			BeerDeleteDTO expected = createBeerDeleteResponse(
+			BeerDeleteResponseDTO expected = createBeerDeleteResponse(
 					getBeer(beerId, beers),
 					"Beer was deleted successfully!"
 			);

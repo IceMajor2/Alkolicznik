@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.demo.alkolicznik.dto.beer.BeerDeleteDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -125,19 +126,21 @@ public class BeerService {
 		return new BeerResponseDTO(beerRepository.save(beer));
 	}
 
-	public BeerDeleteDTO delete(Long beerId) {
+	public BeerDeleteResponseDTO delete(Long beerId) {
 		Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
 				new BeerNotFoundException(beerId));
+		BeerDeleteResponseDTO deleteResponse = new BeerDeleteResponseDTO(toDelete);
+		System.out.println(deleteResponse);
 		beerRepository.delete(toDelete);
 		if (toDelete.getImage().isPresent()) {
 			imageService.deleteBeerImage(toDelete);
 		}
-		return new BeerDeleteDTO(toDelete);
+		return deleteResponse;
 	}
 
-	public BeerDeleteDTO delete(BeerRequestDTO beer) {
-		Beer toDelete = beerRepository.findByFullnameAndVolume(beer.getFullName(), beer.getVolume())
-				.orElseThrow(() -> new BeerNotFoundException(beer.getFullName(), beer.getVolume()));
+	public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
+		Beer toDelete = beerRepository.findByFullnameAndVolume(request.getFullName(), request.getVolume())
+				.orElseThrow(() -> new BeerNotFoundException(request.getFullName(), request.getVolume()));
 		return this.delete(toDelete.getId());
 	}
 

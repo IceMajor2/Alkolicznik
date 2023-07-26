@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
-@JsonPropertyOrder({"url", "image_component"})
+@JsonPropertyOrder({ "url", "external_id" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,14 +14,14 @@ import lombok.*;
 @EqualsAndHashCode
 public class ImageModelResponseDTO {
 
-    @JsonProperty("url")
-    private String imageUrl;
+	@JsonProperty("url")
+	private String imageUrl;
 
-    @JsonProperty("external_id")
-    private String externalId;
+	@JsonProperty("external_id")
+	private String externalId;
 
-    public ImageModelResponseDTO(ImageModel image) {
-        this.imageUrl = image.getImageUrl();
-        this.externalId = image.getExternalId();
-    }
+	public ImageModelResponseDTO(ImageModel image) {
+		this.imageUrl = image.getImageUrl();
+		this.externalId = image.getExternalId();
+	}
 }
