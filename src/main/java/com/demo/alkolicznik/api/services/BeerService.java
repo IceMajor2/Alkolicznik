@@ -89,8 +89,11 @@ public class BeerService {
 	public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
 		Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
 		Beer newBeer = requestDTO.convertToModelNoImage();
+		Beer overwritten = updateFieldsOnPut(toOverwrite, newBeer);
 
-		updateFieldsOnPut(toOverwrite, newBeer);
+		if(beerRepository.exists(overwritten)) {
+			throw new BeerAlreadyExistsException();
+		}
 
 		// for each PUT request all the previous
 		// beer prices for this beer MUST be deleted
@@ -109,7 +112,10 @@ public class BeerService {
 
 	public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
 		Beer beer = checkForPatchConditions(beerId, updateDTO);
-		updateFieldsOnPatch(beer, updateDTO);
+		Beer updated = updateFieldsOnPatch(beer, updateDTO);
+		if(beerRepository.exists(updated)) {
+			throw new BeerAlreadyExistsException();
+		}
 
 		// deleting image and prices if brand and/or type were changed
 		if (updateDTO.imageAndPricesToDelete()) {
@@ -158,7 +164,7 @@ public class BeerService {
 		imageService.save(imageModel);
 	}
 
-	private void updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
+	private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
 		String updatedBrand = updateDTO.getBrand();
 		String updatedType = updateDTO.getType();
 		Double updatedVolume = updateDTO.getVolume();
@@ -173,12 +179,14 @@ public class BeerService {
 		if (updatedVolume != null) {
 			toUpdate.setVolume(updatedVolume);
 		}
+		return toUpdate;
 	}
 
-	private void updateFieldsOnPut(Beer toOverwrite, Beer newBeer) {
+	private Beer updateFieldsOnPut(Beer toOverwrite, Beer newBeer) {
 		toOverwrite.setBrand(newBeer.getBrand());
 		toOverwrite.setType(newBeer.getType());
 		toOverwrite.setVolume(newBeer.getVolume());
+		return toOverwrite;
 	}
 
 	private List<BeerResponseDTO> mapToDto(Collection<Beer> beers) {
@@ -193,10 +201,6 @@ public class BeerService {
 		);
 		if (!updateDTO.anythingToUpdate(beer)) {
 			throw new ObjectsAreEqualException();
-		}
-		Beer converted = updateDTO.convertToModelNoImage();
-		if (converted != null && beerRepository.exists(converted)) {
-			throw new BeerAlreadyExistsException();
 		}
 		return beer;
 	}
