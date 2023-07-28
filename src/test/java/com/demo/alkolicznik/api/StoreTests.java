@@ -42,11 +42,9 @@ import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
-import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
-import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -271,210 +269,156 @@ public class StoreTests {
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PutRequests {
 
-		private List<Store> stores;
-
-		@Autowired
-		public PutRequests(List<Store> stores) {
-			this.stores = stores;
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' update name")
-		@DirtiesContext
-		public void updateStoreNameTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest("Carrefour Express", null, null);
-
-			StoreResponseDTO expected = createStoreResponse(1, "Carrefour Express", "Olsztyn", "ul. Barcza 4");
-			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(mockPutRequest("/api/store/1", request),
-					HttpStatus.NO_CONTENT,
-					expectedJson);
-			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/store/1");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' update city")
-		@DirtiesContext
-
-		public void updateStoreCityTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest(null, "Gdynia", null);
-
-			StoreResponseDTO expected = createStoreResponse(7, "Tesco", "Gdynia", "ul. Morska 22");
-			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(mockPutRequest("/api/store/7", request),
-					HttpStatus.NO_CONTENT,
-					expectedJson);
-			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/store/7");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' update street")
-		@DirtiesContext
-
-		public void updateStoreStreetTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest(null, null, "ul. Zeromskiego 4");
-
-			StoreResponseDTO expected = createStoreResponse(4, "ABC", "Warszawa", "ul. Zeromskiego 4");
-			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(mockPutRequest("/api/store/4", request),
-					HttpStatus.NO_CONTENT,
-					expectedJson);
-			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-
-			var getResponse = getRequest("/api/store/4");
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, StoreResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' [NAME_BLANK]")
-		public void updateStoreNameBlankTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest("", null, null);
-			var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Name was not specified",
-					"/api/store/4"
-			);
-
-			request = createStoreUpdateRequest("\t\n ", null, null);
-			putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Name was not specified",
-					"/api/store/4"
-			);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' [PROPERTIES_SAME]")
-		public void updateStorePropertiesSameTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest("Lubi", "Warszawa", "ul. Nowaka 5");
-			var putResponse = putRequestAuth("admin", "admin",
-					"/api/store/5", request);
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.OK,
-					"Objects are the same: nothing to update",
-					"/api/store/5");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' [STREET_BLANK]")
-		public void updateStoreStreetBlankTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest(null, null, "");
-			var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Street was not specified",
-					"/api/store/4"
-			);
-
-			request = createStoreUpdateRequest(null, null, "\t\n ");
-			putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Street was not specified",
-					"/api/store/4"
-			);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' [CITY_BLANK]")
-		public void updateStoreCityBlankTest() {
-			StoreUpdateDTO request = createStoreUpdateRequest(null, "", null);
-			var putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"City was not specified",
-					"/api/store/4"
-			);
-
-			request = createStoreUpdateRequest(null, "\t\n ", null);
-			putResponse = putRequestAuth("admin", "admin", "/api/store/4", request);
-
-			jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"City was not specified",
-					"/api/store/4"
-			);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/store/{store_id}' [INVALID_REQUEST; UNAUTHORIZED]")
-		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-			var postResponse = putRequest("/api/store/3",
-					createStoreUpdateRequest(" ", null, ""));
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Resource not found",
-					"/api/store/3"
-			);
-		}
 	}
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PatchRequests {
 
+		private List<Store> stores;
+
+		@Autowired
+		public PatchRequests(List<Store> stores) {
+			this.stores = stores;
+		}
+
+		@Test
+		@DisplayName("PATCH: '/api/store/{store_id}' update name")
+		@DirtiesContext
+		public void updateStoreNameTest() {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest("Carrefour Express", null, null);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/1", request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = patchResponse.getBody();
+			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			StoreResponseDTO expected = createStoreResponse(1, "Carrefour Express", "Olsztyn", "ul. Barcza 4");
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("PATCH: '/api/store/{store_id}' update city")
+		@DirtiesContext
+		public void updateStoreCityTest() {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(null, "Gdynia", null);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/7", request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = patchResponse.getBody();
+			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			StoreResponseDTO expected = createStoreResponse(7, "Tesco", "Gdynia", "ul. Morska 22");
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("PATCH: '/api/store/{store_id}' update street")
+		@DirtiesContext
+
+		public void updateStoreStreetTest() {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(null, null, "ul. Zeromskiego 4");
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/4", request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = patchResponse.getBody();
+			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			StoreResponseDTO expected = createStoreResponse(4, "ABC", "Warszawa", "ul. Zeromskiego 4");
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "", " \t \n" })
+		@DisplayName("PATCH: '/api/store/{store_id}' [NAME_BLANK_IF_EXISTS]")
+		public void updateStoreNameBlankTest(String name) {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(name, null, null);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/4", request);
+			String actualJson = patchResponse.getBody();
+
+			// then
+			assertIsError(
+					actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Name was not specified",
+					"/api/store/4"
+			);
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"7, Tesco, Gdansk, ul. Morska 22",
+				"2, Biedronka, Olsztyn, ul. Sikorskiego-Wilczynskiego 12",
+				"4, ABC, Warszawa, ul. Zeromskiego 3"
+		})
+		@DisplayName("PATCH: '/api/store/{store_id}' [PROPERTIES_SAME]")
+		public void updateStorePropertiesSameTest(Long id, String name, String city, String street) {
+			StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+			var patchResponse = patchRequestAuth("admin", "admin",
+					"/api/store/" + id, request);
+
+			String jsonResponse = patchResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.OK,
+					"Objects are the same: nothing to update",
+					"/api/store/" + id);
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "", "\n\n   \t" })
+		@DisplayName("PATCH: '/api/store/{store_id}' [STREET_BLANK_IF_EXISTS]")
+		public void updateStoreStreetBlankTest(String street) {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(null, null, street);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/4", request);
+			String actualJson = patchResponse.getBody();
+
+			// then
+			assertIsError(
+					actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Street was not specified",
+					"/api/store/4"
+			);
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "", "\n\n   \t" })
+		@DisplayName("PATCH: '/api/store/{store_id}' [CITY_BLANK_IF_EXISTS]")
+		public void updateStoreCityBlankTest(String city) {
+			StoreUpdateDTO request = createStoreUpdateRequest(null, city, null);
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/7", request);
+
+			String jsonResponse = patchResponse.getBody();
+
+			assertIsError(
+					jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"City was not specified",
+					"/api/store/7"
+			);
+		}
 	}
 
 	@Nested
