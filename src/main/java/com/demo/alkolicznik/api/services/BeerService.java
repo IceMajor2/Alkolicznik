@@ -208,8 +208,8 @@ public class BeerService {
 		return checkForUpdateConditions(beerId, updateDTO);
 	}
 
-	private Beer checkForPutConditions(Long beerId, BeerRequestDTO updateDTO) {
-		return checkForUpdateConditions(beerId, new BeerUpdateDTO(updateDTO));
+	private Beer checkForPutConditions(Long beerId, BeerRequestDTO requestDTO) {
+		return checkForUpdateConditions(beerId, new BeerUpdateDTO(requestDTO));
 	}
 
 	private void addImage(Beer beer, String imagePath) {

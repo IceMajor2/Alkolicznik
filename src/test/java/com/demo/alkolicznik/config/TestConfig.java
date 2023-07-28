@@ -123,7 +123,7 @@ public class TestConfig {
 		for (Store store : stores) {
 			for (BeerPrice price : prices) {
 				if (price.getStore().equals(store)) {
-					store.addBeer(price.getBeer(), price.getPrice());
+					store.saveBeer(price.getBeer(), price.getPrice());
 				}
 			}
 		}
@@ -138,15 +138,15 @@ public class TestConfig {
 						.addScript("classpath:data_sql/store-data.sql")
 						.addScript("classpath:data_sql/beer-price-data.sql")
 						.addScript("classpath:data_sql/user-data.sql")
-					//	.addScript("classpath:data_sql/image-data.sql")
+						//	.addScript("classpath:data_sql/image-data.sql")
 						.build();
 	}
 
 	@Bean("correctPasswords")
 	public String[] correctPasswords() {
-		String[] randomPasswords = new String[]{"kl;jdvba;gbirjea",
+		String[] randomPasswords = new String[] { "kl;jdvba;gbirjea",
 				"3rt90qw4gmkvsvr", "ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
-				"dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK"};
+				"dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK" };
 		return randomPasswords;
 	}
 
