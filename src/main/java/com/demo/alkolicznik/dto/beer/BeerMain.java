@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public abstract class BeerMain {
 
-	//	protected String brand;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String type;
 
