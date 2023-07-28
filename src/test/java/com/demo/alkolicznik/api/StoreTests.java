@@ -418,7 +418,7 @@ public class StoreTests {
 		@CsvSource(value = {
 				"1, Lidl, Olsztyn, ul. Iwaszkiewicza 1",
 				"6, Zabka, Ilawa, ul. Dworcowa 3",
-				"9, ABC, Warszawa, ul. Nowaka 5"
+				"9, ABC, Warszawa, ul. Zeromskiego 3"
 		}, nullValues = "null")
 		@DisplayName("PUT: '/api/store/{store_id}' [STORE_EXISTS]")
 		public void replaceStoreAlreadyExistsTest(Long id, String name, String city, String street) {
