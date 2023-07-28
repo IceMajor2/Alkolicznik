@@ -18,14 +18,6 @@ public class BeerRequestDTO extends BeerMain {
 
 	private String imagePath;
 
-//	public Beer convertToModelNoImage() {
-//		Beer beer = new Beer();
-//		beer.setBrand(this.brand);
-//		beer.setType(super.type);
-//		beer.setVolume(super.volume);
-//		return beer;
-//	}
-
 	@JsonIgnore
 	public String getFullName() {
 		StringBuilder sb = new StringBuilder(this.brand);
