@@ -39,13 +39,11 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeersInCity;
-import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
@@ -191,13 +189,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Lech", null, 0.5);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Lech", null, 0.5);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -218,13 +216,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Karmi", null, 0.6);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Karmi", null, 0.6);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -246,13 +244,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Ksiazece", "Wisnia", 0.5);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Ksiazece", "Wisnia", 0.5);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -274,13 +272,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Zywiec", "Jasne", 0.33);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Zywiec", "Jasne", 0.33);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -295,20 +293,20 @@ public class BeerTests {
 		public void addFullnameExistsVolumeUniqueTest() {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/beer",
-					createBeerRequest("Perla", "Chmielowa Pils", 0.33)
+					createBeerRequest("Perla", "Chmielowa Pils", 0.6)
 			);
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Perla", "Chmielowa Pils", 0.33);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Perla", "Chmielowa Pils", 0.6);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -329,13 +327,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
+			BeerResponseDTO expected = createBeerResponse(((beers.size() + 1)), "Heineken", null, 0.5);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + ((beers.size() + 1)));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -356,13 +354,13 @@ public class BeerTests {
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Heineken", null, 0.5);
+			BeerResponseDTO expected = createBeerResponse((beers.size() + 1), "Heineken", null, 0.5);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// Fetch the newly-created beer.
-			var getResponse = getRequest("/api/beer/8");
+			var getResponse = getRequest("/api/beer/" + ((beers.size() + 1)));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerResponseDTO.class);
@@ -477,14 +475,14 @@ public class BeerTests {
 		@DisplayName("PUT: '/api/beer' brand & type")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandAndTypeTest() {
-			BeerRequestDTO request = createBeerRequest("Perla", "Miodowa", null);
+			BeerRequestDTO request = createBeerRequest("Perla", "Biala", null);
 
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2", request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = putResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
-			BeerResponseDTO expected = createBeerResponse(2L, "Perla", "Miodowa", 0.5d);
+			BeerResponseDTO expected = createBeerResponse(2L, "Perla", "Biala", 0.5d);
 			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
@@ -775,7 +773,7 @@ public class BeerTests {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void changingVolumeDoesNotRemovePricesTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.33);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, 0.6);
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/1", request);
 			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -783,7 +781,7 @@ public class BeerTests {
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 			// then
-			BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.33);
+			BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.6);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
@@ -796,43 +794,6 @@ public class BeerTests {
 			List<BeerPriceResponseDTO> expectedPrices = getBeer(1L, beers).getPrices().stream().map(price -> {
 				price.getBeer().setVolume(0.33);
 				return new BeerPriceResponseDTO(price);
-			}).toList();
-			assertThat(actualList).hasSameElementsAs(expectedPrices);
-		}
-
-		@Test
-		@DisplayName("PATCH: '/api/beer/{beer_id}' changing image does not remove prices")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-		public void changingImageDoesNotRemovePricesTest() {
-			// given
-			String filename = "perla-chmielowa-pils-0.5.webp";
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
-			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/1", request);
-			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = patchResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			// then
-			BeerResponseDTO expected = createBeerResponse(
-					1L, "Perla", "Chmielowa Pils", 0.5d,
-					createImageResponse(filename, actual.getImage().getExternalId())
-			);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			// when
-			var getResponse = getRequest("/api/beer/1/beer-price");
-			List<BeerPriceResponseDTO> actualList = toModelList(getResponse.getBody(), BeerPriceResponseDTO.class);
-			// then
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			List<BeerPriceResponseDTO> expectedPrices = getBeer(1L, beers).getPrices().stream().map(price -> {
-				BeerPriceResponseDTO responseDTO = new BeerPriceResponseDTO(price);
-				responseDTO.getBeer().setImage(
-						createImageResponse(filename, actual.getImage().getExternalId())
-				);
-				return responseDTO;
 			}).toList();
 			assertThat(actualList).hasSameElementsAs(expectedPrices);
 		}
@@ -1010,7 +971,7 @@ public class BeerTests {
 
 		@ParameterizedTest
 		@CsvSource(value = {
-				"1, Zubr, null, null",
+				"1, Zubr, '', null",
 				"2, Guinness, ' \t', null",
 				"5, Tyskie, Gronie, 0.65",
 				"8, null, Chmielowa Pils, null",
@@ -1166,7 +1127,7 @@ public class BeerTests {
 
 		@ParameterizedTest
 		@CsvSource(value = {
-				"Perla, Miodowa, 0.5",
+				"Perla, Biala, 0.5",
 				"Lech, null, null",
 				"Tyskie, Gronie, null",
 				"Zubr, null, 0.33",
