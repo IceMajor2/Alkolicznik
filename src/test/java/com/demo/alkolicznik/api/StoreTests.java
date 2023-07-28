@@ -59,7 +59,7 @@ public class StoreTests {
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class GetRequests {
 
-		private List<Store> stores;
+		private final List<Store> stores;
 
 		@Autowired
 		public GetRequests(List<Store> stores) {
@@ -115,7 +115,7 @@ public class StoreTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = { "Przemysl", " ", "Olecko" })
+		@ValueSource(strings = { "Przemysl", "", "Olecko" })
 		@DisplayName("GET: '/api/store/{store_id}' of city [CITY_NOT_FOUND]")
 		public void getStoreFromCityNotExistsArrayTest(String city) {
 			var getResponse = getRequest("/api/store", Map.of("city", city));
@@ -151,7 +151,7 @@ public class StoreTests {
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequests {
 
-		private List<Store> stores;
+		private final List<Store> stores;
 
 		@Autowired
 		public PostRequests(List<Store> stores) {
@@ -165,7 +165,7 @@ public class StoreTests {
 				"Lewiatan, Sopot, ul. Monciaka 2"
 		})
 		@DisplayName("POST: '/api/store'")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		@DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
 		public void createStoreTest(String name, String city, String street) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store",
@@ -175,13 +175,13 @@ public class StoreTests {
 			String actualJson = postResponse.getBody();
 			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
 
-			StoreResponseDTO expected = createStoreResponse(stores.size() + 1, name, city, street);
+			StoreResponseDTO expected = createStoreResponse((stores.size() + 1), name, city, street);
 			String expectedJson = toJsonString(expected);
 
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
 
-			var getResponse = getRequest("/api/store/" + stores.size() + 1);
+			var getResponse = getRequest("/api/store/" + (stores.size() + 1));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, StoreResponseDTO.class);
@@ -248,19 +248,18 @@ public class StoreTests {
 		}
 
 		@ParameterizedTest
-		@CsvSource({
+		@CsvSource(value = {
 				"null, Reszel, null, Name was not specified; Street was not specified",
 				"Lubi, null, null, City was not specified; Street was not specified",
 				"null, null, ul. Borowa 1, City was not specified; Name was not specified"
-		})
+		}, nullValues = "null")
 		@DisplayName("POST: '/api/store' [COMBO]")
 		public void createStoreNameBlankCityNullStreetEmptyTest(String name, String city, String street, String errorMessage) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store",
-					createStoreRequest(name, city, street));
+					"/api/store", createStoreRequest(name, city, street));
 
 			String json = postResponse.getBody();
-			System.out.println(json);
+
 			assertIsError(json,
 					HttpStatus.BAD_REQUEST,
 					errorMessage,
@@ -281,7 +280,7 @@ public class StoreTests {
 
 		@Test
 		@DisplayName("PUT: '/api/store/{store_id}' update name")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		@DirtiesContext
 		public void updateStoreNameTest() {
 			StoreUpdateDTO request = createStoreUpdateRequest("Carrefour Express", null, null);
 
@@ -306,7 +305,7 @@ public class StoreTests {
 
 		@Test
 		@DisplayName("PUT: '/api/store/{store_id}' update city")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		@DirtiesContext
 
 		public void updateStoreCityTest() {
 			StoreUpdateDTO request = createStoreUpdateRequest(null, "Gdynia", null);
@@ -332,7 +331,7 @@ public class StoreTests {
 
 		@Test
 		@DisplayName("PUT: '/api/store/{store_id}' update street")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+		@DirtiesContext
 
 		public void updateStoreStreetTest() {
 			StoreUpdateDTO request = createStoreUpdateRequest(null, null, "ul. Zeromskiego 4");
@@ -474,6 +473,12 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	class PatchRequests {
+
+	}
+
+	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
 
 		private List<Store> stores;
@@ -485,8 +490,7 @@ public class StoreTests {
 
 		@Test
 		@DisplayName("DELETE: '/api/store/{store_id}'")
-		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-
+		@DirtiesContext
 		public void deleteStoreTest() {
 			StoreDeleteDTO expected = createStoreDeleteResponse(
 					getStore(6L, stores),
