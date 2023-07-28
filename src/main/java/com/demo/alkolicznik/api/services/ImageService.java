@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;

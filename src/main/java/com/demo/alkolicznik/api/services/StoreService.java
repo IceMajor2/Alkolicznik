@@ -9,8 +9,8 @@ import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
-import com.demo.alkolicznik.exceptions.classes.StoreAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
 

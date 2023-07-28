@@ -12,13 +12,14 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.BeerPriceAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.BeerPriceNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
-import com.demo.alkolicznik.exceptions.classes.StoreNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.BeerAndStoreNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -91,6 +92,9 @@ public class BeerPriceService {
 	}
 
 	public BeerPriceResponseDTO get(Long storeId, Long beerId) {
+		if (!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
+			throw new BeerAndStoreNotFoundException(beerId, storeId);
+		}
 		Store store = storeRepository.findById(storeId).orElseThrow(
 				() -> new StoreNotFoundException(storeId)
 		);

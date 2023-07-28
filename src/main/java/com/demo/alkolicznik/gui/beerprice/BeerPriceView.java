@@ -5,6 +5,10 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.*;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -134,7 +138,8 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
         } catch (ObjectsAreEqualException e) {
             Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
             return;
-        } catch (BeerPriceNotFoundException | BeerNotFoundException | StoreNotFoundException e) {
+        } catch (BeerPriceNotFoundException | BeerNotFoundException |
+				 StoreNotFoundException e) {
             Notification.show("Edytować można jedynie cenę (relacja sklep-piwo musi już istnieć)",
                     4000, Notification.Position.BOTTOM_END);
             return;
