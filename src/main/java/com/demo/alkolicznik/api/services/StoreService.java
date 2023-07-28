@@ -68,6 +68,7 @@ public class StoreService {
 		if(storeRepository.exists(updated)) {
 			throw new StoreAlreadyExistsException();
 		}
+		updated.deleteAllPrices();
 		return new StoreResponseDTO(storeRepository.save(updated));
 	}
 
