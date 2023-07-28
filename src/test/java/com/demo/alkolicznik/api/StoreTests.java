@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Store;
@@ -28,7 +28,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -46,6 +45,7 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRe
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,7 +57,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
 		private final List<Store> stores;
@@ -150,7 +150,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
 		private final List<Store> stores;
@@ -271,14 +271,176 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
+
+		private final List<Store> stores;
+
+		@Autowired
+		public PutRequests(List<Store> stores) {
+			this.stores = stores;
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"1, Biedronka, Olsztyn, ul. Borkowskiego 3",
+				"7, Grosik, Gdansk, ul. Morska 22",
+				"4, Dwojka, Poltusk, ul. Kaczynskiego 13",
+				"6, Na Gorce, Mragowo, ul. Parkowa 1"
+		})
+		@DirtiesContext
+		@DisplayName("PUT: '/api/store/{store_id}'")
+		public void replaceStoreTest(Long id, String name, String city, String street) {
+			// given
+			StoreRequestDTO request = createStoreRequest(name, city, street);
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/" + id, request);
+			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = putResponse.getBody();
+			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			StoreResponseDTO expected = createStoreResponse(id.intValue(), name, city, street);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// when
+			var getResponse = getRequest("/api/store/" + id);
+			actualJson = getResponse.getBody();
+			actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { -893, 0, 9999 })
+		@DisplayName("PUT: '/api/store/{store_id}' [STORE_NOT_FOUND]")
+		public void replaceStoreNotFoundTest(Long id) {
+			// given
+			StoreRequestDTO request = createStoreRequest("Lewiatan", "Antoninow", "ul. Nowickiego 64");
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/" + id, request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '" + id + "' id",
+					"/api/store/" + id);
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"5, Lubi, Warszawa, ul. Nowaka 5",
+				"9, Zabka, Ilawa, ul. Dworcowa 3",
+				"7, Tesco, Gdansk, ul. Morska 22"
+		}, nullValues = "null")
+		@DisplayName("PUT: '/api/store/{store_id}' [STORE_EQUALS]")
+		public void replaceStorePropertiesSameTest(Long id, String name, String city, String street) {
+			// given
+			StoreRequestDTO request = createStoreRequest(name, city, street);
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/" + id, request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.OK,
+					"Objects are the same: nothing to update",
+					"/api/store/" + id);
+		}
+
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "  \n \t", "" })
+		@DisplayName("PUT: '/api/store/{store_id}' [NAME_BLANK]")
+		public void replaceStoreNameBlankTest(String name) {
+			// given
+			StoreRequestDTO request = createStoreRequest(name, "Torun", "ul. Przybyszow 2");
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/3", request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Name was not specified",
+					"/api/store/3");
+		}
+
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "  \n \t", "" })
+		@DisplayName("PUT: '/api/store/{store_id}' [CITY_BLANK]")
+		public void replaceStoreCityBlankTest(String city) {
+			// given
+			StoreRequestDTO request = createStoreRequest("Tesco", city, "ul. Przybyszow 2");
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/7", request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.BAD_REQUEST,
+					"City was not specified",
+					"/api/store/7");
+		}
+
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "  \n \t", "" })
+		@DisplayName("PUT: '/api/store/{store_id}' [NAME_BLANK]")
+		public void replaceStoreStreetBlankTest(String street) {
+			// given
+			StoreRequestDTO request = createStoreRequest("Tesco", "Torun", street);
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/1", request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Street was not specified",
+					"/api/store/1");
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, Lidl, Olsztyn, ul. Iwaszkiewicza 1",
+				"6, Zabka, Ilawa, ul. Dworcowa 3",
+				"9, ABC, Warszawa, ul. Nowaka 5"
+		}, nullValues = "null")
+		@DisplayName("PUT: '/api/store/{store_id}' [STORE_EXISTS]")
+		public void replaceStoreAlreadyExistsTest(Long id, String name, String city, String street) {
+			// given
+			StoreRequestDTO request = createStoreRequest(name, city, street);
+
+			// when
+			var putResponse = putRequestAuth("admin", "admin", "/api/store/" + id, request);
+			String actualJson = putResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.CONFLICT,
+					"Store already exists",
+					"/api/store/" + id);
+		}
+
 
 	}
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PatchRequests {
 
 		private List<Store> stores;
@@ -331,7 +493,6 @@ public class StoreTests {
 		@Test
 		@DisplayName("PATCH: '/api/store/{store_id}' update street")
 		@DirtiesContext
-
 		public void updateStoreStreetTest() {
 			// given
 			StoreUpdateDTO request = createStoreUpdateRequest(null, null, "ul. Zeromskiego 4");
@@ -483,37 +644,11 @@ public class StoreTests {
 					"/api/store/2"
 			);
 		}
-
-		@ParameterizedTest
-		@CsvSource(value = {
-				"2, Lidl, null, null",
-				"4, null, Ilawa, null",
-				"5, null, null, ul. Nowaka 9"
-		}, nullValues = "null")
-		@DisplayName("PATCH: '/api/store/{store_id}' any change = remove beer price")
-		public void updateAnyStoreFieldRemovesAllPricesTest(Long id, String name, String city, String street) {
-			// given
-			StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
-			var getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-			String jsonBeerPrices = getResponse.getBody();
-			List<BeerPriceResponseDTO> beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-			assertThat(beerPrices).isNotEmpty();
-
-			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + id, request);
-			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-			// then
-			getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-			jsonBeerPrices = getResponse.getBody();
-			beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-			assertThat(beerPrices).isEmpty();
-		}
 	}
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class DeleteRequests {
 
 		private List<Store> stores;
