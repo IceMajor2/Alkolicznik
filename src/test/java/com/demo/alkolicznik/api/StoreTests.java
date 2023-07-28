@@ -364,6 +364,28 @@ public class StoreTests {
 		}
 
 		@ParameterizedTest
+		@CsvSource(value = {
+				"8, null, null, ul. Barcza 4",
+				"3, Biedronka, null, ul. Sikorskiego-Wilczynskiego 12",
+				"5, Lidl, Olsztyn, ul. Iwaszkiewicza 1",
+				"9, Grosik, Olsztyn, null"
+		}, nullValues = "null")
+		@DisplayName("PATCH: '/api/store/{store_id}' [STORE_ALREADY_EXISTS]")
+		public void updateStoreAlreadyExistsTest(Long id, String name, String city, String street) {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + id, request);
+			String actualJson = patchResponse.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.CONFLICT,
+					"Store already exists",
+					"/api/store/" + id);
+		}
+
+		@ParameterizedTest
 		@CsvSource({
 				"7, Tesco, Gdansk, ul. Morska 22",
 				"2, Biedronka, Olsztyn, ul. Sikorskiego-Wilczynskiego 12",
