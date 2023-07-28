@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -17,18 +16,15 @@ public class BeerRequestDTO extends BeerMain {
 	@NotBlank(message = "Brand was not specified")
 	private String brand;
 
-	// private String type = super.type;
-	// @Positive(message = "Volume must be a positive number")
-	// private Double volume = super.volume;
 	private String imagePath;
 
-	public Beer convertToModelNoImage() {
-		Beer beer = new Beer();
-		beer.setBrand(this.brand);
-		beer.setType(super.type);
-		beer.setVolume(super.volume);
-		return beer;
-	}
+//	public Beer convertToModelNoImage() {
+//		Beer beer = new Beer();
+//		beer.setBrand(this.brand);
+//		beer.setType(super.type);
+//		beer.setVolume(super.volume);
+//		return beer;
+//	}
 
 	@JsonIgnore
 	public String getFullName() {

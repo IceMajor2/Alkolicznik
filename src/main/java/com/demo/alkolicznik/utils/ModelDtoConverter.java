@@ -3,6 +3,7 @@ package com.demo.alkolicznik.utils;
 import java.util.Collection;
 import java.util.List;
 
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -20,5 +21,13 @@ public class ModelDtoConverter {
 		return stores.stream()
 				.map(StoreResponseDTO::new)
 				.toList();
+	}
+
+	public static Beer convertToModelNoImage(BeerRequestDTO beerRequestDTO) {
+		Beer beer = new Beer();
+		beer.setBrand(beerRequestDTO.getBrand());
+		beer.setType(beerRequestDTO.getType());
+		beer.setVolume(beerRequestDTO.getVolume());
+		return beer;
 	}
 }

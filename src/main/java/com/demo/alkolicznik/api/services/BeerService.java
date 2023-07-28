@@ -21,21 +21,20 @@ import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.vaadin.flow.component.html.Image;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static com.demo.alkolicznik.utils.ModelDtoConverter.beerListToDtoList;
 
 @Service
 public class BeerService {
 
 	private BeerRepository beerRepository;
-
 	private StoreRepository storeRepository;
-
 	private ImageService imageService;
 
+	@Autowired
 	public BeerService(BeerRepository beerRepository, StoreRepository storeRepository, ImageService imageService) {
 		this.beerRepository = beerRepository;
 		this.storeRepository = storeRepository;
@@ -54,7 +53,7 @@ public class BeerService {
 			throw new NoSuchCityException(city);
 		}
 		List<Store> cityStores = storeRepository.findAllByCityOrderByIdAsc(city);
-
+		// order by id ascending
 		Set<Beer> beersInCity = new TreeSet<>(Comparator.comparing(Beer::getId));
 		for (Store store : cityStores) {
 			beersInCity.addAll(
@@ -63,16 +62,16 @@ public class BeerService {
 							.toList()
 			);
 		}
-		return beerListToDtoList(beersInCity);
+		return ModelDtoConverter.beerListToDtoList(beersInCity);
 	}
 
 	public List<BeerResponseDTO> getBeers() {
-		return beerListToDtoList(beerRepository.findAllByOrderByIdAsc());
+		return ModelDtoConverter.beerListToDtoList(beerRepository.findAllByOrderByIdAsc());
 	}
 
 	// TODO: probably should be a transaction
 	public BeerResponseDTO add(BeerRequestDTO requestDTO) {
-		Beer beer = requestDTO.convertToModelNoImage();
+		Beer beer = ModelDtoConverter.convertToModelNoImage(requestDTO);
 
 		if (beerRepository.exists(beer)) {
 			throw new BeerAlreadyExistsException();
@@ -88,10 +87,10 @@ public class BeerService {
 
 	public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
 		Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
-		Beer newBeer = requestDTO.convertToModelNoImage();
+		Beer newBeer = ModelDtoConverter.convertToModelNoImage(requestDTO);
 		Beer overwritten = updateFieldsOnPut(toOverwrite, newBeer);
 
-		if(beerRepository.exists(overwritten)) {
+		if (beerRepository.exists(overwritten)) {
 			throw new BeerAlreadyExistsException();
 		}
 
@@ -113,7 +112,7 @@ public class BeerService {
 	public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
 		Beer beer = checkForPatchConditions(beerId, updateDTO);
 		Beer updated = updateFieldsOnPatch(beer, updateDTO);
-		if(beerRepository.exists(updated)) {
+		if (beerRepository.exists(updated)) {
 			throw new BeerAlreadyExistsException();
 		}
 
