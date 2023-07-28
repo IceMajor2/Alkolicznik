@@ -45,6 +45,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.PATCH, "/api/beer/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.PUT, "/api/store/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.POST, "/api/store").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.PATCH, "/api/store/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.PUT, "/api/beer-price").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.POST, "/api/store/*/beer-price").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .anyRequest().permitAll()
