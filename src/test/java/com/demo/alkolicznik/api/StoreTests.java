@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -57,7 +58,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
 		private final List<Store> stores;
@@ -150,7 +151,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
 		private final List<Store> stores;
@@ -271,7 +272,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
 
 		private final List<Store> stores;
@@ -440,7 +441,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PatchRequests {
 
 		private List<Store> stores;
@@ -648,7 +649,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-			//@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class DeleteRequests {
 
 		private List<Store> stores;
