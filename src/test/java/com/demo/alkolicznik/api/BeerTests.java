@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -60,6 +61,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
 		private List<Beer> beers;
@@ -168,6 +170,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
 		private List<Beer> beers;
@@ -445,6 +448,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
 
 		private List<Beer> beers;
@@ -615,6 +619,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PatchRequests {
 
 		private List<Beer> beers;
@@ -996,6 +1001,7 @@ public class BeerTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class DeleteRequests {
 
 		private List<Beer> beers;

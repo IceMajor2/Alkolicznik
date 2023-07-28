@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -56,6 +57,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
 		private final List<Store> stores;
@@ -141,13 +143,14 @@ public class StoreTests {
 			List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
 			assertThat(actual)
-					.withFailMessage("Elements were not the same or the order of actual array was not ascending by id")
+					//.withFailMessage("Elements were not the same or the order of actual array was not ascending by id")
 					.containsExactlyElementsOf(expected);
 		}
 	}
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
 		private final List<Store> stores;
@@ -268,12 +271,14 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
 
 	}
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PatchRequests {
 
 		private List<Store> stores;
@@ -508,6 +513,7 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class DeleteRequests {
 
 		private List<Store> stores;
