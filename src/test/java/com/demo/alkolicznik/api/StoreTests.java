@@ -267,6 +267,12 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
+	class PutRequests {
+
+	}
+
+	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class PatchRequests {
 
 		private List<Store> stores;
@@ -338,22 +344,22 @@ public class StoreTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = { "", " \t \n" })
-		@DisplayName("PATCH: '/api/store/{store_id}' [NAME_BLANK_IF_EXISTS]")
-		public void updateStoreNameBlankTest(String name) {
+		@ValueSource(longs = { 0, -19, 3456 })
+		@DisplayName("PATCH: '/api/store/{store_id}' [STORE_NOT_FOUND]")
+		public void updateStoreNotFoundTest(Long id) {
 			// given
-			StoreUpdateDTO request = createStoreUpdateRequest(name, null, null);
+			StoreUpdateDTO request = createStoreUpdateRequest("Lidl", "Bydgoszcz", "al. Wroclawska 9");
 
 			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/4", request);
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + id, request);
 			String actualJson = patchResponse.getBody();
 
 			// then
 			assertIsError(
 					actualJson,
-					HttpStatus.BAD_REQUEST,
-					"Name was not specified",
-					"/api/store/4"
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '" + id + "' id",
+					"/api/store/" + id
 			);
 		}
 
@@ -375,6 +381,26 @@ public class StoreTests {
 					HttpStatus.OK,
 					"Objects are the same: nothing to update",
 					"/api/store/" + id);
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "", " \t \n" })
+		@DisplayName("PATCH: '/api/store/{store_id}' [NAME_BLANK_IF_EXISTS]")
+		public void updateStoreNameBlankTest(String name) {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(name, null, null);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/4", request);
+			String actualJson = patchResponse.getBody();
+
+			// then
+			assertIsError(
+					actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Name was not specified",
+					"/api/store/4"
+			);
 		}
 
 		@ParameterizedTest
@@ -411,6 +437,22 @@ public class StoreTests {
 					HttpStatus.BAD_REQUEST,
 					"City was not specified",
 					"/api/store/7"
+			);
+		}
+
+		@Test
+		@DisplayName("PATCH: '/api/store/{store_id}' [NO_PROPERTIES]")
+		public void updateNoPropertiesSpecifiedTest() {
+			StoreUpdateDTO request = createStoreUpdateRequest(null, null, null);
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/2", request);
+
+			String jsonResponse = patchResponse.getBody();
+
+			assertIsError(
+					jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					"No property to update was specified",
+					"/api/store/2"
 			);
 		}
 	}
