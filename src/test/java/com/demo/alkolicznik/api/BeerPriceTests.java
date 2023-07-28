@@ -15,6 +15,9 @@ import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -74,8 +77,128 @@ public class BeerPriceTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
+		@ParameterizedTest
+		@CsvSource({
+				"2, 4, 2.89",
+				"4, 1, 4.09",
+				"5, 6, 6.09"
+		})
+		@DisplayName("GET: '/api/beer-price'")
+		public void getBeerPriceTest(Long storeId, Long beerId, Double price) {
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("store_id", storeId, "beer_id", beerId));
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			String actualJson = getResponse.getBody();
+			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
+
+			BeerPriceResponseDTO expected = createBeerPriceResponse(
+					createBeerResponse(getBeer(beerId, beers)),
+					createStoreResponse(getStore(storeId, stores)),
+					"PLN " + price
+			);
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { 0, -5, 912 })
+		@DisplayName("GET: '/api/beer-price' [BEER_NOT_FOUND]")
+		public void getBeerPriceBeerNotExistsTest(Long beerId) {
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("store_id", 5L, "beer_id", beerId));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '" + beerId + "' id",
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { -2111, 0, 91234 })
+		@DisplayName("GET: '/api/beer/beer-price' [STORE_NOT_FOUND]")
+		public void getBeerPriceStoreNotExistsTest(Long storeId) {
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("store_id", storeId, "beer_id", 3L));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '" + storeId + "' id",
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"1, 4",
+				"3, 2",
+				"7, 1",
+				"6, 7",
+				"9, 9"
+		})
+		@DisplayName("GET: '/api/beer-price' [STORE_NOT_SELL]")
+		public void getBeerPriceNotExistsTest(Long storeId, Long beerId) {
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("store_id", storeId, "beer_id", beerId));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Store does not currently sell this beer",
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"0, 111",
+				"5423, 919",
+				"-318, 546238"
+		})
+		@DisplayName("GET: '/api/beer-price' [STORE_n_BEER_NOT_FOUND]")
+		public void getBeerPriceBeerAndStoreNotExistsTest(Long storeId, Long beerId) {
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("store_id", storeId, "beer_id", beerId));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '" + beerId + "' id; Unable to find store of '" + storeId + "' id",
+					"/api/beer-price");
+		}
+
 		@Test
-		@DisplayName("GET: '/api/beer-price' of city")
+		@DisplayName("GET: '/api/beer-price?city' of empty city")
+		public void getBeerPricesFromCityEmptyTest() {
+			var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			String actualJson = getResponse.getBody();
+
+			String expectedJson = "[]";
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+		@Test
+		@DisplayName("GET: '/api/beer-price?city' [CITY_NOT_FOUND]")
+		public void getBeerPricesFromCityNotExistsTest() {
+			var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"No such city: 'Bydgoszcz'",
+					"/api/beer-price");
+		}
+
+		@Test
+		@DisplayName("GET: '/api/beer-price?city'")
 		public void getBeerPricesFromCityTest() {
 			var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -97,7 +220,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' of beer")
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price'")
 		public void getBeerPricesOfBeerTest() {
 			var getResponse = getRequest("/api/beer/3/beer-price");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -128,27 +251,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer-price'")
-		public void getBeerPriceTest() {
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("store_id", 3L, "beer_id", 3L));
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-			String actualJson = getResponse.getBody();
-			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(3L, beers)),
-					createStoreResponse(getStore(3L, stores)),
-					"PLN 4.19"
-			);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city")
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city'")
 		public void getBeersPriceInCityTest() {
 			var getResponse = getRequest("/api/beer/2/beer-price", Map.of("city", "Warszawa"));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -167,33 +270,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city [BEER_NOT_FOUND]")
-		public void getBeersPriceInCityBeerNotExistsTest() {
-			var getResponse = getRequest("/api/beer/10/beer-price", Map.of("city", "Gdansk"));
-
-			String jsonResponse = getResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '10' id",
-					"/api/beer/10/beer-price");
-		}
-
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' of city [CITY_NOT_FOUND]")
-		public void getBeersPriceInCityCityNotExistsTest() {
-			var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", "Ciechocinek"));
-
-			String jsonResponse = getResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"No such city: 'Ciechocinek'",
-					"/api/beer/5/beer-price");
-		}
-
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' of empty city")
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city' empty city")
 		public void getBeersPriceInCityCityEmptyTest() {
 			var getResponse = getRequest("/api/beer/4/beer-price", Map.of("city", "Gdansk"));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -206,45 +283,29 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [STORE_NOT_FOUND]")
-		public void getBeerPriceStoreNotExistsTest() {
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("store_id", 95L, "beer_id", 3L));
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [BEER_NOT_FOUND]")
+		public void getBeersPriceInCityBeerNotExistsTest() {
+			var getResponse = getRequest("/api/beer/10/beer-price", Map.of("city", "Gdansk"));
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '95' id",
-					"/api/beer-price");
+					"Unable to find beer of '10' id",
+					"/api/beer/10/beer-price");
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer-price' [BEER_NOT_FOUND]")
-		public void getBeerPriceBeerNotExistsTest() {
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("store_id", 5L, "beer_id", 35L));
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [CITY_NOT_FOUND]")
+		public void getBeersPriceInCityCityNotExistsTest() {
+			var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", "Ciechocinek"));
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '35' id",
-					"/api/beer-price");
-		}
-
-		@Test
-		@DisplayName("GET: '/api/beer-price' [STORE_NOT_SELL]")
-		public void getBeerPriceNotExistsTest() {
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("store_id", 3L, "beer_id", 4L));
-
-			String jsonResponse = getResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Store does not currently sell this beer",
-					"/api/beer-price");
+					"No such city: 'Ciechocinek'",
+					"/api/beer/5/beer-price");
 		}
 
 		@Test
@@ -264,7 +325,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("Get beer prices from non-existing store")
+		@DisplayName("GET: '/api/store/{store_id}/beer-price' [STORE_NOT_FOUND]")
 		public void getBeerPricesFromStoreNotExistsTest() {
 			var getResponse = getRequest("/api/store/8/beer-price");
 
@@ -277,7 +338,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/store/{store_id}/beer-price' of store empty")
+		@DisplayName("GET: '/api/store/{store_id}/beer-price' empty store")
 		public void getBeerPricesFromStoreEmptyTest() {
 			var getResponse = getRequest("/api/store/7/beer-price");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -289,33 +350,7 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer-price' of empty city")
-		public void getBeerPricesFromCityEmptyTest() {
-			var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
-			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-			String actualJson = getResponse.getBody();
-
-			String expectedJson = "[]";
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("GET: '/api/beer-price' [CITY_NOT_FOUND]")
-		public void getBeerPricesFromCityNotExistsTest() {
-			var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
-
-			String jsonResponse = getResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"No such city: 'Bydgoszcz'",
-					"/api/beer-price");
-		}
-
-		@Test
 		@DisplayName("GET: '/api/beer-price'")
-		@WithUserDetails("admin")
 		public void getBeerPricesAllArrayTest() {
 			List<BeerPriceResponseDTO> expected = new ArrayList<>();
 			for (Store store : stores) {
