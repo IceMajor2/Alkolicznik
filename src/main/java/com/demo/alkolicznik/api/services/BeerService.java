@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api.services;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +25,8 @@ import com.vaadin.flow.component.html.Image;
 
 import org.springframework.stereotype.Service;
 
+import static com.demo.alkolicznik.utils.ModelDtoConverter.beerListToDtoList;
+
 @Service
 public class BeerService {
 
@@ -48,7 +49,6 @@ public class BeerService {
 		return new BeerResponseDTO(beer);
 	}
 
-	// TODO: Let's put more responsibility on repository class
 	public List<BeerResponseDTO> getBeers(String city) {
 		if (!storeRepository.existsByCity(city)) {
 			throw new NoSuchCityException(city);
@@ -63,11 +63,11 @@ public class BeerService {
 							.toList()
 			);
 		}
-		return this.mapToDto(beersInCity);
+		return beerListToDtoList(beersInCity);
 	}
 
 	public List<BeerResponseDTO> getBeers() {
-		return this.mapToDto(beerRepository.findAllByOrderByIdAsc());
+		return beerListToDtoList(beerRepository.findAllByOrderByIdAsc());
 	}
 
 	// TODO: probably should be a transaction
@@ -187,12 +187,6 @@ public class BeerService {
 		toOverwrite.setType(newBeer.getType());
 		toOverwrite.setVolume(newBeer.getVolume());
 		return toOverwrite;
-	}
-
-	private List<BeerResponseDTO> mapToDto(Collection<Beer> beers) {
-		return beers.stream()
-				.map(BeerResponseDTO::new)
-				.toList();
 	}
 
 	private Beer checkForUpdateConditions(Long beerId, BeerUpdateDTO updateDTO) {

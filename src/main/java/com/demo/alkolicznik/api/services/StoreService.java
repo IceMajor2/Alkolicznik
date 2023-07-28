@@ -16,6 +16,8 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 
 import org.springframework.stereotype.Service;
 
+import static com.demo.alkolicznik.utils.ModelDtoConverter.storeListToDtoList;
+
 @Service
 public class StoreService {
 
@@ -29,11 +31,11 @@ public class StoreService {
 		if (!storeRepository.existsByCity(city)) {
 			throw new NoSuchCityException(city);
 		}
-		return this.mapToDto(storeRepository.findAllByCityOrderByIdAsc(city));
+		return storeListToDtoList(storeRepository.findAllByCityOrderByIdAsc(city));
 	}
 
 	public List<StoreResponseDTO> getStores() {
-		return this.mapToDto(storeRepository.findAllByOrderByIdAsc());
+		return storeListToDtoList(storeRepository.findAllByOrderByIdAsc());
 	}
 
 	public StoreResponseDTO add(StoreRequestDTO storeRequestDTO) {
@@ -55,7 +57,7 @@ public class StoreService {
 		Store newStore = requestDTO.convertToModel();
 		Store overwritten = updateFieldsOnPut(toOverwrite, newStore);
 
-		if(storeRepository.exists(overwritten)) {
+		if (storeRepository.exists(overwritten)) {
 			throw new StoreAlreadyExistsException();
 		}
 
@@ -68,7 +70,7 @@ public class StoreService {
 	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
 		Store store = checkForPatchConditions(storeId, updateDTO);
 		Store updated = updateFieldsOnPatch(store, updateDTO);
-		if(storeRepository.exists(updated)) {
+		if (storeRepository.exists(updated)) {
 			throw new StoreAlreadyExistsException();
 		}
 		updated.deleteAllPrices();
@@ -87,12 +89,6 @@ public class StoreService {
 				.orElseThrow(() -> new StoreNotFoundException(store.getName(), store.getCity(), store.getStreet()));
 		storeRepository.delete(toDelete);
 		return new StoreDeleteDTO(toDelete);
-	}
-
-	private List<StoreResponseDTO> mapToDto(List<Store> stores) {
-		return stores.stream()
-				.map(StoreResponseDTO::new)
-				.toList();
 	}
 
 	private Store checkForPatchConditions(Long storeId, StoreUpdateDTO updateDTO) {
