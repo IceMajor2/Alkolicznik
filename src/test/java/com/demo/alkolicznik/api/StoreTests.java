@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
@@ -476,6 +477,32 @@ public class StoreTests {
 					"No property to update was specified",
 					"/api/store/2"
 			);
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"2, Lidl, null, null",
+				"4, null, Ilawa, null",
+				"5, null, null, ul. Nowaka 9"
+		}, nullValues = "null")
+		@DisplayName("PATCH: '/api/store/{store_id}' any change = remove beer price")
+		public void updateAnyStoreFieldRemovesAllPricesTest(Long id, String name, String city, String street) {
+			// given
+			StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+			var getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
+			String jsonBeerPrices = getResponse.getBody();
+			List<BeerPriceResponseDTO> beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
+			assertThat(beerPrices).isNotEmpty();
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + id, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			// then
+			getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
+			jsonBeerPrices = getResponse.getBody();
+			beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
+			assertThat(beerPrices).isEmpty();
 		}
 	}
 
