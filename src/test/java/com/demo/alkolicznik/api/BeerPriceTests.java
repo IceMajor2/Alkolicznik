@@ -1,15 +1,21 @@
 package com.demo.alkolicznik.api;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,16 +26,24 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.*;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceUpdateRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
+import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
+import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getImage;
+import static com.demo.alkolicznik.utils.TestUtils.getStore;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockGetRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -720,7 +734,7 @@ public class BeerPriceTests {
                     request, Map.of("beer_id", 3L, "store_id", 3L));
             assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             String actualJson = putResponse.getBody();
-            System.out.println(actualJson);
+
             BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
             // then
