@@ -244,6 +244,43 @@ public class ImageModelTests {
 		}
 	}
 
+//	@Test
+//	@DisplayName("PATCH: '/api/beer/{beer_id}' changing image does not remove prices")
+//	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+//	public void changingImageDoesNotRemovePricesTest() {
+//		// given
+//		String filename = "perla-chmielowa-pils-0.5.webp";
+//		BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
+//		// when
+//		var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/1", request);
+//		assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+//		String actualJson = patchResponse.getBody();
+//		BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+//
+//		// then
+//		BeerResponseDTO expected = createBeerResponse(
+//				1L, "Perla", "Chmielowa Pils", 0.5d,
+//				createImageResponse(filename, actual.getImage().getExternalId())
+//		);
+//		String expectedJson = toJsonString(expected);
+//		assertThat(actual).isEqualTo(expected);
+//		assertThat(actualJson).isEqualTo(expectedJson);
+//
+//		// when
+//		var getResponse = getRequest("/api/beer/1/beer-price");
+//		List<BeerPriceResponseDTO> actualList = toModelList(getResponse.getBody(), BeerPriceResponseDTO.class);
+//		// then
+//		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+//		List<BeerPriceResponseDTO> expectedPrices = getBeer(1L, beers).getPrices().stream().map(price -> {
+//			BeerPriceResponseDTO responseDTO = new BeerPriceResponseDTO(price);
+//			responseDTO.getBeer().setImage(
+//					createImageResponse(filename, actual.getImage().getExternalId())
+//			);
+//			return responseDTO;
+//		}).toList();
+//		assertThat(actualList).hasSameElementsAs(expectedPrices);
+//	}
+
 	// TODO: Move image-specific tests from other test classes here
 	// TODO: beer delete (both by param and object) must delete, if present,
 	//		 the previously associated image with it
