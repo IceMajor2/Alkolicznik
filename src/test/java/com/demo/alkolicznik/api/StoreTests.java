@@ -267,12 +267,6 @@ public class StoreTests {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
-	class PutRequests {
-
-	}
-
-	@Nested
-	@TestMethodOrder(MethodOrderer.Random.class)
 	class PatchRequests {
 
 		private List<Store> stores;
