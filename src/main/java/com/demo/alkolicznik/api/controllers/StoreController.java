@@ -8,6 +8,10 @@ import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
@@ -36,6 +40,13 @@ public class StoreController {
 	}
 
 	@GetMapping("/{store_id}")
+	@Operation(summary = "Get store details",
+	description = "Include id of store you would like to see details of. "
+			+ "Details include: see response example below.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "store details retrieved"),
+			@ApiResponse(responseCode = "404", description = "store not found", content = @Content)
+	})
 	public StoreResponseDTO get(@PathVariable("store_id") Long id) {
 		return storeService.get(id);
 	}

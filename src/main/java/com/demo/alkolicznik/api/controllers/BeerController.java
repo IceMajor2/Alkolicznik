@@ -43,14 +43,12 @@ public class BeerController {
 	}
 
 	@GetMapping("/{beer_id}")
-	@Operation(summary = "Get beer's details",
+	@Operation(summary = "Get beer details",
 			description = "Include id of beer you would like to see details of. "
 					+ "Details include: see response example below.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer details retrieved"),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content)
+			@ApiResponse(responseCode = "404", description = "beer not found", content = @Content)
 	})
 	public BeerResponseDTO get(@PathVariable("beer_id") Long id) {
 		return beerService.get(id);
