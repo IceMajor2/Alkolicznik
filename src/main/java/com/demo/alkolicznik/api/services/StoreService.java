@@ -110,10 +110,6 @@ public class StoreService {
 		if (!updateDTO.anythingToUpdate(store)) {
 			throw new ObjectsAreEqualException();
 		}
-		Store converted = updateDTO.convertToModel();
-		if (converted != null && storeRepository.exists(converted)) {
-			throw new StoreAlreadyExistsException();
-		}
 		return store;
 	}
 
