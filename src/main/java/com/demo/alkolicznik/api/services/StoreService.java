@@ -62,53 +62,13 @@ public class StoreService {
 		return new StoreResponseDTO(storeRepository.save(toOverwrite));
 	}
 
-	private Store updateFieldsOnPut(Store toOverwrite, Store newStore) {
-		toOverwrite.setName(newStore.getName());
-		toOverwrite.setCity(newStore.getCity());
-		toOverwrite.setStreet(newStore.getStreet());
-		return toOverwrite;
-	}
-
-	private Store checkForPutConditions(Long storeId, StoreRequestDTO requestDTO) {
-		return checkForUpdateConditions(storeId, StoreUpdateDTO.convertFromRequest(requestDTO));
-	}
-
-	private Store checkForUpdateConditions(Long storeId, StoreUpdateDTO updateDTO) {
-		Store store = storeRepository.findById(storeId).orElseThrow(
-				() -> new StoreNotFoundException(storeId)
-		);
-		if (!updateDTO.anythingToUpdate(store)) {
-			throw new ObjectsAreEqualException();
-		}
-		Store converted = updateDTO.convertToModel();
-		if (converted != null && storeRepository.exists(converted)) {
+	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
+		Store store = checkForPatchConditions(storeId, updateDTO);
+		Store updated = updateFieldsOnPatch(store, updateDTO);
+		if(storeRepository.exists(updated)) {
 			throw new StoreAlreadyExistsException();
 		}
-		return store;
-	}
-
-	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
-		if (updateDTO.propertiesMissing()) {
-			throw new PropertiesMissingException();
-		}
-		Store store = storeRepository.findById(storeId).orElseThrow(() ->
-				new StoreNotFoundException(storeId));
-		if (!updateDTO.anythingToUpdate(store)) {
-			throw new ObjectsAreEqualException();
-		}
-		String updatedName = updateDTO.getName();
-		String updatedCity = updateDTO.getCity();
-		String updatedStreet = updateDTO.getStreet();
-		if (updatedName != null) {
-			store.setName(updatedName);
-		}
-		if (updatedCity != null) {
-			store.setCity(updatedCity);
-		}
-		if (updatedStreet != null) {
-			store.setStreet(updatedStreet);
-		}
-		return new StoreResponseDTO(storeRepository.save(store));
+		return new StoreResponseDTO(storeRepository.save(updated));
 	}
 
 	public StoreDeleteDTO delete(Long storeId) {
@@ -129,5 +89,53 @@ public class StoreService {
 		return stores.stream()
 				.map(StoreResponseDTO::new)
 				.toList();
+	}
+
+	private Store checkForPatchConditions(Long storeId, StoreUpdateDTO updateDTO) {
+		if (updateDTO.propertiesMissing()) {
+			throw new PropertiesMissingException();
+		}
+		return checkForUpdateConditions(storeId, updateDTO);
+	}
+
+	private Store checkForPutConditions(Long storeId, StoreRequestDTO requestDTO) {
+		return checkForUpdateConditions(storeId, StoreUpdateDTO.convertFromRequest(requestDTO));
+	}
+
+	private Store checkForUpdateConditions(Long storeId, StoreUpdateDTO updateDTO) {
+		Store store = storeRepository.findById(storeId).orElseThrow(
+				() -> new StoreNotFoundException(storeId)
+		);
+		if (!updateDTO.anythingToUpdate(store)) {
+			throw new ObjectsAreEqualException();
+		}
+		Store converted = updateDTO.convertToModel();
+		if (converted != null && storeRepository.exists(converted)) {
+			throw new StoreAlreadyExistsException();
+		}
+		return store;
+	}
+
+	private Store updateFieldsOnPut(Store toOverwrite, Store newStore) {
+		toOverwrite.setName(newStore.getName());
+		toOverwrite.setCity(newStore.getCity());
+		toOverwrite.setStreet(newStore.getStreet());
+		return toOverwrite;
+	}
+
+	private Store updateFieldsOnPatch(Store toUpdate, StoreUpdateDTO updateDTO) {
+		String updatedName = updateDTO.getName();
+		String updatedCity = updateDTO.getCity();
+		String updatedStreet = updateDTO.getStreet();
+		if (updatedName != null) {
+			toUpdate.setName(updatedName);
+		}
+		if (updatedCity != null) {
+			toUpdate.setCity(updatedCity);
+		}
+		if (updatedStreet != null) {
+			toUpdate.setStreet(updatedStreet);
+		}
+		return toUpdate;
 	}
 }
