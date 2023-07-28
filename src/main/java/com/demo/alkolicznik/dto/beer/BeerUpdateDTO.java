@@ -80,25 +80,21 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
         return sb.toString();
     }
 
-    public boolean imageAndPricesToDelete() {
-        return this.brand != null || this.type != null;
-    }
-
-    public Beer convertToModelNoImage() {
-        Beer beer = new Beer();
-        if (this.brand == null) {
-            return null;
-        }
-        beer.setBrand(this.brand);
-        if (this.type != null) {
-			if("".equals(this.type.trim())) this.type = null;
-            else beer.setType(this.type);
-        }
-        if (this.volume == null) {
-            beer.setVolume(0.5);
-            return beer;
-        }
-        beer.setVolume(this.volume);
-        return beer;
-    }
+//    public Beer convertToModelNoImage() {
+//        Beer beer = new Beer();
+//        if (this.brand == null) {
+//            return null;
+//        }
+//        beer.setBrand(this.brand);
+//        if (this.type != null) {
+//			if("".equals(this.type.trim())) this.type = null;
+//            else beer.setType(this.type);
+//        }
+//        if (this.volume == null) {
+//            beer.setVolume(0.5);
+//            return beer;
+//        }
+//        beer.setVolume(this.volume);
+//        return beer;
+//    }
 }

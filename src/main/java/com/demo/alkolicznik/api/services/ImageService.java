@@ -1,5 +1,18 @@
 package com.demo.alkolicznik.api.services;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
+
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
@@ -17,222 +30,222 @@ import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.GetFileListRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ImageService {
 
-    private BeerRepository beerRepository;
-    private ImageRepository imageRepository;
-    private String imageKitPath;
+	private BeerRepository beerRepository;
 
-    private ImageKit imageKit;
+	private ImageRepository imageRepository;
 
-    public ImageService(ImageRepository imageRepository, BeerRepository beerRepository, String imageKitPath) {
-        this.imageRepository = imageRepository;
-        this.beerRepository = beerRepository;
-        this.imageKitPath = imageKitPath;
+	private String imageKitPath;
 
-        this.imageKit = ImageKit.getInstance();
-        setConfig();
-    }
+	private ImageKit imageKit;
 
-    /**
-     * This procedure reads the file from a {@code path}, converts it into
-     * an ImageKit-library-uploadable and sends it to an external image hosting.
-     */
-    @SneakyThrows
-    public ImageModel upload(String path, String filename) {
-        // instantiate BufferedImage and check its proportions
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new FileNotFoundException(path);
-        }
-        if (!proportionsOk(ImageIO.read(file))) {
-            throw new ImageProportionsInvalidException();
-        }
-        // send to server
-        byte[] bytes = Files.readAllBytes(Paths.get(path));
-        FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, filename);
-        // prevent adding a random string to the end of the filename
-        fileCreateRequest.setUseUniqueFileName(false);
-        // set folder into which image will be uploaded
-        fileCreateRequest.setFolder(imageKitPath);
+	public ImageService(ImageRepository imageRepository, BeerRepository beerRepository, String imageKitPath) {
+		this.imageRepository = imageRepository;
+		this.beerRepository = beerRepository;
+		this.imageKitPath = imageKitPath;
 
-        Result result = this.imageKit.upload(fileCreateRequest);
+		this.imageKit = ImageKit.getInstance();
+		setConfig();
+	}
 
-        // get link with transformation 'get_beer'
-        List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
-        Map<String, Object> options = new HashMap<>();
-        options.put("path", result.getFilePath());
-        options.put("transformation", transformation);
+	/**
+	 * This procedure reads the file from a {@code path}, converts it into
+	 * an ImageKit-library-uploadable and sends it to an external image hosting.
+	 */
+	@SneakyThrows
+	public ImageModel upload(String path, String filename) {
+		// instantiate BufferedImage and check its proportions
+		File file = new File(path);
+		if (!file.exists()) {
+			throw new FileNotFoundException(path);
+		}
+		if (!proportionsOk(ImageIO.read(file))) {
+			throw new ImageProportionsInvalidException();
+		}
+		// send to server
+		byte[] bytes = Files.readAllBytes(Paths.get(path));
+		FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, filename);
+		// prevent adding a random string to the end of the filename
+		fileCreateRequest.setUseUniqueFileName(false);
+		// set folder into which image will be uploaded
+		fileCreateRequest.setFolder(imageKitPath);
 
-        // should be returned as ResponseDTO
-        return new ImageModel(imageKit.getUrl(options), result.getFileId());
-    }
+		Result result = this.imageKit.upload(fileCreateRequest);
 
-    public ImageModelResponseDTO getBeerImage(Long beerId) {
-        Beer beer = beerRepository.findById(beerId)
-                .orElseThrow(() -> new BeerNotFoundException(beerId));
-        ImageModel image = beer.getImage()
-                .orElseThrow(() -> new ImageNotFoundException());
-        return new ImageModelResponseDTO(image);
-    }
+		// get link with transformation 'get_beer'
+		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
+		Map<String, Object> options = new HashMap<>();
+		options.put("path", result.getFilePath());
+		options.put("transformation", transformation);
 
-    /**
-     * Call to this method will return Vaadin's {@code Image} component.
-     * Its fetching type is lazy. If it's the 1st component request for
-     * this image, then it'll also be created.
-     * Used for frontend display.
-     */
-    public Image getVaadinBeerImage(Long beerId) {
-        Beer beer = beerRepository.findById(beerId)
-                .orElseThrow(() -> new BeerNotFoundException(beerId));
-        ImageModel image = beer.getImage()
-                .orElseThrow(() -> new ImageNotFoundException());
+		// should be returned as ResponseDTO
+		return new ImageModel(imageKit.getUrl(options), result.getFileId());
+	}
 
-        // Lazy fetching. Create component (and save), if not done previously.
-        if (image.getImageComponent() == null) {
-            Image component = createJavaImage(image);
-            saveJavaBeerImage(beer, component);
-        }
-        return beer.getImage().get().getImageComponent();
-    }
+	public ImageModelResponseDTO getBeerImage(Long beerId) {
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		ImageModel image = beer.getImage()
+				.orElseThrow(() -> new ImageNotFoundException());
+		return new ImageModelResponseDTO(image);
+	}
 
-    /**
-     * Creates Vaadin component.
-     */
-    private Image createJavaImage(ImageModel image) {
-        return new Image(image.getImageUrl(), "No image");
-    }
+	/**
+	 * Call to this method will return Vaadin's {@code Image} component.
+	 * Its fetching type is lazy. If it's the 1st component request for
+	 * this image, then it'll also be created.
+	 * Used for frontend display.
+	 */
+	public Image getVaadinBeerImage(Long beerId) {
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		ImageModel image = beer.getImage()
+				.orElseThrow(() -> new ImageNotFoundException());
 
-    /**
-     * Updates the database with actual image as byte array.
-     *
-     * @param beer  to get image model from
-     * @param image to update the image model with
-     */
-    private void saveJavaBeerImage(Beer beer, Image image) {
-        ImageModel beerImage = beer.getImage().get();
-        beerImage.setImageComponent(image);
-        imageRepository.save(beerImage);
-    }
+		// Lazy fetching. Create component (and save), if not done previously.
+		if (image.getImageComponent() == null) {
+			Image component = createJavaImage(image);
+			saveJavaBeerImage(beer, component);
+		}
+		return beer.getImage().get().getImageComponent();
+	}
 
-    /**
-     * Deletes beer's image from database.
-     *
-     * @throws ImageNotFoundException when passed beer does not have an image assigned
-     */
-    @SneakyThrows
-    public void deleteBeerImage(Beer beer) {
-        ImageModel beerImage = beer.getImage().orElseThrow(() ->
-                new ImageNotFoundException());
-        imageKit.deleteFile(beerImage.getExternalId());
-        beer.setImage(null);
-        imageRepository.deleteById(beerImage.getId());
-    }
+	/**
+	 * Creates Vaadin component.
+	 */
+	private Image createJavaImage(ImageModel image) {
+		return new Image(image.getImageUrl(), "No image");
+	}
 
-    @SneakyThrows
-    public void deleteAllExternal(String relativePath) {
-        var deleteIds = getExternalFiles(relativePath).stream().map(BaseFile::getFileId).toList();
-        if(deleteIds.isEmpty()) {
-            return;
-        }
-        imageKit.bulkDeleteFiles(deleteIds);
-    }
+	/**
+	 * Updates the database with actual image as byte array.
+	 *
+	 * @param beer  to get image model from
+	 * @param image to update the image model with
+	 */
+	private void saveJavaBeerImage(Beer beer, Image image) {
+		ImageModel beerImage = beer.getImage().get();
+		beerImage.setImageComponent(image);
+		imageRepository.save(beerImage);
+	}
 
-    public ImageModel findByUrl(String url) {
-        return imageRepository.findByImageUrl(url).orElseThrow(() ->
-                new ImageNotFoundException());
-    }
+	/**
+	 * Deletes beer's image from database.
+	 *
+	 * @throws ImageNotFoundException when passed beer does not have an image assigned
+	 */
+	@SneakyThrows
+	public void delete(Beer beer) {
+		ImageModel beerImage = beer.getImage().orElseThrow(() ->
+				new ImageNotFoundException());
+		imageKit.deleteFile(beerImage.getExternalId());
+		beer.setImage(null);
+		imageRepository.deleteById(beerImage.getId());
+	}
 
-    public ImageModelResponseDTO updateExternalId(ImageModel toUpdate, String externalId) {
-        toUpdate.setExternalId(externalId);
-        return new ImageModelResponseDTO(imageRepository.save(toUpdate));
-    }
+	@SneakyThrows
+	public void deleteAllExternal(String relativePath) {
+		var deleteIds = getExternalFiles(relativePath).stream().map(BaseFile::getFileId).toList();
+		if (deleteIds.isEmpty()) {
+			return;
+		}
+		imageKit.bulkDeleteFiles(deleteIds);
+	}
 
-    public ImageModel save(ImageModel imageModel) {
-        return imageRepository.save(imageModel);
-    }
+	public ImageModel findByUrl(String url) {
+		return imageRepository.findByImageUrl(url).orElseThrow(() ->
+				new ImageNotFoundException());
+	}
 
-    private boolean proportionsOk(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+	public ImageModelResponseDTO updateExternalId(ImageModel toUpdate, String externalId) {
+		toUpdate.setExternalId(externalId);
+		return new ImageModelResponseDTO(imageRepository.save(toUpdate));
+	}
 
-        double widthScaled = (double) width / 3;
-        double heightScaled = (double) height / 3;
+	private boolean proportionsOk(BufferedImage image) {
+		int width = image.getWidth();
+		int height = image.getHeight();
 
-        double heightExact = (widthScaled * 7) / 3;
-        double heightVicinity = heightExact * 0.2;
+		double widthScaled = (double) width / 3;
+		double heightScaled = (double) height / 3;
 
-        double lowerBound = heightVicinity;
-        double upperBound = heightVicinity * 3;
+		double heightExact = (widthScaled * 7) / 3;
+		double heightVicinity = heightExact * 0.2;
 
-        if (heightScaled >= heightExact - lowerBound && heightScaled <= heightExact + upperBound) {
-            return true;
-        }
-        return false;
-    }
+		double lowerBound = heightVicinity;
+		double upperBound = heightVicinity * 3;
 
-    private void setConfig() {
-        String endpoint = "https://ik.imagekit.io/icemajor";
-        String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
-        try {
-            imageKit.setConfig(new Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
-                    endpoint));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read secured file");
-        }
-    }
+		if (heightScaled >= heightExact - lowerBound && heightScaled <= heightExact + upperBound) {
+			return true;
+		}
+		return false;
+	}
 
-    /**
-     * Get all files in ImageKit's directory.
-     */
-    @SneakyThrows
-    public List<BaseFile> getExternalFiles(String relativePath) {
-        GetFileListRequest getFileListRequest = new GetFileListRequest();
-        getFileListRequest.setPath(relativePath);
-        return imageKit.getFileList(getFileListRequest).getResults();
-    }
+	private void setConfig() {
+		String endpoint = "https://ik.imagekit.io/icemajor";
+		String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
+		try {
+			imageKit.setConfig(new Configuration(publicKey,
+					Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
+					endpoint));
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Could not read secured file");
+		}
+	}
 
-    /**
-     * Returns a map with an external file as a key and mapped url as value.
-     */
-    public Map<BaseFile, String> mapExternalFilesURL(List<BaseFile> files) {
-        List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
-        return files.stream().collect(Collectors.toMap(key -> key, value -> {
-            Map<String, Object> options = new HashMap<>();
-            options.put("path", value.getFilePath());
-            options.put("transformation", transformation);
-            return imageKit.getUrl(options);
-        }));
-    }
+	/**
+	 * Get all files in ImageKit's directory.
+	 */
+	@SneakyThrows
+	public List<BaseFile> getExternalFiles(String relativePath) {
+		GetFileListRequest getFileListRequest = new GetFileListRequest();
+		getFileListRequest.setPath(relativePath);
+		return imageKit.getFileList(getFileListRequest).getResults();
+	}
 
-    public String createImageFilename(Beer beer, String extension) {
-        StringBuilder stringBuilder = new StringBuilder("");
-        stringBuilder
-                .append(beer.getFullName().toLowerCase().replace(' ', '-'))
-                .append('-')
-                .append(beer.getVolume())
-                .append('.')
-                .append(extension);
-        return stringBuilder.toString();
-    }
+	/**
+	 * Returns a map with an external file as a key and mapped url as value.
+	 */
+	public Map<BaseFile, String> mapExternalFilesURL(List<BaseFile> files) {
+		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
+		return files.stream().collect(Collectors.toMap(key -> key, value -> {
+			Map<String, Object> options = new HashMap<>();
+			options.put("path", value.getFilePath());
+			options.put("transformation", transformation);
+			return imageKit.getUrl(options);
+		}));
+	}
 
-    public String extractFileExtensionFromPath(String path) {
-        return path.substring(path.lastIndexOf('.') + 1);
-    }
+	public String createImageFilename(Beer beer, String extension) {
+		StringBuilder stringBuilder = new StringBuilder("");
+		stringBuilder
+				.append(beer.getFullName().toLowerCase().replace(' ', '-'))
+				.append('-')
+				.append(beer.getVolume())
+				.append('.')
+				.append(extension);
+		return stringBuilder.toString();
+	}
+
+	public String extractFileExtensionFromPath(String path) {
+		return path.substring(path.lastIndexOf('.') + 1);
+	}
+
+	public void add(Beer beer, String imagePath) {
+		ImageModel imageModel = this.upload(
+				imagePath,
+				this.createImageFilename(
+						beer, this.extractFileExtensionFromPath(imagePath)
+				)
+		);
+		beer.setImage(imageModel);
+		imageModel.setBeer(beer);
+		imageRepository.save(imageModel);
+	}
 }
