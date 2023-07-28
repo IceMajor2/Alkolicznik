@@ -2,14 +2,18 @@ package com.demo.alkolicznik.dto.store;
 
 import com.demo.alkolicznik.models.Store;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 public class StoreDeleteDTO {
 
     private Long id;

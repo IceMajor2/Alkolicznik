@@ -10,7 +10,6 @@ import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.utils.requests.MockRequests;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,7 +32,6 @@ import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
-import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
@@ -436,7 +434,6 @@ public class StoreTests {
 					"/api/store/" + id);
 		}
 
-
 	}
 
 	@Nested
@@ -659,44 +656,51 @@ public class StoreTests {
 			this.stores = stores;
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { 1, 5 })
 		@DisplayName("DELETE: '/api/store/{store_id}'")
 		@DirtiesContext
-		public void deleteStoreTest() {
+		public void deleteStoreTest(Long id) {
+			// when
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + id);
+			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = deleteResponse.getBody();
+			StoreDeleteDTO actual = toModel(actualJson, StoreDeleteDTO.class);
+
+			// then
 			StoreDeleteDTO expected = createStoreDeleteResponse(
-					getStore(6L, stores),
+					getStore(id.longValue(), stores),
 					"Store was deleted successfully!"
 			);
 			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(MockRequests.mockDeleteRequest("/api/store/6"),
-					HttpStatus.OK,
-					expectedJson);
+			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
-			var getRequest = getRequest("/api/store/6");
+			// when
+			var getResponse = getRequest("/api/store/" + id);
 
-			String jsonResponse = getRequest.getBody();
+			actualJson = getResponse.getBody();
 
-			assertIsError(jsonResponse,
+			assertIsError(actualJson,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '6' id",
-					"/api/store/6");
+					"Unable to find store of '" + id + "' id",
+					"/api/store/" + id);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { -14, 0, 849 })
 		@DisplayName("DELETE: '/api/store/{store_id}' [STORE_NOT_FOUND]")
-		public void deleteStoreNotExistsTest() {
+		public void deleteStoreNotExistsTest(Long id) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
-					"/api/store/0");
+					"/api/store/" + id);
 
 			String jsonResponse = deleteResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '0' id",
-					"/api/store/0"
+					"Unable to find store of '" + id + "' id",
+					"/api/store/" + id
 			);
 		}
 	}
