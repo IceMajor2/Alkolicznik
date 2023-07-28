@@ -5,3 +5,5 @@ INSERT INTO store (ID, NAME, CITY, STREET) VALUES (4, 'ABC', 'Warszawa', 'ul. Ze
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (5, 'Lubi', 'Warszawa', 'ul. Nowaka 5');
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (6, 'Grosik', 'Olsztyn', 'ul. Dworcowa 3');
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (7, 'Tesco', 'Gdansk', 'ul. Morska 22');
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (8, 'Carrefour', 'Olsztyn', 'ul. Borkowskiego 3');
+INSERT INTO store (ID, NAME, CITY, STREET) VALUES (9, 'Zabka', 'Ilawa', 'ul. Dworcowa 3');
