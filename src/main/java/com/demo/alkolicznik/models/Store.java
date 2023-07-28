@@ -2,6 +2,7 @@ package com.demo.alkolicznik.models;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,7 +19,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +29,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Store {
 
 	@Id
@@ -47,7 +46,6 @@ public class Store {
 			orphanRemoval = true,
 			fetch = FetchType.LAZY)
 	@JsonIgnore
-	@EqualsAndHashCode.Exclude
 	private Set<BeerPrice> prices = new HashSet<>();
 
 	public void saveBeer(Beer beer, double price) {
@@ -112,5 +110,24 @@ public class Store {
 	@Override
 	public String toString() {
 		return this.name + ", " + this.city + " " + this.street + " (" + this.id + ")";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, city, street);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || !(o instanceof Store)) {
+			return false;
+		}
+		Store store = (Store) o;
+		return Objects.equals(name, store.getName()) &&
+				Objects.equals(city, store.getCity()) &&
+				Objects.equals(street, store.getStreet());
 	}
 }
