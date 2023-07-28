@@ -52,7 +52,17 @@ public class StoreController {
 	}
 
 	@GetMapping(params = "city")
-	public List<StoreResponseDTO> getAllInCity(@RequestParam("city") String city) {
+	@Operation(summary = "Get a list of currently tracked stores",
+	description = "Average user is only enabled to get an array of stores from a "
+			+ "desired city. Accountants may retrieve all stores from database "
+			+ "simply by ommiting the 'city' parameter.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "store list retrieved"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "city not found", content = @Content)
+	})
+	public List<StoreResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
 		return storeService.getStores(city);
 	}
 
