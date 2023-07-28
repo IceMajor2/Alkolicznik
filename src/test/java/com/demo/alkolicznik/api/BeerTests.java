@@ -1012,7 +1012,9 @@ public class BeerTests {
 		@CsvSource(value = {
 				"1, Zubr, null, null",
 				"2, Guinness, ' \t', null",
-				"5, Tyskie, Gronie, 0.65"
+				"5, Tyskie, Gronie, 0.65",
+				"8, null, Chmielowa Pils, null",
+				"9, null, null, 0.5"
 		},
 				nullValues = "null")
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [BEER_EXISTS]")
@@ -1231,4 +1233,3 @@ public class BeerTests {
 				.collect(Collectors.toList());
 	}
 }
-
