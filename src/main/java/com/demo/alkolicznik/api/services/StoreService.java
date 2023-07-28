@@ -53,8 +53,11 @@ public class StoreService {
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {
 		Store toOverwrite = checkForPutConditions(storeId, requestDTO);
 		Store newStore = requestDTO.convertToModel();
-
 		Store overwritten = updateFieldsOnPut(toOverwrite, newStore);
+
+		if(storeRepository.exists(overwritten)) {
+			throw new StoreAlreadyExistsException();
+		}
 
 		// for each PUT request all the previous
 		// beer prices in this store MUST be deleted
