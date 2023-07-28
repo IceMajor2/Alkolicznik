@@ -79,7 +79,7 @@ public class BeerController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "beer successfully created"),
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
 	})
@@ -99,12 +99,14 @@ public class BeerController {
 
 	@Operation(summary = "Replace beer",
 			description = "Here you can replace an already existing beer with new one. "
-					+ "Features? You can keep the id! How cool is that?")
+					+ "Features? You can keep the id! How cool is that? "
+					+ "WARNING: every price associated with the previous beer "
+					+ "will be deleted!")
 	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "beer successfully replaced"),
-			@ApiResponse(responseCode = "200", description = "replacement is the same as original entity - nothing happens", content = @Content),
+			@ApiResponse(responseCode = "200", description = "beer successfully replaced"),
+			@ApiResponse(responseCode = "200 (2)", description = "replacement is the same as original entity - nothing happens", content = @Content),
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "404 (2)", description = "beer of provided id was not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
@@ -120,15 +122,19 @@ public class BeerController {
 			description = "If you are interested in updating just one or two - or even more - individual "
 					+ "fields, you've come to the right place. However, please be cautious "
 					+ "as updating beer's brand and/or type will also remove its image "
-					+ "(if there had already been one) and remove it from all the stores")
+					+ "(if there had already been one) and remove it from all the stores. "
+					+ "WARNING #1: If you update brand and/or type, the beer will be removed "
+					+ "from each store it has been previously linked to. "
+					+ "WARNING #2: If you update anything else than beer volume, then "
+					+ "beer image will be deleted.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "beer successfully updated"),
 			@ApiResponse(responseCode = "200", description = "replacement is the same as original entity - nothing happens", content = @Content),
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
 			@ApiResponse(responseCode = "400 (2)", description = "there was not one single property to update specified", content = @Content),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-			@ApiResponse(responseCode = "404 (2)", description = "beer of provided id was not found"),
+			@ApiResponse(responseCode = "404 (2)", description = "beer of provided id was not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
 	})
 	@PatchMapping("/{beer_id}")
@@ -144,7 +150,7 @@ public class BeerController {
 					+ "Say no more! Just give me an ID...")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer successfully deleted"),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "404 (2)", description = "beer of provided id was not found", content = @Content)
 	})
@@ -161,7 +167,7 @@ public class BeerController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer successfully deleted", content = @Content),
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-			@ApiResponse(responseCode = "404", description = "resource not found - dummy response"
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "404 (2)", description = "beer of provided details was not found", content = @Content)
 	})
