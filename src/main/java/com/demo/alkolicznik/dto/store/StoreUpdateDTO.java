@@ -1,13 +1,13 @@
 package com.demo.alkolicznik.dto.store;
 
+import java.util.Objects;
+
 import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Store;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
@@ -47,4 +47,20 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
         }
         return false;
     }
+
+	public Store convertToModel() {
+		Store store = new Store();
+		store.setName(this.name);
+		store.setCity(this.city);
+		store.setStreet(this.street);
+		return store;
+	}
+
+	public static StoreUpdateDTO convertFromRequest(StoreRequestDTO requestDTO) {
+		StoreUpdateDTO updateDTO = new StoreUpdateDTO();
+		updateDTO.setName(requestDTO.getName());
+		updateDTO.setCity(requestDTO.getCity());
+		updateDTO.setStreet(requestDTO.getStreet());
+		return updateDTO;
+	}
 }
