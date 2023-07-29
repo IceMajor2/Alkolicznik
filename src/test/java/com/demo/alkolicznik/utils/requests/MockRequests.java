@@ -2,9 +2,6 @@ package com.demo.alkolicznik.utils.requests;
 
 import java.util.Map;
 
-import com.demo.alkolicznik.api.BeerPriceTests;
-import com.demo.alkolicznik.api.ImageModelTests;
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,14 +20,7 @@ public class MockRequests {
     public static MockMvc mockMvc;
 
     private static void initMockMvc() {
-        if (ImageModelTests.mockMvc != null) {
-            mockMvc = ImageModelTests.mockMvc;
-            return;
-        }
-        if (BeerPriceTests.mockMvc != null) {
-            mockMvc = BeerPriceTests.mockMvc;
-            return;
-        }
+
     }
 
     public static ResultActions mockGetRequest(String url) {

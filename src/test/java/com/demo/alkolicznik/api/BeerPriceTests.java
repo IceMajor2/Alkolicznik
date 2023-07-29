@@ -30,7 +30,6 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
@@ -67,13 +66,6 @@ public class BeerPriceTests {
 
 	@Autowired
 	private List<Beer> beers;
-
-	public static MockMvc mockMvc;
-
-	@Autowired
-	public void setMockMvc(MockMvc mockMvc) {
-		BeerPriceTests.mockMvc = mockMvc;
-	}
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
