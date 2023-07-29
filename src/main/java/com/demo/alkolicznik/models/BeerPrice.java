@@ -27,7 +27,7 @@ import org.hibernate.annotations.CompositeType;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BeerPrice implements Comparable<BeerPrice> {
+public class BeerPrice {
 
 	@EmbeddedId
 	private BeerPriceId id;
@@ -89,20 +89,5 @@ public class BeerPrice implements Comparable<BeerPrice> {
 	@Override
 	protected BeerPrice clone() {
 		return new BeerPrice(this.id, this.store, this.beer, this.price);
-	}
-
-	@Override
-	public int compareTo(BeerPrice o) {
-		Long thisBeerId = this.beer.getId();
-		Long thatBeerId = o.beer.getId();
-		if (thisBeerId.compareTo(thatBeerId) != 0) {
-			return thisBeerId.compareTo(thatBeerId);
-		}
-		Double thisPrice = this.price.getNumber().doubleValueExact();
-		Double thatPrice = o.price.getNumber().doubleValueExact();
-		if(thisPrice.compareTo(thatPrice) != 0) {
-			return thisPrice.compareTo(thatPrice);
-		}
-		return this.store.getId().compareTo(o.store.getId());
 	}
 }

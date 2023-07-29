@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,24 +128,24 @@ public class BeerPriceService {
 		if (cityStores.isEmpty()) {
 			throw new NoSuchCityException(city);
 		}
-		Set<BeerPrice> prices = new TreeSet<>(BeerPrice::compareTo);
+		Set<BeerPrice> prices = new TreeSet<>(comparatorByBeerIdPriceAndStoreId());
 		for (Store store : cityStores) {
 			prices.addAll(store.getPrices());
 		}
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
-	public Set<BeerPriceResponseDTO> getAllByBeerId(Long beerId) {
+	public List<BeerPriceResponseDTO> getAllByBeerId(Long beerId) {
 		Beer beer = beerRepository.findById(beerId).orElseThrow(
 				() -> new BeerNotFoundException(beerId)
 		);
 		List<Store> stores = storeRepository.findAll();
 
-		Set<BeerPrice> prices = new LinkedHashSet<>();
+		Set<BeerPrice> prices = new TreeSet<>(comparatorByCityPriceAndStoreId());
 		for (Store store : stores) {
 			store.findBeer(beerId).ifPresent((beerPrice -> prices.add(beerPrice)));
 		}
-		return this.mapToDto(prices);
+		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
 	public Set<BeerPriceResponseDTO> getAllByBeerIdAndCity(Long beerId, String city) {
@@ -205,5 +206,17 @@ public class BeerPriceService {
 		return beerPrices.stream()
 				.map(BeerPriceResponseDTO::new)
 				.collect(Collectors.toUnmodifiableSet());
+	}
+
+	private Comparator comparatorByBeerIdPriceAndStoreId() {
+		return Comparator.comparing(p -> ((BeerPrice) p).getBeer().getId())
+				.thenComparing(p -> ((BeerPrice) p).getPrice())
+				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
+	}
+
+	private Comparator comparatorByCityPriceAndStoreId() {
+		return Comparator.comparing(p -> ((BeerPrice) p).getStore().getCity())
+				.thenComparing(p -> ((BeerPrice) p).getPrice())
+				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
 	}
 }
