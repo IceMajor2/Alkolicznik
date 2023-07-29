@@ -48,10 +48,10 @@ import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
-import static com.demo.alkolicznik.utils.requests.MockRequests.mockGetRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -372,50 +372,49 @@ public class BeerPriceTests {
 			List<BeerPriceResponseDTO> expected = store.getPrices().stream()
 					.map(BeerPriceResponseDTO::new)
 					.collect(Collectors.toList());
-			sortByCityBeerIdAndPrice(expected);
+			sortByBeerIdAndPrice(expected);
 			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { -1590, 0, 912345 })
 		@DisplayName("GET: '/api/store/{store_id}/beer-price' [STORE_NOT_FOUND]")
-		public void getBeerPricesFromStoreNotExistsTest() {
-			var getResponse = getRequest("/api/store/8/beer-price");
+		public void getBeerPricesFromStoreNotExistsTest(Long beerId) {
+			var getResponse = getRequest("/api/store/" + beerId + "/beer-price");
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '8' id",
-					"/api/store/8/beer-price");
+					"Unable to find store of '" + beerId + "' id",
+					"/api/store/" + beerId + "/beer-price");
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { 7, 8, 9 })
 		@DisplayName("GET: '/api/store/{store_id}/beer-price' empty store")
-		public void getBeerPricesFromStoreEmptyTest() {
-			var getResponse = getRequest("/api/store/7/beer-price");
+		public void getBeerPricesFromStoreEmptyTest(Long storeId) {
+			var getResponse = getRequest("/api/store/" + storeId + "/beer-price");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
 			String actualJson = getResponse.getBody();
 
-			String expectedJson = "[]";
-			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actualJson).isEqualTo("[]");
 		}
 
 		@Test
-		@DisplayName("GET: '/api/beer-price'")
+		@DisplayName("GET: '/api/beer-price' ordered")
 		public void getBeerPricesAllArrayTest() {
-			List<BeerPriceResponseDTO> expected = new ArrayList<>();
-			for (Store store : stores) {
-				for (BeerPrice beerPrice : store.getPrices()) {
-					expected.add(new BeerPriceResponseDTO(beerPrice));
-				}
-			}
-			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(mockGetRequest("/api/beer-price"),
-					HttpStatus.OK, expectedJson);
+			// when
+			var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = getResponse.getBody();
 			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
+			// then
+			List<BeerPriceResponseDTO> expected = new ArrayList<>();
+			stores.forEach(store -> store.getPrices()
+					.forEach(price -> expected.add(new BeerPriceResponseDTO(price))));
+			sortByCityBeerIdPriceAndStoreId(expected);
 			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 	}
@@ -1028,11 +1027,19 @@ public class BeerPriceTests {
 		Collections.sort(pricesDTO, comparator);
 	}
 
-	private void sortByCityBeerIdAndPrice(List<BeerPriceResponseDTO> pricesDTO) {
+	private void sortByBeerIdAndPrice(List<BeerPriceResponseDTO> pricesDTO) {
+		Comparator<Object> comparator = Comparator
+				.comparing(p -> ((BeerPriceResponseDTO) p).getBeer().getId())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly());
+		Collections.sort(pricesDTO, comparator);
+	}
+
+	private void sortByCityBeerIdPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
 		Comparator<Object> comparator = Comparator
 				.comparing(p -> ((BeerPriceResponseDTO) p).getStore().getCity())
 				.thenComparing(p -> ((BeerPriceResponseDTO) p).getBeer().getId())
-				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly());
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
 		Collections.sort(pricesDTO, comparator);
 	}
 //	@ParameterizedTest
