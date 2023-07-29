@@ -2,7 +2,6 @@ package com.demo.alkolicznik.api.controllers;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
@@ -48,7 +47,7 @@ public class BeerPriceController {
 	@GetMapping("/beer-price")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
-	public Set<BeerPriceResponseDTO> getAll() {
+	public List<BeerPriceResponseDTO> getAll() {
 		return beerPriceService.getAll();
 	}
 
