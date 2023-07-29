@@ -222,7 +222,10 @@ public class BeerPriceTests {
 					expected.add(new BeerPriceResponseDTO(beer));
 				}
 			}
-			Collections.sort(expected, Comparator.comparing(price -> price.getBeer().getId()));
+			Comparator<Object> comparator = Comparator
+					.comparing(p -> ((BeerPriceResponseDTO) p).getBeer().getId())
+					.thenComparing(p -> ((BeerPriceResponseDTO) p).getPrice());
+			Collections.sort(expected, comparator);
 			assertThat(actual).hasSameElementsAs(expected);
 			assertThat(actual).containsExactlyElementsOf(expected);
 		}
