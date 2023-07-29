@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -607,27 +608,13 @@ public class BeerPriceTests {
 					"/api/store/" + storeId + "/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_OF_DIFFERENT_VOL]")
-		public void createBeerPriceBeerExistsButDifferentVolumeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/2/beer-price",
-					createBeerPriceRequest("Zubr", 0.6, 3.19));
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Unable to find beer 'Zubr' of '%.2f' volume".formatted(0.6),
-					"/api/store/2/beer-price");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [VOLUME_NON_POSITIIVE]")
-		public void createBeerPriceNegativeAndZeroVolumeTest() {
+		@ParameterizedTest
+		@ValueSource(doubles = { -1d, -0.5d, 0d })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [VOLUME_NON_POSITIIVE]")
+		public void createBeerPriceNegativeAndZeroVolumeTest(Double volume) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/6/beer-price",
-					createBeerPriceRequest("Tyskie Gronie", -1.0, 3.09));
+					createBeerPriceRequest("Tyskie Gronie", volume, 3.09));
 
 			String jsonResponse = postResponse.getBody();
 
@@ -635,79 +622,34 @@ public class BeerPriceTests {
 					HttpStatus.BAD_REQUEST,
 					"Volume must be a positive number",
 					"/api/store/6/beer-price");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/store/6/beer-price",
-					createBeerPriceRequest("Tyskie Gronie", 0d, 3.09));
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Volume must be a positive number",
-					"/api/store/6/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BRAND_NULL]")
-		public void createBeerPriceBrandNullTest() {
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "", "  \n" })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [BRAND_BLANK]")
+		public void createBeerPriceBrandNullTest(String brand) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/5/beer-price",
-					createBeerPriceRequest(null, 0.5, 3.09));
+					createBeerPriceRequest(brand, 0.5, 3.09));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
-					"Beer was not specified",
+					"Beer (its name and type) was not specified",
 					"/api/store/5/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BRAND_BLANK]")
-		public void createBeerPriceBrandBlankAndEmptyTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/5/beer-price",
-					createBeerPriceRequest("", 0.5, 3.09));
-
-			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Beer was not specified",
-					"/api/store/5/beer-price");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/store/3/beer-price",
-					createBeerPriceRequest(" \t \n\n \t", 1d, 7.99));
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Beer was not specified",
-					"/api/store/3/beer-price");
-		}
-
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [PRICE_NULL]")
-		public void createBeerPriceNegativeAndZeroPriceTest() {
+		@ParameterizedTest
+		@ValueSource(doubles = { 0d, -5.99d })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [PRICE_NON_NEGATIVE]")
+		public void createBeerPriceNonPositivePriceTest(Double price) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/2/beer-price",
-					createBeerPriceRequest("Kormoran Miodne", 0.5, -1d));
+					createBeerPriceRequest("Kormoran Miodne", 0.5, price));
 
 			String jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Price must be a positive number",
-					"/api/store/2/beer-price");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/store/2/beer-price",
-					createBeerPriceRequest("Kormoran Miodne", 0.5, 0d));
-
-			jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
@@ -716,65 +658,99 @@ public class BeerPriceTests {
 		}
 
 		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_NOT_SPECIFIED; PRICE_ZERO, VOLUME_NEGATIVE]")
-		public void createBeerPricePriceNullTest() {
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [PRICE_NULL]")
+		public void createBeerPriceNullPriceTest() {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/2/beer-price",
-					createBeerPriceRequest(null, 0d, -9.4));
+					createBeerPriceRequest("Kormoran Wisniowe", 0.5, null));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
-					"Beer was not specified; Price must be a positive number; Volume must be a positive number",
+					"Price was not specified",
 					"/api/store/2/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_NOT_FOUND]")
-		public void createBeerPriceBeerNotExistsTest() {
+		@ParameterizedTest
+		@CsvSource(value = {
+				"null, null, null, Beer (its name and type) was not specified; Price was not specified",
+				"'  ', -1.33, 5.29, Beer (its name and type) was not specified; Volume must be a positive number",
+				"Zatecky, -1, -2.99, Price must be a positive number; Volume must be a positive number"
+		}, nullValues = "null")
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [COMBO]")
+		public void createBeerPricePriceNullTest(String fullname, Double volume,
+				Double price, String errorMessage) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/4/beer-price",
-					createBeerPriceRequest("Kormoran Miodne", 0.5, 7.99));
+					"/api/store/7/beer-price",
+					createBeerPriceRequest(fullname, volume, price));
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.BAD_REQUEST,
+					errorMessage,
+					"/api/store/7/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"Kormoran Miodne| null| Unable to find beer: [Kormoran Miodne, 0,50l]",
+				"Kozel Cerny| 0.6| Unable to find beer: [Kozel Cerny, 0,60l]",
+				"Miloslaw Ciemne| 0.5| Unable to find beer: [Miloslaw Ciemne, 0,50l]"
+		}, nullValues = "null", delimiter = '|')
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' [BEER_NOT_FOUND]")
+		public void createBeerPriceBeerNotExistsTest(String fullname, Double volume, String errMessage) {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/store/8/beer-price",
+					createBeerPriceRequest(fullname, volume, 7.99));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of 'Kormoran Miodne' name",
-					"/api/store/4/beer-price");
+					errMessage,
+					"/api/store/8/beer-price");
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { -56234, 9021, 0 })
 		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [STORE_NOT_FOUND]")
-		@DirtiesContext
-		public void createBeerPriceStoresNotExistsTest() {
+		public void createBeerPriceStoreNotExistsTest(Long storeId) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/9999/beer-price",
+					"/api/store/" + storeId + "/beer-price",
 					createBeerPriceRequest("Ksiazece Zlote pszeniczne", 0.5, 3.79));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '9999' id",
-					"/api/store/9999/beer-price");
+					"Unable to find store of '" + storeId + "' id",
+					"/api/store/" + storeId + "/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
-		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-			var postResponse = postRequestAuth("user", "user", "/api/store/3/beer-price",
-					createBeerPriceRequest("\t", 0d, -5d));
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1155| Ksiazece Zielone| null| Unable to find beer: "
+						+ "[Ksiazece Zielone, 0,5l]; Unable to find store of '1155' id",
+				"-5| Lomza Pelne| 0.33| Unable to find beer: [Lomza Pelne, 0,33l]; "
+						+ "Unable to find store of '-5' id",
+				"0| Tyskie Gronie| 0.5| Unable to find beer: [Tyskie Gronie, 0,5l]; "
+						+ "Unable to find store of '0' id"
+		}, nullValues = "null", delimiter = '|')
+		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [STORE_NOT_FOUND]")
+		public void createBeerPriceStoreAndBeerNotExistsTest(Long storeId, String fullname,
+				Double volume, String errMessage) {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/store/" + storeId + "/beer-price",
+					createBeerPriceRequest(fullname, volume, 3.79));
 
 			String jsonResponse = postResponse.getBody();
 
-			assertIsError(
-					jsonResponse,
+			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Resource not found",
-					"/api/store/3/beer-price"
-			);
+					errMessage,
+					"/api/store/" + storeId + "/beer-price");
 		}
 	}
 
