@@ -123,9 +123,7 @@ public class BeerPriceService {
 			throw new NoSuchCityException(city);
 		}
 		Set<BeerPrice> prices = new TreeSet<>(comparatorByBeerIdPriceAndStoreId());
-		for (Store store : cityStores) {
-			prices.addAll(store.getPrices());
-		}
+		cityStores.forEach(store -> prices.addAll(store.getPrices()));
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
@@ -136,9 +134,7 @@ public class BeerPriceService {
 		List<Store> stores = storeRepository.findAll();
 
 		Set<BeerPrice> prices = new TreeSet<>(comparatorByCityPriceAndStoreId());
-		for (Store store : stores) {
-			store.findBeer(beerId).ifPresent((beerPrice -> prices.add(beerPrice)));
-		}
+		stores.forEach(store -> store.findBeer(beerId).ifPresent(price -> prices.add(price)));
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
@@ -153,11 +149,9 @@ public class BeerPriceService {
 			throw new NoSuchCityException(city);
 		}
 		Set<BeerPrice> beerPricesInCity = new TreeSet<>(comparatorByPriceAndStoreId());
-		for (BeerPrice beerPrice : beer.getPrices()) {
-			if (beerPrice.getStore().getCity().equals(city)) {
-				beerPricesInCity.add(beerPrice);
-			}
-		}
+		beer.getPrices().stream()
+						.filter(price -> price.getStore().getCity().equals(city))
+								.forEach(price -> beerPricesInCity.add(price));
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(beerPricesInCity);
 	}
 
