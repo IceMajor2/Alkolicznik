@@ -732,10 +732,10 @@ public class BeerPriceTests {
 		@ParameterizedTest
 		@CsvSource(value = {
 				"1155| Ksiazece Zielone| null| Unable to find beer: "
-						+ "[Ksiazece Zielone, 0,5l]; Unable to find store of '1155' id",
+						+ "[Ksiazece Zielone, 0,50l]; Unable to find store of '1155' id",
 				"-5| Lomza Pelne| 0.33| Unable to find beer: [Lomza Pelne, 0,33l]; "
 						+ "Unable to find store of '-5' id",
-				"0| Tyskie Gronie| 0.5| Unable to find beer: [Tyskie Gronie, 0,5l]; "
+				"0| Tyskie Gronie| 0.5| Unable to find beer: [Tyskie Gronie, 0,50l]; "
 						+ "Unable to find store of '0' id"
 		}, nullValues = "null", delimiter = '|')
 		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [STORE_NOT_FOUND]")
