@@ -3,6 +3,7 @@ package com.demo.alkolicznik.api.services;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.money.Monetary;
@@ -25,6 +26,7 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -119,18 +121,17 @@ public class BeerPriceService {
 		return pricesDTO;
 	}
 
-	public Set<BeerPriceResponseDTO> getAllByCity(String city) {
-		List<Store> cityStores = storeRepository.findAllByCity(city);
+	public List<BeerPriceResponseDTO> getAllByCity(String city) {
+		List<Store> cityStores = storeRepository.findAllByCityOrderByIdAsc(city);
 
 		if (cityStores.isEmpty()) {
 			throw new NoSuchCityException(city);
 		}
-
-		Set<BeerPrice> prices = new LinkedHashSet<>();
+		Set<BeerPrice> prices = new TreeSet<>(BeerPrice::compareTo);
 		for (Store store : cityStores) {
 			prices.addAll(store.getPrices());
 		}
-		return this.mapToDto(prices);
+		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
 	public Set<BeerPriceResponseDTO> getAllByBeerId(Long beerId) {

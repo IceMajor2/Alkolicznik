@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api.controllers;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
@@ -57,7 +58,7 @@ public class BeerPriceController {
     }
 
     @GetMapping(value = "/beer-price", params = "city")
-    public Set<BeerPriceResponseDTO> getAllByCity(@RequestParam("city") String city) {
+    public List<BeerPriceResponseDTO> getAllByCity(@RequestParam("city") String city) {
         return beerPriceService.getAllByCity(city);
     }
 
