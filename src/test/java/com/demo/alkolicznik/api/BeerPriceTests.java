@@ -548,29 +548,35 @@ public class BeerPriceTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequestsObject {
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto)")
+		@ParameterizedTest
+		@CsvSource(value = {
+				"4, 3, Tyskie Gronie, 0.65, 5.59",
+				"1, 4, Zubr, null, 2.99",
+				"7, 2, Ksiazece Zlote pszeniczne, null, 5.99",
+				"6, 9, Perla Chmielowa Pils, 0.33, 3.09"
+		}, nullValues = "null")
+		@DisplayName("POST: '/api/store/{store_id}/beer-price'")
 		@DirtiesContext
-		public void addBeerPriceToStoreTest() {
+		public void addBeerPriceToStoreTest(Long storeId, Long beerId,
+				String fullname, Double volume, Double price) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/2/beer-price",
-					createBeerPriceRequest("Perla Chmielowa Pils", 0.5, 3.69));
+					"/api/store/" + storeId + "/beer-price",
+					createBeerPriceRequest(fullname, volume, price));
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
 			String actualJson = postResponse.getBody();
 			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
 			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(1L, beers)),
-					createStoreResponse(getStore(2L, stores)),
-					"PLN 3.69"
+					createBeerResponse(getBeer(beerId.longValue(), beers)),
+					createStoreResponse(getStore(storeId.longValue(), stores)),
+					"PLN " + price
 			);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			var getResponse = getRequest("/api/beer-price",
-					Map.of("beer_id", 1L, "store_id", 2L));
+					Map.of("beer_id", beerId.longValue(), "store_id", storeId.longValue()));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerPriceResponseDTO.class);
@@ -579,81 +585,26 @@ public class BeerPriceTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) (2)")
-		@DirtiesContext
-		public void addBeerPriceToStoreTest2() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/1/beer-price",
-					createBeerPriceRequest("Zubr", 0.5, 2.79));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(4L, beers),
-							createImageResponse(getImage(4L, beers))),
-					createStoreResponse(getStore(1L, stores)),
-					"PLN 2.79"
-			);
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("beer_id", 4L, "store_id", 1L));
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) with no volume")
-		@DirtiesContext
-		public void addBeerPriceToStoreDefaultVolumeTest() {
-			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/7/beer-price",
-					createBeerPriceRequest("Perla Chmielowa Pils", null, 3.69));
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-			String actualJson = postResponse.getBody();
-			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(1L, beers)),
-					createStoreResponse(getStore(7L, stores)),
-					"PLN 3.69");
-			String expectedJson = toJsonString(expected);
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-
-			var getResponse = getRequest("/api/beer-price",
-					Map.of("beer_id", 1L, "store_id", 7L));
-
-			actualJson = getResponse.getBody();
-			actual = toModel(actualJson, BeerPriceResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, Miloslaw Biale, null, 5.79",
+				"5, Tyskie Gronie, 0.65, 5.29",
+				"1, Perla Chmielowa Pils, 0.5, 2.69",
+				"2, Perla Chmielowa Pils, 0.33, 3.69"
+		}, nullValues = "null")
 		@DisplayName("POST: '/api/store/{store_id}/beer-price' (dto) [BEER_PRICE_EXISTS]")
-		public void addBeerPriceAlreadyExistsTest() {
+		public void addBeerPriceAlreadyExistsTest(Long storeId, String fullname,
+				Double volume, Double price) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/1/beer-price",
-					createBeerPriceRequest("Komes Porter Malinowy", 0.33, 8.09));
+					"/api/store/" + storeId + "/beer-price",
+					createBeerPriceRequest(fullname, volume, price));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.CONFLICT,
 					"Beer is already in store",
-					"/api/store/1/beer-price");
+					"/api/store/" + storeId + "/beer-price");
 		}
 
 		@Test
