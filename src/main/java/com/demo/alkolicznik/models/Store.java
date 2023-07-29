@@ -89,14 +89,14 @@ public class Store {
 		return true;
 	}
 
-	public Optional<BeerPrice> findBeer(String beerFullname) {
-		for (BeerPrice beer : prices) {
-			if (beer.getBeer().getFullName().equals(beerFullname)) {
-				return Optional.of(beer);
-			}
-		}
-		return Optional.empty();
-	}
+//	public Optional<BeerPrice> findBeer(String beerFullname) {
+//		for (BeerPrice beer : prices) {
+//			if (beer.getBeer().getFullName().equals(beerFullname)) {
+//				return Optional.of(beer);
+//			}
+//		}
+//		return Optional.empty();
+//	}
 
 	public Optional<BeerPrice> findBeer(Long beerId) {
 		for (BeerPrice beer : prices) {
