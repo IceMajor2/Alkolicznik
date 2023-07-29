@@ -45,16 +45,17 @@ public class BeerPriceService {
 	}
 
 	public BeerPriceResponseDTO addByObject(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
+		String beerFullname = beerPriceRequestDTO.getBeerName();
+		double volume = beerPriceRequestDTO.getBeerVolume();
 		// Fetch both store and beer from repositories.
+		if (!storeRepository.existsById(storeId) && !beerRepository
+				.existsByFullnameAndVolume(beerFullname, volume)) {
+			throw new EntitiesNotFoundException(beerFullname, volume, storeId);
+		}
 		Store store = storeRepository.findById(storeId).orElseThrow(
 				() -> new StoreNotFoundException(storeId)
 		);
 		// Check if beer exists by fullname
-		String beerFullname = beerPriceRequestDTO.getBeerName();
-		if (!beerRepository.existsByFullname(beerFullname)) {
-			throw new BeerNotFoundException(beerFullname);
-		}
-		double volume = beerPriceRequestDTO.getBeerVolume();
 		// If beer is not found in DB, then the reason is volume
 		Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
 				() -> new BeerNotFoundException(beerFullname, volume)
@@ -149,8 +150,8 @@ public class BeerPriceService {
 		}
 		Set<BeerPrice> beerPricesInCity = new TreeSet<>(comparatorByPriceAndStoreId());
 		beer.getPrices().stream()
-						.filter(price -> price.getStore().getCity().equals(city))
-								.forEach(price -> beerPricesInCity.add(price));
+				.filter(price -> price.getStore().getCity().equals(city))
+				.forEach(price -> beerPricesInCity.add(price));
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(beerPricesInCity);
 	}
 
@@ -228,7 +229,7 @@ public class BeerPriceService {
 	}
 
 	private void throwExceptionIfBothStoreAndBeerNotFound(Long storeId, Long beerId) {
-		if(!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
+		if (!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
 			throw new EntitiesNotFoundException(beerId, storeId);
 		}
 	}
