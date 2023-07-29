@@ -20,3 +20,4 @@ INSERT INTO beer_price (store_id, beer_id, price_amount) VALUES (6, 3, 5.09);
 INSERT INTO beer_price (store_id, beer_id, price_amount) VALUES (6, 4, 4.19);
 INSERT INTO beer_price (store_id, beer_id, price_amount) VALUES (6, 5, 7.49);
 INSERT INTO beer_price (store_id, beer_id, price_amount) VALUES (6, 6, 7.09);
+INSERT INTO beer_price (store_id, beer_id, price_amount) VALUES (2, 9, 2.99);
