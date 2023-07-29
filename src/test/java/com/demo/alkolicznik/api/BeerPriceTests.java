@@ -1,6 +1,8 @@
 package com.demo.alkolicznik.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -140,7 +142,7 @@ public class BeerPriceTests {
 				"6, 7",
 				"9, 9"
 		})
-		@DisplayName("GET: '/api/beer-price' [STORE_NOT_SELL]")
+		@DisplayName("GET: '/api/beer-price' [NO_PRICE]")
 		public void getBeerPriceNotExistsTest(Long storeId, Long beerId) {
 			var getResponse = getRequest("/api/beer-price",
 					Map.of("store_id", storeId, "beer_id", beerId));
@@ -172,51 +174,57 @@ public class BeerPriceTests {
 					"/api/beer-price");
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "Ilawa", "Gdansk" })
 		@DisplayName("GET: '/api/beer-price?city' of empty city")
-		public void getBeerPricesFromCityEmptyTest() {
-			var getResponse = getRequest("/api/beer-price", Map.of("city", "Gdansk"));
+		public void getBeerPricesFromCityEmptyTest(String city) {
+			// when
+			var getResponse = getRequest("/api/beer-price", Map.of("city", city));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
 			String actualJson = getResponse.getBody();
 
+			// then
 			String expectedJson = "[]";
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "abdf", "skjo", "" })
 		@DisplayName("GET: '/api/beer-price?city' [CITY_NOT_FOUND]")
-		public void getBeerPricesFromCityNotExistsTest() {
-			var getResponse = getRequest("/api/beer-price", Map.of("city", "Bydgoszcz"));
+		public void getBeerPricesFromCityNotExistsTest(String city) {
+			var getResponse = getRequest("/api/beer-price", Map.of("city", city));
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"No such city: 'Bydgoszcz'",
+					"No such city: '" + city + "'",
 					"/api/beer-price");
 		}
 
-		@Test
-		@DisplayName("GET: '/api/beer-price?city'")
-		public void getBeerPricesFromCityTest() {
-			var getResponse = getRequest("/api/beer-price", Map.of("city", "Olsztyn"));
+		@ParameterizedTest
+		@ValueSource(strings = { "Olsztyn", "Warszawa" })
+		@DisplayName("GET: '/api/beer-price?city' order by id")
+		public void getBeerPricesFromCityTest(String city) {
+			var getResponse = getRequest("/api/beer-price", Map.of("city", city));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 			String actualJson = getResponse.getBody();
 			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-			List<Store> olsztynStores = stores.stream()
-					.filter(store -> store.getCity().equals("Olsztyn"))
+			List<Store> cityStores = stores.stream()
+					.filter(store -> store.getCity().equals(city))
 					.collect(Collectors.toList());
 
 			List<BeerPriceResponseDTO> expected = new ArrayList<>();
-			for (Store store : olsztynStores) {
+			for (Store store : cityStores) {
 				for (BeerPrice beer : store.getPrices()) {
 					expected.add(new BeerPriceResponseDTO(beer));
 				}
 			}
+			Collections.sort(expected, Comparator.comparing(price -> price.getBeer().getId()));
 			assertThat(actual).hasSameElementsAs(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
 		@Test
