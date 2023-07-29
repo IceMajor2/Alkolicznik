@@ -545,8 +545,9 @@ public class BeerPriceTests {
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
-					HttpStatus.CONFLICT,
-					"Unable to find beer of '%d' id; Unable to find store of '%d' id",
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '%d' id; Unable to find store of '%d' id"
+							.formatted(beerId, storeId),
 					"/api/store/" + storeId + "/beer-price");
 		}
 	}

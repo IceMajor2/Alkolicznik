@@ -72,6 +72,7 @@ public class BeerPriceService {
 	// No annotation will throw Hibernate lazy-loading exception (on GUI)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
 	public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, Double price) {
+		throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
 		Store store = storeRepository.findById(storeId).orElseThrow(
 				() -> new StoreNotFoundException(storeId)
 		);
@@ -95,9 +96,7 @@ public class BeerPriceService {
 	}
 
 	public BeerPriceResponseDTO get(Long storeId, Long beerId) {
-		if (!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
-			throw new EntitiesNotFoundException(beerId, storeId);
-		}
+		throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
 		Store store = storeRepository.findById(storeId).orElseThrow(
 				() -> new StoreNotFoundException(storeId)
 		);
@@ -226,5 +225,11 @@ public class BeerPriceService {
 				.thenComparing(p -> ((BeerPrice) p).getBeer().getId())
 				.thenComparing(p -> ((BeerPrice) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
+	}
+
+	private void throwExceptionIfBothStoreAndBeerNotFound(Long storeId, Long beerId) {
+		if(!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
+			throw new EntitiesNotFoundException(beerId, storeId);
+		}
 	}
 }
