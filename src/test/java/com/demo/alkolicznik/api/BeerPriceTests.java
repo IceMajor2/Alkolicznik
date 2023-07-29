@@ -429,7 +429,7 @@ public class BeerPriceTests {
 				"5, 5, 3.09",
 				"3, 2, 4.49"
 		})
-		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price'")
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price='")
 		@DirtiesContext
 		public void addBeerPriceIdTest(Long storeId, Long beerId, Double price) {
 			// when
@@ -460,27 +460,29 @@ public class BeerPriceTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [STORE_NOT_EXISTS]")
-		public void addBeerPriceIdStoreNotExistsTest() {
+		@ParameterizedTest
+		@ValueSource(longs = { -546, 0, 8932 })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price=' [STORE_NOT_EXISTS]")
+		public void addBeerPriceIdStoreNotExistsTest(Long storeId) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/9999/beer-price",
+					"/api/store/" + storeId + "/beer-price",
 					Map.of("beer_id", 3L, "beer_price", 4.19));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '9999' id",
-					"/api/store/9999/beer-price");
+					"Unable to find store of '" + storeId + "' id",
+					"/api/store/" + storeId + "/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [VOLUME_NON_POSITIVE]")
-		public void addBeerPriceIdVolumeNegativeAndZeroTest() {
+		@ParameterizedTest
+		@ValueSource(doubles = { 0d, -5.9d, -0.1d })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price=' [PRICE_NON_POSITIVE]")
+		public void addBeerPriceIdVolumeNegativeAndZeroTest(Double price) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/2/beer-price",
-					Map.of("beer_id", 5L, "beer_price", 0d));
+					Map.of("beer_id", 5L, "beer_price", price));
 
 			String jsonResponse = postResponse.getBody();
 
@@ -488,47 +490,43 @@ public class BeerPriceTests {
 					HttpStatus.BAD_REQUEST,
 					"Price must be a positive number",
 					"/api/store/2/beer-price");
-
-			postResponse = postRequestAuth("admin", "admin",
-					"/api/store/2/beer-price",
-					Map.of("beer_id", 5L, "beer_price", -5.213));
-
-			jsonResponse = postResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Price must be a positive number",
-					"/api/store/2/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [BEER_NOT_FOUND]")
-		public void addBeerPriceIdBeerNotExistsTest() {
+		@ParameterizedTest
+		@ValueSource(longs = { 0, -948, 6391 })
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price=' [BEER_NOT_FOUND]")
+		public void addBeerPriceIdBeerNotExistsTest(Long beerId) {
 			var postResponse = postRequestAuth("admin", "admin",
 					"/api/store/1/beer-price",
-					Map.of("beer_id", 999L, "beer_price", 6.69));
+					Map.of("beer_id", beerId.longValue(), "beer_price", 6.69));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '999' id",
+					"Unable to find beer of '" + beerId + "' id",
 					"/api/store/1/beer-price");
 		}
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (params) [BEER_PRICE_EXISTS]")
-		public void addBeerPriceIdAlreadyExistsTest() {
+		@ParameterizedTest
+		@CsvSource({
+				"2, 2, 4.99",
+				"5, 2, 5.29",
+				"6, 1, 5.09",
+				"6, 6, 7.09"
+		})
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price=' [BEER_PRICE_EXISTS]")
+		public void addBeerPriceIdAlreadyExistsTest(Long storeId, Long beerId, Double price) {
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/1/beer-price",
-					Map.of("beer_id", 2, "beer_price", 6.69));
+					"/api/store/" + storeId + "/beer-price",
+					Map.of("beer_id", beerId.longValue(), "beer_price", price));
 
 			String jsonResponse = postResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.CONFLICT,
 					"Beer is already in store",
-					"/api/store/1/beer-price");
+					"/api/store/" + storeId + "/beer-price");
 		}
 	}
 
