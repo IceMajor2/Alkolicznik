@@ -528,6 +528,27 @@ public class BeerPriceTests {
 					"Beer is already in store",
 					"/api/store/" + storeId + "/beer-price");
 		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"0, 1112",
+				"564975, 564322",
+				"-6, -921",
+				"59236, 0"
+		})
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price=' [BEER_n_STORE_NOT_FOUND]")
+		public void addBeerPriceBeerAndStoreNotExistsTest(Long storeId, Long beerId) {
+			var postResponse = postRequestAuth("admin", "admin",
+					"/api/store/" + storeId + "/beer-price",
+					Map.of("beer_id", beerId.longValue(), "beer_price", "4.29"));
+
+			String jsonResponse = postResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.CONFLICT,
+					"Unable to find beer of '%d' id; Unable to find store of '%d' id",
+					"/api/store/" + storeId + "/beer-price");
+		}
 	}
 
 	@Nested
