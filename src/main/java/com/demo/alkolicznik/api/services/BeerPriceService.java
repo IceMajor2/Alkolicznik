@@ -59,26 +59,26 @@ public class BeerPriceService {
 		Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
 				() -> new BeerNotFoundException(beerFullname, volume)
 		);
-		if (store.findBeer(beer.getFullName()).isPresent()) {
+		if (store.findBeer(beer.getId()).isPresent()) {
 			throw new BeerPriceAlreadyExistsException();
 		}
 		// Pass beer with price to store and save changes.
 		double price = beerPriceRequestDTO.getPrice();
 		store.saveBeer(beer, price);
 		storeRepository.save(store);
-		return new BeerPriceResponseDTO(store.findBeer(beerFullname).get());
+		return new BeerPriceResponseDTO(store.findBeer(beer.getId()).get());
 	}
 
-	// No annotation throws Hibernation lazy-loading exception (on GUI)
+	// No annotation will throw Hibernate lazy-loading exception (on GUI)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
-	public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, double price) {
+	public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, Double price) {
 		Store store = storeRepository.findById(storeId).orElseThrow(
 				() -> new StoreNotFoundException(storeId)
 		);
 		Beer beer = beerRepository.findById(beerId).orElseThrow(
 				() -> new BeerNotFoundException(beerId)
 		);
-		if (store.findBeer(beer.getFullName()).isPresent()) {
+		if (store.findBeer(beer.getId()).isPresent()) {
 			throw new BeerPriceAlreadyExistsException();
 		}
 		store.saveBeer(beer, price);
