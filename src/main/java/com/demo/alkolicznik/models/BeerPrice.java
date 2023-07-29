@@ -65,6 +65,11 @@ public class BeerPrice {
 				.setCurrency("PLN").setNumber(price).create());
 	}
 
+	@JsonIgnore
+	public Double getAmountOnly() {
+		return price.getNumber().doubleValueExact();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

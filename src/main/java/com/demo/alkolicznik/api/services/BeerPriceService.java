@@ -148,20 +148,20 @@ public class BeerPriceService {
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
-	public Set<BeerPriceResponseDTO> getAllByBeerIdAndCity(Long beerId, String city) {
+	public List<BeerPriceResponseDTO> getAllByBeerIdAndCity(Long beerId, String city) {
 		Beer beer = beerRepository.findById(beerId).orElseThrow(
 				() -> new BeerNotFoundException(beerId)
 		);
 		if (!storeRepository.existsByCity(city)) {
 			throw new NoSuchCityException(city);
 		}
-		Set<BeerPrice> beerPricesInCity = new LinkedHashSet<>();
+		Set<BeerPrice> beerPricesInCity = new TreeSet<>(comparatorByPriceAndStoreId());
 		for (BeerPrice beerPrice : beer.getPrices()) {
 			if (beerPrice.getStore().getCity().equals(city)) {
 				beerPricesInCity.add(beerPrice);
 			}
 		}
-		return this.mapToDto(beerPricesInCity);
+		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(beerPricesInCity);
 	}
 
 	public BeerPriceResponseDTO update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
@@ -210,13 +210,18 @@ public class BeerPriceService {
 
 	private Comparator comparatorByBeerIdPriceAndStoreId() {
 		return Comparator.comparing(p -> ((BeerPrice) p).getBeer().getId())
-				.thenComparing(p -> ((BeerPrice) p).getPrice())
+				.thenComparing(p -> ((BeerPrice) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
 	}
 
 	private Comparator comparatorByCityPriceAndStoreId() {
 		return Comparator.comparing(p -> ((BeerPrice) p).getStore().getCity())
-				.thenComparing(p -> ((BeerPrice) p).getPrice())
+				.thenComparing(p -> ((BeerPrice) p).getAmountOnly())
+				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
+	}
+
+	private Comparator comparatorByPriceAndStoreId() {
+		return Comparator.comparing(p -> ((BeerPrice) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
 	}
 }

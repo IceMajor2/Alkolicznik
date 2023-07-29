@@ -68,7 +68,7 @@ public class BeerPriceController {
 	}
 
 	@GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
-	public Set<BeerPriceResponseDTO> getAllByBeerIdAndCity(@PathVariable("beer_id") Long beerId,
+	public List<BeerPriceResponseDTO> getAllByBeerIdAndCity(@PathVariable("beer_id") Long beerId,
 			@RequestParam("city") String city) {
 		return beerPriceService.getAllByBeerIdAndCity(beerId, city);
 	}
