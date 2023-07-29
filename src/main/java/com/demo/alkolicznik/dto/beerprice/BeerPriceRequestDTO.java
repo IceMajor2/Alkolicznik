@@ -14,7 +14,7 @@ import lombok.Setter;
 public class BeerPriceRequestDTO {
 
     @JsonProperty("beer_name")
-    @NotBlank(message = "Beer was not specified")
+    @NotBlank(message = "Beer (its name and type) was not specified")
     private String beerName;
 
     @JsonProperty("beer_volume")
