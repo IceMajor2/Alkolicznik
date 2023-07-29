@@ -354,7 +354,7 @@ public class BeerPriceTests {
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"No such city '%s'; Unable to find beer of '%d' id"
+					"No such city: '%s'; Unable to find beer of '%d' id"
 							.formatted(city, beerId),
 					"/api/beer/" + beerId + "/beer-price");
 		}
