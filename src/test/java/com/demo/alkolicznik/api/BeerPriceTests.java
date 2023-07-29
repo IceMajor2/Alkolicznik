@@ -14,9 +14,13 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -58,8 +62,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(DisabledVaadinContext.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("main")
+@TestClassOrder(ClassOrderer.Random.class)
+@AutoConfigureMockMvc
 public class BeerPriceTests {
 
 	@Autowired
@@ -70,6 +75,7 @@ public class BeerPriceTests {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class GetRequests {
 
 		@ParameterizedTest
@@ -414,6 +420,7 @@ public class BeerPriceTests {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequestsParam {
 
 		@ParameterizedTest
@@ -547,6 +554,7 @@ public class BeerPriceTests {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequestsObject {
 
 		@ParameterizedTest
@@ -756,6 +764,7 @@ public class BeerPriceTests {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class PutRequests {
 
 		@Test
@@ -869,6 +878,7 @@ public class BeerPriceTests {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
 
 		@Test
