@@ -297,43 +297,66 @@ public class BeerPriceTests {
 			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city' empty city")
-		public void getBeersPriceInCityCityEmptyTest() {
-			var getResponse = getRequest("/api/beer/4/beer-price", Map.of("city", "Gdansk"));
+		@ParameterizedTest
+		@CsvSource({
+				"1, Gdansk",
+				"5, Warszawa",
+				"7, Olsztyn"
+		})
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city' not selling")
+		public void getBeersPriceInCityCityEmptyTest(Long beerId, String city) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price", Map.of("city", city));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
 			String actualJson = getResponse.getBody();
 
-			String expectedJson = "[]";
-
-			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actualJson).isEqualTo("[]");
 		}
 
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [BEER_NOT_FOUND]")
-		public void getBeersPriceInCityBeerNotExistsTest() {
-			var getResponse = getRequest("/api/beer/10/beer-price", Map.of("city", "Gdansk"));
-
-			String jsonResponse = getResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '10' id",
-					"/api/beer/10/beer-price");
-		}
-
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = { "dgj", "sdif", "" })
 		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [CITY_NOT_FOUND]")
-		public void getBeersPriceInCityCityNotExistsTest() {
-			var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", "Ciechocinek"));
+		public void getBeersPriceInCityCityNotExistsTest(String city) {
+			var getResponse = getRequest("/api/beer/5/beer-price", Map.of("city", city));
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"No such city: 'Ciechocinek'",
+					"No such city: '" + city + "'",
 					"/api/beer/5/beer-price");
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { -532, 0, 3456956 })
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [CITY_NOT_FOUND]")
+		public void getBeersPriceInCityBeerNotExistsTest(Long beerId) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price", Map.of("city", "Olsztyn"));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '" + beerId + "' id",
+					"/api/beer/" + beerId + "/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"-1, osk",
+				"23909, PP",
+				"0, 023"
+		})
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [CITY_NOT_FOUND]")
+		public void getBeersPriceInCityBeerNotExistsAndCityNotExistsTest(Long beerId, String city) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price", Map.of("city", city));
+
+			String jsonResponse = getResponse.getBody();
+
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"No such city '%s'; Unable to find beer of '%d' id"
+							.formatted(beerId, city),
+					"/api/beer/" + beerId + "/beer-price");
 		}
 
 		@Test
