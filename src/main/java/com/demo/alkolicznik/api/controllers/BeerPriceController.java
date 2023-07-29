@@ -95,7 +95,7 @@ public class BeerPriceController {
 	public ResponseEntity<BeerPriceResponseDTO> addByParam(
 			@PathVariable("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
-			@RequestParam("beer_price") @Positive(message = "Price must be a positive number") double price) {
+			@RequestParam("beer_price") @Positive(message = "Price must be a positive number") Double price) {
 		BeerPriceResponseDTO beerPrice = beerPriceService.addByParam(storeId, beerId, price);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()
