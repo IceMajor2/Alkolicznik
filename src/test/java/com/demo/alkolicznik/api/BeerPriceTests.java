@@ -248,15 +248,15 @@ public class BeerPriceTests {
 		@ParameterizedTest
 		@ValueSource(longs = { -532, 0, 5328 })
 		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' [BEER_NOT_FOUND]")
-		public void getBeerPricesOfBeerNotExistsTest() {
-			var getResponse = getRequest("/api/beer/333/beer-price");
+		public void getBeerPricesOfBeerNotExistsTest(Long beerId) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
 
 			String jsonResponse = getResponse.getBody();
 
 			assertIsError(jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '333' id",
-					"/api/beer/333/beer-price");
+					"Unable to find beer of '" + beerId + "' id",
+					"/api/beer/" + beerId + "/beer-price");
 		}
 
 		@Test
