@@ -259,23 +259,42 @@ public class BeerPriceTests {
 					"/api/beer/" + beerId + "/beer-price");
 		}
 
-		@Test
-		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city'")
-		public void getBeersPriceInCityTest() {
-			var getResponse = getRequest("/api/beer/2/beer-price", Map.of("city", "Warszawa"));
+		@ParameterizedTest
+		@ValueSource(longs = { 7, 8, 9 })
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' beer not sold")
+		public void getBeerPricesOfBeerNotSoldTest(Long beerId) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+			String jsonResponse = getResponse.getBody();
+			assertThat(jsonResponse).isEqualTo("[]");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"4, Warszawa",
+				"1, Olsztyn",
+				"2, Olsztyn"
+		})
+		@DisplayName("GET: '/api/beer/{beer_id}/beer-price?city' ordered")
+		public void getBeersPriceInCityTest(Long beerId, String city) {
+			// when
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price",
+					Map.of("city", city));
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = getResponse.getBody();
 			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-			Beer expectedBeer = getBeer(2L, beers);
+			// then
+			Beer expectedBeer = getBeer(beerId.longValue(), beers);
 			List<BeerPriceResponseDTO> expected = new ArrayList<>();
 			for (BeerPrice beerPrice : expectedBeer.getPrices()) {
-				if (beerPrice.getStore().getCity().equals("Warszawa")) {
+				if (beerPrice.getStore().getCity().equals(city)) {
 					expected.add(new BeerPriceResponseDTO(beerPrice));
 				}
 			}
-			assertThat(actual).hasSameElementsAs(expected);
+			sortByPriceAndStoreId(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
 		@Test
@@ -330,7 +349,7 @@ public class BeerPriceTests {
 			List<BeerPriceResponseDTO> expected = store.getPrices().stream()
 					.map(BeerPriceResponseDTO::new)
 					.toList();
-			assertThat(actual).hasSameElementsAs(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
 		@Test
@@ -373,7 +392,7 @@ public class BeerPriceTests {
 					HttpStatus.OK, expectedJson);
 			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-			assertThat(actual).hasSameElementsAs(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 	}
 
@@ -965,7 +984,7 @@ public class BeerPriceTests {
 	private void sortByBeerIdPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
 		Comparator<Object> comparator = Comparator
 				.comparing(p -> ((BeerPriceResponseDTO) p).getBeer().getId())
-				.thenComparing(p -> ((BeerPriceResponseDTO) p).getPrice())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
 		Collections.sort(pricesDTO, comparator);
 	}
@@ -973,7 +992,14 @@ public class BeerPriceTests {
 	private void sortByCityPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
 		Comparator<Object> comparator = Comparator
 				.comparing(p -> ((BeerPriceResponseDTO) p).getStore().getCity())
-				.thenComparing(p -> ((BeerPriceResponseDTO) p).getPrice())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
+		Collections.sort(pricesDTO, comparator);
+	}
+
+	private void sortByPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
+		Comparator<Object> comparator = Comparator
+				.comparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
 		Collections.sort(pricesDTO, comparator);
 	}
