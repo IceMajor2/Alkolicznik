@@ -359,19 +359,20 @@ public class BeerPriceTests {
 					"/api/beer/" + beerId + "/beer-price");
 		}
 
-		@Test
-		@DisplayName("GET: '/api/store/{store_id}/beer-price'")
-		public void getBeerPricesFromStoreTest() {
-			var getResponse = getRequest("/api/store/3/beer-price");
+		@ParameterizedTest
+		@ValueSource(longs = { 1, 5, 2 })
+		@DisplayName("GET: '/api/store/{store_id}/beer-price' ordered")
+		public void getBeerPricesFromStoreTest(Long storeId) {
+			var getResponse = getRequest("/api/store/" + storeId + "/beer-price");
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
 			String actualJson = getResponse.getBody();
 			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 
-			Store store = getStore(3L, stores);
+			Store store = getStore(storeId.longValue(), stores);
 			List<BeerPriceResponseDTO> expected = store.getPrices().stream()
 					.map(BeerPriceResponseDTO::new)
-					.toList();
+					.collect(Collectors.toList());
+			sortByCityBeerIdAndPrice(expected);
 			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
@@ -1024,6 +1025,14 @@ public class BeerPriceTests {
 		Comparator<Object> comparator = Comparator
 				.comparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
+		Collections.sort(pricesDTO, comparator);
+	}
+
+	private void sortByCityBeerIdAndPrice(List<BeerPriceResponseDTO> pricesDTO) {
+		Comparator<Object> comparator = Comparator
+				.comparing(p -> ((BeerPriceResponseDTO) p).getStore().getCity())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getBeer().getId())
+				.thenComparing(p -> ((BeerPriceResponseDTO) p).getAmountOnly());
 		Collections.sort(pricesDTO, comparator);
 	}
 //	@ParameterizedTest
