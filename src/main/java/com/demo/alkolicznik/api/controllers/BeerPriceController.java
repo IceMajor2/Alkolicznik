@@ -53,7 +53,7 @@ public class BeerPriceController {
 	}
 
 	@GetMapping("/store/{store_id}/beer-price")
-	public Set<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
+	public List<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
 		return beerPriceService.getAllByStoreId(storeId);
 	}
 

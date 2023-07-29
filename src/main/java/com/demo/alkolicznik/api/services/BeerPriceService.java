@@ -87,11 +87,12 @@ public class BeerPriceService {
 		return new BeerPriceResponseDTO(store.findBeer(beerId).get());
 	}
 
-	public Set<BeerPriceResponseDTO> getAllByStoreId(Long storeId) {
+	public List<BeerPriceResponseDTO> getAllByStoreId(Long storeId) {
 		Store store = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
-		Set<BeerPrice> prices = store.getPrices();
-		return this.mapToDto(prices);
+		Set<BeerPrice> prices = new TreeSet<>(comparatorByBeerIdAndPrice());
+		prices.addAll(store.getPrices());
+		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
 	public BeerPriceResponseDTO get(Long storeId, Long beerId) {
@@ -226,5 +227,10 @@ public class BeerPriceService {
 	private Comparator comparatorByPriceAndStoreId() {
 		return Comparator.comparing(p -> ((BeerPrice) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
+	}
+
+	private Comparator comparatorByBeerIdAndPrice() {
+		return Comparator.comparing(p -> ((BeerPrice) p).getBeer().getId())
+				.thenComparing(p -> ((BeerPrice) p).getAmountOnly());
 	}
 }
