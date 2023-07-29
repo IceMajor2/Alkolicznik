@@ -423,29 +423,35 @@ public class BeerPriceTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequestsParam {
 
-		@Test
-		@DisplayName("POST: '/api/store/{store_id}/beer-price' (params)")
+		@ParameterizedTest
+		@CsvSource({
+				"1, 9, 2.99",
+				"5, 5, 3.09",
+				"3, 2, 4.49"
+		})
+		@DisplayName("POST: '/api/store/{store_id}/beer-price?beer_id=?beer_price'")
 		@DirtiesContext
-		public void addBeerPriceIdTest() {
+		public void addBeerPriceIdTest(Long storeId, Long beerId, Double price) {
+			// when
 			var postResponse = postRequestAuth("admin", "admin",
-					"/api/store/1/beer-price",
-					Map.of("beer_id", 3L, "beer_price", 4.19));
+					"/api/store/" + storeId + "/beer-price",
+					Map.of("beer_id", beerId.longValue(), "beer_price", price));
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
 			String actualJson = postResponse.getBody();
 			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
+			// then
 			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(3L, beers)),
-					createStoreResponse(getStore(1L, stores)),
-					"PLN 4.19"
+					createBeerResponse(getBeer(beerId.longValue(), beers)),
+					createStoreResponse(getStore(storeId.longValue(), stores)),
+					"PLN " + price
 			);
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			var getResponse = getRequest("/api/beer-price",
-					Map.of("beer_id", 3L, "store_id", 1L));
+					Map.of("beer_id", beerId.longValue(), "store_id", storeId.longValue()));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerPriceResponseDTO.class);
