@@ -8,12 +8,12 @@ import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
-import com.vaadin.flow.component.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/store")
-@Tag("Store Controller")
+@Tag(name = "Store Controller")
 public class StoreController {
 
 	private StoreService storeService;
@@ -43,8 +43,7 @@ public class StoreController {
 
 	@GetMapping("/{store_id}")
 	@Operation(summary = "Get store details",
-			description = "Include id of store you would like to see details of. "
-					+ "Details include: see response example below.")
+			description = "Include id of store you would like to see details of.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "store details retrieved"),
 			@ApiResponse(responseCode = "404", description = "store not found", content = @Content)
@@ -56,8 +55,10 @@ public class StoreController {
 	@GetMapping(params = "city")
 	@Operation(summary = "Get a list of currently tracked stores",
 			description = "Average user is only enabled to get an array of stores from a "
-					+ "desired city. Accountants may retrieve all stores from database "
-					+ "simply by ommiting the 'city' parameter.")
+					+ "desired city. Accountants may retrieve all stores from database.<br>"
+					+ "<b>Options available</b>:<br>"
+					+ "<i>/api/store</i> - lists all stores in database: secured<br>"
+					+ "<i>/api/store?city=</i> - lists all stores in a city")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "store list retrieved"),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
@@ -101,9 +102,9 @@ public class StoreController {
 
 	@Operation(summary = "Replace store",
 			description = "Replace a store that, for example, you might have seen "
-					+ "closed and replaced by a new one. Features? "
-					+ "You can keep the id! How cool is that? "
-					+ "WARNING: every price associated with the previous store "
+					+ "closed and replaced by a new one.<br>"
+					+ "Features? You can keep the id!<br>"
+					+ "<b>WARNING:</b> every price associated with the previous store "
 					+ "will be deleted!")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "store successfully replaced"),
@@ -111,7 +112,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-			@ApiResponse(responseCode = "404 (2)", description = "store of provided id was not found", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
 	})
 	@PutMapping("/{store_id}")
@@ -124,8 +125,9 @@ public class StoreController {
 	@Operation(summary = "Update store",
 			description = "If you'd just like to tweak some store's properties, "
 					+ "without fully providing a new set of data, then here is "
-					+ "the right place to do so. WARNING: No matter what field "
-					+ "you replace, all of the store prices will, of course, be deleted!")
+					+ "the right place to do so.<br>"
+					+ "<b>WARNING:</b> No matter what field you replace, "
+					+ "all of the store prices will, of course, be deleted!")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "store successfully updated"),
 			@ApiResponse(responseCode = "200 (2)", description = "replacement is the same as original entity - nothing happens", content = @Content),
@@ -133,7 +135,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "400 (2)", description = "there was not one single property to update specified in the request", content = @Content),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-			@ApiResponse(responseCode = "404 (2)", description = "store of provided id was not found", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
 	})
 	@PatchMapping("/{store_id}")
@@ -144,14 +146,15 @@ public class StoreController {
 	}
 
 	@Operation(summary = "Delete store by id",
-			description = "You've just gone bankrupt... again, haven't you? Well, what a "
-					+ "shame... But please, do remember to delete it from Alkolicznik"
+			description = "You've just gone bankrupt... again, haven't you?"
+					+ " Well, what a shame...<br>"
+					+ "But please, do remember to delete it from <b>Alkolicznik</b>"
 					+ '\u2122' + "... Thanks!")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "store successfully deleted"),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-			@ApiResponse(responseCode = "404 (2)", description = "store of provided id was not found", content = @Content)
+			@ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content)
 	})
 	@DeleteMapping("/{store_id}")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
