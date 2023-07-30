@@ -26,17 +26,14 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
-import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
@@ -46,12 +43,12 @@ import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getBeerPrice;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
-import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,7 +56,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles("main")
 @TestClassOrder(ClassOrderer.Random.class)
-@AutoConfigureMockMvc
 public class BeerPriceTests {
 
 	@Nested
@@ -68,6 +64,7 @@ public class BeerPriceTests {
 	class GetRequests {
 
 		private List<Beer> beers;
+
 		private List<Store> stores;
 
 		@Autowired
@@ -422,6 +419,7 @@ public class BeerPriceTests {
 	class PostRequestsParam {
 
 		private List<Beer> beers;
+
 		private List<Store> stores;
 
 		@Autowired
@@ -565,6 +563,7 @@ public class BeerPriceTests {
 	class PostRequestsObject {
 
 		private List<Beer> beers;
+
 		private List<Store> stores;
 
 		@Autowired
@@ -784,6 +783,7 @@ public class BeerPriceTests {
 	class PatchRequests {
 
 		private List<Beer> beers;
+
 		private List<Store> stores;
 
 		@Autowired
@@ -981,6 +981,7 @@ public class BeerPriceTests {
 	class DeleteRequests {
 
 		private List<Beer> beers;
+
 		private List<Store> stores;
 
 		@Autowired
@@ -989,26 +990,38 @@ public class BeerPriceTests {
 			this.stores = stores;
 		}
 
-		@Test
-		@DisplayName("DELETE: '/api/beer-price'")
+		@ParameterizedTest
+		@CsvSource({
+				"1, 1",
+				"6, 2",
+				"4, 6",
+		})
+		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id='")
 		@DirtiesContext
-		@WithUserDetails("admin")
-		public void deleteBeerPriceTest() {
+		public void deleteBeerPriceTest(Long storeId, Long beerId) {
+			// given
+			var params = Map.of(
+					"store_id", storeId,
+					"beer_id", beerId
+			);
+			// when
+			var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer-price", params);
+			assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = deleteResponse.getBody();
+			BeerPriceDeleteDTO actual = toModel(actualJson, BeerPriceDeleteDTO.class);
+
+			// then
 			BeerPriceDeleteDTO expected = createBeerPriceDeleteResponse(
-					getBeer(2L, beers),
-					getStore(5L, stores),
-					"5.49 PLN",
+					createBeerResponse(getBeer(beerId.longValue(), beers)),
+					createStoreResponse(getStore(storeId.longValue(), stores)),
+					getBeerPrice(storeId, beerId, stores, beers).getPrice().toString(),
 					"Beer price was deleted successfully!"
 			);
 			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(mockDeleteRequest("/api/beer-price",
-							Map.of("beer_id", 2L, "store_id", 5L)),
-					HttpStatus.OK,
-					expectedJson);
+			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
-			var getRequest = getRequest("/api/beer-price", Map.of("beer_id", 2L, "store_id", 5L));
+			var getRequest = getRequest("/api/beer-price", Map.of("beer_id", beerId, "store_id", storeId));
 
 			String jsonResponse = getRequest.getBody();
 
