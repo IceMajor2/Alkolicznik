@@ -43,16 +43,15 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
@@ -765,29 +764,33 @@ public class BeerPriceTests {
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
-	class PutRequests {
+	class PatchRequests {
 
-		@Test
-		@DisplayName("PUT: '/api/beer-price'")
+		@ParameterizedTest
+		@CsvSource({
+				"4, 6, 5.89",
+				"1, 1, 4.99",
+				"6, 1, 5.09"
+		})
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price='")
 		@DirtiesContext
-		public void updateBeerPricePriceTest() {
+		public void updateBeerPricePriceTest(Long storeId, Long beerId, Double price) {
 			// given
-			BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(4.59);
-
+			Map<String, ?> params = Map.of
+					("beer_id", beerId.longValue(),
+							"store_id", storeId.longValue(),
+							"price", price);
 			// when
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer-price",
-					request, Map.of("beer_id", 3L, "store_id", 3L));
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = patchResponse.getBody();
 			BeerPriceResponseDTO actual = toModel(actualJson, BeerPriceResponseDTO.class);
 
 			// then
 			BeerPriceResponseDTO expected = createBeerPriceResponse(
-					createBeerResponse(getBeer(3L, beers),
-							createImageResponse(getImage(3L, beers))),
-					createStoreResponse(getStore(3L, stores)),
-					"PLN 4.59"
+					createBeerResponse(getBeer(beerId.longValue(), beers)),
+					createStoreResponse(getStore(storeId.longValue(), stores)),
+					"PLN " + price
 			);
 
 			String expectedJson = toJsonString(expected);
@@ -795,7 +798,8 @@ public class BeerPriceTests {
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 
-			var getResponse = getRequest("/api/beer-price", Map.of("beer_id", 3L, "store_id", 3L));
+			var getResponse = getRequest("/api/beer-price",
+					Map.of("beer_id", beerId.longValue(), "store_id", storeId.longValue()));
 
 			actualJson = getResponse.getBody();
 			actual = toModel(actualJson, BeerPriceResponseDTO.class);
