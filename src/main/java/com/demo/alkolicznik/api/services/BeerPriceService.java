@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
@@ -45,23 +44,22 @@ public class BeerPriceService {
 	public BeerPriceResponseDTO addByObject(Long storeId, BeerPriceRequestDTO beerPriceRequestDTO) {
 		String beerFullname = beerPriceRequestDTO.getBeerName();
 		double volume = beerPriceRequestDTO.getBeerVolume();
-		// Fetch both store and beer from repositories.
 		if (!storeRepository.existsById(storeId) && !beerRepository
 				.existsByFullnameAndVolume(beerFullname, volume)) {
 			throw new EntitiesNotFoundException(beerFullname, volume, storeId);
 		}
-		Store store = storeRepository.findById(storeId).orElseThrow(
-				() -> new StoreNotFoundException(storeId)
-		);
-		// Check if beer exists by fullname
-		// If beer is not found in DB, then the reason is volume
+
+		throwExceptionIfStoreNotFound(storeId);
+		Store store = storeRepository.findById(storeId).get();
+
 		Beer beer = beerRepository.findByFullnameAndVolume(beerFullname, volume).orElseThrow(
 				() -> new BeerNotFoundException(beerFullname, volume)
 		);
+
 		if (store.findBeer(beer.getId()).isPresent()) {
 			throw new BeerPriceAlreadyExistsException();
 		}
-		// Pass beer with price to store and save changes.
+		// END: conditions checks
 		double price = beerPriceRequestDTO.getPrice();
 		store.saveBeer(beer, price);
 		storeRepository.save(store);
@@ -71,13 +69,9 @@ public class BeerPriceService {
 	// No annotation will throw Hibernate lazy-loading exception (on GUI)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
 	public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, Double price) {
-		throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
-		Store store = storeRepository.findById(storeId).orElseThrow(
-				() -> new StoreNotFoundException(storeId)
-		);
-		Beer beer = beerRepository.findById(beerId).orElseThrow(
-				() -> new BeerNotFoundException(beerId)
-		);
+		throwIfNotFoundAll(storeId, beerId);
+		Store store = storeRepository.findById(storeId).get();
+		Beer beer = beerRepository.findById(beerId).get();
 		if (store.findBeer(beer.getId()).isPresent()) {
 			throw new BeerPriceAlreadyExistsException();
 		}
@@ -87,21 +81,16 @@ public class BeerPriceService {
 	}
 
 	public List<BeerPriceResponseDTO> getAllByStoreId(Long storeId) {
-		Store store = storeRepository.findById(storeId).orElseThrow(() ->
-				new StoreNotFoundException(storeId));
+		throwExceptionIfStoreNotFound(storeId);
+		Store store = storeRepository.findById(storeId).get();
 		Set<BeerPrice> prices = new TreeSet<>(comparatorByBeerIdAndPrice());
 		prices.addAll(store.getPrices());
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(prices);
 	}
 
 	public BeerPriceResponseDTO get(Long storeId, Long beerId) {
-		throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
-		Store store = storeRepository.findById(storeId).orElseThrow(
-				() -> new StoreNotFoundException(storeId)
-		);
-		if (!beerRepository.existsById(beerId)) {
-			throw new BeerNotFoundException(beerId);
-		}
+		throwIfNotFoundAll(storeId, beerId);
+		Store store = storeRepository.findById(storeId).get();
 		return new BeerPriceResponseDTO(store.findBeer(beerId).orElseThrow(
 				() -> new BeerPriceNotFoundException()
 		));
@@ -126,9 +115,7 @@ public class BeerPriceService {
 	}
 
 	public List<BeerPriceResponseDTO> getAllByBeerId(Long beerId) {
-		Beer beer = beerRepository.findById(beerId).orElseThrow(
-				() -> new BeerNotFoundException(beerId)
-		);
+		throwExceptionIfBeerNotFound(beerId);
 		List<Store> stores = storeRepository.findAll();
 
 		Set<BeerPrice> prices = new TreeSet<>(comparatorByCityPriceAndStoreId());
@@ -140,9 +127,8 @@ public class BeerPriceService {
 		if (!beerRepository.existsById(beerId) && !storeRepository.existsByCity(city)) {
 			throw new EntitiesNotFoundException(beerId, city);
 		}
-		Beer beer = beerRepository.findById(beerId).orElseThrow(
-				() -> new BeerNotFoundException(beerId)
-		);
+		throwExceptionIfBeerNotFound(beerId);
+		Beer beer = beerRepository.findById(beerId).get();
 		if (!storeRepository.existsByCity(city)) {
 			throw new NoSuchCityException(city);
 		}
@@ -154,17 +140,11 @@ public class BeerPriceService {
 	}
 
 	public BeerPriceResponseDTO update(Long storeId, Long beerId, Double price) {
-		if(!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
-			throw new EntitiesNotFoundException(beerId, storeId);
-		}
-		Store store = storeRepository.findById(storeId).orElseThrow(() ->
-				new StoreNotFoundException(storeId));
-		if (!beerRepository.existsById(beerId)) {
-			throw new BeerNotFoundException(beerId);
-		}
+		throwIfNotFoundAll(storeId, beerId);
+		Store store = storeRepository.findById(storeId).get();
 		BeerPrice beerPrice = store.findBeer(beerId).orElseThrow(() ->
 				new BeerPriceNotFoundException());
-		if(beerPrice.getAmountOnly().equals(price)) {
+		if (beerPrice.getAmountOnly().equals(price)) {
 			throw new PriceIsSameException(beerPrice.getPrice().toString());
 		}
 		MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
@@ -178,22 +158,16 @@ public class BeerPriceService {
 	// No annotation throws Hibernation lazy-loading exception (on GUI)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
 	public BeerPriceDeleteDTO delete(Long storeId, Long beerId) {
-		Store store = storeRepository.findById(storeId).orElseThrow(() ->
-				new StoreNotFoundException(storeId));
-		Beer beer = beerRepository.findById(beerId).orElseThrow(() ->
-				new BeerNotFoundException(beerId));
-		BeerPrice beerPrice = store.findBeer(beerId).orElseThrow(() ->
-				new BeerPriceNotFoundException());
+		throwIfNotFoundAll(storeId, beerId);
+		Store store = storeRepository.findById(storeId).get();
+		Beer beer = beerRepository.findById(beerId).get();
+
+		store.findBeer(beerId).orElseThrow(() -> new BeerPriceNotFoundException());
+
 		BeerPrice deleted = store.deleteBeer(beer);
 		beerRepository.save(beer);
 		storeRepository.save(store);
 		return new BeerPriceDeleteDTO(deleted);
-	}
-
-	private Set<BeerPriceResponseDTO> mapToDto(Set<BeerPrice> beerPrices) {
-		return beerPrices.stream()
-				.map(BeerPriceResponseDTO::new)
-				.collect(Collectors.toUnmodifiableSet());
 	}
 
 	private Comparator comparatorByBeerIdPriceAndStoreId() {
@@ -223,6 +197,24 @@ public class BeerPriceService {
 				.thenComparing(p -> ((BeerPrice) p).getBeer().getId())
 				.thenComparing(p -> ((BeerPrice) p).getAmountOnly())
 				.thenComparing(p -> ((BeerPrice) p).getStore().getId());
+	}
+
+	private void throwIfNotFoundAll(Long storeId, Long beerId) {
+		throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
+		throwExceptionIfBeerNotFound(beerId);
+		throwExceptionIfStoreNotFound(storeId);
+	}
+
+	private void throwExceptionIfBeerNotFound(Long beerId) {
+		if (!beerRepository.existsById(beerId)) {
+			throw new BeerNotFoundException(beerId);
+		}
+	}
+
+	private void throwExceptionIfStoreNotFound(Long storeId) {
+		if (!storeRepository.existsById(storeId)) {
+			throw new StoreNotFoundException(storeId);
+		}
 	}
 
 	private void throwExceptionIfBothStoreAndBeerNotFound(Long storeId, Long beerId) {
