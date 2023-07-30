@@ -80,6 +80,7 @@ public class StoreService {
 	public StoreDeleteDTO delete(Long storeId) {
 		Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
+		toDelete.deleteAllPrices();
 		storeRepository.delete(toDelete);
 		return new StoreDeleteDTO(toDelete);
 	}
@@ -87,8 +88,7 @@ public class StoreService {
 	public StoreDeleteDTO delete(StoreRequestDTO store) {
 		Store toDelete = storeRepository.findByStoreRequest(store)
 				.orElseThrow(() -> new StoreNotFoundException(store.getName(), store.getCity(), store.getStreet()));
-		storeRepository.delete(toDelete);
-		return new StoreDeleteDTO(toDelete);
+		return this.delete(toDelete.getId());
 	}
 
 	private Store checkForPatchConditions(Long storeId, StoreUpdateDTO updateDTO) {
