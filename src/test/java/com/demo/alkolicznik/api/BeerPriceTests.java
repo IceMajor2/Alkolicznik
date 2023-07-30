@@ -13,6 +13,7 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -44,6 +45,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
@@ -1254,6 +1256,45 @@ public class BeerPriceTests {
 			}
 		}
 
+		@Nested
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class DeleteRequests {
+
+			private List<Store> stores;
+
+			@Autowired
+			public DeleteRequests(List<Store> stores) {
+				this.stores = stores;
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"3, Biedronka, Olsztyn, ul. Iwaszkiewicza 1",
+					"6, ABC, Rzeszow, ul. Polna 1",
+					"4, Lubi, Krakow, ul. Nowaka 5"
+			})
+			@DirtiesContext
+			@DisplayName("PUT: '/api/store/{store_id}' replacing store removes prices")
+			public void replaceStoreRemovesPricesTest(Long storeId, String name, String city, String street) {
+				// given
+				StoreRequestDTO request = createStoreRequest(name, city, street);
+				assertThat(getStore(storeId, stores).getPrices()).isNotEmpty();
+
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequest("/api/store/" + storeId + "/beer-price");
+				String actualJson = getResponse.getBody();
+				assertThat(actualJson).isEqualTo("[]");
+			}
+		}
+
+		@Nested
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		@TestMethodOrder(MethodOrderer.Random.class)
 		class ImageRequests {
 			// TODO: write analogical tests with images
 		}
