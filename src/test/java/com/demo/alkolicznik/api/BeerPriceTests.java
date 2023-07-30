@@ -14,6 +14,7 @@ import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -47,6 +48,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
@@ -1259,13 +1261,37 @@ public class BeerPriceTests {
 		@Nested
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		@TestMethodOrder(MethodOrderer.Random.class)
-		class DeleteRequests {
+		class StoreRequests {
 
 			private List<Store> stores;
 
 			@Autowired
-			public DeleteRequests(List<Store> stores) {
+			public StoreRequests(List<Store> stores) {
 				this.stores = stores;
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"1, null, null, ul. Barcza 5",
+					"4, Lubi, null, null",
+					"5, null, Wroclaw, null",
+					"6, Piwiarnia, Gdansk, ul. Galczynskiego 7"
+			}, nullValues = "null")
+			@DirtiesContext
+			@DisplayName("PATCH: '/api/store/{store_id}' updating store removes prices")
+			public void updateStoreRemovesPricesTest(Long storeId, String name, String city, String street) {
+				// given
+				StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+				assertThat(getStore(storeId.longValue(), stores).getPrices()).isNotEmpty();
+
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequest("/api/store/" + storeId + "/beer-price");
+				String actualJson = getResponse.getBody();
+				assertThat(actualJson).isEqualTo("[]");
 			}
 
 			@ParameterizedTest
@@ -1289,6 +1315,25 @@ public class BeerPriceTests {
 				var getResponse = getRequest("/api/store/" + storeId + "/beer-price");
 				String actualJson = getResponse.getBody();
 				assertThat(actualJson).isEqualTo("[]");
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 5, 1, 2 })
+			@DirtiesContext
+			@DisplayName("DELETE: '/api/store/{store_id}' deleting store removes prices")
+			public void deleteStoreRemovesPricesTest(Long storeId) {
+				assertThat(getStore(storeId.longValue(), stores).getPrices()).isNotEmpty();
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				// then
+				var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
+				System.out.println(getResponse.getBody());
+				List<BeerPriceResponseDTO> prices = toModelList(getResponse.getBody(), BeerPriceResponseDTO.class);
+				List<BeerPriceResponseDTO> pricesOfStore = prices.stream()
+						.filter(price -> price.getBeer().getId().equals(storeId))
+						.toList();
+				assertThat(pricesOfStore).isEmpty();
 			}
 		}
 
