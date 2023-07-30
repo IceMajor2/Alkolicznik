@@ -159,7 +159,7 @@ public class BeerController {
 		return beerService.delete(beerId);
 	}
 
-	@Operation(summary = "Delete beer by properties",
+	@Operation(summary = "Delete beer by JSON string",
 			description = "The beer is nowhere to be found anymore and - even worse - you can't get its ID?<br>"
 					+ "Not a problem! Try to describe it just as you'd create it de novo.")
 	@ApiResponses({

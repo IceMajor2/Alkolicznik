@@ -115,6 +115,21 @@ public class BeerPriceController {
 	}
 
 	@PostMapping("/store/{store_id}/beer-price")
+	@Operation(summary = "Add price (by properties or JSON string)",
+			description = "This whole application is about prices! "
+					+ "What are you waiting for?<br>"
+					+ "<b>Options available:</b><br>"
+					+ "<i>/api/store/{store_id}/beer-price</i> - add by JSON string (see body below)<br>"
+					+ "<i>/api/store/{store_id}/beer-price?beer_id=?beer_price=</i> - add by parameters")
+	@ApiResponses({
+			@ApiResponse(responseCode = "201", description = "price added"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (3)", description = "city not found", content = @Content),
+			@ApiResponse(responseCode = "404 (4)", description = "both store and beer not found", content = @Content),
+			@ApiResponse(responseCode = "409", description = "price already exists", content = @Content)
+	})
 	@SecurityRequirement(name = "Basic Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByObject(
 			@PathVariable("store_id") Long storeId,
@@ -135,8 +150,8 @@ public class BeerPriceController {
 	@SecurityRequirement(name = "Basic Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByParam(
 			@PathVariable("store_id") Long storeId,
-			@RequestParam(value = "beer_id") Long beerId,
-			@RequestParam(value = "beer_price")
+			@RequestParam(value = "beer_id", required = false) Long beerId,
+			@RequestParam(value = "beer_price", required = false)
 			@Positive(message = "Price must be a positive number") Double price) {
 		BeerPriceResponseDTO beerPrice = beerPriceService.addByParam(storeId, beerId, price);
 		URI location = ServletUriComponentsBuilder
