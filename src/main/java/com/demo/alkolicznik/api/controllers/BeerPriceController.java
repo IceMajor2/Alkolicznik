@@ -50,12 +50,13 @@ public class BeerPriceController {
 					+ "<i>/api/beer-price?store_id=?beer_id=?</i> - specific price<br>"
 					+ "<i>/api/beer-price?city=?</i> - all prices from stores in a specified city<br>")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "price retrieved"),
+			@ApiResponse(responseCode = "200", description = "price(s) retrieved"),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
 			@ApiResponse(responseCode = "404 (3)", description = "store not found", content = @Content),
-			@ApiResponse(responseCode = "404 (4)", description = "both store and beer not found", content = @Content)
+			@ApiResponse(responseCode = "404 (4)", description = "both store and beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (5)", description = "city not found", content = @Content)
 	})
 	public BeerPriceResponseDTO get(
 			@RequestParam(value = "store_id", required = false) Long storeId,
@@ -77,18 +78,39 @@ public class BeerPriceController {
 	}
 
 	@GetMapping("/store/{store_id}/beer-price")
+	@Operation(summary = "Get prices of some store",
+			description = "Getting prices of your vis-a-vis "
+					+ "competition was never as easy.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "prices retrieved"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content)
+	})
 	public List<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
 		return beerPriceService.getAllByStoreId(storeId);
 	}
 
 	@GetMapping("/beer/{beer_id}/beer-price")
+	@Operation(summary = "Acquire a list of prices of your favourite beer.<br>"
+			+ "<b>Options available:</b><br>"
+			+ "<i>/api/beer/{beer_id}/beer-price</i> - list all beer-specific prices<br>"
+			+ "<i>/api/beer/{beer_id}/beer-price?city=</i> - list all beer-specific prices in a city")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "prices retrieved"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (3)", description = "city not found", content = @Content),
+			@ApiResponse(responseCode = "404 (4)", description = "both beer and city not found", content = @Content)
+	})
 	public List<BeerPriceResponseDTO> getAllByBeerId(@PathVariable("beer_id") Long beerId) {
 		return beerPriceService.getAllByBeerId(beerId);
 	}
 
 	@GetMapping(value = "/beer/{beer_id}/beer-price", params = "city")
 	public List<BeerPriceResponseDTO> getAllByBeerIdAndCity(@PathVariable("beer_id") Long beerId,
-			@RequestParam("city") String city) {
+			@RequestParam(value = "city", required = false) String city) {
 		return beerPriceService.getAllByBeerIdAndCity(beerId, city);
 	}
 
