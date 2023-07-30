@@ -145,8 +145,7 @@ public class BeerController {
 	}
 
 	@Operation(summary = "Delete beer by id",
-			description = "Are you tired of selling a certain beer? You can't make "
-					+ "enough money or working with the provider is a pain in the ass? "
+			description = "Was this beer a limited edition? Is it nowhere to be acquired anymore? "
 					+ "Say no more! Just give me an ID...")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer successfully deleted"),
@@ -162,7 +161,7 @@ public class BeerController {
 	}
 
 	@Operation(summary = "Delete beer by properties",
-			description = "You can't sell a beer and - even worse - you can't get its ID? "
+			description = "The beer is nowhere to be found anymore and - even worse - you can't get its ID? "
 					+ "Not a problem! Try to describe it just as you'd create it de novo")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer successfully deleted", content = @Content),
