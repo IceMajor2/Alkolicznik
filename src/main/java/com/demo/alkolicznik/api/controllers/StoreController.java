@@ -8,6 +8,7 @@ import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.vaadin.flow.component.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/store")
+@Tag("Store Controller")
 public class StoreController {
 
 	private StoreService storeService;
