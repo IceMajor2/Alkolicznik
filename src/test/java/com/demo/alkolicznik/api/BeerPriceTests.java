@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
@@ -36,6 +37,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
@@ -1210,12 +1212,37 @@ public class BeerPriceTests {
 			@ValueSource(longs = { 1, 4 })
 			@DisplayName("DELETE: '/api/beer/{beer_id}' deleting beer removes prices")
 			@DirtiesContext
-			public void deleteBeerRemovesPricesTest(Long beerId) {
+			public void deleteBeerByIdRemovesPricesTest(Long beerId) {
 				assertThat(getBeer(beerId.longValue(), beers).getPrices()).isNotEmpty();
 				// when
 				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
 				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+				// then
+				var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
+				List<BeerPriceResponseDTO> prices = toModelList
+						(getResponse.getBody(), BeerPriceResponseDTO.class);
+				List<BeerPriceResponseDTO> pricesOfBeer = prices.stream()
+						.filter(price -> price.getBeer().getId().equals(beerId))
+						.toList();
+				assertThat(pricesOfBeer).isEmpty();
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"9, Perla, Chmielowa Pils, 0.33",
+					"6, Miloslaw, Biale, null",
+					"2, Ksiazece, Zlote pszeniczne, 0.5"
+			}, nullValues = "null")
+			@DisplayName("DELETE: '/api/beer' deleting beer removes prices")
+			@DirtiesContext
+			public void deleteBeerByObjectRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
+				// given
+				BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+				assertThat(getBeer(beerId.longValue(), beers).getPrices()).isNotEmpty();
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				// then
 				var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
 				List<BeerPriceResponseDTO> prices = toModelList
