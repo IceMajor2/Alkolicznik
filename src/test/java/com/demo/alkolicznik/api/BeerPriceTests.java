@@ -847,8 +847,8 @@ public class BeerPriceTests {
 
 			// then
 			assertIsError(jsonResponse,
-					HttpStatus.OK,
-					"The price is '%s' already".formatted(price + " PLN"),
+					HttpStatus.CONFLICT,
+					"The price is '%s' already".formatted("PLN " + price),
 					"/api/beer-price");
 		}
 
