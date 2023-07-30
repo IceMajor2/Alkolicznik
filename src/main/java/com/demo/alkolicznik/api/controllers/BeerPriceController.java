@@ -48,7 +48,7 @@ public class BeerPriceController {
 					+ "<b>Options available:</b><br>"
 					+ "<i>/api/beer-price</i> - lists everything: secured<br>"
 					+ "<i>/api/beer-price?store_id=?beer_id=?</i> - specific price<br>"
-					+ "<i>/api/beer-price?city=?</i> - all prices from stores in a specified city<br>")
+					+ "<i>/api/beer-price?city=</i> - all prices from stores in a specified city<br>")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "price(s) retrieved"),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
@@ -92,7 +92,8 @@ public class BeerPriceController {
 	}
 
 	@GetMapping("/beer/{beer_id}/beer-price")
-	@Operation(summary = "Acquire a list of prices of your favourite beer.<br>"
+	@Operation(summary = "Get beer-specific prices",
+			description = "Acquire a list of prices of your favourite beer.<br>"
 			+ "<b>Options available:</b><br>"
 			+ "<i>/api/beer/{beer_id}/beer-price</i> - list all beer-specific prices<br>"
 			+ "<i>/api/beer/{beer_id}/beer-price?city=</i> - list all beer-specific prices in a city")
@@ -123,6 +124,7 @@ public class BeerPriceController {
 					+ "<i>/api/store/{store_id}/beer-price?beer_id=?beer_price=</i> - add by parameters")
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "price added"),
+			@ApiResponse(responseCode = "400", description = "constraint validation failed", content = @Content),
 			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
 					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
 			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
@@ -165,6 +167,22 @@ public class BeerPriceController {
 	}
 
 	@PatchMapping(value = "/beer-price", params = { "store_id", "beer_id", "price" })
+	@Operation(summary = "Update price",
+			description = "You've just put a discount on a beer? That's great!<br>"
+					+ "Or maybe, please don't, prices are going up?! "
+					+ "Ah well, ain't inflation a bitch.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "price updated"),
+			@ApiResponse(responseCode = "200 (2)", description = "price did not differ", content = @Content),
+			@ApiResponse(responseCode = "400", description = "constraint validation failed", content = @Content),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "price not found", content = @Content),
+			@ApiResponse(responseCode = "404 (3)", description = "beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (4)", description = "store not found", content = @Content),
+			@ApiResponse(responseCode = "404 (5)", description = "both store and beer not found", content = @Content),
+			@ApiResponse(responseCode = "409", description = "price already exists", content = @Content)
+	})
 	@SecurityRequirement(name = "Basic Authentication")
 	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
@@ -174,6 +192,18 @@ public class BeerPriceController {
 
 	@DeleteMapping("/beer-price")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@Operation(summary = "Delete price",
+			description = "In case of you not selling a beer not anymore, "
+					+ "delete it from our application. Customers will be glad!")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "price deleted"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "price not found", content = @Content),
+			@ApiResponse(responseCode = "404 (3)", description = "beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (4)", description = "store not found", content = @Content),
+			@ApiResponse(responseCode = "404 (5)", description = "both store and beer not found", content = @Content)
+	})
 	@SecurityRequirement(name = "Basic Authentication")
 	public BeerPriceDeleteDTO delete(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId) {
