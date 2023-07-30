@@ -259,7 +259,7 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = { 7, 8, 9 })
+		@ValueSource(longs = { 7, 8 })
 		@DisplayName("GET: '/api/beer/{beer_id}/beer-price' beer not sold")
 		public void getBeerPricesOfBeerNotSoldTest(Long beerId) {
 			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");

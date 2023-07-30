@@ -1150,7 +1150,7 @@ public class BeerTests {
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer '%s' of '%.2f' volume"
+					"Unable to find beer: [%s, %.2fl]"
 							.formatted(request.getFullName(), request.getVolume()),
 					"/api/beer"
 			);
