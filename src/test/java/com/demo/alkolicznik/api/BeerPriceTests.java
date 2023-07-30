@@ -849,6 +849,100 @@ public class BeerPriceTests {
 					"The price is '%s' already".formatted("PLN " + price),
 					"/api/beer-price");
 		}
+
+		@ParameterizedTest
+		@ValueSource(longs = {-51245, 0, 968532})
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [BEER_NOT_FOUND]")
+		public void updateBeerPriceBeerNotFound(Long beerId) {
+			// given
+			var params = Map.of(
+					"store_id", 4,
+					"beer_id", beerId,
+					"price", 4.49
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
+
+			// then
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '%d' id".formatted(beerId),
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = {-5203, 0, 2039})
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [STORE_NOT_FOUND]")
+		public void updateBeerPriceStoreNotFound(Long storeId) {
+			// given
+			var params = Map.of(
+					"store_id", storeId,
+					"beer_id", 3,
+					"price", 3.99
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
+
+			// then
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '%d' id".formatted(storeId),
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"0, 253980",
+				"21359, -5",
+				"-695842, 0"
+		})
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [BEER_n_STORE_404]")
+		public void updateBeerPriceStoreAndBeerNotFound(Long storeId, Long beerId) {
+			// given
+			var params = Map.of(
+					"store_id", storeId,
+					"beer_id", beerId,
+					"price", 6.99
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
+
+			// then
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '%d' id; Unable to find store of '%d' id"
+							.formatted(beerId, storeId),
+					"/api/beer-price");
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"7, 8",
+				"1, 4",
+				"8, 1",
+				"4, 3"
+		})
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [PRICE_NOT_FOUND]")
+		public void updateBeerPricePriceNotFound(Long storeId, Long beerId) {
+			// given
+			var params = Map.of(
+					"store_id", storeId,
+					"beer_id", beerId,
+					"price", 5.29
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
+
+			// then
+			assertIsError(jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Store does not currently sell this beer",
+					"/api/beer-price");
+		}
 	}
 
 	@Nested
