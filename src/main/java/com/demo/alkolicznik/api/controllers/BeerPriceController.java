@@ -7,7 +7,12 @@ import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -28,6 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api")
 @Validated
+@Tag(name = "Beer Price Controller")
 public class BeerPriceController {
 
 	private BeerPriceService beerPriceService;
@@ -37,8 +43,23 @@ public class BeerPriceController {
 	}
 
 	@GetMapping(value = "/beer-price", params = { "store_id", "beer_id" })
-	public BeerPriceResponseDTO get(@RequestParam("store_id") Long storeId,
-			@RequestParam("beer_id") Long beerId) {
+	@Operation(summary = "Get the price of beer in a store",
+			description = "Here's the right place to seek discounts!<br>"
+					+ "<b>Options available:</b><br>"
+					+ "<i>/api/beer-price</i> - lists everything: secured<br>"
+					+ "<i>/api/beer-price?store_id=?beer_id=?</i> - specific price<br>"
+					+ "<i>/api/beer-price?city=?</i> - all prices from stores in a specified city<br>")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "price retrieved"),
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
+			@ApiResponse(responseCode = "404 (3)", description = "store not found", content = @Content),
+			@ApiResponse(responseCode = "404 (4)", description = "both store and beer not found", content = @Content)
+	})
+	public BeerPriceResponseDTO get(
+			@RequestParam(value = "store_id", required = false) Long storeId,
+			@RequestParam(value = "beer_id", required = false) Long beerId) {
 		return beerPriceService.get(storeId, beerId);
 	}
 
@@ -49,14 +70,15 @@ public class BeerPriceController {
 		return beerPriceService.getAll();
 	}
 
+	@GetMapping(value = "/beer-price", params = "city")
+	public List<BeerPriceResponseDTO> getAllByCity(
+			@RequestParam(value = "city", required = false) String city) {
+		return beerPriceService.getAllByCity(city);
+	}
+
 	@GetMapping("/store/{store_id}/beer-price")
 	public List<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {
 		return beerPriceService.getAllByStoreId(storeId);
-	}
-
-	@GetMapping(value = "/beer-price", params = "city")
-	public List<BeerPriceResponseDTO> getAllByCity(@RequestParam("city") String city) {
-		return beerPriceService.getAllByCity(city);
 	}
 
 	@GetMapping("/beer/{beer_id}/beer-price")
@@ -91,8 +113,9 @@ public class BeerPriceController {
 	@SecurityRequirement(name = "Basic Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByParam(
 			@PathVariable("store_id") Long storeId,
-			@RequestParam("beer_id") Long beerId,
-			@RequestParam("beer_price") @Positive(message = "Price must be a positive number") Double price) {
+			@RequestParam(value = "beer_id") Long beerId,
+			@RequestParam(value = "beer_price")
+			@Positive(message = "Price must be a positive number") Double price) {
 		BeerPriceResponseDTO beerPrice = beerPriceService.addByParam(storeId, beerId, price);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()

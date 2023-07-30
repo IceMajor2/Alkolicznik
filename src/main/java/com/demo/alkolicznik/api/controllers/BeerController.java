@@ -58,7 +58,7 @@ public class BeerController {
 			description = "Average user is only enabled to get an array of beers from a "
 					+ "desired city. Accountants may retrieve all beers from database.<br>"
 					+ "<b>Options available</b>:<br>"
-					+ "<i>/api/beer<i> - lists every beer in database: secured<br>"
+					+ "<i>/api/beer</i> - lists every beer in database: secured<br>"
 					+ "<i>/api/beer?city=</i> - lists every beer sold in a city")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer list retrieved"),
@@ -123,7 +123,7 @@ public class BeerController {
 			description = "If you are interested in updating just one or two - or even more - individual "
 					+ "fields, you've come to the right place.<br>"
 					+ "<b>WARNING #1:</b> If you update brand and/or type, the beer will be removed "
-					+ "from each store it has been previously linked to. "
+					+ "from each store it has been previously linked to.<br>"
 					+ "<b>WARNING #2:</b> If you update anything else than beer volume, then "
 					+ "beer image will be deleted.")
 	@ApiResponses({
