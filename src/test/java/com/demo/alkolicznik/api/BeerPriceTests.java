@@ -851,7 +851,7 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {-51245, 0, 968532})
+		@ValueSource(longs = { -51245, 0, 968532 })
 		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [BEER_NOT_FOUND]")
 		public void updateBeerPriceBeerNotFound(Long beerId) {
 			// given
@@ -872,7 +872,7 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {-5203, 0, 2039})
+		@ValueSource(longs = { -5203, 0, 2039 })
 		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [STORE_NOT_FOUND]")
 		public void updateBeerPriceStoreNotFound(Long storeId) {
 			// given
@@ -1066,56 +1066,4 @@ public class BeerPriceTests {
 				.thenComparing(p -> ((BeerPriceResponseDTO) p).getStore().getId());
 		Collections.sort(pricesDTO, comparator);
 	}
-//	@ParameterizedTest
-//	@CsvSource(value = {
-//			"4, Lubi, Olsztyn, ul. Michala Kajki 1",
-//			"6, Biedronka, Olsztyn, ul. Jerzego Lanca 4",
-//			"3, Carrefour Express, Katowice, ul. Mrongowiusza 11"
-//	})
-//	@DisplayName("PUT: '/api/store/{store_id}' removes beer prices")
-//	@DirtiesContext
-//	public void replaceStoreRemovesAllPricesTest(Long id, String name, String city, String street) {
-//		// given
-//		StoreRequestDTO request = createStoreRequest(name, city, street);
-//		var getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-//		String jsonBeerPrices = getResponse.getBody();
-//		List<BeerPriceResponseDTO> beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-//		assertThat(beerPrices).isNotEmpty();
-//
-//		// when
-//		var putResponse = putRequestAuth("admin", "admin", "/api/store/" + id, request);
-//		assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//		// then
-//		getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-//		jsonBeerPrices = getResponse.getBody();
-//		beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-//		assertThat(beerPrices).isEmpty();
-//	}
-//@ParameterizedTest
-//@CsvSource(value = {
-//		"2, Lidl, null, null",
-//		"4, null, Ilawa, null",
-//		"5, null, null, ul. Nowaka 9"
-//}, nullValues = "null")
-//@DisplayName("PATCH: '/api/store/{store_id}' any change = remove beer price")
-//@DirtiesContext
-//public void updateAnyStoreFieldRemovesAllPricesTest(Long id, String name, String city, String street) {
-//	// given
-//	StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
-//	var getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-//	String jsonBeerPrices = getResponse.getBody();
-//	List<BeerPriceResponseDTO> beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-//	assertThat(beerPrices).isNotEmpty();
-//
-//	// when
-//	var patchResponse = patchRequestAuth("admin", "admin", "/api/store/" + id, request);
-//	assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//	// then
-//	getResponse = getRequestAuth("admin", "admin", "/api/store/" + id + "/beer-price");
-//	jsonBeerPrices = getResponse.getBody();
-//	beerPrices = toModelList(jsonBeerPrices, BeerPriceResponseDTO.class);
-//	assertThat(beerPrices).isEmpty();
-//}
 }
