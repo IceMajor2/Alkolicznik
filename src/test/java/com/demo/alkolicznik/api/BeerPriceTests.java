@@ -1122,6 +1122,7 @@ public class BeerPriceTests {
 	}
 
 	@Nested
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestClassOrder(ClassOrderer.Random.class)
 	class OtherControllerRequests {
 
