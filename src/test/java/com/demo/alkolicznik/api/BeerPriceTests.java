@@ -1031,43 +1031,50 @@ public class BeerPriceTests {
 					"/api/beer-price");
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = {-5238, 0, 9812344})
 		@DisplayName("DELETE: '/api/beer-price' [STORE_NOT_FOUND]")
-		public void deleteBeerPriceStoreNotExistsTest() {
+		public void deleteBeerPriceStoreNotExistsTest(Long storeId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
-					"/api/beer-price", Map.of("store_id", 913L, "beer_id", 3L));
+					"/api/beer-price", Map.of("store_id", storeId, "beer_id", 3L));
 
 			String jsonResponse = deleteResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find store of '913' id",
+					"Unable to find store of '%d' id".formatted(storeId),
 					"/api/beer-price"
 			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = {-95624, 0, 25398})
 		@DisplayName("DELETE: '/api/beer-price' [BEER_NOT_FOUND]")
-		public void deleteBeerPriceBeerNotExistsTest() {
+		public void deleteBeerPriceBeerNotExistsTest(Long beerId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
-					"/api/beer-price", Map.of("store_id", 3L, "beer_id", 433L));
+					"/api/beer-price", Map.of("store_id", 3L, "beer_id", beerId));
 
 			String jsonResponse = deleteResponse.getBody();
 
 			assertIsError(
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
-					"Unable to find beer of '433' id",
+					"Unable to find beer of '%d' id".formatted(beerId),
 					"/api/beer-price"
 			);
 		}
 
-		@Test
+		@ParameterizedTest
+		@CsvSource({
+				"-921743, 3888",
+				"0, -5283",
+				"5238, 0"
+		})
 		@DisplayName("DELETE: '/api/beer-price' [BEER_PRICE_NOT_FOUND]")
-		public void deleteBeerPricePriceNotExistsTest() {
+		public void deleteBeerPricePriceNotExistsTest(Long storeId, Long beerId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
-					"/api/beer-price", Map.of("store_id", 5L, "beer_id", 1L));
+					"/api/beer-price", Map.of("store_id", storeId, "beer_id", beerId));
 
 			String jsonResponse = deleteResponse.getBody();
 
