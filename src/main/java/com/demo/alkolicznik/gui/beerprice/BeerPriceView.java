@@ -1,10 +1,13 @@
 package com.demo.alkolicznik.gui.beerprice;
 
+import java.util.Collections;
+
 import com.demo.alkolicznik.api.services.BeerPriceService;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.*;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
@@ -17,8 +20,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-
-import java.util.Collections;
 
 @Route(value = "beer-price", layout = MainLayout.class)
 @PageTitle("Baza cen | Alkolicznik")
@@ -133,7 +134,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
         try {
             beerPriceService.update(request.getStoreId().longValue(),
                     request.getBeerId().longValue(),
-                    update
+                    null
             );
         } catch (ObjectsAreEqualException e) {
             Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
