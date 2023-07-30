@@ -1113,70 +1113,78 @@ public class BeerPriceTests {
 	}
 
 	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-	@TestMethodOrder(MethodOrderer.Random.class)
+	@TestClassOrder(ClassOrderer.Random.class)
 	class OtherControllerRequests {
 
-		private List<Beer> beers;
+		@Nested
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class BeerRequests {
 
-		@Autowired
-		public OtherControllerRequests(List<Beer> beers) {
-			this.beers = beers;
+			private List<Beer> beers;
+
+			@Autowired
+			public BeerRequests(List<Beer> beers) {
+				this.beers = beers;
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"6, Ksiazece, null, 0.6",
+					"2, Namyslow, Chmielowe, null",
+					"4, null, Ciemnozloty, null"
+			}, nullValues = "null")
+			@DisplayName("PATCH: '/api/beer/{beer_id}' brand/type update removes prices")
+			@DirtiesContext
+			public void updateBeerBrandAndOrTypeRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
+				// given
+				BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
+				var prices = getBeer(beerId.longValue(), beers).getPrices();
+				assertThat(prices).isNotEmpty();
+
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
+				String actualJson = getResponse.getBody();
+				assertThat(actualJson).isEqualTo("[]");
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"2, 0.33",
+					"3, 0.5"
+			})
+			@DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove prices")
+			@DirtiesContext
+			public void updateBeerVolumeDoesNotRemovePricesTest(Long beerId, Double volume) {
+				// given
+				BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
+				List<BeerPriceResponseDTO> prices = getBeer(beerId.longValue(), beers)
+						.getPrices()
+						.stream()
+						.map(BeerPriceResponseDTO::new)
+						.toList();
+				assertThat(prices).isNotEmpty();
+
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
+				String actualJson = getResponse.getBody();
+				List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+				assertThat(actual).hasSameElementsAs(prices);
+			}
 		}
 
-		@ParameterizedTest
-		@CsvSource(value = {
-				"6, Ksiazece, null, 0.6",
-				"2, Namyslow, Chmielowe, null",
-				"4, null, Ciemnozloty, null"
-		}, nullValues = "null")
-		@DisplayName("PATCH: '/api/beer/{beer_id}' brand/type update removes prices")
-		@DirtiesContext
-		public void updateBeerBrandAndOrTypeRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
-			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
-			var prices = getBeer(beerId.longValue(), beers).getPrices();
-			assertThat(prices).isNotEmpty();
-
-			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
-			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-			// then
-			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
-			String actualJson = getResponse.getBody();
-			assertThat(actualJson).isEqualTo("[]");
+		class ImageRequests {
+			// TODO: write analogical tests with images
 		}
 
-		@ParameterizedTest
-		@CsvSource(value = {
-				"2, 0.33",
-				"3, 0.5"
-		})
-		@DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove prices")
-		@DirtiesContext
-		public void updateBeerVolumeDoesNotRemovePricesTest(Long beerId, Double volume) {
-			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
-			List<BeerPriceResponseDTO> prices = getBeer(beerId.longValue(), beers)
-					.getPrices()
-					.stream()
-					.map(BeerPriceResponseDTO::new)
-					.toList();
-			assertThat(prices).isNotEmpty();
-
-			// when
-			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
-			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-			// then
-			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
-			String actualJson = getResponse.getBody();
-			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
-			assertThat(actual).hasSameElementsAs(prices);
-		}
-
-		// TODO: write analogical tests with images
 	}
 
 	private void sortByBeerIdPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
