@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Deprecated(forRemoval = true)
 public class BeerPriceUpdateDTO implements UpdateModel<BeerPrice> {
 
     @Positive(message = "Price must be a positive number")
