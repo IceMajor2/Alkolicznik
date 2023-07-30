@@ -1205,6 +1205,26 @@ public class BeerPriceTests {
 				String actualJson = getResponse.getBody();
 				assertThat(actualJson).isEqualTo("[]");
 			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 1, 4 })
+			@DisplayName("DELETE: '/api/beer/{beer_id}' deleting beer removes prices")
+			@DirtiesContext
+			public void deleteBeerRemovesPricesTest(Long beerId) {
+				assertThat(getBeer(beerId.longValue(), beers).getPrices()).isNotEmpty();
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
+				List<BeerPriceResponseDTO> prices = toModelList
+						(getResponse.getBody(), BeerPriceResponseDTO.class);
+				List<BeerPriceResponseDTO> pricesOfBeer = prices.stream()
+						.filter(price -> price.getBeer().getId().equals(beerId))
+						.toList();
+				assertThat(pricesOfBeer).isEmpty();
+			}
 		}
 
 		class ImageRequests {
