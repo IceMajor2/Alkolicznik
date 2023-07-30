@@ -154,6 +154,9 @@ public class BeerPriceService {
 	}
 
 	public BeerPriceResponseDTO update(Long storeId, Long beerId, Double price) {
+		if(!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
+			throw new EntitiesNotFoundException(beerId, storeId);
+		}
 		Store store = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
 		if (!beerRepository.existsById(beerId)) {
