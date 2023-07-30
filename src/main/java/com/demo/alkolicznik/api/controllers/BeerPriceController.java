@@ -12,12 +12,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -107,15 +107,29 @@ public class BeerPriceController {
 				.body(beerPrice);
 	}
 
+	@PatchMapping(value = "/beer-price", params = { "store_id", "beer_id" })
+	@SecurityRequirement(name = "Basic Authentication")
+	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
+			@RequestParam("beer_id") Long beerId,
+			@RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
+		return null;
+	}
+
+	@PatchMapping(value = "/beer-price", params = { "store_id", "beer_id", "price" })
+	@SecurityRequirement(name = "Basic Authentication")
+	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
+			@RequestParam("beer_id") Long beerId,
+			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
+		return null;
+	}
+
 	@PutMapping("/beer-price")
 	// secured in SecurityConfig
 	@SecurityRequirement(name = "Basic Authentication")
-	public ResponseEntity<BeerPriceResponseDTO> update(@RequestParam("store_id") Long storeId,
+	public BeerPriceResponseDTO replace(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
 			@RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.body(beerPriceService.update(storeId, beerId, updateDTO));
+		return null;
 	}
 
 	@DeleteMapping("/beer-price")
