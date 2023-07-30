@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
@@ -53,7 +52,6 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRe
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
@@ -776,7 +774,7 @@ public class BeerPriceTests {
 		@DirtiesContext
 		public void updateBeerPricePriceTest(Long storeId, Long beerId, Double price) {
 			// given
-			Map<String, ?> params = Map.of
+			var params = Map.of
 					("beer_id", beerId.longValue(),
 							"store_id", storeId.longValue(),
 							"price", price);
@@ -808,57 +806,45 @@ public class BeerPriceTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@Test
-		@DisplayName("PUT: '/api/beer-price' [PRICE_NON_POSITIVE]")
-		public void updateBeerPricePriceNegativeAndZeroTest() {
-			BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(0d);
-			var putResponse = putRequestAuth("admin", "admin",
-					"/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+		@ParameterizedTest
+		@ValueSource(doubles = { -1.2, 0d })
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [PRICE_NON_POSITIVE]")
+		public void updateBeerPricePriceNegativeAndZeroTest(Double price) {
+			// given
+			var params = Map.of(
+					"store_id", 4L,
+					"beer_id", 1L,
+					"price", price
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
 
-			String jsonResponse = putResponse.getBody();
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"Price must be a positive number",
-					"/api/beer-price");
-
-			request = createBeerPriceUpdateRequest(-5.9);
-			putResponse = putRequestAuth("admin", "admin",
-					"/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
-
-			jsonResponse = putResponse.getBody();
+			// then
 			assertIsError(jsonResponse,
 					HttpStatus.BAD_REQUEST,
 					"Price must be a positive number",
 					"/api/beer-price");
 		}
 
-		@Test
-		@DisplayName("PUT: '/api/beer-price' [PROPERTIES_NOT_SPECIFIED]")
-		public void updateBeerPricePriceNullTest() {
-			BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(null);
-			var putResponse = putRequestAuth("admin", "admin",
-					"/api/beer-price", request, Map.of("beer_id", 3L, "store_id", 3L));
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [PRICE_SAME]")
+		public void updateBeerPricePropertiesSameTest(Long storeId, Long beerId, Double price) {
+			// given
+			var params = Map.of(
+					"store_id", storeId,
+					"beer_id", beerId,
+					"price", price
+			);
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer-price", params);
+			String jsonResponse = patchResponse.getBody();
 
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(jsonResponse,
-					HttpStatus.BAD_REQUEST,
-					"No property to update was specified",
-					"/api/beer-price");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer-price' [PROPERTIES_SAME]")
-		public void updateBeerPricePropertiesSameTest() {
-			BeerPriceUpdateDTO request = createBeerPriceUpdateRequest(2.89);
-			var putResponse = putRequestAuth("admin", "admin",
-					"/api/beer-price", request, Map.of("beer_id", 4L, "store_id", 2L));
-
-			String jsonResponse = putResponse.getBody();
-
+			// then
 			assertIsError(jsonResponse,
 					HttpStatus.OK,
-					"Objects are the same: nothing to update",
+					"The price is '%s' already".formatted(price + " PLN"),
 					"/api/beer-price");
 		}
 
