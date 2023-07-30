@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -111,14 +110,6 @@ public class BeerPriceController {
 			@RequestParam("beer_id") Long beerId,
 			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
 		return beerPriceService.update(storeId, beerId, price);
-	}
-
-	@PutMapping("/beer-price")
-	@SecurityRequirement(name = "Basic Authentication")
-	public BeerPriceResponseDTO replace(@RequestParam("store_id") Long storeId,
-			@RequestParam("beer_id") Long beerId,
-			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
-		return null;
 	}
 
 	@DeleteMapping("/beer-price")

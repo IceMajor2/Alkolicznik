@@ -978,22 +978,6 @@ public class BeerPriceTests {
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
-	class PutRequests {
-
-		private List<Beer> beers;
-		private List<Store> stores;
-
-		@Autowired
-		public PutRequests(List<Beer> beers, List<Store> stores) {
-			this.beers = beers;
-			this.stores = stores;
-		}
-
-	}
-
-	@Nested
-	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
 
 		private List<Beer> beers;
