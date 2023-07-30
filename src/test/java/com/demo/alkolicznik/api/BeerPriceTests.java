@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
@@ -38,6 +39,7 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
@@ -51,6 +53,7 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRe
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1178,6 +1181,29 @@ public class BeerPriceTests {
 				String actualJson = getResponse.getBody();
 				List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
 				assertThat(actual).hasSameElementsAs(prices);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"2, Kasztelan, Niepasteryzowane, null",
+					"6, Zywiec, Porter, 0.6"
+			}, nullValues = "null")
+			@DisplayName("PUT: '/api/beer/{beer_id}' replacing beer removes prices")
+			@DirtiesContext
+			public void replaceBeerRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
+				// given
+				BeerRequestDTO request = createBeerRequest(brand, type, volume);
+				var prices = getBeer(beerId.longValue(), beers).getPrices();
+				assertThat(prices).isNotEmpty();
+
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+				// then
+				var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
+				String actualJson = getResponse.getBody();
+				assertThat(actualJson).isEqualTo("[]");
 			}
 		}
 
