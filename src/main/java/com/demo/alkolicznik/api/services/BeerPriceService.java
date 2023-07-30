@@ -12,11 +12,8 @@ import javax.money.MonetaryAmount;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.EntitiesNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
-import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
@@ -155,10 +152,7 @@ public class BeerPriceService {
 		return ModelDtoConverter.beerPriceSetToDtoListKeepOrder(beerPricesInCity);
 	}
 
-	public BeerPriceResponseDTO update(Long storeId, Long beerId, BeerPriceUpdateDTO updateDTO) {
-		if (updateDTO.propertiesMissing()) {
-			throw new PropertiesMissingException();
-		}
+	public BeerPriceResponseDTO update(Long storeId, Long beerId, Double price) {
 		Store store = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
 		if (!beerRepository.existsById(beerId)) {
@@ -166,12 +160,9 @@ public class BeerPriceService {
 		}
 		BeerPrice beerPrice = store.findBeer(beerId).orElseThrow(() ->
 				new BeerPriceNotFoundException());
-		if (!updateDTO.anythingToUpdate(beerPrice)) {
-			throw new ObjectsAreEqualException();
-		}
 
 		MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
-				.setCurrency("PLN").setNumber(updateDTO.getPrice()).create();
+				.setCurrency("PLN").setNumber(price).create();
 		beerPrice.setPrice(updatedPrice);
 
 		storeRepository.save(store);

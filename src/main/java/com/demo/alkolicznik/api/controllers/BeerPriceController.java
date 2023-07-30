@@ -7,7 +7,6 @@ import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -73,7 +72,6 @@ public class BeerPriceController {
 	}
 
 	@PostMapping("/store/{store_id}/beer-price")
-	// secured in SecurityConfig
 	@SecurityRequirement(name = "Basic Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByObject(
 			@PathVariable("store_id") Long storeId,
@@ -107,28 +105,19 @@ public class BeerPriceController {
 				.body(beerPrice);
 	}
 
-	@PatchMapping(value = "/beer-price", params = { "store_id", "beer_id" })
-	@SecurityRequirement(name = "Basic Authentication")
-	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
-			@RequestParam("beer_id") Long beerId,
-			@RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
-		return null;
-	}
-
 	@PatchMapping(value = "/beer-price", params = { "store_id", "beer_id", "price" })
 	@SecurityRequirement(name = "Basic Authentication")
 	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
 			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
-		return null;
+		return beerPriceService.update(storeId, beerId, price);
 	}
 
 	@PutMapping("/beer-price")
-	// secured in SecurityConfig
 	@SecurityRequirement(name = "Basic Authentication")
 	public BeerPriceResponseDTO replace(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
-			@RequestBody @Valid BeerPriceUpdateDTO updateDTO) {
+			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
 		return null;
 	}
 
