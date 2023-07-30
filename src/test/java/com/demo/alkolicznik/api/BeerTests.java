@@ -459,7 +459,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' brand")
+		@DisplayName("PUT: '/api/beer/{beer_id}' brand")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTest() {
 			BeerRequestDTO request = createBeerRequest("Lech", null, null);
@@ -476,7 +476,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' brand & type")
+		@DisplayName("PUT: '/api/beer/{beer_id}' brand & type")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandAndTypeTest() {
 			BeerRequestDTO request = createBeerRequest("Perla", "Biala", null);
@@ -493,7 +493,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' brand, type & volume")
+		@DisplayName("PUT: '/api/beer/{beer_id}' brand, type & volume")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTypeAndVolumeTest() {
 			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33);
@@ -510,7 +510,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' brand, type, volume & image")
+		@DisplayName("PUT: '/api/beer/{beer_id}' brand, type, volume & image")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceWithBrandTypeVolumeAndImageTest() {
 			BeerRequestDTO request = createBeerRequest("Zywiec", "Jasne", 0.33);
@@ -527,7 +527,7 @@ public class BeerTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer' check prices after replacing")
+		@DisplayName("PUT: '/api/beer/{beer_id}' check prices after replacing")
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void replaceBeerWithPrices() {
 			BeerRequestDTO request = createBeerRequest("Manufaktura Piwna", "Piwo na miodzie gryczanym", null);
@@ -555,7 +555,7 @@ public class BeerTests {
 				"7, Guinness, '\n  \t', null"
 		},
 				nullValues = { "null" })
-		@DisplayName("PUT: '/api/beer' [BEERS_EQUAL]")
+		@DisplayName("PUT: '/api/beer/{beer_id}' [BEERS_EQUAL]")
 		public void replaceWithSameValuesTest(Long id, String brand, String type, Double volume) {
 			BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
@@ -575,7 +575,7 @@ public class BeerTests {
 				"Guinness, '\n  \t', null"
 		},
 				nullValues = { "null" })
-		@DisplayName("PUT: '/api/beer' [BEER_EXISTS]")
+		@DisplayName("PUT: '/api/beer/{beer_id}' [BEER_EXISTS]")
 		public void replaceWithAlreadyExistingTest(String brand, String type, Double volume) {
 			BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
@@ -589,7 +589,7 @@ public class BeerTests {
 
 		@ParameterizedTest
 		@ValueSource(longs = { -5, 0, 9999 })
-		@DisplayName("PUT: '/api/beer' [BEER_NOT_FOUND]")
+		@DisplayName("PUT: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
 		public void replaceNonExistingTest(Long id) {
 			BeerRequestDTO request = createBeerRequest("Ksiazece", "Wisniowe", 0.6);
 
@@ -604,7 +604,7 @@ public class BeerTests {
 		@ParameterizedTest
 		@NullSource
 		@ValueSource(strings = { "", " \t" })
-		@DisplayName("PUT: '/api/beer' [BRAND_BLANK]")
+		@DisplayName("PUT: '/api/beer/{beer_id}' [BRAND_BLANK]")
 		public void replaceBrandBlankTest(String brand) {
 			BeerRequestDTO brandBlank = createBeerRequest(brand, "Cerny", null);
 
