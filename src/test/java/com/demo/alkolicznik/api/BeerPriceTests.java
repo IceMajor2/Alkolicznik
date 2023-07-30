@@ -1328,10 +1328,9 @@ public class BeerPriceTests {
 				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				// then
 				var getResponse = getRequestAuth("admin", "admin", "/api/beer-price");
-				System.out.println(getResponse.getBody());
 				List<BeerPriceResponseDTO> prices = toModelList(getResponse.getBody(), BeerPriceResponseDTO.class);
 				List<BeerPriceResponseDTO> pricesOfStore = prices.stream()
-						.filter(price -> price.getBeer().getId().equals(storeId))
+						.filter(price -> price.getStore().getId().equals(storeId))
 						.toList();
 				assertThat(pricesOfStore).isEmpty();
 			}
