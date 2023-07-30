@@ -62,16 +62,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 public class BeerPriceTests {
 
-	@Autowired
-	private List<Store> stores;
-
-	@Autowired
-	private List<Beer> beers;
-
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class GetRequests {
+
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public GetRequests(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
 
 		@ParameterizedTest
 		@CsvSource({
@@ -418,6 +421,15 @@ public class BeerPriceTests {
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequestsParam {
 
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public PostRequestsParam(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
+
 		@ParameterizedTest
 		@CsvSource({
 				"1, 9, 2.99",
@@ -551,6 +563,15 @@ public class BeerPriceTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PostRequestsObject {
+
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public PostRequestsObject(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
 
 		@ParameterizedTest
 		@CsvSource(value = {
@@ -762,6 +783,15 @@ public class BeerPriceTests {
 	@TestMethodOrder(MethodOrderer.Random.class)
 	class PatchRequests {
 
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public PatchRequests(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
+
 		@ParameterizedTest
 		@CsvSource({
 				"4, 6, 5.89",
@@ -948,7 +978,32 @@ public class BeerPriceTests {
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	@TestMethodOrder(MethodOrderer.Random.class)
+	class PutRequests {
+
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public PutRequests(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
+
+	}
+
+	@Nested
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
 	class DeleteRequests {
+
+		private List<Beer> beers;
+		private List<Store> stores;
+
+		@Autowired
+		public DeleteRequests(List<Beer> beers, List<Store> stores) {
+			this.beers = beers;
+			this.stores = stores;
+		}
 
 		@Test
 		@DisplayName("DELETE: '/api/beer-price'")
