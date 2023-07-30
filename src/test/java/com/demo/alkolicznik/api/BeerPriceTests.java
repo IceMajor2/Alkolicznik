@@ -1126,15 +1126,15 @@ public class BeerPriceTests {
 
 		@ParameterizedTest
 		@CsvSource(value = {
-				"6, Ksiazece, null",
-				"2, Namyslow, Chmielowe",
-				"4, null, Ciemnozloty"
+				"6, Ksiazece, null, 0.6",
+				"2, Namyslow, Chmielowe, null",
+				"4, null, Ciemnozloty, null"
 		}, nullValues = "null")
-		@DisplayName("PATCH: '/api/beer/{beer_id}' brand update removes prices")
+		@DisplayName("PATCH: '/api/beer/{beer_id}' brand/type update removes prices")
 		@DirtiesContext
-		public void updateBeerBrandAndOrTypeRemovesPricesTest(Long beerId, String brand, String type) {
+		public void updateBeerBrandAndOrTypeRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
 			var prices = getBeer(beerId.longValue(), beers).getPrices();
 			assertThat(prices).isNotEmpty();
 
@@ -1146,6 +1146,34 @@ public class BeerPriceTests {
 			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
 			String actualJson = getResponse.getBody();
 			assertThat(actualJson).isEqualTo("[]");
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"2, 0.33",
+				"3, 0.5"
+		})
+		@DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove prices")
+		@DirtiesContext
+		public void updateBeerVolumeDoesNotRemovePricesTest(Long beerId, Double volume) {
+			// given
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
+			List<BeerPriceResponseDTO> prices = getBeer(beerId.longValue(), beers)
+					.getPrices()
+					.stream()
+					.map(BeerPriceResponseDTO::new)
+					.toList();
+			assertThat(prices).isNotEmpty();
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			// then
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
+			String actualJson = getResponse.getBody();
+			List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
+			assertThat(actual).hasSameElementsAs(prices);
 		}
 
 		// TODO: write analogical tests with images
