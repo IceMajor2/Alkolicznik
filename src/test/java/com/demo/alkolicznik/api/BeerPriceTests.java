@@ -828,7 +828,11 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@CsvSource
+		@CsvSource({
+				"6, 2, 6.19",
+				"2, 4, 2.89",
+				"2, 9, 2.99"
+		})
 		@DisplayName("PATCH: '/api/beer-price?store_id=?beer_id=?price=' [PRICE_SAME]")
 		public void updateBeerPricePropertiesSameTest(Long storeId, Long beerId, Double price) {
 			// given
