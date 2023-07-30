@@ -1033,7 +1033,7 @@ public class BeerPriceTests {
 
 		@ParameterizedTest
 		@ValueSource(longs = {-5238, 0, 9812344})
-		@DisplayName("DELETE: '/api/beer-price' [STORE_NOT_FOUND]")
+		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [STORE_NOT_FOUND]")
 		public void deleteBeerPriceStoreNotExistsTest(Long storeId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
 					"/api/beer-price", Map.of("store_id", storeId, "beer_id", 3L));
@@ -1050,7 +1050,7 @@ public class BeerPriceTests {
 
 		@ParameterizedTest
 		@ValueSource(longs = {-95624, 0, 25398})
-		@DisplayName("DELETE: '/api/beer-price' [BEER_NOT_FOUND]")
+		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [BEER_NOT_FOUND]")
 		public void deleteBeerPriceBeerNotExistsTest(Long beerId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
 					"/api/beer-price", Map.of("store_id", 3L, "beer_id", beerId));
@@ -1067,11 +1067,12 @@ public class BeerPriceTests {
 
 		@ParameterizedTest
 		@CsvSource({
-				"-921743, 3888",
-				"0, -5283",
-				"5238, 0"
+				"2, 1",
+				"6, 7",
+				"8, 9",
+				"3, 4"
 		})
-		@DisplayName("DELETE: '/api/beer-price' [BEER_PRICE_NOT_FOUND]")
+		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [BEER_PRICE_NOT_FOUND]")
 		public void deleteBeerPricePriceNotExistsTest(Long storeId, Long beerId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
 					"/api/beer-price", Map.of("store_id", storeId, "beer_id", beerId));
@@ -1082,6 +1083,28 @@ public class BeerPriceTests {
 					jsonResponse,
 					HttpStatus.NOT_FOUND,
 					"Store does not currently sell this beer",
+					"/api/beer-price"
+			);
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"-921743, 3888",
+				"0, -5283",
+				"5238, 0"
+		})
+		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [STORE_n_BEER_404]")
+		public void deleteBeerPriceStoreAndBeerNotFoundTest(Long storeId, Long beerId) {
+			var deleteResponse = deleteRequestAuth("admin", "admin",
+					"/api/beer-price", Map.of("store_id", storeId, "beer_id", beerId));
+
+			String jsonResponse = deleteResponse.getBody();
+
+			assertIsError(
+					jsonResponse,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '%d' id; Unable to find store of '%d' id"
+							.formatted(beerId, storeId),
 					"/api/beer-price"
 			);
 		}
