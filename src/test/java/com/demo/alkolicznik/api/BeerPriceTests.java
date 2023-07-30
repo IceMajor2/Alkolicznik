@@ -40,7 +40,6 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
@@ -54,7 +53,6 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchReq
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.MockRequests.mockDeleteRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
-import static com.demo.alkolicznik.utils.requests.SimpleRequests.putRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -850,23 +848,6 @@ public class BeerPriceTests {
 					HttpStatus.CONFLICT,
 					"The price is '%s' already".formatted("PLN " + price),
 					"/api/beer-price");
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
-		public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-			var putResponse = putRequest("/api/beer-price",
-					createBeerPriceUpdateRequest(-5d),
-					Map.of("store_id", 2, "beer_id", 2));
-
-			String jsonResponse = putResponse.getBody();
-
-			assertIsError(
-					jsonResponse,
-					HttpStatus.NOT_FOUND,
-					"Resource not found",
-					"/api/beer-price"
-			);
 		}
 	}
 

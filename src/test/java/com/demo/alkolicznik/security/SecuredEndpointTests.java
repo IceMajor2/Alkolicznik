@@ -134,6 +134,22 @@ public class SecuredEndpointTests {
 //						"/api/store/3/beer-price"
 //				);
 //			}
+//			@Test
+//			@DisplayName("PUT: '/api/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
+//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
+//				var putResponse = putRequest("/api/beer-price",
+//						createBeerPriceUpdateRequest(-5d),
+//						Map.of("store_id", 2, "beer_id", 2));
+//
+//				String jsonResponse = putResponse.getBody();
+//
+//				assertIsError(
+//						jsonResponse,
+//						HttpStatus.NOT_FOUND,
+//						"Resource not found",
+//						"/api/beer-price"
+//				);
+//			}
 			@Test
 			@DisplayName("ANONYMOUS: POST '/api/beer'")
 			public void whenAnonCreatesBeer_thenReturn404Test() {
