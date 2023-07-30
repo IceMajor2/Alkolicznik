@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -38,6 +39,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
@@ -1032,7 +1034,7 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {-5238, 0, 9812344})
+		@ValueSource(longs = { -5238, 0, 9812344 })
 		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [STORE_NOT_FOUND]")
 		public void deleteBeerPriceStoreNotExistsTest(Long storeId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
@@ -1049,7 +1051,7 @@ public class BeerPriceTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {-95624, 0, 25398})
+		@ValueSource(longs = { -95624, 0, 25398 })
 		@DisplayName("DELETE: '/api/beer-price?store_id=?beer_id=' [BEER_NOT_FOUND]")
 		public void deleteBeerPriceBeerNotExistsTest(Long beerId) {
 			var deleteResponse = deleteRequestAuth("admin", "admin",
@@ -1108,6 +1110,45 @@ public class BeerPriceTests {
 					"/api/beer-price"
 			);
 		}
+	}
+
+	@Nested
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	@TestMethodOrder(MethodOrderer.Random.class)
+	class OtherControllerRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public OtherControllerRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"6, Ksiazece, null",
+				"2, Namyslow, Chmielowe",
+				"4, null, Ciemnozloty"
+		}, nullValues = "null")
+		@DisplayName("PATCH: '/api/beer/{beer_id}' brand update removes prices")
+		@DirtiesContext
+		public void updateBeerBrandAndOrTypeRemovesPricesTest(Long beerId, String brand, String type) {
+			// given
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, null);
+			var prices = getBeer(beerId.longValue(), beers).getPrices();
+			assertThat(prices).isNotEmpty();
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			// then
+			var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
+			String actualJson = getResponse.getBody();
+			assertThat(actualJson).isEqualTo("[]");
+		}
+
+		// TODO: write analogical tests with images
 	}
 
 	private void sortByBeerIdPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
