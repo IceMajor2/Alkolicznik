@@ -11,6 +11,8 @@ import lombok.*;
 @Getter
 @Setter
 @JsonPropertyOrder({"beer", "price", "store", "status"})
+@EqualsAndHashCode
+@ToString
 public class BeerPriceDeleteDTO {
 
     private StoreResponseDTO store;
@@ -21,6 +23,6 @@ public class BeerPriceDeleteDTO {
     public BeerPriceDeleteDTO(BeerPrice beerPrice) {
         this.store = new StoreResponseDTO(beerPrice.getStore());
         this.beer = new BeerResponseDTO(beerPrice.getBeer());
-        this.price = beerPrice.getPrice().getNumber() + " " + beerPrice.getPrice().getCurrency().getCurrencyCode();
+		this.price = beerPrice.getPrice().toString();
     }
 }
