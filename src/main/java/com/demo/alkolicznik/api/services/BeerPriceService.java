@@ -14,6 +14,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.EntitiesNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.PriceIsSameException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
@@ -160,7 +161,9 @@ public class BeerPriceService {
 		}
 		BeerPrice beerPrice = store.findBeer(beerId).orElseThrow(() ->
 				new BeerPriceNotFoundException());
-
+		if(beerPrice.getAmountOnly().equals(price)) {
+			throw new PriceIsSameException(beerPrice.getPrice().toString());
+		}
 		MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
 				.setCurrency("PLN").setNumber(price).create();
 		beerPrice.setPrice(updatedPrice);
