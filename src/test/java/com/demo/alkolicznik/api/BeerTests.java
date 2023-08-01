@@ -1002,12 +1002,12 @@ public class BeerTests {
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-	class DeleteRequests {
+	class DeleteRequestsPath {
 
 		private List<Beer> beers;
 
 		@Autowired
-		public DeleteRequests(List<Beer> beers) {
+		public DeleteRequestsPath(List<Beer> beers) {
 			this.beers = beers;
 		}
 
@@ -1090,6 +1090,19 @@ public class BeerTests {
 					"Unable to find beer of '" + id + "' id",
 					"/api/beer/" + id
 			);
+		}
+	}
+
+	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	class DeleteRequestsObject {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public DeleteRequestsObject(List<Beer> beers) {
+			this.beers = beers;
 		}
 
 		@ParameterizedTest
