@@ -797,7 +797,7 @@ public class BeerTests {
 			// then
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			List<BeerPriceResponseDTO> expectedPrices = getBeer(1L, beers).getPrices().stream().map(price -> {
-				price.getBeer().setVolume(0.33);
+				price.getBeer().setVolume(0.6);
 				return new BeerPriceResponseDTO(price);
 			}).toList();
 			assertThat(actualList).hasSameElementsAs(expectedPrices);

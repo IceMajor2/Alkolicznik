@@ -1184,6 +1184,7 @@ public class BeerPriceTests {
 				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 				// then
+				prices.stream().forEach(price -> price.getBeer().setVolume(volume));
 				var getResponse = getRequest("/api/beer/" + beerId + "/beer-price");
 				String actualJson = getResponse.getBody();
 				List<BeerPriceResponseDTO> actual = toModelList(actualJson, BeerPriceResponseDTO.class);
