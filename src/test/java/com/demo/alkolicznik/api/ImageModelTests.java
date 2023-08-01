@@ -433,6 +433,24 @@ public class ImageModelTests {
 					"File was not found (Path: '%s')".formatted(imgPath),
 					"/api/beer/2");
 		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
+		@DisplayName("PATCH: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
+		public void updateBeerImageInvalidProportionsTest(String filename) {
+			// given
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
+			String actualJson = patchResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.BAD_REQUEST,
+					"Image proportions are invalid",
+					"/api/beer/5");
+		}
 	}
 
 	@Nested
