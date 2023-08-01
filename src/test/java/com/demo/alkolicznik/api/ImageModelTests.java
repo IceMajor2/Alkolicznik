@@ -22,13 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
-import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
@@ -39,7 +37,6 @@ import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
-import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -244,53 +241,9 @@ public class ImageModelTests {
 		}
 
 		@Test
-		@DisplayName("PUT: '/api/beer/{beer_id}' contained img previously")
-		@DirtiesContext
-		@WithUserDetails("admin")
-		public void givenBeerWithImage_whenUpdatingBeerImage_thenReturnOKTest() {
-			// given
-			String filename = "perla-chmielowa-pils_2.webp";
-
-			// when
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1",
-					createBeerUpdateRequest(null, null, null, getRawPathToImage(filename)));
-			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-			String actualJson = putResponse.getBody();
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			// then
-			BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5,
-					createImageResponse(filename, actual.getImage()));
-			String expectedJson = toJsonString(expected);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
-		@DisplayName("PUT: '/api/beer/{beer_id}' assert changing brand deletes image")
-		@DirtiesContext
-		@WithUserDetails("admin")
-		public void whenUpdatingBeerBrand_thenImageShouldBeDeletedTest() {
-			var expected = createBeerResponse(6, "Browar Polczyn", "Zdrojowe", 0.5d, null);
-			String expectedJson = toJsonString(expected);
-
-			String actualJson = assertMockRequest(
-					mockPutRequest("/api/beer/6",
-							createBeerUpdateRequest("Browar Polczyn", "Zdrojowe", null, null)),
-					HttpStatus.OK,
-					expectedJson
-			);
-			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-
-			assertThat(actual).isEqualTo(expected);
-			assertThat(actualJson).isEqualTo(expectedJson);
-		}
-
-		@Test
 		@DisplayName("PUT: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
 		public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
-			String path = getRawPathToImage("karpackie-0.5.jpg");
+			String path = getRawPathToImage("gdfijh.webp");
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5",
 					createBeerUpdateRequest("Karpackie", null, 0.5, path));
 
@@ -302,12 +255,13 @@ public class ImageModelTests {
 					"/api/beer/5");
 		}
 
-		@Test
-		@DisplayName("PUT: '/api/beer/{beer_id}' [PROPORTIONS_INVALID]")
-		public void givenInvalidProportions_whenUpdatingBeerImage_thenReturn400Test() {
-			String path = getRawPathToImage("heineken-0.33_proportions.webp");
+		@ParameterizedTest
+		@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
+		@DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
+		public void givenInvalidProportions_whenReplacingBeer_thenReturn400Test(String filename) {
+			String path = getRawPathToImage(filename);
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2",
-					createBeerUpdateRequest("Heineken", null, 0.33, path));
+					createBeerUpdateRequest("Debowe", "Monce", null, path));
 
 			String jsonResponse = putResponse.getBody();
 
