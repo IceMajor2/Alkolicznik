@@ -114,7 +114,7 @@ public class BeerService {
 		Beer beer = checkForPatchConditions(beerId, updateDTO);
 		Beer updated = updateFieldsOnPatch(beer, updateDTO);
 
-		if (beerRepository.exists(updated)) {
+		if (beerRepository.exists(updated) && updateDTO.getImagePath() == null) {
 			throw new BeerAlreadyExistsException();
 		}
 		// deleting prices on conditions
@@ -197,7 +197,9 @@ public class BeerService {
 	}
 
 	private void updateImage(Beer toUpdate, BeerUpdateDTO updateDTO) {
-		imageService.delete(toUpdate);
+		if(toUpdate.getImage().isPresent()) {
+			imageService.delete(toUpdate);
+		}
 		String imagePath = updateDTO.getImagePath();
 		if (imagePath != null) {
 			imageService.add(toUpdate, imagePath);
@@ -212,6 +214,9 @@ public class BeerService {
 			return false;
 		}
 		if (toUpdate.getImage().isPresent()) {
+			return true;
+		}
+		if(updateDTO.getImagePath() != null) {
 			return true;
 		}
 		return false;
