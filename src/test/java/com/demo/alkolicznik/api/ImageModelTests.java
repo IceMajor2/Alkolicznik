@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.ImageModel;
@@ -29,11 +30,13 @@ import org.springframework.test.context.ActiveProfiles;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -220,6 +223,10 @@ public class ImageModelTests {
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 			// then
+			assertThat(actual.getImage().getExternalId())
+					.withFailMessage("The image's external id was null. That means it "
+							+ "probably was not send to the remote server.")
+					.isNotNull();
 			volume = volume == null ? 0.5 : volume;
 			BeerResponseDTO expected = createBeerResponse(replaceId, brand, type, volume,
 					createImageResponse(expectedFilename, actual.getImage()));
@@ -268,6 +275,53 @@ public class ImageModelTests {
 					HttpStatus.BAD_REQUEST,
 					"Image proportions are invalid",
 					"/api/beer/2");
+		}
+	}
+
+	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	class PatchRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public PatchRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"7, 0.5, namyslow.png, guinness-0.5.png",
+				"4, 0.5, kasztelan-niepasteryzowane-0.5.png, zubr-0.5.png",
+				"5, 0.33, zywiec-jasne-0.33.jpg, komes-porter-malinowy-0.33.jpg"
+		})
+		@DisplayName("PATCH: '/api/beer/{beer_id}'")
+		@DirtiesContext
+		public void updateBeerWithImageTest(Long beerId, Double volume,
+				String filename, String expectedFilename) {
+			Beer beer = getBeer(beerId, beers);
+			// given
+			BeerUpdateDTO request = createBeerUpdateRequest
+					(null, null, volume, getRawPathToImage(filename));
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = patchResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			// then
+			assertThat(actual.getImage().getExternalId())
+					.withFailMessage("The image's external id was null. That means it "
+							+ "probably was not send to the remote server.")
+					.isNotNull();
+			beer.setVolume(volume);
+			BeerResponseDTO expected = createBeerResponse(beer,
+					createImageResponse(expectedFilename, actual.getImage()));
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 	}
 
