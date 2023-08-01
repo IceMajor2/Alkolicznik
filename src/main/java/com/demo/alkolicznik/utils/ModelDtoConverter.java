@@ -29,8 +29,18 @@ public class ModelDtoConverter {
 	public static Beer convertToModelNoImage(BeerRequestDTO beerRequestDTO) {
 		Beer beer = new Beer();
 		beer.setBrand(beerRequestDTO.getBrand());
-		beer.setType(beerRequestDTO.getType());
-		beer.setVolume(beerRequestDTO.getVolume());
+		if (beerRequestDTO.getType() != null && beerRequestDTO.getType().isBlank()) {
+			beer.setType(null);
+		}
+		else {
+			beer.setType(beerRequestDTO.getType());
+		}
+		if (beerRequestDTO.getVolume() == null) {
+			beer.setVolume(0.5);
+		}
+		else {
+			beer.setVolume(beerRequestDTO.getVolume());
+		}
 		return beer;
 	}
 

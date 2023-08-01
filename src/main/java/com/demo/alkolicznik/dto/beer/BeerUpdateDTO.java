@@ -6,6 +6,8 @@ import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,85 +18,70 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@JsonPropertyOrder({ "brand", "type", "volume", "image_path" })
 public class BeerUpdateDTO implements UpdateModel<Beer> {
 
-    @NotBlankIfExists(message = "Brand was not specified")
-    private String brand;
+	@NotBlankIfExists(message = "Brand was not specified")
+	private String brand;
 
-    private String type;
-    @Positive(message = "Volume must be a positive number")
-    private Double volume;
+	private String type;
 
-    private String imagePath;
+	@Positive(message = "Volume must be a positive number")
+	private Double volume;
 
-    public BeerUpdateDTO(BeerRequestDTO requestDTO) {
-        this.brand = requestDTO.getBrand();
-        this.type = requestDTO.getType();
-        this.volume = requestDTO.getVolume();
-        this.imagePath = requestDTO.getImagePath();
-    }
+	@JsonProperty("image_path")
+	private String imagePath;
 
-    @Override
-    public boolean propertiesMissing() {
-        return brand == null && type == null && volume == null && imagePath == null;
-    }
+	public BeerUpdateDTO(BeerRequestDTO requestDTO) {
+		this.brand = requestDTO.getBrand();
+		this.type = requestDTO.getType();
+		this.volume = requestDTO.getVolume();
+		this.imagePath = requestDTO.getImagePath();
+	}
 
-    @Override
-    public boolean anythingToUpdate(Beer beer) {
-        // for now: not going to compare external image with the new, requested one
-        if (this.imagePath != null) {
-            return true;
-        }
-        String currBrand = beer.getBrand();
-        String currType = beer.getType();
-        Double currVolume = beer.getVolume();
+	@Override
+	public boolean propertiesMissing() {
+		return brand == null && type == null && volume == null && imagePath == null;
+	}
 
-        String upBrand = this.getBrand();
-        String upType = this.getType();
-        Double upVolume = this.getVolume();
+	@Override
+	public boolean anythingToUpdate(Beer beer) {
+		// for now: not going to compare external image with the new, requested one
+		if (this.imagePath != null) {
+			return true;
+		}
+		String currBrand = beer.getBrand();
+		String currType = beer.getType();
+		Double currVolume = beer.getVolume();
 
-        if (upBrand != null && !Objects.equals(currBrand, upBrand)) {
-            return true;
-        }
-        if (upVolume != null && !Objects.equals(currVolume, upVolume)) {
-            return true;
-        }
+		String upBrand = this.getBrand();
+		String upType = this.getType();
+		Double upVolume = this.getVolume();
+
+		if (upBrand != null && !Objects.equals(currBrand, upBrand)) {
+			return true;
+		}
+		if (upVolume != null && !Objects.equals(currVolume, upVolume)) {
+			return true;
+		}
 		if (upType != null && !Objects.equals(currType, upType)) {
-			if("".equals(upType.trim()) && currType == null) {
+			if ("".equals(upType.trim()) && currType == null) {
 				return false;
 			}
 			return true;
 		}
-        return false;
-    }
+		return false;
+	}
 
-    @JsonIgnore
-    public String getFullName() {
-        if (this.brand == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder(this.brand);
-        if (this.type != null) {
-            sb.append(" ").append(this.type);
-        }
-        return sb.toString();
-    }
-
-//    public Beer convertToModelNoImage() {
-//        Beer beer = new Beer();
-//        if (this.brand == null) {
-//            return null;
-//        }
-//        beer.setBrand(this.brand);
-//        if (this.type != null) {
-//			if("".equals(this.type.trim())) this.type = null;
-//            else beer.setType(this.type);
-//        }
-//        if (this.volume == null) {
-//            beer.setVolume(0.5);
-//            return beer;
-//        }
-//        beer.setVolume(this.volume);
-//        return beer;
-//    }
+	@JsonIgnore
+	public String getFullName() {
+		if (this.brand == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder(this.brand);
+		if (this.type != null) {
+			sb.append(" ").append(this.type);
+		}
+		return sb.toString();
+	}
 }

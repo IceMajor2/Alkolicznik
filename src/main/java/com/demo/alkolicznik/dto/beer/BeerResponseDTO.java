@@ -12,39 +12,43 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@JsonPropertyOrder({"id", "brand", "type", "volume", "image"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
-public class BeerResponseDTO extends BeerMain {
+@JsonPropertyOrder({ "id", "brand", "type", "volume", "image" })
+public class BeerResponseDTO {
 
-    private Long id;
-    private String brand;
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private String type;
-//    private Double volume;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private ImageModelResponseDTO image;
+	private Long id;
 
-    public BeerResponseDTO(Beer beer) {
-        this.id = beer.getId();
-        this.brand = beer.getBrand();
-        super.type = beer.getType();
-		super.volume = beer.getVolume();
-        if(beer.getImage().isPresent()) {
-            this.image = new ImageModelResponseDTO(beer.getImage().get());
-        }
-    }
+	private String brand;
 
-    @JsonIgnore
-    public String getFullName() {
-        StringBuilder sb = new StringBuilder(this.brand);
-        if (this.type != null) {
-            sb.append(" ").append(this.type);
-        }
-        return sb.toString();
-    }
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String type;
+
+	private Double volume;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private ImageModelResponseDTO image;
+
+	public BeerResponseDTO(Beer beer) {
+		this.id = beer.getId();
+		this.brand = beer.getBrand();
+		this.type = beer.getType();
+		this.volume = beer.getVolume();
+		if (beer.getImage().isPresent()) {
+			this.image = new ImageModelResponseDTO(beer.getImage().get());
+		}
+	}
+
+	@JsonIgnore
+	public String getFullName() {
+		StringBuilder sb = new StringBuilder(this.brand);
+		if (this.type != null) {
+			sb.append(" ").append(this.type);
+		}
+		return sb.toString();
+	}
 }
