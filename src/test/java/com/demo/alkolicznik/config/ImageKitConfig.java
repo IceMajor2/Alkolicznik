@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.demo.alkolicznik.utils.TestUtils;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.BadRequestException;
 import io.imagekit.sdk.exceptions.ForbiddenException;
@@ -37,6 +38,8 @@ import static com.demo.alkolicznik.utils.TestUtils.getRawPathToClassPathResource
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ImageKitConfig {
 
+	private TestUtils testUtils;
+
 	private static String imageKitPath;
 
 	private ImageKit imageKit;
@@ -46,6 +49,11 @@ public class ImageKitConfig {
 	private static final List<String> expectedBeerImages = List.of
 			("tyskie-gronie-0.65.png", "zubr-0.5.png",
 					"komes-porter-malinowy-0.33.jpg", "miloslaw-biale-0.5.jpg");
+
+	@Autowired
+	public ImageKitConfig(TestUtils testUtils) {
+		this.testUtils = testUtils;
+	}
 
 	@Autowired
 	public void setImageKitPath(String imageKitPath) {
