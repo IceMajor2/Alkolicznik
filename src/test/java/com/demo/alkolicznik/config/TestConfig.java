@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -130,6 +131,20 @@ public class TestConfig {
 	}
 
 	@Bean("dataSource")
+	@ConditionalOnProperty(prefix = "enable.image", name = "database", havingValue = "true")
+	public DataSource dataSource2() {
+		return
+				(new EmbeddedDatabaseBuilder())
+						.addScript("classpath:data_sql/schema.sql")
+						.addScript("classpath:data_sql/beer-data.sql")
+						.addScript("classpath:data_sql/store-data.sql")
+						.addScript("classpath:data_sql/beer-price-data.sql")
+						.addScript("classpath:data_sql/user-data.sql")
+						.addScript("classpath:data_sql/image-data.sql")
+						.build();
+	}
+
+	@Bean("dataSource")
 	public DataSource dataSource() {
 		return
 				(new EmbeddedDatabaseBuilder())
@@ -138,7 +153,6 @@ public class TestConfig {
 						.addScript("classpath:data_sql/store-data.sql")
 						.addScript("classpath:data_sql/beer-price-data.sql")
 						.addScript("classpath:data_sql/user-data.sql")
-						//	.addScript("classpath:data_sql/image-data.sql")
 						.build();
 	}
 
