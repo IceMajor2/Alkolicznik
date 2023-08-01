@@ -415,6 +415,24 @@ public class ImageModelTests {
 			ImageModelResponseDTO expected = createImageResponse(beer.getImage().get());
 			assertThat(actual).isEqualTo(expected);
 		}
+
+		@Test
+		@DisplayName("PATCH: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
+		public void updateBeerImageFileNotFoundTest() {
+			// given
+			String imgPath = getRawPathToImage("kljhvdfsur.png");
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, imgPath);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/2", request);
+			String actualJson = patchResponse.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"File was not found (Path: '%s')".formatted(imgPath),
+					"/api/beer/2");
+		}
 	}
 
 	@Nested
