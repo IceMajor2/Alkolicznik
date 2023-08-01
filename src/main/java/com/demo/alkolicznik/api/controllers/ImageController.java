@@ -1,8 +1,11 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.ImageService;
+import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,4 +25,10 @@ public class ImageController {
     public ImageModelResponseDTO get(@PathVariable("beer_id") Long beerId) {
         return imageService.getBeerImage(beerId);
     }
+
+	@DeleteMapping("/beer/{beer_id}/image")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	public ImageDeleteDTO delete(@PathVariable("beer_id") Long beerId) {
+		return imageService.delete(beerId);
+	}
 }

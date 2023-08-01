@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
@@ -140,12 +141,18 @@ public class ImageService {
 	 * @throws ImageNotFoundException when passed beer does not have an image assigned
 	 */
 	@SneakyThrows
-	public void delete(Beer beer) {
+	public ImageDeleteDTO delete(Beer beer) {
 		ImageModel beerImage = beer.getImage().orElseThrow(() ->
 				new ImageNotFoundException());
 		imageKit.deleteFile(beerImage.getExternalId());
 		beer.setImage(null);
 		imageRepository.deleteById(beerImage.getId());
+		return new ImageDeleteDTO(beer);
+	}
+
+	public ImageDeleteDTO delete(Long beerId) {
+		return this.delete(beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId)));
 	}
 
 	@SneakyThrows
