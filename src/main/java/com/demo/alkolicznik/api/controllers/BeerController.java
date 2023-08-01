@@ -62,7 +62,9 @@ public class BeerController {
 					+ "<i>/api/beer?city=</i> - lists every beer sold in a city")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "beer list retrieved"),
-			@ApiResponse(responseCode = "404", description = "city not found", content = @Content)
+			@ApiResponse(responseCode = "404", description = "resource not found - dummy response "
+					+ "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
+			@ApiResponse(responseCode = "404 (2)", description = "city not found", content = @Content)
 	})
 	public List<BeerResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
 		return beerService.getBeers(city);
