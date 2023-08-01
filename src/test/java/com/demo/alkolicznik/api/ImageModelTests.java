@@ -153,12 +153,13 @@ public class ImageModelTests {
 			assertThat(actual_2).isEqualTo(expected_2);
 		}
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(strings = {"prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp"})
 		@DisplayName("POST: '/api/beer' [INVALID_PROPORTIONS]")
-		public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test() {
+		public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test(String filename) {
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer",
 					createBeerRequest("Heineken", null, 0.33,
-							getRawPathToImage("heineken-0.33_proportions.webp")));
+							getRawPathToImage(filename)));
 
 			String jsonResponse = postResponse.getBody();
 
@@ -171,7 +172,7 @@ public class ImageModelTests {
 		@Test
 		@DisplayName("POST: '/api/beer' [FILE_NOT_FOUND]")
 		public void givenInvalidPath_whenAddingBeerImage_thenReturn404Test() {
-			String imgPath = getRawPathToImage("lomza-0.5.png");
+			String imgPath = getRawPathToImage("kljhvdfsur.png");
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer",
 					createBeerRequest("Lomza", null, null, imgPath));
 
