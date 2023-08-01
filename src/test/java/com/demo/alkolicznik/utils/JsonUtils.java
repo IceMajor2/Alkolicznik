@@ -89,7 +89,7 @@ public class JsonUtils {
 
 	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(ImageModelTests.BeerImages.IMG_TRANSFORMED_URL + filename);
 		if (actual.getExternalId() != null) {
 			response.setExternalId(actual.getExternalId());
 		}
@@ -98,7 +98,7 @@ public class JsonUtils {
 
 	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(ImageModelTests.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(ImageModelTests.BeerImages.IMG_TRANSFORMED_URL + filename);
 		response.setExternalId(remoteId);
 		return response;
 	}
