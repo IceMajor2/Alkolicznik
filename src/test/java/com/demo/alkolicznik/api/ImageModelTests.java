@@ -502,6 +502,54 @@ public class ImageModelTests {
 				assertThat(actual).isEqualTo(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 1, 2, 7, 8 })
+			@DisplayName("DELETE: '/api/beer/{beer_id}/image' [IMAGE_NOT_FOUND]")
+			public void deleteImageNotFoundTest(Long beerId) {
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId + "/image");
+				String actualJson = deleteResponse.getBody();
+
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this beer",
+						"/api/beer/" + beerId + "/image");
+			}
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class DeleteRequestsBeer {
+
+			private List<Beer> beers;
+
+			@Autowired
+			public DeleteRequestsBeer(List<Beer> beers) {
+				this.beers = beers;
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 6, 4, 5 })
+			@DisplayName("DELETE: '/api/beer/{beer_id}'")
+			@DirtiesContext
+			public void deleteBeerByIdRemovesImageTest(Long beerId) {
+				// given
+				Beer beer = getBeer(beerId.longValue(), beers);
+				assertThat(beer.getImage()).isNotEmpty();
+
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequest("/api/beer/" + beerId + "/image");
+				String actualJson = getResponse.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Unable to find beer of '%d' id".formatted(beerId),
+						"/api/beer/" + beerId + "/image");
+			}
 		}
 	}
 }
