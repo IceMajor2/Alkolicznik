@@ -323,6 +323,32 @@ public class ImageModelTests {
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"3, null, ''",
+				"4, null, Ciemnozloty",
+				"6, Ksiazece, null"
+		}, nullValues = "null")
+		@DisplayName("PATCH: '/api/beer/{beer_id}' brand / type update removes image")
+		@DirtiesContext
+		public void updateBeerBrandOrTypeShouldRemoveImageTest(Long beerId, String brand, String type) {
+			// given
+			BeerUpdateDTO request = createBeerUpdateRequest(brand, type, null);
+			Beer toUpdate = getBeer(beerId.longValue(), beers);
+			assertThat(toUpdate.getImage()).isNotEmpty();
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			var getResponse = getRequest("/api/beer/" + beerId);
+			String actualJson = getResponse.getBody();
+			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
+
+			// then
+			assertThat(actual.getImage()).isNull();
+		}
 	}
 
 	@Nested
