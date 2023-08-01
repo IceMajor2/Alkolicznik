@@ -359,7 +359,7 @@ public class ImageModelTests {
 				"1, namyslow.png",
 				"5, kasztelan-niepasteryzowane-0.5.png",
 				"9, zywiec-jasne-0.33.jpg"
-		}, nullValues = "null")
+		})
 		@DisplayName("PATCH: '/api/beer/{beer_id}' image update does not remove prices")
 		@DirtiesContext
 		public void updateImageShouldNotRemovePricesTest(Long beerId, String filename) {
@@ -389,6 +389,31 @@ public class ImageModelTests {
 					})
 					.collect(Collectors.toList());
 			assertThat(actualPrices).hasSameElementsAs(expectedPrices);
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"3, 0.5",
+				"5, 0.6"
+		})
+		@DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove image")
+		@DirtiesContext
+		public void updateVolumeShouldNotRemoveImageTest(Long beerId, Double volume) {
+			// given
+			Beer beer = getBeer(beerId.longValue(), beers);
+			assertThat(beer.getImage()).isNotEmpty();
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+			var getResponse = getRequest("/api/beer/" + beerId + "/image");
+			ImageModelResponseDTO actual = toModel(getResponse.getBody(), ImageModelResponseDTO.class);
+
+			// then
+			ImageModelResponseDTO expected = createImageResponse(beer.getImage().get());
+			assertThat(actual).isEqualTo(expected);
 		}
 	}
 
