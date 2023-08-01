@@ -9,9 +9,15 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("main")
+@TestClassOrder(ClassOrderer.Random.class)
 public class SecuredEndpointTests {
 
 	@Autowired
@@ -46,9 +53,69 @@ public class SecuredEndpointTests {
 	private List<Store> stores;
 
 	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
 	class BeerController {
 
+		@ParameterizedTest
+		@CsvSource({
+				"/api/beer"
+		})
+		@DisplayName("[ANON]: restricted GET endpoints")
+		public void anonRestrictedGetEndpointsTest(String endpoint) {
+			var response = getRequest(endpoint);
+			String actualJson = response.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					endpoint);
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"/api/beer, Ksiazece, IPA, null",
+				"/api/beer, '', null, -1.0"
+		}, nullValues = "null")
+		@DisplayName("[ANON]: restricted POST endpoints")
+		public void anonRestrictedPostEndpointsTest(String endpoint, String brand,
+				String type, Double volume) {
+			// given
+			System.out.println(type);
+			BeerRequestDTO request = createBeerRequest(brand, type, volume);
+			System.out.println(request);
+			System.out.println(request.getType());
+			// when
+			var response = postRequest(endpoint, request);
+			String actualJson = response.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					endpoint);
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+
+		})
+		@DisplayName("[ANON]: restricted PUT endpoints")
+		public void anonRestrictedPutEndpointsTest(String endpoint, String brand,
+				String type, Double volume) {
+			// given
+			BeerRequestDTO request = createBeerRequest(brand, type, volume);
+
+			// when
+			var response = putRequest(endpoint, request);
+			String actualJson = response.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					endpoint);
+		}
+
 		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
 		class Anonymous {
 
 			@Test
@@ -61,95 +128,6 @@ public class SecuredEndpointTests {
 				assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/beer");
 			}
 
-			//			@Test
-//			@DisplayName("POST: '/api/beer' [INVALID_BODY; UNAUTHORIZED]")
-//			public void givenInvalidRequest_whenUserIsUnauthorized_thenReturn404Test() {
-//				var postResponse = postRequest("/api/beer", createBeerRequest(null, null, null));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"Resource not found",
-//						"/api/beer");
-//			}
-// TODO: Move to 'SecuredEndpointTests'
-//@Test
-//@DisplayName("DELETE: '/api/beer' [INVALID_REQUEST; UNAUTHORIZED]")
-//public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-//	var deleteResponse = deleteRequestAuth("user", "user", "/api/beer",
-//			createBeerRequest(" ", "Porter Malinowy", -1d));
-//
-//	String jsonResponse = deleteResponse.getBody();
-//
-//	assertIsError(
-//			jsonResponse,
-//			HttpStatus.NOT_FOUND,
-//			"Resource not found",
-//			"/api/beer"
-//	);
-//}
-//			@Test
-//			@DisplayName("POST: '/api/store' [INVALID_REQUEST; UNAUTHORIZED]")
-//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-//				var postResponse = postRequestAuth("user", "user", "/api/store",
-//						createStoreRequest(" ", null, ""));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(
-//						jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"Resource not found",
-//						"/api/store"
-//				);
-//			}
-//			@Test
-//			@DisplayName("PATCH: '/api/store/{store_id}' [INVALID_REQUEST; UNAUTHORIZED]")
-//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-//				var postResponse = putRequest("/api/store/3",
-//						createStoreUpdateRequest(" ", null, ""));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(
-//						jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"Resource not found",
-//						"/api/store/3"
-//				);
-//			}
-//			@Test
-//			@DisplayName("POST: '/api/store/{store_id}/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
-//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-//				var postResponse = postRequestAuth("user", "user", "/api/store/3/beer-price",
-//						createBeerPriceRequest("\t", 0d, -5d));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(
-//						jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"Resource not found",
-//						"/api/store/3/beer-price"
-//				);
-//			}
-//			@Test
-//			@DisplayName("PUT: '/api/beer-price' [INVALID_REQUEST; UNAUTHORIZED]")
-//			public void givenInvalidBody_whenUserIsUnauthorized_thenReturn404Test() {
-//				var putResponse = putRequest("/api/beer-price",
-//						createBeerPriceUpdateRequest(-5d),
-//						Map.of("store_id", 2, "beer_id", 2));
-//
-//				String jsonResponse = putResponse.getBody();
-//
-//				assertIsError(
-//						jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"Resource not found",
-//						"/api/beer-price"
-//				);
-//			}
 			@Test
 			@DisplayName("ANONYMOUS: POST '/api/beer'")
 			public void whenAnonCreatesBeer_thenReturn404Test() {
@@ -210,6 +188,7 @@ public class SecuredEndpointTests {
 		}
 
 		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
 		class User {
 
 			@Test
@@ -299,6 +278,7 @@ public class SecuredEndpointTests {
 		}
 
 		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
 		class Accountant {
 
 			@Test
@@ -341,6 +321,7 @@ public class SecuredEndpointTests {
 		}
 
 		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
 		class Admin {
 
 			//        @Test
@@ -362,13 +343,14 @@ public class SecuredEndpointTests {
 	}
 
 	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
 	class StoreController {
 
 		@Nested
 		class Anonymous {
 
 			@Test
-			@DisplayName("ANONYMOUS: GET '/api/store'")
+			@DisplayName("NOT_LOGGED: GET '/api/store'")
 			public void whenAnonGetsStores_thenReturn404Test() {
 				var getResponse = getRequest("/api/store");
 
@@ -377,8 +359,13 @@ public class SecuredEndpointTests {
 				assertIsError(json, HttpStatus.NOT_FOUND, "Resource not found", "/api/store");
 			}
 
-			@Test
-			@DisplayName("ANONYMOUS: PUT '/api/store/{store_id}'")
+			@ParameterizedTest
+			@CsvSource({
+					"admin, admin",
+					"accountant, accountant",
+					"user, user"
+			})
+			@DisplayName("LOGGED: PUT '/api/store/{store_id}'")
 			public void whenAnonUpdatesStore_thenReturn404Test() {
 				StoreUpdateDTO request = createStoreUpdateRequest("Lubi", null, null);
 				var putResponse = putRequestAuth("user", "user", "/api/store/4", request);
@@ -453,6 +440,7 @@ public class SecuredEndpointTests {
 	}
 
 	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
 	class BeerPriceController {
 
 		@Nested
