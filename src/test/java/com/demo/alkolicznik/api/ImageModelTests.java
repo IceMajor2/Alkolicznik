@@ -1,25 +1,30 @@
 package com.demo.alkolicznik.api;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.ImageModel;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertMockRequest;
@@ -37,9 +42,9 @@ import static com.demo.alkolicznik.utils.requests.MockRequests.mockPutRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+		properties = "enable.image.database=true")
 @Import(DisabledVaadinContext.class)
-@AutoConfigureMockMvc
 @ActiveProfiles({ "main", "image" })
 public class ImageModelTests {
 
@@ -48,27 +53,26 @@ public class ImageModelTests {
 	@Autowired
 	private List<Beer> beers;
 
-	public static MockMvc mockMvc;
-
-	@Autowired
-	public void setMockMvc(MockMvc mockMvc) {
-		ImageModelTests.mockMvc = mockMvc;
-	}
-
 	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
-		@Test
+		@ParameterizedTest
+		@ValueSource(longs = { 3, 4, 5, 6 })
 		@DisplayName("GET: '/api/beer/{beer_id}/image'")
-		public void whenGettingBeerImage_thenReturnOKTest() {
-			ImageModelResponseDTO expected = createImageResponse(getBeer(5L, beers).getImage().get());
-			String expectedJson = toJsonString(expected);
+		public void whenGettingBeerImage_thenReturnOKTest(Long beerId) {
+			Optional<ImageModel> img = getBeer(beerId.longValue(), beers).getImage();
+			assertThat(img).isNotEmpty();
 
-			var response = getRequest("/api/beer/5/image");
-
+			// when
+			var response = getRequest("/api/beer/" + beerId + "/image");
 			String actualJson = response.getBody();
 			ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
+			// then
+			ImageModelResponseDTO expected = createImageResponse(img.get());
+			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
 		}
@@ -243,43 +247,6 @@ public class ImageModelTests {
 
 		}
 	}
-
-//	@Test
-//	@DisplayName("PATCH: '/api/beer/{beer_id}' changing image does not remove prices")
-//	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
-//	public void changingImageDoesNotRemovePricesTest() {
-//		// given
-//		String filename = "perla-chmielowa-pils-0.5.webp";
-//		BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
-//		// when
-//		var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/1", request);
-//		assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//		String actualJson = patchResponse.getBody();
-//		BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-//
-//		// then
-//		BeerResponseDTO expected = createBeerResponse(
-//				1L, "Perla", "Chmielowa Pils", 0.5d,
-//				createImageResponse(filename, actual.getImage().getExternalId())
-//		);
-//		String expectedJson = toJsonString(expected);
-//		assertThat(actual).isEqualTo(expected);
-//		assertThat(actualJson).isEqualTo(expectedJson);
-//
-//		// when
-//		var getResponse = getRequest("/api/beer/1/beer-price");
-//		List<BeerPriceResponseDTO> actualList = toModelList(getResponse.getBody(), BeerPriceResponseDTO.class);
-//		// then
-//		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//		List<BeerPriceResponseDTO> expectedPrices = getBeer(1L, beers).getPrices().stream().map(price -> {
-//			BeerPriceResponseDTO responseDTO = new BeerPriceResponseDTO(price);
-//			responseDTO.getBeer().setImage(
-//					createImageResponse(filename, actual.getImage().getExternalId())
-//			);
-//			return responseDTO;
-//		}).toList();
-//		assertThat(actualList).hasSameElementsAs(expectedPrices);
-//	}
 
 	// TODO: Move image-specific tests from other test classes here
 	// TODO: beer delete (both by param and object) must delete, if present,
