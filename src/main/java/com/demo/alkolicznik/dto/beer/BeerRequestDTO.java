@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.dto.beer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class BeerRequestDTO extends BeerMain {
 	@NotBlank(message = "Brand was not specified")
 	private String brand;
 
+	@JsonProperty("image_path")
 	private String imagePath;
 
 	@JsonIgnore
