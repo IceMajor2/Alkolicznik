@@ -9,6 +9,7 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.ImageModel;
@@ -35,12 +36,14 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createImageDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
@@ -463,12 +466,41 @@ public class ImageModelTests {
 		@Nested
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-		class DeleteRequests {
+		class DeleteRequestsImage {
 
-			@Test
+			private List<Beer> beers;
+
+			@Autowired
+			public DeleteRequestsImage(List<Beer> beers) {
+				this.beers = beers;
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 3, 4, 5 })
 			@DisplayName("DELETE: '/api/beer/{beer_id}/image'")
-			public void whenDeletingBeerImage_thenReturnOKTest() {
+			@DirtiesContext
+			public void whenDeletingBeerImage_thenReturnOKTest(Long beerId) {
+				// given
+				Beer beer = getBeer(beerId.longValue(), beers);
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId + "/image");
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				String actualJson = deleteResponse.getBody();
+				ImageDeleteDTO actual = toModel(actualJson, ImageDeleteDTO.class);
 
+				var getResponse = getRequest("/api/beer/" + beerId + "/image");
+				assertIsError(getResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this beer",
+						"/api/beer/" + beerId + "/image");
+
+				// then
+				beer.setImage(null);
+				ImageDeleteDTO expected = createImageDeleteResponse(beer,
+						"Image was deleted successfully!");
+				String expectedJson = toJsonString(expected);
+				assertThat(actual).isEqualTo(expected);
+				assertThat(actualJson).isEqualTo(expectedJson);
 			}
 		}
 	}

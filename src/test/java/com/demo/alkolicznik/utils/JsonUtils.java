@@ -14,6 +14,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
+import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -243,6 +244,13 @@ public class JsonUtils {
 		userResponseDTO.setUsername(username);
 		userResponseDTO.setRoles(Set.of(roles));
 		return userResponseDTO;
+	}
+
+	public static ImageDeleteDTO createImageDeleteResponse(Beer beer, String message) {
+		ImageDeleteDTO deleteDTO = new ImageDeleteDTO();
+		deleteDTO.setBeer(createBeerResponse(beer));
+		deleteDTO.setMessage(message);
+		return deleteDTO;
 	}
 
 	public static <T> List<T> toModelList(String json, Class<T> clazz) {
