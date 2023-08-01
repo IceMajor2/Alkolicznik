@@ -203,27 +203,44 @@ public class ImageModelTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"2, Miloslaw, Pilzner, 0.5, miloslaw-pilzner.png, miloslaw-pilzner-0.5.png",
+				"4, Zywiec, Jasne, 0.33, zywiec-jasne-0.33.jpg, zywiec-jasne-0.33.jpg",
+				"6, Namyslow, null, null, namyslow.png, namyslow-0.5.png"
+		}, nullValues = "null")
 		@DisplayName("PUT: '/api/beer/{beer_id}'")
 		@DirtiesContext
-		public void givenBeerWithNoImage_whenUpdatingBeerImage_thenReturnOKTest() {
+		public void replacingBeerWithBeerWithImageShouldReturnOkTest(Long replaceId, String brand,
+				String type, Double volume, String filename, String expectedFilename) {
 			// given
-			String filename = "perla-chmielowa-pils-0.5.webp";
+			BeerRequestDTO request =
+					createBeerRequest(brand, type, volume, getRawPathToImage(filename));
 
 			// when
-			var putResponse = putRequestAuth("admin", "admin", "/api/beer/1",
-					createBeerUpdateRequest(null, null, null, getRawPathToImage(filename)));
+			var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + replaceId, request);
 			assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 			String actualJson = putResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 			// then
-			BeerResponseDTO expected = createBeerResponse(1L, "Perla", "Chmielowa Pils", 0.5,
-					createImageResponse(filename, actual.getImage()));
+			volume = volume == null ? 0.5 : volume;
+			BeerResponseDTO expected = createBeerResponse(replaceId, brand, type, volume,
+					createImageResponse(expectedFilename, actual.getImage()));
 			String expectedJson = toJsonString(expected);
-
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// when
+			var getResponse = getRequest("/api/beer/" + replaceId + "/image");
+			actualJson = getResponse.getBody();
+			ImageModelResponseDTO actual_2 = toModel(actualJson, ImageModelResponseDTO.class);
+
+			// then
+			ImageModelResponseDTO expected_2 = expected.getImage();
+			expectedJson = toJsonString(expected_2);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual_2).isEqualTo(expected_2);
 		}
 
 		@Test
