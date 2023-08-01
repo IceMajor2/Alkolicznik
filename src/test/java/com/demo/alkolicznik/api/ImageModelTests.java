@@ -142,6 +142,15 @@ public class ImageModelTests {
 			assertThat(actualJson).isEqualTo(expectedJson);
 
 			// when
+			var getResponse = getRequest("/api/beer/" + (beers.size() + 1) + "/image");
+			actualJson = getResponse.getBody();
+			ImageModelResponseDTO actual_2 = toModel(actualJson, ImageModelResponseDTO.class);
+
+			// then
+			ImageModelResponseDTO expected_2 = expected.getImage();
+			expectedJson = toJsonString(expected_2);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual_2).isEqualTo(expected_2);
 		}
 
 		@Test
