@@ -51,13 +51,17 @@ public class ImageModelTests {
 
 	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/";
 
-	@Autowired
-	private List<Beer> beers;
-
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
+
+		private List<Beer> beers;
+
+		@Autowired
+		public GetRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
 
 		@ParameterizedTest
 		@ValueSource(longs = { 3, 4, 5, 6 })
@@ -112,6 +116,13 @@ public class ImageModelTests {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
+		private List<Beer> beers;
+
+		@Autowired
+		public PostRequests(List<Beer> beers) {
+			this.beers = beers;
+		}
+
 		@ParameterizedTest
 		@CsvSource(value = {
 				"Perla, Chmielowa Pils, 0.6, perla-chmielowa-pils_2.webp, perla-chmielowa-pils-0.6.webp",
@@ -156,7 +167,7 @@ public class ImageModelTests {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = {"prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp"})
+		@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
 		@DisplayName("POST: '/api/beer' [INVALID_PROPORTIONS]")
 		public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test(String filename) {
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer",
@@ -195,7 +206,6 @@ public class ImageModelTests {
 		@Test
 		@DisplayName("PUT: '/api/beer/{beer_id}'")
 		@DirtiesContext
-		@WithUserDetails("admin")
 		public void givenBeerWithNoImage_whenUpdatingBeerImage_thenReturnOKTest() {
 			// given
 			String filename = "perla-chmielowa-pils-0.5.webp";
