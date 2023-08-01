@@ -66,8 +66,8 @@ public class ImageModelTests {
 			assertThat(img).isNotEmpty();
 
 			// when
-			var response = getRequest("/api/beer/" + beerId + "/image");
-			String actualJson = response.getBody();
+			var getResponse = getRequest("/api/beer/" + beerId + "/image");
+			String actualJson = getResponse.getBody();
 			ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
 			// then
@@ -75,6 +75,34 @@ public class ImageModelTests {
 			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { -1238, 0, 19824 })
+		@DisplayName("GET: '/api/beer/{beer_id}/image' [BEER_NOT_FOUND]")
+		public void shouldReturnNotFoundOnInvalidBeerIdTest(Long beerId) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/image");
+
+			String actualJson = getResponse.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find beer of '%d' id".formatted(beerId),
+					"/api/beer/" + beerId + "/image");
+		}
+
+		@ParameterizedTest
+		@ValueSource(longs = { 1, 2, 7 })
+		@DisplayName("GET: '/api/beer/{beer_id}/image' [NO_IMAGE]")
+		public void shouldReturnNotFoundOnBeerWithNoImageTest(Long beerId) {
+			var getResponse = getRequest("/api/beer/" + beerId + "/image");
+
+			String actualJson = getResponse.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find image for this beer",
+					"/api/beer/" + beerId + "/image");
 		}
 	}
 
