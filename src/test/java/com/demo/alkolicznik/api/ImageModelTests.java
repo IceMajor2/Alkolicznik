@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,28 +110,38 @@ public class ImageModelTests {
 	@Nested
 	class PostRequests {
 
-		@Test
+		@ParameterizedTest
+		@CsvSource(value = {
+				"Perla, Chmielowa Pils, 0.6, perla-chmielowa-pils_2.webp, perla-chmielowa-pils-0.6.webp",
+				"Zywiec, Jasne, 0.33, zywiec-jasne-0.33.jpg, zywiec-jasne-0.33.jpg",
+				"Namyslow, null, null, namyslow.png, namyslow-0.5.png"
+		}, nullValues = "null")
 		@DisplayName("POST: '/api/beer'")
 		@DirtiesContext
-		@WithUserDetails("admin")
-		public void whenAddingBeerWithImage_thenReturnOKTest() {
+		public void whenAddingBeerWithImage_thenReturnOKTest(String brand, String type,
+				Double volume, String filename, String expectedFilename) {
 			// given
-			String filename = "kasztelan-niepasteryzowane-0.5.png";
-			BeerRequestDTO request = createBeerRequest("Kasztelan", "Niepasteryzowane", null, getRawPathToImage(filename));
+			BeerRequestDTO request = createBeerRequest(brand, type, volume, getRawPathToImage(filename));
 
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
-			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 			String actualJson = postResponse.getBody();
 			BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 			// then
-			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, "Kasztelan", "Niepasteryzowane", 0.5d,
-					createImageResponse(filename, actual.getImage()));
+			assertThat(actual.getImage().getExternalId())
+					.withFailMessage("The image's external id was null. That means it "
+							+ "probably was not send to the remote server.")
+					.isNotNull();
+			volume = volume == null ? 0.5 : volume;
+			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, brand, type,
+					volume, createImageResponse(expectedFilename, actual.getImage()));
 			String expectedJson = toJsonString(expected);
-
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
+
+			// when
 		}
 
 		@Test
@@ -275,8 +286,4 @@ public class ImageModelTests {
 
 		}
 	}
-
-	// TODO: Move image-specific tests from other test classes here
-	// TODO: beer delete (both by param and object) must delete, if present,
-	//		 the previously associated image with it
 }
