@@ -29,7 +29,6 @@ import org.springframework.test.context.ActiveProfiles;
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
@@ -245,7 +244,7 @@ public class ImageModelTests {
 		public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
 			String path = getRawPathToImage("gdfijh.webp");
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5",
-					createBeerUpdateRequest("Karpackie", null, 0.5, path));
+					createBeerRequest("Karpackie", null, 0.5, path));
 
 			String jsonResponse = putResponse.getBody();
 
@@ -261,7 +260,7 @@ public class ImageModelTests {
 		public void givenInvalidProportions_whenReplacingBeer_thenReturn400Test(String filename) {
 			String path = getRawPathToImage(filename);
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2",
-					createBeerUpdateRequest("Debowe", "Monce", null, path));
+					createBeerRequest("Debowe", "Mocne", null, path));
 
 			String jsonResponse = putResponse.getBody();
 
