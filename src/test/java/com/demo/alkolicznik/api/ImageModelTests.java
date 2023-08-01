@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -33,6 +34,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
@@ -531,7 +533,7 @@ public class ImageModelTests {
 
 			@ParameterizedTest
 			@ValueSource(longs = { 6, 4, 5 })
-			@DisplayName("DELETE: '/api/beer/{beer_id}'")
+			@DisplayName("DELETE: '/api/beer/{beer_id}' by id")
 			@DirtiesContext
 			public void deleteBeerByIdRemovesImageTest(Long beerId) {
 				// given
@@ -540,6 +542,33 @@ public class ImageModelTests {
 
 				// when
 				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequest("/api/beer/" + beerId + "/image");
+				String actualJson = getResponse.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Unable to find beer of '%d' id".formatted(beerId),
+						"/api/beer/" + beerId + "/image");
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"3, Tyskie, Gronie, 0.65",
+					"4, Zubr, null, null",
+					"6, Miloslaw, Biale, null"
+			}, nullValues = "null")
+			@DisplayName("DELETE: '/api/beer/{beer_id}' by object")
+			@DirtiesContext
+			public void deleteBeerByObjectRemovesImageTest(Long beerId, String brand, String type, Double volume) {
+				// given
+				Beer beer = getBeer(beerId.longValue(), beers);
+				assertThat(beer.getImage()).isNotEmpty();
+				BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				var getResponse = getRequest("/api/beer/" + beerId + "/image");
 				String actualJson = getResponse.getBody();
