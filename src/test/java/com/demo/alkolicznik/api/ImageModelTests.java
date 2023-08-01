@@ -2,11 +2,13 @@ package com.demo.alkolicznik.api;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.ImageModel;
@@ -34,8 +36,10 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
@@ -348,6 +352,43 @@ public class ImageModelTests {
 
 			// then
 			assertThat(actual.getImage()).isNull();
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"1, namyslow.png",
+				"5, kasztelan-niepasteryzowane-0.5.png",
+				"9, zywiec-jasne-0.33.jpg"
+		}, nullValues = "null")
+		@DisplayName("PATCH: '/api/beer/{beer_id}' image update does not remove prices")
+		@DirtiesContext
+		public void updateImageShouldNotRemovePricesTest(Long beerId, String filename) {
+			// given
+			Beer beer = getBeer(beerId.longValue(), beers);
+			var prices = beer.getPrices();
+			assertThat(prices).isNotEmpty();
+			BeerUpdateDTO request =
+					createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
+
+			// when
+			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			ImageModelResponseDTO actualImg = toModel(patchResponse.getBody(), BeerResponseDTO.class).getImage();
+
+			var getResponse = getRequestAuth("admin", "admin", "/api/beer/" + beerId + "/beer-price");
+			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+			String actualJson = getResponse.getBody();
+			List<BeerPriceResponseDTO> actualPrices = toModelList(actualJson, BeerPriceResponseDTO.class);
+
+			// then
+			List<BeerPriceResponseDTO> expectedPrices = prices.stream()
+					.map(price -> {
+						BeerPriceResponseDTO dto = new BeerPriceResponseDTO(price);
+						dto.getBeer().setImage(actualImg);
+						return dto;
+					})
+					.collect(Collectors.toList());
+			assertThat(actualPrices).hasSameElementsAs(expectedPrices);
 		}
 	}
 
