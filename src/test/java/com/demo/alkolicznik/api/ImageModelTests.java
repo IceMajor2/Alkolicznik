@@ -108,6 +108,8 @@ public class ImageModelTests {
 	}
 
 	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PostRequests {
 
 		@ParameterizedTest
@@ -186,6 +188,8 @@ public class ImageModelTests {
 	}
 
 	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class PutRequests {
 
 		@Test
@@ -288,6 +292,8 @@ public class ImageModelTests {
 	}
 
 	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class DeleteRequests {
 
 		@Test
