@@ -94,7 +94,7 @@ public class SecuredEndpointTests {
 			public void anonRestrictedPutEndpointsTest(Long beerId, String brand,
 					String type, Double volume) {
 				// given
-				String endpoint = "/api/beer" + beerId;
+				String endpoint = "/api/beer/" + beerId;
 				BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
 				// when
@@ -117,7 +117,7 @@ public class SecuredEndpointTests {
 			public void anonRestrictedPatchRequestsTest(Long beerId, String brand,
 					String type, Double volume) {
 				// given
-				String endpoint = "/api/beer" + beerId;
+				String endpoint = "/api/beer/" + beerId;
 				BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
 
 				// when
@@ -156,10 +156,10 @@ public class SecuredEndpointTests {
 			}
 
 			@ParameterizedTest
-			@ValueSource(longs = {3, -5})
+			@ValueSource(longs = { 3, -5 })
 			@DisplayName("[ANON]: restricted DELETE by id requests")
 			public void anonRestrictedDeleteByIdRequestsTest(Long beerId) {
-				String endpoint = "/api/beer" + beerId;
+				String endpoint = "/api/beer/" + beerId;
 				// when
 				var response = deleteRequest(endpoint);
 				String actualJson = response.getBody();
@@ -176,17 +176,12 @@ public class SecuredEndpointTests {
 		@TestMethodOrder(MethodOrderer.Random.class)
 		class Unauthorized {
 
-			private String username = "user";
-
-			private String password = "user";
-
-			@ParameterizedTest
-			@CsvSource({
-					"/api/beer"
-			})
+			@ValueSource(strings = "user")
 			@DisplayName("[UNAUTHORIZED]: restricted GET endpoints")
-			public void unauthorizedRestrictedEndpointsTest(String endpoint) {
-				var response = getRequestAuth(username, password, endpoint);
+			public void unauthorizedRestrictedEndpointsTest(String credentials) {
+				String endpoint = "/api/beer";
+				// password is same as username
+				var response = getRequestAuth(credentials, credentials, endpoint);
 				String actualJson = response.getBody();
 
 				// then
@@ -198,16 +193,17 @@ public class SecuredEndpointTests {
 
 			@ParameterizedTest
 			@CsvSource(value = {
-					"/api/beer, Ksiazece, IPA, null",
-					"/api/beer, '', null, -1.0"
+					"user, Ksiazece, IPA, null",
+					"user, '', null, -1.0"
 			}, nullValues = "null")
 			@DisplayName("[UNAUTHORIZED]: restricted POST endpoints")
-			public void unauthorizedRestrictedPostEndpointsTest(String endpoint, String brand,
-					String type, Double volume) {
+			public void unauthorizedRestrictedPostEndpointsTest(String credentials, String brand, String type,
+					Double volume) {
 				// given
+				String endpoint = "/api/beer";
 				BeerRequestDTO request = createBeerRequest(brand, type, volume);
 				// when
-				var response = postRequestAuth(username, password, endpoint, request);
+				var response = postRequestAuth(credentials, credentials, endpoint, request);
 				String actualJson = response.getBody();
 
 				// then
@@ -219,18 +215,19 @@ public class SecuredEndpointTests {
 
 			@ParameterizedTest
 			@CsvSource(value = {
-					"/api/beer/4, Manufaktura Piwna, Piwo na miodzie gryczanym, null",
-					"/api/beer/9218, null, IPA, 0",
-					"/api/beer/3, null, null, null"
+					"user, 3, Manufaktura Piwna, Piwo na miodzie gryczanym, null",
+					"user, -12564, null, IPA, 0",
+					"user, 1, null, null, null"
 			}, nullValues = "null")
 			@DisplayName("[UNAUTHORIZED]: restricted PUT endpoints")
-			public void unauthorizedRestrictedPutEndpointsTest(String endpoint, String brand,
-					String type, Double volume) {
+			public void unauthorizedRestrictedPutEndpointsTest(String credentials, Long beerId,
+					String brand, String type, Double volume) {
 				// given
+				String endpoint = "/api/beer/" + beerId;
 				BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
 				// when
-				var response = putRequestAuth(username, password, endpoint, request);
+				var response = putRequestAuth(credentials, credentials, endpoint, request);
 				String actualJson = response.getBody();
 
 				// then
@@ -242,18 +239,19 @@ public class SecuredEndpointTests {
 
 			@ParameterizedTest
 			@CsvSource(value = {
-					"/api/beer/2, Miloslaw, null, 0.33",
-					"/api/beer/-5, Namyslow, null, -0.5",
-					"/api/beer/3, null, null, null"
+					"user, 2, Miloslaw, null, 0.33",
+					"user, -5, Namyslow, null, -0.5",
+					"user, 3, null, null, null"
 			}, nullValues = "null")
 			@DisplayName("[UNAUTHORIZED]: restricted PATCH requests")
-			public void unauthorizedRestrictedPatchRequestsTest(String endpoint, String brand,
-					String type, Double volume) {
+			public void unauthorizedRestrictedPatchRequestsTest(String credentials, Long beerId,
+					String brand, String type, Double volume) {
 				// given
+				String endpoint = "/api/beer/" + beerId;
 				BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
 
 				// when
-				var response = patchRequestAuth(username, password, endpoint, request);
+				var response = patchRequestAuth(credentials, credentials, endpoint, request);
 				String actualJson = response.getBody();
 
 				// then
@@ -265,18 +263,19 @@ public class SecuredEndpointTests {
 
 			@ParameterizedTest
 			@CsvSource(value = {
-					"/api/beer, Ksiazece, Zlote pszeniczne, null",
-					"/api/beer, null, Biale, 0",
-					"/api/beer, null, null, null"
+					"user, Ksiazece, Zlote pszeniczne, null",
+					"user, null, Biale, 0",
+					"user, null, null, null"
 			}, nullValues = "null")
 			@DisplayName("[UNAUTHORIZED]: restricted DELETE by object requests")
-			public void unauthorizedRestrictedDeleteByObjectRequestsTest(String endpoint, String brand,
+			public void unauthorizedRestrictedDeleteByObjectRequestsTest(String credentials, String brand,
 					String type, Double volume) {
 				// given
+				String endpoint = "/api/beer";
 				BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
 
 				// when
-				var response = deleteRequestAuth(username, password, endpoint, request);
+				var response = deleteRequestAuth(credentials, credentials, endpoint, request);
 				String actualJson = response.getBody();
 
 				// then
@@ -288,13 +287,14 @@ public class SecuredEndpointTests {
 
 			@ParameterizedTest
 			@CsvSource(value = {
-					"/api/beer/1",
-					"/api/beer/-5"
+					"user, 1",
+					"user, -5"
 			})
 			@DisplayName("[UNAUTHORIZED]: restricted DELETE by id requests")
-			public void unauthorizedRestrictedDeleteByIdRequestsTest(String endpoint) {
+			public void unauthorizedRestrictedDeleteByIdRequestsTest(String credentials, Long beerId) {
 				// when
-				var response = deleteRequestAuth(username, password, endpoint);
+				String endpoint = "/api/beer/" + beerId;
+				var response = deleteRequestAuth(credentials, credentials, endpoint);
 				String actualJson = response.getBody();
 
 				// then
@@ -321,10 +321,7 @@ public class SecuredEndpointTests {
 			})
 			@DisplayName("[AUTHORIZED]: restricted GET endpoints")
 			public void authorizedRestrictedEndpointsTest(String endpoint) {
-				for(var entry : credentials.entrySet()) {
 
-				}
-				var response = getRequestAuth()
 			}
 		}
 	}
