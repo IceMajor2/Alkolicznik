@@ -163,5 +163,17 @@ public class SecuredEndpointTests {
 						endpoint);
 			}
 		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Unauthorized {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Authorized {
+
+		}
 	}
 }
