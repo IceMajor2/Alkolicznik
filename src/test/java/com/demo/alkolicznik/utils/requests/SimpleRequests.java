@@ -1,13 +1,13 @@
 package com.demo.alkolicznik.utils.requests;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 import static com.demo.alkolicznik.utils.TestUtils.buildURI;
 
@@ -48,6 +48,11 @@ public class SimpleRequests {
         String urlTemplate = buildURI(url, parameters);
         return putRequest(urlTemplate, request);
     }
+
+	public static ResponseEntity<String> patchRequest(String url, Object request) {
+		return restTemplate
+				.exchange(url, HttpMethod.PATCH, new HttpEntity<>(request), String.class);
+	}
 
     public static ResponseEntity<String> deleteRequest(String url) {
         return restTemplate
