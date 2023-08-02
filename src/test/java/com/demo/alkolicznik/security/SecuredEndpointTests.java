@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.security;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
+import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import org.junit.jupiter.api.ClassOrderer;
@@ -16,8 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.deleteRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
@@ -95,8 +98,7 @@ public class SecuredEndpointTests {
 				"/api/beer/2, Miloslaw, null, 0.33",
 				"/api/beer/-5, Namyslow, null, -0.5",
 				"/api/beer/3, null, null, null"
-		}, nullValues = "null"
-		)
+		}, nullValues = "null")
 		@DisplayName("[ANON]: restricted PATCH requests")
 		public void anonRestrictedPatchRequestsTest(String endpoint, String brand,
 				String type, Double volume) {
@@ -105,6 +107,47 @@ public class SecuredEndpointTests {
 
 			// when
 			var response = patchRequest(endpoint, request);
+			String actualJson = response.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					endpoint);
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"/api/beer, Ksiazece, Zlote pszeniczne, null",
+				"/api/beer, null, Biale, 0",
+				"/api/beer, null, null, null"
+		}, nullValues = "null")
+		@DisplayName("[ANON]: restricted DELETE by object requests")
+		public void anonRestrictedDeleteByObjectRequestsTest(String endpoint, String brand,
+				String type, Double volume) {
+			// given
+			BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+
+			// when
+			var response = deleteRequest(endpoint, request);
+			String actualJson = response.getBody();
+
+			// then
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Resource not found",
+					endpoint);
+		}
+
+		@ParameterizedTest
+		@CsvSource(value = {
+				"/api/beer/1",
+				"/api/beer/-5"
+		})
+		@DisplayName("[ANON]: restricted DELETE by id requests")
+		public void anonRestrictedDeleteByIdRequestsTest(String endpoint) {
+			// when
+			var response = deleteRequest(endpoint);
 			String actualJson = response.getBody();
 
 			// then
