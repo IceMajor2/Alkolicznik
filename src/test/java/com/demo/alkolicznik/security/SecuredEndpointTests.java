@@ -22,6 +22,11 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.deleteRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
@@ -168,6 +173,133 @@ public class SecuredEndpointTests {
 		@TestMethodOrder(MethodOrderer.Random.class)
 		class Unauthorized {
 
+			private String username = "user";
+
+			private String password = "user";
+
+			@ParameterizedTest
+			@CsvSource({
+					"/api/beer"
+			})
+			@DisplayName("[UNAUTHORIZED]: restricted GET endpoints")
+			public void unauthorizedRestrictedEndpointsTest(String endpoint) {
+				var response = getRequestAuth(username, password, endpoint);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"/api/beer, Ksiazece, IPA, null",
+					"/api/beer, '', null, -1.0"
+			}, nullValues = "null")
+			@DisplayName("[UNAUTHORIZED]: restricted POST endpoints")
+			public void unauthorizedRestrictedPostEndpointsTest(String endpoint, String brand,
+					String type, Double volume) {
+				// given
+				BeerRequestDTO request = createBeerRequest(brand, type, volume);
+				// when
+				var response = postRequestAuth(username, password, endpoint, request);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"/api/beer/4, Manufaktura Piwna, Piwo na miodzie gryczanym, null",
+					"/api/beer/9218, null, IPA, 0",
+					"/api/beer/3, null, null, null"
+			}, nullValues = "null")
+			@DisplayName("[UNAUTHORIZED]: restricted PUT endpoints")
+			public void unauthorizedRestrictedPutEndpointsTest(String endpoint, String brand,
+					String type, Double volume) {
+				// given
+				BeerRequestDTO request = createBeerRequest(brand, type, volume);
+
+				// when
+				var response = putRequestAuth(username, password, endpoint, request);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"/api/beer/2, Miloslaw, null, 0.33",
+					"/api/beer/-5, Namyslow, null, -0.5",
+					"/api/beer/3, null, null, null"
+			}, nullValues = "null")
+			@DisplayName("[UNAUTHORIZED]: restricted PATCH requests")
+			public void unauthorizedRestrictedPatchRequestsTest(String endpoint, String brand,
+					String type, Double volume) {
+				// given
+				BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
+
+				// when
+				var response = patchRequestAuth(username, password, endpoint, request);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"/api/beer, Ksiazece, Zlote pszeniczne, null",
+					"/api/beer, null, Biale, 0",
+					"/api/beer, null, null, null"
+			}, nullValues = "null")
+			@DisplayName("[UNAUTHORIZED]: restricted DELETE by object requests")
+			public void unauthorizedRestrictedDeleteByObjectRequestsTest(String endpoint, String brand,
+					String type, Double volume) {
+				// given
+				BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+
+				// when
+				var response = deleteRequestAuth(username, password, endpoint, request);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"/api/beer/1",
+					"/api/beer/-5"
+			})
+			@DisplayName("[UNAUTHORIZED]: restricted DELETE by id requests")
+			public void unauthorizedRestrictedDeleteByIdRequestsTest(String endpoint) {
+				// when
+				var response = deleteRequestAuth(username, password, endpoint);
+				String actualJson = response.getBody();
+
+				// then
+				assertIsError(actualJson,
+						HttpStatus.NOT_FOUND,
+						"Resource not found",
+						endpoint);
+			}
 		}
 
 		@Nested
