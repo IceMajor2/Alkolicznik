@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.CascadeType;
@@ -17,6 +18,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -40,8 +43,10 @@ public class Store {
 	private String city;
 
 	private String street;
-//
-//	private BeerImage image;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "store_name")
+	private StoreImage image;
 
 	@OneToMany(mappedBy = "store",
 			cascade = { CascadeType.ALL, CascadeType.MERGE },
