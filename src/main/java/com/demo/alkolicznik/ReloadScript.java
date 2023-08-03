@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import com.demo.alkolicznik.api.services.ImageService;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.repositories.ImageKitRepository;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -30,87 +31,95 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnProperty(
-        prefix = "command.line.runner",
-        value = "enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+		prefix = "command.line.runner",
+		value = "enabled",
+		havingValue = "true",
+		matchIfMissing = true)
 public class ReloadScript implements CommandLineRunner {
 
-    public static void main(String[] args) {
-        turnOn = true;
-        SpringApplication.run(AlkolicznikApplication.class, args).close();
-    }
+	public static void main(String[] args) {
+		turnOn = true;
+		SpringApplication.run(AlkolicznikApplication.class, args).close();
+	}
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReloadScript.class);
-    private static boolean turnOn = false;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReloadScript.class);
 
-    private ImageService imageService;
+	private static boolean turnOn = false;
 
-    public ReloadScript(ImageService imageService) {
-        this.imageService = imageService;
-    }
+	private ImageKitRepository imageKitRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        if (turnOn) {
-            LOGGER.info("Reloading ImageKit directory");
-            bulkDeleteRemoteImages();
-            bulkSendImagesToRemote();
-            LOGGER.info("Successfully reloaded ImageKit directory");
-            updateDatabaseTableWithRemoteIds();
-        }
-    }
+	private ImageService imageService;
 
-    @Bean
-    @ConditionalOnClass(ReloadScript.class)
-    public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
-        if (turnOn) {
-            ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-            resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
-            resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
-            resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
+	private String imageKitPath;
 
-            DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-            dataSourceInitializer.setDataSource(dataSource);
-            dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-            return dataSourceInitializer;
-        }
-        return null;
-    }
+	public ReloadScript(ImageKitRepository imageKitRepository, ImageService imageService, String imageKitPath) {
+		this.imageKitRepository = imageKitRepository;
+		this.imageService = imageService;
+		this.imageKitPath = imageKitPath;
+	}
 
-    private void bulkDeleteRemoteImages() {
-        LOGGER.info("Deleting ImageKit images");
-        imageService.deleteAllExternal("/beer");
-        LOGGER.info("Success!");
-    }
+	@Override
+	public void run(String... args) throws Exception {
+		if (turnOn) {
+			LOGGER.info("Reloading ImageKit directory");
+			bulkDeleteRemoteImages();
+			bulkSendImagesToRemote();
+			LOGGER.info("Successfully reloaded ImageKit directory");
+			updateDatabaseTableWithRemoteIds();
+		}
+	}
 
-    @SneakyThrows
-    private void bulkSendImagesToRemote() {
-        LOGGER.info("Sending all files in '/images' directory into remote's '/beer'");
-        File[] imageDirectory = new File(new ClassPathResource("/images/beer").getURI().getRawPath()).listFiles();
-        for (File image : imageDirectory) {
-            imageService.upload(image.getAbsolutePath(), image.getName());
-        }
-        LOGGER.info("Success!");
-    }
+	@Bean
+	@ConditionalOnClass(ReloadScript.class)
+	public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
+		if (turnOn) {
+			ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+			resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
+			resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
+			resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
 
-    private void updateDatabaseTableWithRemoteIds() {
-        LOGGER.info("Fetching beer images' external ids");
+			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+			dataSourceInitializer.setDataSource(dataSource);
+			dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+			return dataSourceInitializer;
+		}
+		return null;
+	}
 
-        List<BaseFile> externalFiles = imageService.getExternalFiles("/beer");
-        Map<BaseFile, String> externalFilesWithMappedURLs = imageService.mapExternalFilesURL(externalFiles);
+	private void bulkDeleteRemoteImages() {
+		LOGGER.info("Deleting ImageKit images");
+		imageKitRepository.deleteAllIn(imageKitPath);
+		LOGGER.info("Success!");
+	}
 
-        for (var entry : externalFilesWithMappedURLs.entrySet()) {
-            BaseFile keyBaseFile = entry.getKey();
-            String mappedURL = entry.getValue();
+	@SneakyThrows
+	private void bulkSendImagesToRemote() {
+		LOGGER.info("Sending all files in '/images' directory into remote's '/beer'");
+		File[] imageDirectory = new File(new ClassPathResource("/images/beer").getURI().getRawPath()).listFiles();
+		for (File image : imageDirectory) {
+			imageKitRepository.save(image.getAbsolutePath(), imageKitPath, image.getName());
+		}
+		LOGGER.info("Success!");
+	}
 
-            String externalId = keyBaseFile.getFileId();
-            BeerImage modelToUpdate = imageService.findByUrl(mappedURL);
+	private void updateDatabaseTableWithRemoteIds() {
+		LOGGER.info("Fetching beer images' external ids");
 
-            if (modelToUpdate.getRemoteId() == null) {
-                imageService.updateExternalId(modelToUpdate, externalId);
-            }
-        }
-        LOGGER.info("Remote IDs were successfully saved in the database");
-    }
+		List<BaseFile> externalFiles = imageKitRepository.findAllIn(imageKitPath);
+		Map<BaseFile, String> externalFilesWithMappedURLs = imageKitRepository
+				.bulkRemoteUrlMappings(externalFiles);
+
+		for (var entry : externalFilesWithMappedURLs.entrySet()) {
+			BaseFile keyBaseFile = entry.getKey();
+			String mappedURL = entry.getValue();
+
+			String externalId = keyBaseFile.getFileId();
+			BeerImage modelToUpdate = imageService.findByUrl(mappedURL);
+
+			if (modelToUpdate.getRemoteId() == null) {
+				imageService.updateRemoteIdCrudRepository(modelToUpdate, externalId);
+			}
+		}
+		LOGGER.info("Remote IDs were successfully saved in the database");
+	}
 }

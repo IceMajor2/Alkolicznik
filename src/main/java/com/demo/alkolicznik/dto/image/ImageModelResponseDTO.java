@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.image;
 
-import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class ImageModelResponseDTO {
 	@JsonProperty("remote_id")
 	private String remoteId;
 
-	public ImageModelResponseDTO(BeerImage image) {
+	public ImageModelResponseDTO(ImageModel image) {
 		this.imageUrl = image.getImageUrl();
 		this.remoteId = image.getRemoteId();
 	}
