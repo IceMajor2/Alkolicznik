@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
@@ -38,7 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("main")
-//@Import(DisabledVaadinContext.class)
 @TestClassOrder(ClassOrderer.Random.class)
 public class SecuredEndpointTests {
 
@@ -324,10 +324,11 @@ public class SecuredEndpointTests {
 			}
 
 			@ParameterizedTest
-			@CsvSource({
+			@CsvSource(value = {
 					"accountant, Lomza, Jasne, 0.33",
 					"admin, Manufaktura Piwna, Piwo na miodzie gryczanym, null"
-			})
+			}, nullValues = "null")
+			@DirtiesContext
 			@DisplayName("[AUTHORIZED]: restricted POST endpoints")
 			public void authorizedRestrictedPostEndpointsTest(String credentials,
 					String brand, String type, Double volume) {
@@ -341,15 +342,16 @@ public class SecuredEndpointTests {
 			@ParameterizedTest
 			@CsvSource(value = {
 					"admin, 3, Manufaktura Piwna, Piwo na miodzie gryczanym, null",
-					"accountant, 5, null, IPA, 0.33"
+					"accountant, 5, Tyskie, IPA, 0.33"
 			}, nullValues = "null")
+			@DirtiesContext
 			@DisplayName("[AUTHORIZED]: restricted PUT endpoints")
 			public void authorizedRestrictedPutEndpointsTest(String credentials, Long beerId,
 					String brand, String type, Double volume) {
-				String endpoint = "/api/beer" + beerId;
+				String endpoint = "/api/beer/" + beerId;
 				BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
-				var response = postRequestAuth(credentials, credentials, endpoint, request);
+				var response = putRequestAuth(credentials, credentials, endpoint, request);
 				assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 			}
 
@@ -358,6 +360,7 @@ public class SecuredEndpointTests {
 					"admin, 2, Miloslaw, null, 0.33",
 					"accountant, 1, null, Porter, null"
 			}, nullValues = "null")
+			@DirtiesContext
 			@DisplayName("[AUTHORIZED]: restricted PATCH requests")
 			public void authorizedRestrictedPatchRequestsTest(String credentials, Long beerId,
 					String brand, String type, Double volume) {
@@ -373,6 +376,7 @@ public class SecuredEndpointTests {
 					"admin, Ksiazece, Zlote pszeniczne, null",
 					"accountant, Zubr, null, 0.5"
 			}, nullValues = "null")
+			@DirtiesContext
 			@DisplayName("[AUTHORIZED]: restricted DELETE by object requests")
 			public void authorizedRestrictedDeleteByObjectRequestsTest(String credentials,
 					String brand, String type, Double volume) {
@@ -390,8 +394,9 @@ public class SecuredEndpointTests {
 					"admin, 7",
 					"accountant, 4"
 			})
-			@DisplayName("[UNAUTHORIZED]: restricted DELETE by id requests")
-			public void unauthorizedRestrictedDeleteByIdRequestsTest(String credentials, Long beerId) {
+			@DirtiesContext
+			@DisplayName("[AUTHORIZED]: restricted DELETE by id requests")
+			public void authorizedRestrictedDeleteByIdRequestsTest(String credentials, Long beerId) {
 				// when
 				String endpoint = "/api/beer/" + beerId;
 				var response = deleteRequestAuth(credentials, credentials, endpoint);
