@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.models;
+package com.demo.alkolicznik.models.image;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.component.html.Image;

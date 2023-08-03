@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.demo.alkolicznik.api.services.ImageService;
-import com.demo.alkolicznik.models.BeerImage;
+import com.demo.alkolicznik.models.image.BeerImage;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;

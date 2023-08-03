@@ -20,7 +20,7 @@ import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerImage;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageRepository;
 import com.vaadin.flow.component.html.Image;

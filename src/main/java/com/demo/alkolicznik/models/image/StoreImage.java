@@ -1,7 +1,8 @@
-package com.demo.alkolicznik.models;
+package com.demo.alkolicznik.models.image;
 
 import java.util.Objects;
 
+import com.demo.alkolicznik.models.Store;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

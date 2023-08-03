@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.image;
 
-import com.demo.alkolicznik.models.BeerImage;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;

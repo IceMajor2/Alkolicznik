@@ -14,7 +14,7 @@ import java.util.Map;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.BeerImage;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;

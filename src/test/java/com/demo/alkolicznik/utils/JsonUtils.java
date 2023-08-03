@@ -23,7 +23,7 @@ import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerImage;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
