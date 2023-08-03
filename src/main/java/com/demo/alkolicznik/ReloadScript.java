@@ -87,7 +87,7 @@ public class ReloadScript implements CommandLineRunner {
     @SneakyThrows
     private void bulkSendImagesToRemote() {
         LOGGER.info("Sending all files in '/images' directory into remote's '/beer'");
-        File[] imageDirectory = new File(new ClassPathResource("/images").getURI().getRawPath()).listFiles();
+        File[] imageDirectory = new File(new ClassPathResource("/images/beer").getURI().getRawPath()).listFiles();
         for (File image : imageDirectory) {
             imageService.upload(image.getAbsolutePath(), image.getName());
         }
