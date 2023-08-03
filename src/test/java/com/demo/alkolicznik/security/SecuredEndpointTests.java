@@ -399,4 +399,97 @@ public class SecuredEndpointTests {
 			}
 		}
 	}
+
+	// TODO: write below test classes
+	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
+	class StoreController {
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Anonymous {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Unauthorized {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Authorized {
+
+		}
+	}
+
+	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
+	class BeerPriceController {
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Anonymous {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Unauthorized {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Authorized {
+
+		}
+	}
+
+	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
+	class ImageController {
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Anonymous {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Unauthorized {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Authorized {
+
+		}
+	}
+
+	@Nested
+	@TestClassOrder(ClassOrderer.Random.class)
+	class AuthController {
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Anonymous {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Unauthorized {
+
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		class Authorized {
+
+		}
+	}
 }
