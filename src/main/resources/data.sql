@@ -23,6 +23,8 @@ INSERT INTO beer_image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajo
 INSERT INTO beer_image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/zubr-0.5.png');
 INSERT INTO beer_image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/komes-porter-malinowy-0.33.jpg');
 INSERT INTO beer_image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/miloslaw-biale-0.5.jpg');
+INSERT INTO store_image (ID, STORE_NAME, URL) VALUES (1, 'Carrefour', 'https://ik.imagekit.io/icemajor/store/carrefour.png');
+INSERT INTO store_image (ID, STORE_NAME, URL) VALUES (2, 'Biedronka', 'https://ik.imagekit.io/icemajor/store/biedronka.png');
 
 -- store equipment
 INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (1, 1, 3.39, 'PLN');

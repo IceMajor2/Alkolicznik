@@ -29,6 +29,15 @@ CREATE TABLE IF NOT EXISTS beer_image (
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
 
+CREATE TABLE IF NOT EXISTS store_image (
+	id BIGINT NOT NULL,
+	store_name VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    remote_id VARCHAR(255),
+    image_component BYTEA,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(32) NOT NULL,
