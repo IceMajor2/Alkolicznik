@@ -20,7 +20,7 @@ import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageRepository;
 import com.vaadin.flow.component.html.Image;
@@ -59,7 +59,7 @@ public class ImageService {
 	 * an ImageKit-library-uploadable and sends it to an external image hosting.
 	 */
 	@SneakyThrows
-	public ImageModel upload(String path, String filename) {
+	public BeerImage upload(String path, String filename) {
 		// instantiate BufferedImage and check its proportions
 		File file = new File(path);
 		if (!file.exists()) {
@@ -85,13 +85,13 @@ public class ImageService {
 		options.put("transformation", transformation);
 
 		// should be returned as ResponseDTO
-		return new ImageModel(imageKit.getUrl(options), result.getFileId());
+		return new BeerImage(imageKit.getUrl(options), result.getFileId());
 	}
 
 	public ImageModelResponseDTO getBeerImage(Long beerId) {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
-		ImageModel image = beer.getImage()
+		BeerImage image = beer.getImage()
 				.orElseThrow(() -> new ImageNotFoundException());
 		return new ImageModelResponseDTO(image);
 	}
@@ -105,7 +105,7 @@ public class ImageService {
 	public Image getVaadinBeerImage(Long beerId) {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
-		ImageModel image = beer.getImage()
+		BeerImage image = beer.getImage()
 				.orElseThrow(() -> new ImageNotFoundException());
 
 		// Lazy fetching. Create component (and save), if not done previously.
@@ -119,7 +119,7 @@ public class ImageService {
 	/**
 	 * Creates Vaadin component.
 	 */
-	private Image createJavaImage(ImageModel image) {
+	private Image createJavaImage(BeerImage image) {
 		return new Image(image.getImageUrl(), "No image");
 	}
 
@@ -130,7 +130,7 @@ public class ImageService {
 	 * @param image to update the image model with
 	 */
 	private void saveJavaBeerImage(Beer beer, Image image) {
-		ImageModel beerImage = beer.getImage().get();
+		BeerImage beerImage = beer.getImage().get();
 		beerImage.setImageComponent(image);
 		imageRepository.save(beerImage);
 	}
@@ -142,9 +142,9 @@ public class ImageService {
 	 */
 	@SneakyThrows
 	public ImageDeleteDTO delete(Beer beer) {
-		ImageModel beerImage = beer.getImage().orElseThrow(() ->
+		BeerImage beerImage = beer.getImage().orElseThrow(() ->
 				new ImageNotFoundException());
-		imageKit.deleteFile(beerImage.getExternalId());
+		imageKit.deleteFile(beerImage.getRemoteId());
 		beer.setImage(null);
 		imageRepository.deleteById(beerImage.getId());
 		return new ImageDeleteDTO(beer);
@@ -164,13 +164,13 @@ public class ImageService {
 		imageKit.bulkDeleteFiles(deleteIds);
 	}
 
-	public ImageModel findByUrl(String url) {
+	public BeerImage findByUrl(String url) {
 		return imageRepository.findByImageUrl(url).orElseThrow(() ->
 				new ImageNotFoundException());
 	}
 
-	public ImageModelResponseDTO updateExternalId(ImageModel toUpdate, String externalId) {
-		toUpdate.setExternalId(externalId);
+	public ImageModelResponseDTO updateExternalId(BeerImage toUpdate, String externalId) {
+		toUpdate.setRemoteId(externalId);
 		return new ImageModelResponseDTO(imageRepository.save(toUpdate));
 	}
 
@@ -245,14 +245,14 @@ public class ImageService {
 	}
 
 	public void add(Beer beer, String imagePath) {
-		ImageModel imageModel = this.upload(
+		BeerImage beerImage = this.upload(
 				imagePath,
 				this.createImageFilename(
 						beer, this.extractFileExtensionFromPath(imagePath)
 				)
 		);
-		beer.setImage(imageModel);
-		imageModel.setBeer(beer);
-		imageRepository.save(imageModel);
+		beer.setImage(beerImage);
+		beerImage.setBeer(beer);
+		imageRepository.save(beerImage);
 	}
 }

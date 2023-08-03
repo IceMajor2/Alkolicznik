@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.image;
 
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -16,17 +16,17 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-@JsonPropertyOrder({ "url", "external_id" })
+@JsonPropertyOrder({ "url", "remote_id" })
 public class ImageModelResponseDTO {
 
 	@JsonProperty("url")
 	private String imageUrl;
 
-	@JsonProperty("external_id")
-	private String externalId;
+	@JsonProperty("remote_id")
+	private String remoteId;
 
-	public ImageModelResponseDTO(ImageModel image) {
+	public ImageModelResponseDTO(BeerImage image) {
 		this.imageUrl = image.getImageUrl();
-		this.externalId = image.getExternalId();
+		this.remoteId = image.getRemoteId();
 	}
 }

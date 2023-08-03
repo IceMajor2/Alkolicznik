@@ -25,7 +25,7 @@ import lombok.Setter;
 
 @Table(name = "store")
 @Entity(name = "Store")
-@JsonPropertyOrder({ "id", "name", "city", "street" })
+@JsonPropertyOrder({ "id", "name", "city", "street", "image" })
 @NoArgsConstructor
 @Getter
 @Setter
@@ -40,6 +40,8 @@ public class Store {
 	private String city;
 
 	private String street;
+//
+//	private BeerImage image;
 
 	@OneToMany(mappedBy = "store",
 			cascade = { CascadeType.ALL, CascadeType.MERGE },

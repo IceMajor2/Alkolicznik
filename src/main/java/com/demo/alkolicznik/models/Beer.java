@@ -47,7 +47,7 @@ public class Beer {
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY)
 	@PrimaryKeyJoinColumn
-	private ImageModel image;
+	private BeerImage image;
 
 	@OneToMany(mappedBy = "beer",
 			cascade = { CascadeType.MERGE },
@@ -78,11 +78,11 @@ public class Beer {
 		this.volume = volume;
 	}
 
-	public Optional<ImageModel> getImage() {
+	public Optional<BeerImage> getImage() {
 		return Optional.ofNullable(image);
 	}
 
-	public void setImage(ImageModel image) {
+	public void setImage(BeerImage image) {
 		this.image = image;
 	}
 
@@ -102,7 +102,7 @@ public class Beer {
 		sb.append(" [%.2f]".formatted(this.volume));
 		sb.append(" (ID: %d)".formatted(this.id));
 		if (this.getImage().isPresent()) {
-			sb.append(" ").append(this.image.getExternalId());
+			sb.append(" ").append(this.image.getRemoteId());
 		}
 		return sb.toString();
 	}

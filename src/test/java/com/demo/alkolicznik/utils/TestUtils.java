@@ -14,7 +14,7 @@ import java.util.Map;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
@@ -87,7 +87,7 @@ public class TestUtils {
 		return beersInCity;
 	}
 
-	public static ImageModel getImage(Long beerId, List<Beer> beers) {
+	public static BeerImage getImage(Long beerId, List<Beer> beers) {
 		return getBeer(beerId, beers).getImage().get();
 	}
 

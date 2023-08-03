@@ -13,7 +13,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles({ "main", "image" })
 @TestClassOrder(ClassOrderer.Random.class)
-public class ImageModelTests {
+public class BeerImageTests {
 
 	@Nested
 	@TestClassOrder(ClassOrderer.Random.class)
@@ -82,7 +82,7 @@ public class ImageModelTests {
 			@ValueSource(longs = { 3, 4, 5, 6 })
 			@DisplayName("GET: '/api/beer/{beer_id}/image'")
 			public void whenGettingBeerImage_thenReturnOKTest(Long beerId) {
-				Optional<ImageModel> img = getBeer(beerId.longValue(), beers).getImage();
+				Optional<BeerImage> img = getBeer(beerId.longValue(), beers).getImage();
 				assertThat(img).isNotEmpty();
 
 				// when
@@ -158,7 +158,7 @@ public class ImageModelTests {
 				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 				// then
-				assertThat(actual.getImage().getExternalId())
+				assertThat(actual.getImage().getImageUrl())
 						.withFailMessage("The image's external id was null. That means it "
 								+ "probably was not send to the remote server.")
 						.isNotNull();
@@ -239,7 +239,7 @@ public class ImageModelTests {
 				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 				// then
-				assertThat(actual.getImage().getExternalId())
+				assertThat(actual.getImage().getRemoteId())
 						.withFailMessage("The image's external id was null. That means it "
 								+ "probably was not send to the remote server.")
 						.isNotNull();
@@ -328,7 +328,7 @@ public class ImageModelTests {
 				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
 
 				// then
-				assertThat(actual.getImage().getExternalId())
+				assertThat(actual.getImage().getRemoteId())
 						.withFailMessage("The image's external id was null. That means it "
 								+ "probably was not send to the remote server.")
 						.isNotNull();

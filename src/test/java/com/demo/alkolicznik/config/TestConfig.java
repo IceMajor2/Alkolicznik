@@ -12,8 +12,8 @@ import javax.money.MonetaryAmount;
 import javax.sql.DataSource;
 
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerImage;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.utils.TestUtils;
@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import static com.demo.alkolicznik.config.ImageKitConfig.extractFilenameFromUrl;
-import static com.demo.alkolicznik.config.ImageKitConfig.getExternalId;
+import static com.demo.alkolicznik.config.ImageKitConfig.getRemoteId;
 
 @Configuration
 @Profile("main")
@@ -187,10 +187,10 @@ public class TestConfig {
 				beer.setBrand(rs.getString("brand"));
 				beer.setType(rs.getString("type"));
 				beer.setVolume(rs.getDouble("volume"));
-				String sql = "SELECT * FROM image i WHERE i.beer_id = " + beer.getId();
-				ImageModel image = jdbcTemplate.query(sql, new ResultSetExtractor<ImageModel>() {
+				String sql = "SELECT * FROM beer_image i WHERE i.beer_id = " + beer.getId();
+				BeerImage image = jdbcTemplate.query(sql, new ResultSetExtractor<BeerImage>() {
 					@Override
-					public ImageModel extractData(ResultSet rs) throws SQLException, DataAccessException {
+					public BeerImage extractData(ResultSet rs) throws SQLException, DataAccessException {
 						// at beginning ResultSet is pointed *BEFORE* the 1st row
 						// due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
 						// we move the pointer to the next row with rs.next() command
@@ -199,17 +199,17 @@ public class TestConfig {
 						if (!rs.next()) {
 							return null;
 						}
-						ImageModel image = new ImageModel();
+						BeerImage image = new BeerImage();
 						String url = rs.getString("url");
 						Long beerId = rs.getLong("beer_id");
-						String externalId = getExternalId(extractFilenameFromUrl(url));
+						String remoteId = getRemoteId(extractFilenameFromUrl(url));
 
 						image.setImageUrl(url);
 						image.setId(beerId);
-						// update image table with ImageKit's external id of this image
-						String updateQuery = "UPDATE image SET external_id = ? where beer_id = ?";
-						jdbcTemplate.update(updateQuery, externalId, beerId);
-						image.setExternalId(externalId);
+						// update image table with ImageKit's remote id of this image
+						String updateQuery = "UPDATE beer_image SET remote_id = ? where beer_id = ?";
+						jdbcTemplate.update(updateQuery, remoteId, beerId);
+						image.setRemoteId(remoteId);
 						return image;
 					}
 				});

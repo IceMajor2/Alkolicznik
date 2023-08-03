@@ -130,7 +130,7 @@ public class ImageKitConfig {
 		return url.substring(url.lastIndexOf('/') + 1);
 	}
 
-	static String getExternalId(String filename) {
+	static String getRemoteId(String filename) {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
 		getFileListRequest.setPath(imageKitPath);
 		ResultList resultList = null;

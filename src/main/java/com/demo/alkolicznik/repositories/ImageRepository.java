@@ -1,11 +1,11 @@
 package com.demo.alkolicznik.repositories;
 
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface ImageRepository extends CrudRepository<ImageModel, Long> {
+public interface ImageRepository extends CrudRepository<BeerImage, Long> {
 
-    Optional<ImageModel> findByImageUrl(String imageUrl);
+    Optional<BeerImage> findByImageUrl(String imageUrl);
 }

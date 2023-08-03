@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.demo.alkolicznik.api.ImageModelTests;
+import com.demo.alkolicznik.api.BeerImageTests;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
@@ -23,8 +23,8 @@ import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerImage;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.ImageModel;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -90,25 +90,25 @@ public class JsonUtils {
 
 	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(ImageModelTests.BeerImages.IMG_TRANSFORMED_URL + filename);
-		if (actual.getExternalId() != null) {
-			response.setExternalId(actual.getExternalId());
+		response.setImageUrl(BeerImageTests.BeerImages.IMG_TRANSFORMED_URL + filename);
+		if (actual.getRemoteId() != null) {
+			response.setRemoteId(actual.getRemoteId());
 		}
 		return response;
 	}
 
 	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(ImageModelTests.BeerImages.IMG_TRANSFORMED_URL + filename);
-		response.setExternalId(remoteId);
+		response.setImageUrl(BeerImageTests.BeerImages.IMG_TRANSFORMED_URL + filename);
+		response.setRemoteId(remoteId);
 		return response;
 	}
 
-	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
+	public static ImageModelResponseDTO createImageResponse(BeerImage image) {
 		if (image != null) {
 			ImageModelResponseDTO response = new ImageModelResponseDTO();
 			response.setImageUrl(image.getImageUrl());
-			response.setExternalId(image.getExternalId());
+			response.setRemoteId(image.getRemoteId());
 			return response;
 		}
 		return null;

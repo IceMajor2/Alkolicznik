@@ -1,11 +1,18 @@
 package com.demo.alkolicznik;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import com.demo.alkolicznik.api.services.ImageService;
-import com.demo.alkolicznik.models.ImageModel;
+import com.demo.alkolicznik.models.BeerImage;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,11 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Launching this class reloads everything initial data
@@ -103,9 +105,9 @@ public class ReloadScript implements CommandLineRunner {
             String mappedURL = entry.getValue();
 
             String externalId = keyBaseFile.getFileId();
-            ImageModel modelToUpdate = imageService.findByUrl(mappedURL);
+            BeerImage modelToUpdate = imageService.findByUrl(mappedURL);
 
-            if (modelToUpdate.getExternalId() == null) {
+            if (modelToUpdate.getRemoteId() == null) {
                 imageService.updateExternalId(modelToUpdate, externalId);
             }
         }

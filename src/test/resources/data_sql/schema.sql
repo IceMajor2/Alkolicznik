@@ -27,9 +27,9 @@ CREATE TABLE beer_price (
     FOREIGN KEY (store_id) REFERENCES store(id)
     );
 
-CREATE TABLE IF NOT EXISTS image (
+CREATE TABLE IF NOT EXISTS beer_image (
     beer_id BIGINT NOT NULL,
-    external_id VARCHAR(255),
+    remote_id VARCHAR(255),
     url VARCHAR(255),
     image_component BLOB(1024),
     PRIMARY KEY (beer_id),

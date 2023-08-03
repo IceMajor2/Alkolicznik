@@ -19,10 +19,10 @@ INSERT INTO beer (ID, BRAND, TYPE, VOLUME) VALUES (9, 'Perla', 'Miodowa', 0.33);
 INSERT INTO beer (ID, BRAND, VOLUME) VALUES (10, 'Lomza', 0.5);
 
 -- images
-INSERT INTO image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/tyskie-gronie-0.65.png');
-INSERT INTO image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/zubr-0.5.png');
-INSERT INTO image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/komes-porter-malinowy-0.33.jpg');
-INSERT INTO image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/miloslaw-biale-0.5.jpg');
+INSERT INTO beer_image (BEER_ID, URL) VALUES (3, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/tyskie-gronie-0.65.png');
+INSERT INTO beer_image (BEER_ID, URL) VALUES (4, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/zubr-0.5.png');
+INSERT INTO beer_image (BEER_ID, URL) VALUES (5, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/komes-porter-malinowy-0.33.jpg');
+INSERT INTO beer_image (BEER_ID, URL) VALUES (6, 'https://ik.imagekit.io/icemajor/tr:n-get_beer/beer/miloslaw-biale-0.5.jpg');
 
 -- store equipment
 INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (1, 1, 3.39, 'PLN');
