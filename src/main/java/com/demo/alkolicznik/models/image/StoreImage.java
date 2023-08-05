@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.models.image;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class StoreImage extends ImageModel {
 	private String storeName;
 
 	@OneToMany(mappedBy = "image", orphanRemoval = true)
-	private Set<Store> stores;
+	private Set<Store> stores = new HashSet<>();
 
 	public StoreImage(String imageUrl, String remoteId) {
 		super(imageUrl, remoteId);
