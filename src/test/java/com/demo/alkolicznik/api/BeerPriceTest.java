@@ -67,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles("main")
 @TestClassOrder(ClassOrderer.Random.class)
-public class BeerPriceTests {
+public class BeerPriceTest {
 
 	@Nested
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)

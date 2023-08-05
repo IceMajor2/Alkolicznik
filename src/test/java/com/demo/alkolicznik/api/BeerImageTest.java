@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles({ "main", "image" })
 @TestClassOrder(ClassOrderer.Random.class)
-public class BeerImageTests {
+public class BeerImageTest {
 
 	@Nested
 	@TestClassOrder(ClassOrderer.Random.class)

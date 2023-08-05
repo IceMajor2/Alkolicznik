@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.demo.alkolicznik.api.BeerImageTests;
+import com.demo.alkolicznik.api.BeerImageTest;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
@@ -90,7 +90,7 @@ public class JsonUtils {
 
 	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(BeerImageTests.BeerImages.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(BeerImageTest.BeerImages.IMG_TRANSFORMED_URL + filename);
 		if (actual.getRemoteId() != null) {
 			response.setRemoteId(actual.getRemoteId());
 		}
@@ -99,7 +99,7 @@ public class JsonUtils {
 
 	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(BeerImageTests.BeerImages.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(BeerImageTest.BeerImages.IMG_TRANSFORMED_URL + filename);
 		response.setRemoteId(remoteId);
 		return response;
 	}

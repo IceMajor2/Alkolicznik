@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles("main")
 @TestClassOrder(ClassOrderer.Random.class)
-public class StoreTests {
+public class StoreTest {
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
