@@ -16,6 +16,7 @@ import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.TestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,10 +174,43 @@ public class TestConfig {
 				store.setName(rs.getString("name"));
 				store.setCity(rs.getString("city"));
 				store.setStreet(rs.getString("street"));
+
+				String sql = "SELECT * FROM store_image WHERE store_name = ?";
+				StoreImage image = jdbcTemplate.query(sql, new ResultSetExtractor<StoreImage>() {
+					@Override
+					public StoreImage extractData(ResultSet rs) throws SQLException, DataAccessException {
+						// at beginning ResultSet is pointed *BEFORE* the 1st row
+						if (!rs.next()) {
+							return null;
+						}
+						StoreImage image = new StoreImage();
+						Long imgId = rs.getLong("id");
+						String url = rs.getString("url");
+						String storeName = rs.getString("store_name");
+						String remoteId = getRemoteId(extractFilenameFromUrl(url));
+
+						image.setId(imgId);
+						image.setImageUrl(url);
+						image.setStoreName(storeName);
+						// update image table with ImageKit's remote id of this image
+						String updateQuery = "UPDATE store_image SET remote_id = ? WHERE store_name = ?";
+						jdbcTemplate.update(updateQuery, remoteId, storeName);
+						image.setRemoteId(remoteId);
+						return image;
+					}
+				}, store.getName());
+				if (image != null) {
+					store.setImage(image);
+					image.getStores().add(store);
+				}
 				return store;
 			}
 		};
 	}
+
+//	private StoreImage mapToStoreImage(ResultSet rs) {
+//
+//	}
 
 	private RowMapper<Beer> mapToBeer() {
 		return new RowMapper<Beer>() {
@@ -194,7 +228,7 @@ public class TestConfig {
 						// at beginning ResultSet is pointed *BEFORE* the 1st row
 						// due to the fact that this ResultSet may return at most 1 row (ID is UNIQUE)
 						// we move the pointer to the next row with rs.next() command
-						// if it returns false, then there's no image assigned to the beer
+						// if it returns false, then there's no image assigned to the entity
 						// thus returning null below
 						if (!rs.next()) {
 							return null;
@@ -207,7 +241,7 @@ public class TestConfig {
 						image.setImageUrl(url);
 						image.setId(beerId);
 						// update image table with ImageKit's remote id of this image
-						String updateQuery = "UPDATE beer_image SET remote_id = ? where beer_id = ?";
+						String updateQuery = "UPDATE beer_image SET remote_id = ? WHERE beer_id = ?";
 						jdbcTemplate.update(updateQuery, remoteId, beerId);
 						image.setRemoteId(remoteId);
 						return image;
