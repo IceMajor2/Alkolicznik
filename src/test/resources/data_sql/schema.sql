@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS beer_price;
-DROP TABLE IF EXISTS image;
+DROP TABLE IF EXISTS beer_image;
+DROP TABLE IF EXISTS store_image;
 DROP TABLE IF EXISTS store;
 DROP TABLE IF EXISTS beer;
 DROP TABLE IF EXISTS users;
@@ -34,6 +35,15 @@ CREATE TABLE IF NOT EXISTS beer_image (
     image_component BLOB(1024),
     PRIMARY KEY (beer_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id)
+);
+
+CREATE TABLE IF NOT EXISTS store_image (
+	id BIGINT NOT NULL,
+	store_name VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    remote_id VARCHAR(255),
+    image_component BLOB(1024),
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE users (
