@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS beer_image (
 
 CREATE TABLE IF NOT EXISTS store_image (
 	id BIGINT NOT NULL,
-	store_name VARCHAR(255) NOT NULL,
+	store_name VARCHAR(255) NOT NULL UNIQUE,
     url VARCHAR(255) NOT NULL,
     remote_id VARCHAR(255),
     image_component BYTEA,
