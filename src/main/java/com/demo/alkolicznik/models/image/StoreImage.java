@@ -1,10 +1,12 @@
 package com.demo.alkolicznik.models.image;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import com.demo.alkolicznik.models.Store;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
 
 @Entity(name = "StoreImage")
 @Table(name = "store_image")
@@ -23,7 +26,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class StoreImage extends ImageModel {
+public class StoreImage extends ImageModel implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +34,11 @@ public class StoreImage extends ImageModel {
 	private Long id;
 
 	@Column(name = "store_name")
+	@NaturalId
 	private String storeName;
 
-	@OneToMany(mappedBy = "image", orphanRemoval = true)
+	@OneToMany(mappedBy = "image")
+	@JsonIgnore
 	private Set<Store> stores = new HashSet<>();
 
 	public StoreImage(String imageUrl, String remoteId) {

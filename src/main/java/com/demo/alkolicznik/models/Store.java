@@ -45,7 +45,12 @@ public class Store {
 	private String street;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "store_name")
+	@JoinColumn(
+			name = "name",
+			referencedColumnName = "store_name",
+			insertable = false,
+			updatable = false
+	)
 	private StoreImage image;
 
 	@OneToMany(mappedBy = "store",
