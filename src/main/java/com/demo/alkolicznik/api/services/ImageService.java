@@ -2,8 +2,6 @@ package com.demo.alkolicznik.api.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -19,7 +17,6 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.ImageRepository;
 import com.vaadin.flow.component.html.Image;
-import io.imagekit.sdk.models.BaseFile;
 import lombok.SneakyThrows;
 
 import org.springframework.stereotype.Service;
@@ -52,7 +49,7 @@ public class ImageService {
 		if (!proportionsOk(ImageIO.read(file))) {
 			throw new ImageProportionsInvalidException();
 		}
-		BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, imagePath,
+		BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, "/beer",
 				this.createImageFilename
 						(beer, this.extractFileExtensionFromPath(imagePath)));
 		beer.setImage(beerImage);
@@ -131,16 +128,6 @@ public class ImageService {
 				.orElseThrow(() -> new BeerNotFoundException(beerId)));
 	}
 
-	public BeerImage findByUrl(String url) {
-		return imageRepository.findByImageUrl(url).orElseThrow(() ->
-				new ImageNotFoundException());
-	}
-
-	public ImageModelResponseDTO updateRemoteIdCrudRepository(BeerImage toUpdate, String externalId) {
-		toUpdate.setRemoteId(externalId);
-		return new ImageModelResponseDTO(imageRepository.save(toUpdate));
-	}
-
 	private boolean proportionsOk(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -158,13 +145,6 @@ public class ImageService {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Returns a map with an external file as a key and mapped url as value.
-	 */
-	public Map<BaseFile, String> mapExternalFilesURL(List<BaseFile> files) {
-		return imageKitRepository.bulkRemoteUrlMappings(files);
 	}
 
 	public String createImageFilename(Beer beer, String extension) {

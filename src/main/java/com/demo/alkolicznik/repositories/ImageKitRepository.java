@@ -27,8 +27,11 @@ public class ImageKitRepository {
 
 	private ImageKit imageKit;
 
-	public ImageKitRepository() {
+	private String imageKitPath;
+
+	public ImageKitRepository(String imageKitPath) {
 		this.imageKit = ImageKit.getInstance();
+		this.imageKitPath = imageKitPath;
 		setConfig();
 	}
 
@@ -50,9 +53,9 @@ public class ImageKitRepository {
 			Map<String, Object> options = new HashMap<>();
 			options.put("path", result.getFilePath());
 			options.put("transformation", transformation);
-			return new BeerImage(this.imageKit.getUrl(options), result.getFileId());
+			return new BeerImage(mapUrl(options), result.getFileId());
 		}
-		return new BeerImage(this.imageKit.getUrl(null), result.getFileId());
+		return new BeerImage(mapUrl(null), result.getFileId());
 	}
 
 	@SneakyThrows
@@ -63,7 +66,7 @@ public class ImageKitRepository {
 		// prevent adding a random string to the end of the filename
 		fileCreateRequest.setUseUniqueFileName(false);
 		// set folder into which image will be uploaded
-		fileCreateRequest.setFolder(remotePath);
+		fileCreateRequest.setFolder(imageKitPath + remotePath);
 		return this.imageKit.upload(fileCreateRequest);
 	}
 
@@ -75,7 +78,7 @@ public class ImageKitRepository {
 	@SneakyThrows
 	public List<BaseFile> findAllIn(String path) {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(path);
+		getFileListRequest.setPath(imageKitPath + path);
 		return imageKit.getFileList(getFileListRequest).getResults();
 	}
 
@@ -86,7 +89,7 @@ public class ImageKitRepository {
 
 	@SneakyThrows
 	public void deleteAllIn(String path) {
-		var deleteIds = findAllIn(path).stream()
+		var deleteIds = findAllIn(imageKitPath + path).stream()
 				.map(BaseFile::getFileId)
 				.toList();
 		if (deleteIds.isEmpty()) {
