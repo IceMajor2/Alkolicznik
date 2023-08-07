@@ -28,7 +28,7 @@ CREATE TABLE beer_price (
     FOREIGN KEY (store_id) REFERENCES store(id)
     );
 
-CREATE TABLE IF NOT EXISTS beer_image (
+CREATE TABLE beer_image (
     beer_id BIGINT NOT NULL,
     remote_id VARCHAR(255),
     url VARCHAR(255),
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS beer_image (
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
 
-CREATE TABLE IF NOT EXISTS store_image (
+CREATE TABLE store_image (
 	id BIGINT NOT NULL,
 	store_name VARCHAR(255) NOT NULL,
     url VARCHAR(255) NOT NULL,
