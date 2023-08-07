@@ -126,11 +126,11 @@ public class ImageKitConfig {
 		}
 	}
 
-	static String extractFilenameFromUrl(String url) {
+	public static String extractFilenameFromUrl(String url) {
 		return url.substring(url.lastIndexOf('/') + 1);
 	}
 
-	static String getRemoteId(String filename) {
+	public static String getRemoteId(String filename) {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
 		getFileListRequest.setPath(imageKitPath);
 		ResultList resultList = null;
