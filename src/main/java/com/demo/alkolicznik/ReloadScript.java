@@ -6,9 +6,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.demo.alkolicznik.api.services.ImageService;
-import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
+import com.demo.alkolicznik.repositories.ImageRepository;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -48,13 +47,13 @@ public class ReloadScript implements CommandLineRunner {
 
 	private ImageKitRepository imageKitRepository;
 
-	private ImageService imageService;
+	private ImageRepository imageRepository;
 
 	private String imageKitPath;
 
-	public ReloadScript(ImageKitRepository imageKitRepository, ImageService imageService, String imageKitPath) {
+	public ReloadScript(ImageKitRepository imageKitRepository, ImageRepository imageRepository, String imageKitPath) {
 		this.imageKitRepository = imageKitRepository;
-		this.imageService = imageService;
+		this.imageRepository = imageRepository;
 		this.imageKitPath = imageKitPath;
 	}
 
@@ -88,7 +87,7 @@ public class ReloadScript implements CommandLineRunner {
 
 	private void bulkDeleteRemoteImages() {
 		LOGGER.info("Deleting ImageKit images");
-		imageKitRepository.deleteAllIn(imageKitPath);
+		imageKitRepository.deleteAllIn("/beer");
 		LOGGER.info("Success!");
 	}
 
@@ -97,7 +96,7 @@ public class ReloadScript implements CommandLineRunner {
 		LOGGER.info("Sending all files in '/images' directory into remote's '/beer'");
 		File[] imageDirectory = new File(new ClassPathResource("/images/beer").getURI().getRawPath()).listFiles();
 		for (File image : imageDirectory) {
-			imageKitRepository.save(image.getAbsolutePath(), imageKitPath, image.getName());
+			imageKitRepository.save(image.getAbsolutePath(), "/beer", image.getName());
 		}
 		LOGGER.info("Success!");
 	}
@@ -105,7 +104,7 @@ public class ReloadScript implements CommandLineRunner {
 	private void updateDatabaseTableWithRemoteIds() {
 		LOGGER.info("Fetching beer images' external ids");
 
-		List<BaseFile> externalFiles = imageKitRepository.findAllIn(imageKitPath);
+		List<BaseFile> externalFiles = imageKitRepository.findAllIn("/beer");
 		Map<BaseFile, String> externalFilesWithMappedURLs = imageKitRepository
 				.bulkRemoteUrlMappings(externalFiles);
 
@@ -114,11 +113,12 @@ public class ReloadScript implements CommandLineRunner {
 			String mappedURL = entry.getValue();
 
 			String externalId = keyBaseFile.getFileId();
-			BeerImage modelToUpdate = imageService.findByUrl(mappedURL);
-
-			if (modelToUpdate.getRemoteId() == null) {
-				imageService.updateRemoteIdCrudRepository(modelToUpdate, externalId);
-			}
+			imageRepository.findByImageUrl(mappedURL).ifPresent(beerImage -> {
+				if (beerImage.getRemoteId() == null) {
+					beerImage.setRemoteId(externalId);
+					imageRepository.save(beerImage);
+				}
+			});
 		}
 		LOGGER.info("Remote IDs were successfully saved in the database");
 	}
