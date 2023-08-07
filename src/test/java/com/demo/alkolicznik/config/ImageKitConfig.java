@@ -70,7 +70,7 @@ public class ImageKitConfig {
 
 	private void deletePostedByTestImages() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath);
+		getFileListRequest.setPath(imageKitPath + "/beer");
 		ResultList resultList = this.imageKit.getFileList(getFileListRequest);
 
 		for (BaseFile baseFile : resultList.getResults()) {
@@ -87,7 +87,7 @@ public class ImageKitConfig {
 
 	private void sendInitialImages() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IOException, IllegalAccessException, InstantiationException {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath);
+		getFileListRequest.setPath(imageKitPath + "/beer");
 
 		Map<String, String> baseFiles = this.imageKit.getFileList(getFileListRequest)
 				.getResults()
@@ -105,7 +105,7 @@ public class ImageKitConfig {
 			byte[] bytes = Files.readAllBytes(image.toPath());
 			FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, image.getName());
 			fileCreateRequest.setUseUniqueFileName(false);
-			fileCreateRequest.setFolder(imageKitPath);
+			fileCreateRequest.setFolder(imageKitPath + "/beer");
 			Result result = this.imageKit.upload(fileCreateRequest);
 			LOGGER.info("'%s' was successfully sent. (ID: %s)"
 					.formatted(result.getName(), result.getFileId()));
@@ -132,7 +132,7 @@ public class ImageKitConfig {
 
 	public static String getRemoteId(String filename) {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath);
+		getFileListRequest.setPath(imageKitPath + "/beer");
 		ResultList resultList = null;
 		try {
 			resultList = ImageKit.getInstance().getFileList(getFileListRequest);

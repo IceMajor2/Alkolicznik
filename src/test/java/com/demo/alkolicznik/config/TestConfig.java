@@ -104,7 +104,7 @@ public class TestConfig {
 	@Bean
 	@Primary
 	public String imageKitPath2() {
-		return "/test/beer";
+		return "/test";
 	}
 
 	@Bean("dataSource")
