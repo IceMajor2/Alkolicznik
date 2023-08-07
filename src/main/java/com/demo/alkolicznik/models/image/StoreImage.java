@@ -25,7 +25,7 @@ import org.hibernate.annotations.NaturalId;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 public class StoreImage extends ImageModel implements Serializable {
 
 	@Id

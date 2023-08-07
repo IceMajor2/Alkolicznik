@@ -20,7 +20,7 @@ import lombok.ToString;
 @Table(name = "beer_image")
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class BeerImage extends ImageModel {
 
