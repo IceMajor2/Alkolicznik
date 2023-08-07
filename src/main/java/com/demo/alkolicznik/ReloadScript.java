@@ -6,10 +6,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
+import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
+import io.imagekit.sdk.exceptions.NotFoundException;
 import io.imagekit.sdk.models.BaseFile;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ import org.springframework.stereotype.Component;
 		value = "enabled",
 		havingValue = "true",
 		matchIfMissing = true)
-// @RequiredArgsConstructor
+@AllArgsConstructor
 public class ReloadScript implements CommandLineRunner {
 
 	public static void main(String[] args) {
@@ -54,13 +56,6 @@ public class ReloadScript implements CommandLineRunner {
 	private StoreImageRepository storeImageRepository;
 
 	private String imageKitPath;
-
-	public ReloadScript(ImageKitRepository imageKitRepository, BeerImageRepository beerImageRepository, StoreImageRepository storeImageRepository, String imageKitPath) {
-		this.imageKitRepository = imageKitRepository;
-		this.beerImageRepository = beerImageRepository;
-		this.storeImageRepository = storeImageRepository;
-		this.imageKitPath = imageKitPath;
-	}
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -97,7 +92,9 @@ public class ReloadScript implements CommandLineRunner {
 	}
 
 	private void deleteFolder(String path) {
-		imageKitRepository.deleteFolder(path);
+		try {
+			imageKitRepository.deleteFolder(path);
+		} catch (NotFoundException e) {}
 	}
 
 	@SneakyThrows
