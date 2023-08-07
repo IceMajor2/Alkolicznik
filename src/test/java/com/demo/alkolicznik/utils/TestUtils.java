@@ -46,6 +46,8 @@ public class TestUtils {
 		return null;
 	}
 
+	// TODO: add helpers for other beans
+
 	// TODO: change parameters
 	public static BeerPrice getBeerPrice(Long storeId, Long beerId, List<Store> stores, List<Beer> beers) {
 		Store store = getStore(storeId, stores);
