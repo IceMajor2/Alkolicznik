@@ -107,7 +107,7 @@ public class BeerService {
 		// if yes, execute the whole 'addImage' procedure
 		String imagePath = requestDTO.getImagePath();
 		if (imagePath != null) {
-			imageService.add(toOverwrite, requestDTO.getImagePath());
+			imageService.add(toOverwrite, imagePath);
 		}
 		return new BeerResponseDTO(beerRepository.save(toOverwrite));
 	}
