@@ -15,6 +15,7 @@ import com.demo.alkolicznik.models.image.ImageModel;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.models.BaseFile;
+import io.imagekit.sdk.models.DeleteFolderRequest;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.GetFileListRequest;
 import io.imagekit.sdk.models.results.Result;
@@ -98,8 +99,15 @@ public class ImageKitRepository {
 		imageKit.bulkDeleteFiles(deleteIds);
 	}
 
-	public Map<BaseFile, String> bulkRemoteUrlMappings(List<BaseFile> files) {
-		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", "get_beer")));
+	@SneakyThrows
+	public void deleteFolder(String path) {
+		DeleteFolderRequest deleteFolderRequest = new DeleteFolderRequest();
+		deleteFolderRequest.setFolderPath(imageKitPath + path);
+		imageKit.deleteFolder(deleteFolderRequest);
+	}
+
+	public Map<BaseFile, String> bulkRemoteUrlMappings(List<BaseFile> files, String transformationName) {
+		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", transformationName)));
 		return files.stream().collect(Collectors.toMap(key -> key, value -> {
 			Map<String, Object> options = new HashMap<>();
 			options.put("path", value.getFilePath());
