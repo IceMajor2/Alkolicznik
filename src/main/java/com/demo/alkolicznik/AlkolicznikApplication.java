@@ -23,6 +23,6 @@ public class AlkolicznikApplication implements AppShellConfigurator {
 
     @Bean
     public String imageKitPath() {
-        return "/beer";
+        return "/main";
     }
 }
