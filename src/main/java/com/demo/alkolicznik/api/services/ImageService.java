@@ -15,7 +15,7 @@ import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
-import com.demo.alkolicznik.repositories.ImageRepository;
+import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.vaadin.flow.component.html.Image;
 import lombok.SneakyThrows;
 
@@ -28,14 +28,14 @@ public class ImageService {
 
 	private BeerRepository beerRepository;
 
-	private ImageRepository imageRepository;
+	private BeerImageRepository beerImageRepository;
 
 	private String imageKitPath;
 
-	public ImageService(ImageKitRepository imageKitRepository, BeerRepository beerRepository, ImageRepository imageRepository, String imageKitPath) {
+	public ImageService(ImageKitRepository imageKitRepository, BeerRepository beerRepository, BeerImageRepository beerImageRepository, String imageKitPath) {
 		this.imageKitRepository = imageKitRepository;
 		this.beerRepository = beerRepository;
-		this.imageRepository = imageRepository;
+		this.beerImageRepository = beerImageRepository;
 		this.imageKitPath = imageKitPath;
 	}
 
@@ -54,7 +54,7 @@ public class ImageService {
 						(beer, this.extractFileExtensionFromPath(imagePath)));
 		beer.setImage(beerImage);
 		beerImage.setBeer(beer);
-		imageRepository.save(beerImage);
+		beerImageRepository.save(beerImage);
 	}
 
 	public ImageModelResponseDTO getBeerImage(Long beerId) {
@@ -101,7 +101,7 @@ public class ImageService {
 	private void saveJavaBeerImage(Beer beer, Image image) {
 		BeerImage beerImage = beer.getImage().get();
 		beerImage.setImageComponent(image);
-		imageRepository.save(beerImage);
+		beerImageRepository.save(beerImage);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class ImageService {
 				new ImageNotFoundException());
 		imageKitRepository.delete(beerImage);
 		beer.setImage(null);
-		imageRepository.deleteById(beerImage.getId());
+		beerImageRepository.deleteById(beerImage.getId());
 		return new ImageDeleteDTO(beer);
 	}
 
