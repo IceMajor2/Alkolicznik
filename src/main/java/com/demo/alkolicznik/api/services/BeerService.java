@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,7 @@ import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
@@ -193,6 +195,13 @@ public class BeerService {
 	}
 
 	private Beer checkForPutConditions(Long beerId, BeerRequestDTO requestDTO) {
+		String imagePath = requestDTO.getImagePath();
+		if(imagePath != null) {
+			File file = new File(imagePath);
+			if(!file.exists()) {
+				throw new FileNotFoundException(imagePath);
+			}
+		}
 		return checkForUpdateConditions(beerId, new BeerUpdateDTO(requestDTO));
 	}
 
