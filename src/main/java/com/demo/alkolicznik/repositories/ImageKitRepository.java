@@ -14,6 +14,7 @@ import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
+import io.imagekit.sdk.exceptions.NotFoundException;
 import io.imagekit.sdk.models.BaseFile;
 import io.imagekit.sdk.models.DeleteFolderRequest;
 import io.imagekit.sdk.models.FileCreateRequest;
@@ -100,7 +101,7 @@ public class ImageKitRepository {
 	}
 
 	@SneakyThrows
-	public void deleteFolder(String path) {
+	public void deleteFolder(String path) throws NotFoundException {
 		DeleteFolderRequest deleteFolderRequest = new DeleteFolderRequest();
 		deleteFolderRequest.setFolderPath(imageKitPath + path);
 		imageKit.deleteFolder(deleteFolderRequest);
