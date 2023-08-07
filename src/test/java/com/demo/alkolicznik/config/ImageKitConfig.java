@@ -38,17 +38,22 @@ import static com.demo.alkolicznik.utils.TestUtils.getRawPathToClassPathResource
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ImageKitConfig {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImageKitConfig.class);
+
+	private static final List<String> BEER_IMAGES = List.of(
+			"tyskie-gronie-0.65.png", "zubr-0.5.png",
+			"komes-porter-malinowy-0.33.jpg", "miloslaw-biale-0.5.jpg"
+	);
+
+	private static final List<String> STORE_IMAGES = List.of(
+			"carrefour.png", "lidl.png", "zabka.png"
+	);
+
 	private TestUtils testUtils;
 
 	private static String imageKitPath;
 
 	private ImageKit imageKit;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ImageKitConfig.class);
-
-	private static final List<String> expectedBeerImages = List.of
-			("tyskie-gronie-0.65.png", "zubr-0.5.png",
-					"komes-porter-malinowy-0.33.jpg", "miloslaw-biale-0.5.jpg");
 
 	@Autowired
 	public ImageKitConfig(TestUtils testUtils) {
@@ -62,52 +67,59 @@ public class ImageKitConfig {
 
 	@PostConstruct
 	public void init() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IOException, IllegalAccessException, InstantiationException {
-		LOGGER.info("Reloading ImageKit's directory");
+		String remoteBeerImgPath = imageKitPath + "/beer";
+		String remoteStoreImgPath = imageKitPath + "/store";
+		LOGGER.info("Reloading ImageKit's directory...");
 		setImageKit();
-		deletePostedByTestImages();
-		sendInitialImages();
+		LOGGER.info("Deleting unwanted images from '%s' directory...".formatted(remoteBeerImgPath));
+		deleteFilesIn(remoteBeerImgPath);
+		LOGGER.info("Deleting unwanted images from '%s' directory...".formatted(remoteStoreImgPath));
+		deleteFilesIn(remoteStoreImgPath);
+		LOGGER.info("Sending BEER images to remote directory '%s'...".formatted(remoteBeerImgPath));
+		sendImages("/data_img/beer_at_launch", remoteBeerImgPath);
+		LOGGER.info("Sending STORE images to remote directory '%s'...".formatted(remoteStoreImgPath));
+		sendImages("/data_img/store_at_launch", remoteStoreImgPath);
 	}
 
-	private void deletePostedByTestImages() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
+	private void deleteFilesIn(String path) throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath + "/beer");
+		getFileListRequest.setPath(path);
 		ResultList resultList = this.imageKit.getFileList(getFileListRequest);
 
 		for (BaseFile baseFile : resultList.getResults()) {
-			if (expectedBeerImages.contains(baseFile.getName())) {
-				LOGGER.info("'%s' was found (ID: %s). Not to be DELETED"
+			if (BEER_IMAGES.contains(baseFile.getName())
+					|| STORE_IMAGES.contains(baseFile.getName())) {
+				LOGGER.info("No need to DELETE. '%s' was found (ID: %s)"
 						.formatted(baseFile.getName(), baseFile.getFileId()));
 				continue;
 			}
-			LOGGER.info("Deleting '%s'... (ID: %s)"
-					.formatted(baseFile.getName(), baseFile.getFileId()));
+			LOGGER.info("Deleting... '%s' is not an 'at-launch' image"
+					.formatted(baseFile.getName()));
 			this.imageKit.deleteFile(baseFile.getFileId());
 		}
 	}
 
-	private void sendInitialImages() throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IOException, IllegalAccessException, InstantiationException {
+	private void sendImages(String srcPath, String remotePath) throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IOException, IllegalAccessException, InstantiationException {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath + "/beer");
+		getFileListRequest.setPath(remotePath);
 
 		Map<String, String> baseFiles = this.imageKit.getFileList(getFileListRequest)
 				.getResults()
 				.stream()
 				.collect(Collectors.toMap(BaseFile::getName, BaseFile::getFileId));
 		File[] testDir =
-				new File(getRawPathToClassPathResource("/data_img/init_data")).listFiles();
+				new File(getRawPathToClassPathResource(srcPath)).listFiles();
 
 		for (File image : testDir) {
 			if (baseFiles.containsKey(image.getName())) {
-				LOGGER.info("'%s' was found (ID: %s). Not to be SENT"
-						.formatted(image.getName(), baseFiles.get(image.getName())));
 				continue;
 			}
 			byte[] bytes = Files.readAllBytes(image.toPath());
 			FileCreateRequest fileCreateRequest = new FileCreateRequest(bytes, image.getName());
 			fileCreateRequest.setUseUniqueFileName(false);
-			fileCreateRequest.setFolder(imageKitPath + "/beer");
+			fileCreateRequest.setFolder(remotePath);
 			Result result = this.imageKit.upload(fileCreateRequest);
-			LOGGER.info("'%s' was successfully sent. (ID: %s)"
+			LOGGER.info("'%s' was successfully sent (ID: %s)"
 					.formatted(result.getName(), result.getFileId()));
 		}
 	}
