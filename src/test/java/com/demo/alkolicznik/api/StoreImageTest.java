@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreRequestDTO;
+import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
 import org.junit.jupiter.api.ClassOrderer;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +28,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,7 +76,7 @@ class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {-349, 0, 129048})
+		@ValueSource(longs = { -349, 0, 129048 })
 		@DisplayName("GET: '/api/store/{store_id}/image' [STORE_NOT_FOUND]")
 		public void shouldReturnNotFoundOnInvalidStoreIdTest(Long storeId) {
 			var getResponse = getRequest("/api/store/" + storeId + "/image");
@@ -84,7 +91,7 @@ class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = {2, 4, 5})
+		@ValueSource(longs = { 2, 4, 5 })
 		@DisplayName("GET: '/api/store/{store_id}/image' [NO_IMAGE]")
 		public void shouldReturnNotFoundOnBeerWithNoImageTest(Long storeId) {
 			var getResponse = getRequest("/api/store/" + storeId + "/image");
@@ -96,5 +103,58 @@ class StoreImageTest {
 					"Unable to find image for this store",
 					"/api/store/" + storeId + "/image");
 		}
+	}
+
+	@Nested
+	@TestMethodOrder(MethodOrderer.Random.class)
+	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+	class PostRequests {
+
+		private List<Store> stores;
+
+		@Autowired
+		public PostRequests(List<Store> stores) {
+			this.stores = stores;
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"Auchan, Ostroleka, ul. Cieszynska 3, auchan.webp, auchan-ostroleka-cieszynska.webp",
+				"Piotr i Pawel, Rzeszow, ul. Krakowska 12, groszek.png, piotr-i-pawel-rzeszow-krakowska.png",
+				"Lewiatan, Zielona Gora, ul. Generala Andersa 15, lewiatan.png, lewiatan-zielona-gora-generala-andersa.png"
+		})
+		@DisplayName("POST: '/api/store' with new name")
+		@DirtiesContext
+		public void whenAddingStoreWithImage_thenReturnOKTest(String name, String city,
+				String street, String filename, String expectedFilename) {
+			// given
+			StoreRequestDTO request = createStoreRequest(name, city, street,
+					getRawPathToImage("store/" + filename));
+
+			// when
+			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+			String actualJson = postResponse.getBody();
+			StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+
+			// then
+			assertThat(actual.getImage().getImageUrl())
+					.withFailMessage("The image's remote id was null. That means it "
+							+ "probably was not send to the remote server.")
+					.isNotNull();
+			StoreResponseDTO expected = createStoreResponse(stores.size() + 1, name,
+					city, street, createImageResponse(expectedFilename, actual.getImage()));
+			String expectedJson = toJsonString(expected);
+			assertThat(actual).isEqualTo(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+		}
+
+//		@ParameterizedTest
+//		@CsvSource({
+//				""
+//		})
+//		@DisplayName("POST: '/api/store' with new name")
+//		@DirtiesContext
+//		public void whenAddingStoreWithImage
 	}
 }
