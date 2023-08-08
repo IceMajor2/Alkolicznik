@@ -39,7 +39,7 @@ CREATE TABLE beer_image (
 
 CREATE TABLE store_image (
 	id BIGINT NOT NULL,
-	store_name VARCHAR(255) NOT NULL,
+	store_name VARCHAR(255) NOT NULL UNIQUE,
     url VARCHAR(255) NOT NULL,
     remote_id VARCHAR(255),
     image_component BLOB(1024),
@@ -55,3 +55,4 @@ CREATE TABLE users (
 );
 
 CREATE SEQUENCE user_id_seq START WITH 7 INCREMENT BY 1;
+CREATE SEQUENCE store_img_id_seq START WITH 4 INCREMENT BY 1;

@@ -29,7 +29,7 @@ import org.hibernate.annotations.NaturalId;
 public class StoreImage extends ImageModel implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "storeImgIdSeq")
 	@Column(name = "id")
 	private Long id;
 
