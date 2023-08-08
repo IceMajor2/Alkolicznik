@@ -9,10 +9,12 @@ import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.vaadin.flow.component.html.Image;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -52,6 +55,7 @@ class StoreImageTest {
 	class GetRequests {
 
 		private List<Store> stores;
+
 		private List<StoreImage> storeImages;
 
 		@Autowired
@@ -162,9 +166,14 @@ class StoreImageTest {
 
 		private List<Store> stores;
 
-		@Autowired
-		public PostRequests(List<Store> stores) {
+		private List<StoreImage> storeImages;
+
+		private JdbcTemplate jdbcTemplate;
+
+		public PostRequests(List<Store> stores, List<StoreImage> storeImages, JdbcTemplate jdbcTemplate) {
 			this.stores = stores;
+			this.storeImages = storeImages;
+			this.jdbcTemplate = jdbcTemplate;
 		}
 
 		@ParameterizedTest
@@ -199,12 +208,32 @@ class StoreImageTest {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-		@ParameterizedTest
-		@CsvSource
-		@DisplayName("POST: '/api/store' new image and new store but with existing name")
+		@Test
+		@DisplayName("POST: '/api/store' new image and new store but with existing name overrides previous image")
 		@DirtiesContext
 		public void newStoreAndImageButNonUniqueNameShouldAddImageTest() {
+			// given
+			StoreImage notExpected = getStoreImage("Zabka", storeImages);
+			String notExpectedRemoteId = notExpected.getRemoteId();
+//			Image notExpectedImage = notExpected.getImageComponent();
+			StoreRequestDTO request = createStoreRequest("Zabka", "Kasztanowo", "ul. Niewiadoma 1",
+					getRawPathToImage("store/zabka.jpg"));
 
+			// when
+			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+			String actualRemoteId = jdbcTemplate.queryForObject(
+					"SELECT remote_id FROM store_image WHERE store_name = 'Zabka'", String.class);
+//			Image actualImage = new Image(jdbcTemplate.queryForObject
+//					("SELECT image_url FROM store_image WHERE store_name = 'Zabka'", String.class),
+//					"No image");
+
+			// then
+			assertThat(actualRemoteId)
+					.withFailMessage("The image url was null. That probably means it "
+							+ "was not send to the remote server.")
+					.isNotEqualTo(notExpectedRemoteId);
+//			assertThat(actualImage).isNotEqualTo(notExpectedImage);
 		}
 
 		@ParameterizedTest
