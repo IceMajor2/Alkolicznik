@@ -103,6 +103,27 @@ class StoreImageTest {
 					"Unable to find image for this store",
 					"/api/store/" + storeId + "/image");
 		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "Carrefour", "Lidl", "Zabka" })
+		@DisplayName("GET: '/api/image?store_name=?'")
+		public void shouldReturnImageTest() {
+
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "ikjgsde", "032ka", "fsdkasfgd" })
+		@DisplayName("GET: '/api/image?store_name=?' [STORE_NOT_FOUND]")
+		public void shouldReturn404OnNameNotFoundTest() {
+
+		}
+
+		@ParameterizedTest
+		@ValueSource(strings = { "Biedronka", "Grosik", "Lubi" })
+		@DisplayName("GET: '/api/image?store_name=?' [NO_IMAGE]")
+		public void shouldReturn404OnNoImageTest() {
+
+		}
 	}
 
 	@Nested
@@ -123,9 +144,9 @@ class StoreImageTest {
 				"Piotr i Pawel, Rzeszow, ul. Krakowska 12, groszek.png, piotr-i-pawel-rzeszow-krakowska.png",
 				"Lewiatan, Zielona Gora, ul. Generala Andersa 15, lewiatan.png, lewiatan-zielona-gora-generala-andersa.png"
 		})
-		@DisplayName("POST: '/api/store' with new name")
+		@DisplayName("POST: '/api/store' new store name + image at once")
 		@DirtiesContext
-		public void whenAddingStoreWithImage_thenReturnOKTest(String name, String city,
+		public void shouldAddNewStoreWithImageTest(String name, String city,
 				String street, String filename, String expectedFilename) {
 			// given
 			StoreRequestDTO request = createStoreRequest(name, city, street,
@@ -149,12 +170,36 @@ class StoreImageTest {
 			assertThat(actualJson).isEqualTo(expectedJson);
 		}
 
-//		@ParameterizedTest
-//		@CsvSource({
-//				""
-//		})
-//		@DisplayName("POST: '/api/store' with new name")
-//		@DirtiesContext
-//		public void whenAddingStoreWithImage
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("POST: '/api/store' new image and new store but with existing name")
+		@DirtiesContext
+		public void newStoreAndImageButNonUniqueNameShouldAddImageTest() {
+
+		}
+
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("POST: '/api/store' [STORE_EXISTS]; only image is different")
+		@DirtiesContext
+		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest() {
+
+		}
+
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("POST: '/api/store' image is connected to new store")
+		@DirtiesContext
+		public void imagesShouldBeAssociatedWithNewStoreTest() {
+
+		}
+
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("POST: '/api/store' no image for names = no image for new store")
+		@DirtiesContext
+		public void newStoreWithNoNameImageRelationShouldHaveNoImageTest() {
+
+		}
 	}
 }
