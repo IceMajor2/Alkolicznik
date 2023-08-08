@@ -154,7 +154,7 @@ public class BeerImageTest {
 
 			// then
 			assertThat(actual.getImage().getImageUrl())
-					.withFailMessage("The image's external id was null. That means it "
+					.withFailMessage("The image's remote id was null. That means it "
 							+ "probably was not send to the remote server.")
 					.isNotNull();
 			volume = volume == null ? 0.5 : volume;
@@ -206,6 +206,8 @@ public class BeerImageTest {
 					"File was not found (Path: '%s')".formatted(imgPath),
 					"/api/beer");
 		}
+
+		// TODO: beer exists but with different (or empty) image. expect: 400
 	}
 
 	@Nested
