@@ -302,11 +302,11 @@ public class BeerImageTest {
 		}
 
 		@ParameterizedTest
-		@CsvSource({
+		@CsvSource(value = {
 				"7, 0.5, namyslow.png, guinness-0.5.png",
 				"4, null, kasztelan-niepasteryzowane-0.5.png, zubr-0.5.png",
 				"5, 0.33, zywiec-jasne-0.33.jpg, komes-porter-malinowy-0.33.jpg"
-		})
+		}, nullValues = "null")
 		@DisplayName("PATCH: '/api/beer/{beer_id}'")
 		@DirtiesContext
 		public void updateBeerWithImageTest(Long beerId, Double volume,
@@ -327,7 +327,6 @@ public class BeerImageTest {
 					.withFailMessage("The image's external id was null. That means it "
 							+ "probably was not send to the remote server.")
 					.isNotNull();
-			beer.setVolume(volume);
 			BeerResponseDTO expected = createBeerResponse(beer,
 					createImageResponse(expectedFilename, actual.getImage()));
 			String expectedJson = toJsonString(expected);
