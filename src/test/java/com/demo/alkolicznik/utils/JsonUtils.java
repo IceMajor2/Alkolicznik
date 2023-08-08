@@ -37,16 +37,22 @@ public class JsonUtils {
 
 	private static ObjectMapper mapper = new ObjectMapper();
 
-	public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
+	public static StoreRequestDTO createStoreRequest(String name, String city,
+			String street, String imagePath) {
 		StoreRequestDTO request = new StoreRequestDTO();
 		request.setName(name);
 		request.setCity(city);
 		request.setStreet(street);
+		request.setImagePath(imagePath);
 		return request;
 	}
 
 	public static StoreRequestDTO createStoreRequest(Store store) {
-		return createStoreRequest(store.getName(), store.getCity(), store.getStreet());
+		return createStoreRequest(store.getName(), store.getCity(), store.getStreet(), null);
+	}
+
+	public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
+		return createStoreRequest(name, city, street, null);
 	}
 
 	public static StoreResponseDTO createStoreResponse(Integer id, String name, String city, String street) {
@@ -127,6 +133,15 @@ public class JsonUtils {
 		return request;
 	}
 
+	public static BeerRequestDTO createBeerRequest(Beer beer) {
+		BeerRequestDTO request =
+				createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume(), null);
+//		if (beer.getImage().isPresent()) {
+//			request.setImagePath(beer.getImage().get().getImageUrl());
+//		}
+		return request;
+	}
+
 	public static BeerDeleteRequestDTO createBeerDeleteRequest(String brand, String type, Double volume) {
 		BeerDeleteRequestDTO request = new BeerDeleteRequestDTO();
 		request.setBrand(brand);
@@ -137,14 +152,6 @@ public class JsonUtils {
 
 	public static BeerDeleteRequestDTO createBeerDeleteRequest(Beer beer) {
 		return createBeerDeleteRequest(beer.getBrand(), beer.getType(), beer.getVolume());
-	}
-
-	public static BeerRequestDTO createBeerRequest(Beer beer) {
-		BeerRequestDTO request = createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
-		if (beer.getImage().isPresent()) {
-			request.setImagePath(beer.getImage().get().getImageUrl());
-		}
-		return request;
 	}
 
 	public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
