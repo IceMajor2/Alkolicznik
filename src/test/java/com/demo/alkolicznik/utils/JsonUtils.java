@@ -105,10 +105,13 @@ public class JsonUtils {
 	}
 
 	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
-		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(image.getImageUrl());
-		response.setRemoteId(image.getRemoteId());
-		return response;
+		if(image != null) {
+			ImageModelResponseDTO response = new ImageModelResponseDTO();
+			response.setImageUrl(image.getImageUrl());
+			response.setRemoteId(image.getRemoteId());
+			return response;
+		}
+		return null;
 	}
 
 	public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
