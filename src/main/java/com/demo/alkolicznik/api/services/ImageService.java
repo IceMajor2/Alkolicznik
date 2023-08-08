@@ -77,12 +77,36 @@ public class ImageService {
 		if (!proportionsOk(ImageIO.read(file))) {
 			throw new ImageProportionsInvalidException();
 		}
-		BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, "/beer",
-				this.createImageFilename
-						(beer, this.extractFileExtensionFromPath(imagePath)));
+		BeerImage beerImage = (BeerImage) imageKitRepository.save(
+				imagePath, "/beer", this.createImageFilename(beer,
+						this.extractFileExtensionFromPath(imagePath)), BeerImage.class);
 		beer.setImage(beerImage);
 		beerImage.setBeer(beer);
 		beerImageRepository.save(beerImage);
+	}
+
+	public void addStoreImage(Store store, String imagePath) {
+		File file = new File(imagePath);
+		if (!file.exists()) throw new FileNotFoundException(imagePath);
+
+		String storeName = store.getName();
+		StoreImage storeImage = (StoreImage) imageKitRepository.save(
+				imagePath, "/store", this.createImageFilename(storeName,
+						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
+		storeImage.setStoreName(storeName);
+		storeImage.getStores().add(store);
+		store.setImage(storeImage);
+		storeImageRepository.save(storeImage);
+		// updating other stores
+		// TODO: do not make this update and see what happens once all the tests are written
+		Set<Store> namedStores = storeRepository.findAllByName(storeName);
+
+		if (namedStores.isEmpty()) return;
+		for (Store namedStore : namedStores) {
+			namedStore.setImage(storeImage);
+		}
+		storeImage.getStores().addAll(namedStores);
+		storeRepository.saveAll(namedStores);
 	}
 
 	public ImageModelResponseDTO addStoreImage(String storeName, ImageRequestDTO imageRequestDTO) {
@@ -91,10 +115,10 @@ public class ImageService {
 		String imagePath = imageRequestDTO.getImagePath();
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
-		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
-				this.createImageFilename
-						(storeName, this.extractFileExtensionFromPath(imagePath)));
-		for(Store store : namedStores) {
+		StoreImage storeImage = (StoreImage) imageKitRepository.save(
+				imagePath, "/store", this.createImageFilename(storeName,
+						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
+		for (Store store : namedStores) {
 			store.setImage(storeImage);
 		}
 		storeImage.setStores(namedStores);
@@ -199,6 +223,7 @@ public class ImageService {
 		StringBuilder stringBuilder = new StringBuilder("");
 		stringBuilder
 				.append(storeName.toLowerCase().replace(' ', '-'))
+				.append('.')
 				.append(extension);
 		return stringBuilder.toString();
 	}

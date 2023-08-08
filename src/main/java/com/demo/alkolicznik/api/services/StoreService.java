@@ -14,19 +14,19 @@ import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
+import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
 import static com.demo.alkolicznik.utils.ModelDtoConverter.storeListToDtoList;
 
 @Service
+@AllArgsConstructor
 public class StoreService {
 
 	private StoreRepository storeRepository;
 
-	public StoreService(StoreRepository storeRepository) {
-		this.storeRepository = storeRepository;
-	}
+	private ImageService imageService;
 
 	public List<StoreResponseDTO> getStores(String city) {
 		if (!storeRepository.existsByCity(city)) {
@@ -39,18 +39,20 @@ public class StoreService {
 		return storeListToDtoList(storeRepository.findAllByOrderByIdAsc());
 	}
 
-	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
-		Store store = ModelDtoConverter.convertToModelNoImage(requestDTO);
-		if (storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
-			throw new StoreAlreadyExistsException();
-		}
-		return new StoreResponseDTO(storeRepository.save(store));
-	}
-
 	public StoreResponseDTO get(Long storeId) {
 		return new StoreResponseDTO(storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId))
 		);
+	}
+
+	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
+		Store store = ModelDtoConverter.convertToModelNoImage(requestDTO);
+		if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
+
+		String imagePath = requestDTO.getImagePath();
+		if (imagePath != null) imageService.addStoreImage(store, imagePath);
+		StoreResponseDTO storeResponseDTO = new StoreResponseDTO(storeRepository.save(store));
+		return storeResponseDTO;
 	}
 
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {

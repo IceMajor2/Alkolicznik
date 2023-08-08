@@ -6,7 +6,7 @@ import com.demo.alkolicznik.api.services.ImageService;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ImageController {
 
 	private ImageService imageService;

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
+import com.demo.alkolicznik.models.image.StoreImage;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.exceptions.NotFoundException;
@@ -37,27 +38,33 @@ public class ImageKitRepository {
 		setConfig();
 	}
 
-	public ImageModel save(String srcPath, String remotePath, String filename) {
-		return save(srcPath, remotePath, filename, true);
-	}
-
 	/**
 	 * This procedure reads the file from a {@code path}, converts it into
 	 * an ImageKit-library-uploadable and sends it to an external image hosting.
 	 */
 	@SneakyThrows
-	public ImageModel save(String srcPath, String remotePath, String filename, boolean urlTransform) {
+	public ImageModel save(String srcPath, String remotePath, String filename, Class<? extends ImageModel> imgClass) {
 		Result result = upload(srcPath, remotePath, filename);
-		if (urlTransform) {
-			// get link with named transformation 'get_beer'
-			List<Map<String, String>> transformation = new ArrayList<>
-					(List.of(Map.of("named", "get_beer")));
-			Map<String, Object> options = new HashMap<>();
-			options.put("path", result.getFilePath());
-			options.put("transformation", transformation);
+		// get link with named transformation
+		var options = getOptions(result, imgClass);
+		if (imgClass.equals(StoreImage.class))
+			return new StoreImage(mapUrl(options), result.getFileId());
+		if (imgClass.equals(BeerImage.class))
 			return new BeerImage(mapUrl(options), result.getFileId());
-		}
-		return new BeerImage(mapUrl(null), result.getFileId());
+		return null;
+	}
+
+	private static Map<String, Object> getOptions(Result result, Class<? extends ImageModel> imgClass) {
+		List<Map<String, String>> transformation = new ArrayList<>
+				(List.of(Map.of(
+						"named", imgClass.equals(StoreImage.class)
+								? "get_store" : imgClass.equals(BeerImage.class)
+								? "get_beer" : null
+				)));
+		Map<String, Object> options = new HashMap<>();
+		options.put("path", result.getFilePath());
+		options.put("transformation", transformation);
+		return options;
 	}
 
 	@SneakyThrows
