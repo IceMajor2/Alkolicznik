@@ -89,6 +89,15 @@ public class TestUtils {
 		return null;
 	}
 
+	public static StoreImage getStoreImage(String storeName, List<StoreImage> storeImages) {
+		for(var image : storeImages) {
+			if(image.getStoreName().equals(storeName)) {
+				return image;
+			}
+		}
+		return null;
+	}
+
 	public static User getUser(int id, List<User> users) {
 		for (User user : users) {
 			if (user.getId().intValue() == id) {

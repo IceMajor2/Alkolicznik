@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import java.util.List;
+import java.util.Map;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
@@ -51,10 +52,12 @@ class StoreImageTest {
 	class GetRequests {
 
 		private List<Store> stores;
+		private List<StoreImage> storeImages;
 
 		@Autowired
-		public GetRequests(List<Store> stores) {
+		public GetRequests(List<Store> stores, List<StoreImage> storeImages) {
 			this.stores = stores;
+			this.storeImages = storeImages;
 		}
 
 		@ParameterizedTest
@@ -107,22 +110,48 @@ class StoreImageTest {
 		@ParameterizedTest
 		@ValueSource(strings = { "Carrefour", "Lidl", "Zabka" })
 		@DisplayName("GET: '/api/image?store_name=?'")
-		public void shouldReturnImageTest() {
+		public void shouldReturnImageTest(String storeName) {
+			StoreImage image = getStoreImage(storeName, storeImages);
 
+			// when
+			var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+			String actualJson = getResponse.getBody();
+			ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
+
+			// then
+			ImageModelResponseDTO expected = createImageResponse(image);
+			String expectedJson = toJsonString(expected);
+			assertThat(actualJson).isEqualTo(expectedJson);
+			assertThat(actual).isEqualTo(expected);
 		}
 
 		@ParameterizedTest
 		@ValueSource(strings = { "ikjgsde", "032ka", "fsdkasfgd" })
 		@DisplayName("GET: '/api/image?store_name=?' [STORE_NOT_FOUND]")
-		public void shouldReturn404OnNameNotFoundTest() {
+		public void shouldReturn404OnNameNotFoundTest(String storeName) {
+			var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
 
+			String actualJson = getResponse.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '%s' name".formatted(storeName),
+					"/api/image"
+			);
 		}
 
 		@ParameterizedTest
 		@ValueSource(strings = { "Biedronka", "Grosik", "Lubi" })
 		@DisplayName("GET: '/api/image?store_name=?' [NO_IMAGE]")
-		public void shouldReturn404OnNoImageTest() {
+		public void shouldReturn404OnNoImageTest(String storeName) {
+			var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
 
+			String actualJson = getResponse.getBody();
+
+			assertIsError(actualJson,
+					HttpStatus.NOT_FOUND,
+					"Unable to find image for this store",
+					"/api/image");
 		}
 	}
 
