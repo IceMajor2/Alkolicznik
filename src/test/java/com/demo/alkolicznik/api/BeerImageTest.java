@@ -60,6 +60,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestClassOrder(ClassOrderer.Random.class)
 public class BeerImageTest {
 
+	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_beer/test/beer/";
+
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
