@@ -80,10 +80,10 @@ public class TestUtils {
 		return null;
 	}
 
-	public static StoreImage getStoreImage(String storeName, List<StoreImage> storeImages) {
-		for (var image : storeImages) {
-			if (image.getStoreName().equals(storeName)) {
-				return image;
+	public static StoreImage getStoreImage(Long storeId, List<Store> stores) {
+		for(var store: stores) {
+			if(store.getId().equals(storeId)) {
+				return store.getImage().orElse(null);
 			}
 		}
 		return null;

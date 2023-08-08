@@ -60,6 +60,34 @@ public class Store {
 	@JsonIgnore
 	private Set<BeerPrice> prices = new HashSet<>();
 
+	@Override
+	public String toString() {
+		return this.name + ", " + this.city + " " + this.street + " (" + this.id + ")";
+	}
+
+	public Optional<StoreImage> getImage() {
+		return Optional.ofNullable(image);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, city, street);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || !(o instanceof Store)) {
+			return false;
+		}
+		Store store = (Store) o;
+		return Objects.equals(name, store.getName()) &&
+				Objects.equals(city, store.getCity()) &&
+				Objects.equals(street, store.getStreet());
+	}
+
 	public void saveBeer(Beer beer, double price) {
 		saveBeer(beer, Monetary.getDefaultAmountFactory()
 				.setCurrency("PLN").setNumber(price).create());
@@ -108,29 +136,5 @@ public class Store {
 			}
 		}
 		return Optional.empty();
-	}
-
-	@Override
-	public String toString() {
-		return this.name + ", " + this.city + " " + this.street + " (" + this.id + ")";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(name, city, street);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || !(o instanceof Store)) {
-			return false;
-		}
-		Store store = (Store) o;
-		return Objects.equals(name, store.getName()) &&
-				Objects.equals(city, store.getCity()) &&
-				Objects.equals(street, store.getStreet());
 	}
 }
