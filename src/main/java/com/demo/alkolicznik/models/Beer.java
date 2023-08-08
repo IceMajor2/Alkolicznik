@@ -83,10 +83,6 @@ public class Beer {
 		return Optional.ofNullable(image);
 	}
 
-	public void setImage(BeerImage image) {
-		this.image = image;
-	}
-
 	@JsonProperty("name")
 	public String getFullName() {
 		StringBuilder sb = new StringBuilder(this.brand);
