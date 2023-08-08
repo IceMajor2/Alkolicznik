@@ -57,6 +57,14 @@ public class ImageService {
 		return new ImageModelResponseDTO(image);
 	}
 
+	public ImageModelResponseDTO getStoreImage(String storeName) {
+		if (!storeRepository.existsByName(storeName))
+			throw new StoreNotFoundException(storeName);
+		StoreImage image = storeImageRepository.findByStoreName(storeName)
+				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
+		return new ImageModelResponseDTO(image);
+	}
+
 	@SneakyThrows
 	public void add(Beer beer, String imagePath) {
 		// instantiate BufferedImage and check its proportions

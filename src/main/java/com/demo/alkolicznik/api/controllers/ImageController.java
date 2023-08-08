@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,8 +33,13 @@ public class ImageController {
 		return imageService.delete(beerId);
 	}
 
-	@GetMapping("store/{store_id}/image")
+	@GetMapping("/store/{store_id}/image")
 	public ImageModelResponseDTO getStoreImage(@PathVariable("store_id") Long storeId) {
 		return imageService.getStoreImage(storeId);
+	}
+
+	@GetMapping("/image")
+	public ImageModelResponseDTO getStoreImage(@RequestParam("store_name") String storeName) {
+		return imageService.getStoreImage(storeName);
 	}
 }

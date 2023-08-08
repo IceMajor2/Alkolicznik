@@ -39,6 +39,8 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 
 	boolean existsByNameAndCityAndStreet(String name, String city, String street);
 
+	boolean existsByName(String name);
+
 	default boolean exists(Store store) {
 		return existsByNameAndCityAndStreet
 				(store.getName(), store.getCity(), store.getStreet());

@@ -13,4 +13,8 @@ public class StoreNotFoundException extends RuntimeException {
     public StoreNotFoundException(String name, String city, String street) {
         super("Unable to find '%s' located in '%s, %s'".formatted(name, city, street));
     }
+
+	public StoreNotFoundException(String name) {
+		super("Unable to find store of '%s' name".formatted(name));
+	}
 }

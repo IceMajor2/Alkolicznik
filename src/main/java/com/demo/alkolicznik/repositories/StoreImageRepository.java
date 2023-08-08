@@ -9,4 +9,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface StoreImageRepository extends CrudRepository<StoreImage, Long> {
 
 	Optional<StoreImage> findByImageUrl(String imageUrl);
+
+	Optional<StoreImage> findByStoreName(String storeName);
 }
