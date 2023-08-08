@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.dto.store;
 
-import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -26,11 +25,4 @@ public class StoreRequestDTO {
 	@JsonProperty("image_path")
 	private String imagePath;
 
-    public Store convertToModel() {
-        Store store = new Store();
-        store.setName(this.name);
-        store.setCity(this.city);
-        store.setStreet(this.street);
-        return store;
-    }
 }

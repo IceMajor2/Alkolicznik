@@ -13,6 +13,7 @@ import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.StoreRepository;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 
 import org.springframework.stereotype.Service;
 
@@ -38,8 +39,8 @@ public class StoreService {
 		return storeListToDtoList(storeRepository.findAllByOrderByIdAsc());
 	}
 
-	public StoreResponseDTO add(StoreRequestDTO storeRequestDTO) {
-		Store store = storeRequestDTO.convertToModel();
+	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
+		Store store = ModelDtoConverter.convertToModelNoImage(requestDTO);
 		if (storeRepository.existsByNameAndCityAndStreet(store.getName(), store.getCity(), store.getStreet())) {
 			throw new StoreAlreadyExistsException();
 		}
@@ -54,7 +55,7 @@ public class StoreService {
 
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {
 		Store toOverwrite = checkForPutConditions(storeId, requestDTO);
-		Store newStore = requestDTO.convertToModel();
+		Store newStore = ModelDtoConverter.convertToModelNoImage(requestDTO);
 		Store overwritten = updateFieldsOnPut(toOverwrite, newStore);
 
 		if (storeRepository.exists(overwritten)) {
