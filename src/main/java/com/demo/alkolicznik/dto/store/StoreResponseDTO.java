@@ -11,6 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class StoreResponseDTO {
 
     private Long id;
@@ -28,10 +29,5 @@ public class StoreResponseDTO {
 		if(store.getImage().isPresent()) {
 			this.image = new ImageModelResponseDTO(store.getImage().get());
 		}
-    }
-
-    @Override
-    public String toString() {
-        return "ID %d. %s, %s (%s)".formatted(this.id, this.name, this.street, this.city);
     }
 }
