@@ -6,6 +6,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
@@ -64,9 +67,9 @@ public class ReloadScript implements CommandLineRunner {
 			LOGGER.info("Deleting remote directory '%s'...".formatted(imageKitPath));
 			deleteFolder("");
 			LOGGER.info("Sending BEER images to remote...");
-			sendImages("/images/beer", "/beer");
+			sendImages("/images/beer", "/beer", BeerImage.class);
 			LOGGER.info("Sending STORE images to remote...");
-			sendImages("/images/store", "/store");
+			sendImages("/images/store", "/store", StoreImage.class);
 			LOGGER.info("Updating database table with remote IDs...");
 			updateBeerImagesWithRemoteIDs("/beer");
 			updateStoreImageWithRemoteIDs("/store");
@@ -98,10 +101,10 @@ public class ReloadScript implements CommandLineRunner {
 	}
 
 	@SneakyThrows
-	private void sendImages(String srcPath, String remoteDir) {
+	private void sendImages(String srcPath, String remoteDir, Class<? extends ImageModel> imgClass) {
 		File[] imageDirectory = new File(new ClassPathResource(srcPath).getURI().getRawPath()).listFiles();
 		for (File image : imageDirectory) {
-			imageKitRepository.save(image.getAbsolutePath(), remoteDir, image.getName());
+			imageKitRepository.save(image.getAbsolutePath(), remoteDir, image.getName(), imgClass);
 		}
 	}
 

@@ -3,6 +3,8 @@ package com.demo.alkolicznik.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -46,7 +48,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(DisabledVaadinContext.class)
 @ActiveProfiles({ "main", "image" })
 @TestClassOrder(ClassOrderer.Random.class)
-class StoreImageTest {
+public class StoreImageTest {
+
+	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_store/test/store/";
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
@@ -169,10 +173,11 @@ class StoreImageTest {
 
 		private JdbcTemplate jdbcTemplate;
 
-		public PostRequests(List<Store> stores, List<StoreImage> storeImages, JdbcTemplate jdbcTemplate) {
+		@Autowired
+		public PostRequests(List<Store> stores, List<StoreImage> storeImages, DataSource dataSource) {
 			this.stores = stores;
 			this.storeImages = storeImages;
-			this.jdbcTemplate = jdbcTemplate;
+			this.jdbcTemplate = new JdbcTemplate(dataSource);
 		}
 
 		@ParameterizedTest
@@ -197,11 +202,12 @@ class StoreImageTest {
 
 			// then
 			assertThat(actual.getImage().getImageUrl())
-					.withFailMessage("The image's remote id was null. That means it "
+					.withFailMessage("The image url was null. That means it "
 							+ "probably was not send to the remote server.")
 					.isNotNull();
 			StoreResponseDTO expected = createStoreResponse(stores.size() + 1, name,
-					city, street, createImageResponse(expectedFilename, actual.getImage()));
+					city, street, createImageResponse(expectedFilename, actual.getImage(),
+							StoreImage.class));
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);

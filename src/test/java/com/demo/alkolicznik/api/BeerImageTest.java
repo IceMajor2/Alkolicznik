@@ -159,7 +159,7 @@ public class BeerImageTest {
 					.isNotNull();
 			volume = volume == null ? 0.5 : volume;
 			BeerResponseDTO expected = createBeerResponse(beers.size() + 1, brand, type,
-					volume, createImageResponse(expectedFilename, actual.getImage()));
+					volume, createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
@@ -242,7 +242,7 @@ public class BeerImageTest {
 					.isNotNull();
 			volume = volume == null ? 0.5 : volume;
 			BeerResponseDTO expected = createBeerResponse(replaceId, brand, type, volume,
-					createImageResponse(expectedFilename, actual.getImage()));
+					createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
@@ -330,7 +330,7 @@ public class BeerImageTest {
 							+ "probably was not send to the remote server.")
 					.isNotNull();
 			BeerResponseDTO expected = createBeerResponse(beer,
-					createImageResponse(expectedFilename, actual.getImage()));
+					createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
 			String expectedJson = toJsonString(expected);
 			assertThat(actual).isEqualTo(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);

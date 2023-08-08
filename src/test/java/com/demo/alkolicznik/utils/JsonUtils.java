@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.demo.alkolicznik.api.BeerImageTest;
+import com.demo.alkolicznik.api.StoreImageTest;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
@@ -26,7 +27,9 @@ import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -102,18 +105,26 @@ public class JsonUtils {
 				image);
 	}
 
-	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual) {
+	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(
+				(imgClass.equals(StoreImage.class)
+						? StoreImageTest.IMG_TRANSFORMED_URL : imgClass.equals(BeerImage.class)
+						? BeerImageTest.IMG_TRANSFORMED_URL : null) + filename
+		);
 		if (actual.getRemoteId() != null) {
 			response.setRemoteId(actual.getRemoteId());
 		}
 		return response;
 	}
 
-	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId) {
+	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId, Class<? extends ImageModel> imgClass) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
-		response.setImageUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
+		response.setImageUrl(
+				(imgClass.equals(StoreImage.class)
+						? StoreImageTest.IMG_TRANSFORMED_URL : imgClass.equals(BeerImage.class)
+						? BeerImageTest.IMG_TRANSFORMED_URL : null) + filename
+		);
 		response.setRemoteId(remoteId);
 		return response;
 	}
