@@ -23,10 +23,10 @@ import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.ImageModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -104,14 +104,11 @@ public class JsonUtils {
 		return response;
 	}
 
-	public static ImageModelResponseDTO createImageResponse(BeerImage image) {
-		if (image != null) {
-			ImageModelResponseDTO response = new ImageModelResponseDTO();
-			response.setImageUrl(image.getImageUrl());
-			response.setRemoteId(image.getRemoteId());
-			return response;
-		}
-		return null;
+	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
+		ImageModelResponseDTO response = new ImageModelResponseDTO();
+		response.setImageUrl(image.getImageUrl());
+		response.setRemoteId(image.getRemoteId());
+		return response;
 	}
 
 	public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
