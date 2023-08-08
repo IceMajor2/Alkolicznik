@@ -144,7 +144,7 @@ public class BeerImageTest {
 		public void whenAddingBeerWithImage_thenReturnOKTest(String brand, String type,
 				Double volume, String filename, String expectedFilename) {
 			// given
-			BeerRequestDTO request = createBeerRequest(brand, type, volume, getRawPathToImage(filename));
+			BeerRequestDTO request = createBeerRequest(brand, type, volume, getRawPathToImage("beer/" + filename));
 
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
@@ -182,7 +182,7 @@ public class BeerImageTest {
 		public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test(String filename) {
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer",
 					createBeerRequest("Heineken", null, 0.33,
-							getRawPathToImage(filename)));
+							getRawPathToImage("beer/" + filename)));
 
 			String jsonResponse = postResponse.getBody();
 
@@ -195,7 +195,7 @@ public class BeerImageTest {
 		@Test
 		@DisplayName("POST: '/api/beer' [FILE_NOT_FOUND]")
 		public void givenInvalidPath_whenAddingBeerImage_thenReturn404Test() {
-			String imgPath = getRawPathToImage("kljhvdfsur.png");
+			String imgPath = getRawPathToImage("beer/kljhvdfsur.png");
 			var postResponse = postRequestAuth("admin", "admin", "/api/beer",
 					createBeerRequest("Lomza", null, null, imgPath));
 
@@ -227,7 +227,7 @@ public class BeerImageTest {
 				String type, Double volume, String filename, String expectedFilename) {
 			// given
 			BeerRequestDTO request =
-					createBeerRequest(brand, type, volume, getRawPathToImage(filename));
+					createBeerRequest(brand, type, volume, getRawPathToImage("beer/" + filename));
 
 			// when
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + replaceId, request);
@@ -262,7 +262,7 @@ public class BeerImageTest {
 		@Test
 		@DisplayName("PUT: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
 		public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
-			String path = getRawPathToImage("gdfijh.webp");
+			String path = getRawPathToImage("beer/gdfijh.webp");
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/5",
 					createBeerRequest("Karpackie", null, 0.5, path));
 
@@ -278,7 +278,7 @@ public class BeerImageTest {
 		@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
 		@DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
 		public void givenInvalidProportions_whenReplacingBeer_thenReturn400Test(String filename) {
-			String path = getRawPathToImage(filename);
+			String path = getRawPathToImage("beer/" + filename);
 			var putResponse = putRequestAuth("admin", "admin", "/api/beer/2",
 					createBeerRequest("Debowe", "Mocne", null, path));
 
@@ -316,7 +316,7 @@ public class BeerImageTest {
 			Beer beer = getBeer(beerId, beers);
 			// given
 			BeerUpdateDTO request = createBeerUpdateRequest
-					(null, null, volume, getRawPathToImage(filename));
+					(null, null, volume, getRawPathToImage("beer/" + filename));
 
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
@@ -376,7 +376,7 @@ public class BeerImageTest {
 			var prices = beer.getPrices();
 			assertThat(prices).isNotEmpty();
 			BeerUpdateDTO request =
-					createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
+					createBeerUpdateRequest(null, null, null, getRawPathToImage("beer/" + filename));
 
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
@@ -428,7 +428,7 @@ public class BeerImageTest {
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
 		public void updateBeerImageFileNotFoundTest() {
 			// given
-			String imgPath = getRawPathToImage("kljhvdfsur.png");
+			String imgPath = getRawPathToImage("beer/kljhvdfsur.png");
 			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, imgPath);
 
 			// when
@@ -447,7 +447,7 @@ public class BeerImageTest {
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
 		public void updateBeerImageInvalidProportionsTest(String filename) {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage(filename));
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage("beer/" + filename));
 
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
