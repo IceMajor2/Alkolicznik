@@ -995,10 +995,13 @@ public class BeerPriceTest {
 
 		private List<Store> stores;
 
+		private List<BeerPrice> prices;
+
 		@Autowired
-		public DeleteRequests(List<Beer> beers, List<Store> stores) {
+		public DeleteRequests(List<Beer> beers, List<Store> stores, List<BeerPrice> beerPrices) {
 			this.beers = beers;
 			this.stores = stores;
+			this.prices = beerPrices;
 		}
 
 		@ParameterizedTest
@@ -1025,7 +1028,7 @@ public class BeerPriceTest {
 			BeerPriceDeleteDTO expected = createBeerPriceDeleteResponse(
 					createBeerResponse(getBeer(beerId.longValue(), beers)),
 					createStoreResponse(getStore(storeId.longValue(), stores)),
-					getBeerPrice(storeId, beerId, stores, beers).getPrice().toString(),
+					getBeerPrice(storeId, beerId, prices).getPrice().toString(),
 					"Beer price was deleted successfully!"
 			);
 			String expectedJson = toJsonString(expected);

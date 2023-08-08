@@ -12,6 +12,7 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.StoreImage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -46,14 +47,10 @@ public class TestUtils {
 		return null;
 	}
 
-	// TODO: add helpers for other beans
-
-	// TODO: change parameters
-	public static BeerPrice getBeerPrice(Long storeId, Long beerId, List<Store> stores, List<Beer> beers) {
-		Store store = getStore(storeId, stores);
-		for (BeerPrice beerPrice : store.getPrices()) {
-			if (beerPrice.getBeer().getId().equals(beerId)) {
-				return beerPrice;
+	public static BeerPrice getBeerPrice(Long storeId, Long beerId, List<BeerPrice> prices) {
+		for (var price : prices) {
+			if (price.getBeer().getId().equals(beerId) && price.getStore().getId().equals(storeId)) {
+				return price;
 			}
 		}
 		return null;
@@ -74,13 +71,27 @@ public class TestUtils {
 		return beersInCity;
 	}
 
-	public static BeerImage getImage(Long beerId, List<Beer> beers) {
-		return getBeer(beerId, beers).getImage().get();
+	public static BeerImage getBeerImage(Long beerId, List<BeerImage> beerImages) {
+		for (var image : beerImages) {
+			if (image.getId().equals(beerId)) {
+				return image;
+			}
+		}
+		return null;
+	}
+
+	public static StoreImage getStoreImage(String storeName, List<StoreImage> storeImages) {
+		for (var image : storeImages) {
+			if (image.getStoreName().equals(storeName)) {
+				return image;
+			}
+		}
+		return null;
 	}
 
 	public static User getUser(int id, List<User> users) {
-		for(User user : users) {
-			if(user.getId().intValue() == id) {
+		for (User user : users) {
+			if (user.getId().intValue() == id) {
 				return user;
 			}
 		}
