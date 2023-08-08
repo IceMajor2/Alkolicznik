@@ -55,17 +55,25 @@ public class JsonUtils {
 		return createStoreRequest(name, city, street, null);
 	}
 
-	public static StoreResponseDTO createStoreResponse(Integer id, String name, String city, String street) {
+	public static StoreResponseDTO createStoreResponse(Integer id, String name,
+			String city, String street, ImageModelResponseDTO imageDTO) {
 		StoreResponseDTO store = new StoreResponseDTO();
 		store.setId(id.longValue());
 		store.setName(name);
 		store.setCity(city);
 		store.setStreet(street);
+		store.setImage(imageDTO);
 		return store;
 	}
 
+	public static StoreResponseDTO createStoreResponse(Integer id, String name,
+			String city, String street) {
+		return createStoreResponse(id, name, city, street, null);
+	}
+
 	public static StoreResponseDTO createStoreResponse(Store store) {
-		return createStoreResponse(store.getId().intValue(), store.getName(), store.getCity(), store.getStreet());
+		return createStoreResponse(store.getId().intValue(), store.getName(),
+				store.getCity(), store.getStreet(), createImageResponse(store.getImage().orElse(null)));
 	}
 
 	public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageModelResponseDTO imageDTO) {
@@ -111,7 +119,7 @@ public class JsonUtils {
 	}
 
 	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
-		if(image != null) {
+		if (image != null) {
 			ImageModelResponseDTO response = new ImageModelResponseDTO();
 			response.setImageUrl(image.getImageUrl());
 			response.setRemoteId(image.getRemoteId());
@@ -136,9 +144,6 @@ public class JsonUtils {
 	public static BeerRequestDTO createBeerRequest(Beer beer) {
 		BeerRequestDTO request =
 				createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume(), null);
-//		if (beer.getImage().isPresent()) {
-//			request.setImagePath(beer.getImage().get().getImageUrl());
-//		}
 		return request;
 	}
 
@@ -171,8 +176,7 @@ public class JsonUtils {
 	}
 
 	public static BeerPriceResponseDTO createBeerPriceResponse(BeerResponseDTO beerResponseDTO,
-			StoreResponseDTO storeResponseDTO,
-			String price) {
+			StoreResponseDTO storeResponseDTO, String price) {
 		BeerPriceResponseDTO response = new BeerPriceResponseDTO();
 		response.setBeer(beerResponseDTO);
 		response.setStore(storeResponseDTO);
