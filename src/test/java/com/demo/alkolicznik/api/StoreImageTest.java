@@ -9,7 +9,6 @@ import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
-import com.vaadin.flow.component.html.Image;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -178,9 +177,9 @@ class StoreImageTest {
 
 		@ParameterizedTest
 		@CsvSource({
-				"Auchan, Ostroleka, ul. Cieszynska 3, auchan.webp, auchan-ostroleka-cieszynska.webp",
-				"Piotr i Pawel, Rzeszow, ul. Krakowska 12, groszek.png, piotr-i-pawel-rzeszow-krakowska.png",
-				"Lewiatan, Zielona Gora, ul. Generala Andersa 15, lewiatan.png, lewiatan-zielona-gora-generala-andersa.png"
+				"Auchan, Ostroleka, ul. Cieszynska 3, f_auchan.webp, auchan.webp",
+				"Piotr i Pawel, Rzeszow, ul. Krakowska 12, f_piotr-i-pawel.png, piotr-i-pawel.png",
+				"Lewiatan, Zielona Gora, ul. Generala Andersa 15, f_lewiatan.png, lewiatan.png"
 		})
 		@DisplayName("POST: '/api/store' new store name + image at once")
 		@DirtiesContext
