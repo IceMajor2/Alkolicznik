@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.api;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
@@ -44,6 +43,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
+import static com.demo.alkolicznik.utils.TestUtils.getBeerImage;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
@@ -67,19 +67,18 @@ public class BeerImageTest {
 	@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 	class GetRequests {
 
-		private List<Beer> beers;
+		private List<BeerImage> beerImages;
 
 		@Autowired
-		public GetRequests(List<Beer> beers) {
-			this.beers = beers;
+		public GetRequests(List<BeerImage> beerImages) {
+			this.beerImages = beerImages;
 		}
 
 		@ParameterizedTest
 		@ValueSource(longs = { 3, 4, 5, 6 })
 		@DisplayName("GET: '/api/beer/{beer_id}/image'")
 		public void whenGettingBeerImage_thenReturnOKTest(Long beerId) {
-			Optional<BeerImage> img = getBeer(beerId.longValue(), beers).getImage();
-			assertThat(img).isNotEmpty();
+			BeerImage img = getBeerImage(beerId.longValue(), beerImages);
 
 			// when
 			var getResponse = getRequest("/api/beer/" + beerId + "/image");
@@ -87,7 +86,7 @@ public class BeerImageTest {
 			ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
 			// then
-			ImageModelResponseDTO expected = createImageResponse(img.get());
+			ImageModelResponseDTO expected = createImageResponse(img);
 			String expectedJson = toJsonString(expected);
 			assertThat(actualJson).isEqualTo(expectedJson);
 			assertThat(actual).isEqualTo(expected);
@@ -305,7 +304,7 @@ public class BeerImageTest {
 		@ParameterizedTest
 		@CsvSource({
 				"7, 0.5, namyslow.png, guinness-0.5.png",
-				"4, 0.5, kasztelan-niepasteryzowane-0.5.png, zubr-0.5.png",
+				"4, null, kasztelan-niepasteryzowane-0.5.png, zubr-0.5.png",
 				"5, 0.33, zywiec-jasne-0.33.jpg, komes-porter-malinowy-0.33.jpg"
 		})
 		@DisplayName("PATCH: '/api/beer/{beer_id}'")
