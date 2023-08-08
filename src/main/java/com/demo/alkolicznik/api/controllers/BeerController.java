@@ -78,7 +78,7 @@ public class BeerController {
 	}
 
 	@Operation(summary = "Add new beer",
-			description = "If you found a beer missing, feel free to add it!")
+			description = "If you found a beer missing, feel free to addBeerImage it!")
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "beer successfully created"),
 			@ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),

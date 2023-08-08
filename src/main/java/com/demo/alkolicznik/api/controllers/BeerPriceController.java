@@ -120,8 +120,8 @@ public class BeerPriceController {
 			description = "This whole application is about prices! "
 					+ "What are you waiting for?<br>"
 					+ "<b>Options available:</b><br>"
-					+ "<i>/api/store/{store_id}/beer-price</i> - add by JSON string (see body below)<br>"
-					+ "<i>/api/store/{store_id}/beer-price?beer_id=?beer_price=</i> - add by parameters")
+					+ "<i>/api/store/{store_id}/beer-price</i> - addBeerImage by JSON string (see body below)<br>"
+					+ "<i>/api/store/{store_id}/beer-price?beer_id=?beer_price=</i> - addBeerImage by parameters")
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "price added"),
 			@ApiResponse(responseCode = "400", description = "constraint validation failed", content = @Content),

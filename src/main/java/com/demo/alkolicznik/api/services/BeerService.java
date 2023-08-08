@@ -83,7 +83,7 @@ public class BeerService {
 		// the uploading of image and attaching it to beer object.
 		String imagePath = requestDTO.getImagePath();
 		if (imagePath != null) {
-			imageService.add(beer, imagePath);
+			imageService.addBeerImage(beer, imagePath);
 		}
 		return new BeerResponseDTO(beerRepository.save(beer));
 	}
@@ -107,7 +107,7 @@ public class BeerService {
 		// if yes, execute the whole 'addImage' procedure
 		String imagePath = requestDTO.getImagePath();
 		if (imagePath != null) {
-			imageService.add(toOverwrite, imagePath);
+			imageService.addBeerImage(toOverwrite, imagePath);
 		}
 		return new BeerResponseDTO(beerRepository.save(toOverwrite));
 	}
@@ -211,7 +211,7 @@ public class BeerService {
 		}
 		String imagePath = updateDTO.getImagePath();
 		if (imagePath != null) {
-			imageService.add(toUpdate, imagePath);
+			imageService.addBeerImage(toUpdate, imagePath);
 		}
 	}
 

@@ -2,9 +2,11 @@ package com.demo.alkolicznik.api.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import com.demo.alkolicznik.api.controllers.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
@@ -66,7 +68,7 @@ public class ImageService {
 	}
 
 	@SneakyThrows
-	public void add(Beer beer, String imagePath) {
+	public void addBeerImage(Beer beer, String imagePath) {
 		// instantiate BufferedImage and check its proportions
 		File file = new File(imagePath);
 		if (!file.exists()) {
@@ -81,6 +83,23 @@ public class ImageService {
 		beer.setImage(beerImage);
 		beerImage.setBeer(beer);
 		beerImageRepository.save(beerImage);
+	}
+
+	public ImageModelResponseDTO addStoreImage(String storeName, ImageRequestDTO imageRequestDTO) {
+		Set<Store> namedStores = storeRepository.findAllByName(storeName);
+		if (namedStores.isEmpty()) throw new StoreNotFoundException(storeName);
+		String imagePath = imageRequestDTO.getImagePath();
+		File file = new File(imagePath);
+		if (!file.exists()) throw new FileNotFoundException(imagePath);
+		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
+				this.createImageFilename
+						(storeName, this.extractFileExtensionFromPath(imagePath)));
+		for(Store store : namedStores) {
+			store.setImage(storeImage);
+		}
+		storeImage.setStores(namedStores);
+		storeRepository.saveAll(namedStores);
+		return new ImageModelResponseDTO(storeImageRepository.save(storeImage));
 	}
 
 	/**
@@ -172,6 +191,14 @@ public class ImageService {
 				.append('-')
 				.append(beer.getVolume())
 				.append('.')
+				.append(extension);
+		return stringBuilder.toString();
+	}
+
+	private String createImageFilename(String storeName, String extension) {
+		StringBuilder stringBuilder = new StringBuilder("");
+		stringBuilder
+				.append(storeName.toLowerCase().replace(' ', '-'))
 				.append(extension);
 		return stringBuilder.toString();
 	}

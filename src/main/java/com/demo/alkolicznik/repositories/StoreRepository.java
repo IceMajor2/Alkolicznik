@@ -2,6 +2,7 @@ package com.demo.alkolicznik.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.models.Store;
@@ -17,6 +18,9 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 
 	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices")
 	List<Store> findAll();
+
+	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE s.name = :name")
+	Set<Store> findAllByName(@Param("name") String name);
 
 	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices "
 			+ "WHERE s.city = :city ORDER BY s.id ASC")
