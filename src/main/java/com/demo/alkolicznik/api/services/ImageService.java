@@ -45,7 +45,7 @@ public class ImageService {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
 		BeerImage image = beer.getImage()
-				.orElseThrow(() -> new ImageNotFoundException());
+				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
 		return new ImageModelResponseDTO(image);
 	}
 
@@ -53,7 +53,7 @@ public class ImageService {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		StoreImage image = store.getImage()
-				.orElseThrow(() -> new ImageNotFoundException());
+				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
 		return new ImageModelResponseDTO(image);
 	}
 
@@ -85,7 +85,7 @@ public class ImageService {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
 		BeerImage image = beer.getImage()
-				.orElseThrow(() -> new ImageNotFoundException());
+				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
 
 		// Lazy fetching. Create component (and save), if not done previously.
 		if (image.getImageComponent() == null) {
@@ -122,7 +122,7 @@ public class ImageService {
 	@SneakyThrows
 	public ImageDeleteDTO delete(Beer beer) {
 		BeerImage beerImage = beer.getImage().orElseThrow(() ->
-				new ImageNotFoundException());
+				new ImageNotFoundException(BeerImage.class));
 		imageKitRepository.delete(beerImage);
 		beer.setImage(null);
 		beerImageRepository.deleteById(beerImage.getId());
