@@ -44,12 +44,4 @@ public class BeerRequestDTO {
 		}
 		this.volume = volume;
 	}
-
-//	public void setType(String type) {
-//		if(type != null && type.isBlank()) {
-//			this.type = null;
-//			return;
-//		}
-//		this.type = type;
-//	}
 }
