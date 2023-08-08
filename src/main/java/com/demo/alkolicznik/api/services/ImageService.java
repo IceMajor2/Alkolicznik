@@ -11,32 +11,50 @@ import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
-import com.demo.alkolicznik.repositories.BeerImageRepository;
+import com.demo.alkolicznik.repositories.StoreImageRepository;
+import com.demo.alkolicznik.repositories.StoreRepository;
 import com.vaadin.flow.component.html.Image;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class ImageService {
 
 	private ImageKitRepository imageKitRepository;
 
-	private BeerRepository beerRepository;
-
 	private BeerImageRepository beerImageRepository;
 
-	private String imageKitPath;
+	private StoreImageRepository storeImageRepository;
 
-	public ImageService(ImageKitRepository imageKitRepository, BeerRepository beerRepository, BeerImageRepository beerImageRepository, String imageKitPath) {
-		this.imageKitRepository = imageKitRepository;
-		this.beerRepository = beerRepository;
-		this.beerImageRepository = beerImageRepository;
-		this.imageKitPath = imageKitPath;
+	private BeerRepository beerRepository;
+
+	private StoreRepository storeRepository;
+
+	public ImageModelResponseDTO getBeerImage(Long beerId) {
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		BeerImage image = beer.getImage()
+				.orElseThrow(() -> new ImageNotFoundException());
+		return new ImageModelResponseDTO(image);
+	}
+
+	public ImageModelResponseDTO getStoreImage(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new StoreNotFoundException(storeId));
+		StoreImage image = store.getImage()
+				.orElseThrow(() -> new ImageNotFoundException());
+		return new ImageModelResponseDTO(image);
 	}
 
 	@SneakyThrows
@@ -55,14 +73,6 @@ public class ImageService {
 		beer.setImage(beerImage);
 		beerImage.setBeer(beer);
 		beerImageRepository.save(beerImage);
-	}
-
-	public ImageModelResponseDTO getBeerImage(Long beerId) {
-		Beer beer = beerRepository.findById(beerId)
-				.orElseThrow(() -> new BeerNotFoundException(beerId));
-		BeerImage image = beer.getImage()
-				.orElseThrow(() -> new ImageNotFoundException());
-		return new ImageModelResponseDTO(image);
 	}
 
 	/**

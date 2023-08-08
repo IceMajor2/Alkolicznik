@@ -22,13 +22,18 @@ public class ImageController {
     }
 
     @GetMapping("/beer/{beer_id}/image")
-    public ImageModelResponseDTO get(@PathVariable("beer_id") Long beerId) {
+    public ImageModelResponseDTO getBeerImage(@PathVariable("beer_id") Long beerId) {
         return imageService.getBeerImage(beerId);
     }
 
 	@DeleteMapping("/beer/{beer_id}/image")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
-	public ImageDeleteDTO delete(@PathVariable("beer_id") Long beerId) {
+	public ImageDeleteDTO deleteBeerImage(@PathVariable("beer_id") Long beerId) {
 		return imageService.delete(beerId);
+	}
+
+	@GetMapping("store/{store_id}/image")
+	public ImageModelResponseDTO getStoreImage(@PathVariable("store_id") Long storeId) {
+		return imageService.getStoreImage(storeId);
 	}
 }
