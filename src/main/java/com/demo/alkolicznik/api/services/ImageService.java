@@ -17,6 +17,7 @@ import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
@@ -88,8 +89,6 @@ public class ImageService {
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
 		String storeName = store.getName();
-		StoreImage toOverwrite = storeImageRepository.findByStoreName(storeName)
-				.orElse(null);
 
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(
 				imagePath, "/store", this.createImageFilename(storeName,
@@ -97,7 +96,6 @@ public class ImageService {
 
 		storeImage.setStoreName(storeName);
 		storeImage.getStores().add(store);
-		storeImage.setId(toOverwrite.getId());
 		store.setImage(storeImage);
 		storeImageRepository.save(storeImage);
 		// updating other stores
@@ -144,13 +142,17 @@ public class ImageService {
 		return new ImageDeleteDTO(beer);
 	}
 
-	public void deleteAllRemoteIn(String path) {
-		imageKitRepository.deleteAllIn(path);
-	}
-
 	public ImageDeleteDTO delete(Long beerId) {
 		return this.delete(beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId)));
+	}
+
+	public <T extends ImageModel> ImageModel save(T image, Class<T> imgClass) {
+		if (imgClass.equals(BeerImage.class))
+			return beerImageRepository.save((BeerImage) image);
+		if (imgClass.equals(StoreImage.class))
+			return storeImageRepository.save((StoreImage) image);
+		return null;
 	}
 
 	private boolean proportionsOk(BufferedImage image) {
