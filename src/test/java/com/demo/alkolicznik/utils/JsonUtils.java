@@ -110,12 +110,21 @@ public class JsonUtils {
 		response.setImageUrl(
 				(imgClass.equals(StoreImage.class)
 						? StoreImageTest.IMG_TRANSFORMED_URL : imgClass.equals(BeerImage.class)
-						? BeerImageTest.IMG_TRANSFORMED_URL : null) + filename
+						? BeerImageTest.IMG_TRANSFORMED_URL : null)
+						+ filename
 		);
+		if (imgClass.equals(StoreImage.class)) {
+			response.setImageUrl(response.getImageUrl()
+					+ "?updatedAt=" + fetchEpochsInUpdatedAt(actual.getImageUrl()));
+		}
 		if (actual.getRemoteId() != null) {
 			response.setRemoteId(actual.getRemoteId());
 		}
 		return response;
+	}
+
+	private static String fetchEpochsInUpdatedAt(String url) {
+		return url.substring(url.lastIndexOf('=') + 1);
 	}
 
 	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId, Class<? extends ImageModel> imgClass) {
