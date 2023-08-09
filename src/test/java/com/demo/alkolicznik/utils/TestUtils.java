@@ -1,11 +1,16 @@
 package com.demo.alkolicznik.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
@@ -115,6 +120,45 @@ public class TestUtils {
 		}
 		String urlTemplate = builder.encode().toUriString();
 		return urlTemplate;
+	}
+
+	public static BufferedImage getBufferedImageFromWeb(String url) {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new URL(url));
+			return image;
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static BufferedImage getBufferedImageFromLocal(String path) {
+		try {
+			BufferedImage image = ImageIO.read(new File(path));
+			return image;
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static boolean imageEquals(BufferedImage imgA, BufferedImage imgB) {
+		if (imgA.getWidth() != imgB.getWidth() || imgA.getHeight() != imgB.getHeight()) {
+			return false;
+		}
+		int width = imgA.getWidth();
+		int height = imgA.getHeight();
+		// Loop over every pixel.
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				// Compare the pixels for equality.
+				if (imgA.getRGB(x, y) != imgB.getRGB(x, y)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public static String getRawPathToClassPathResource(String resource) {

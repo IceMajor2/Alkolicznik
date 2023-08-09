@@ -1,18 +1,20 @@
 package com.demo.alkolicznik.api;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
-import com.vaadin.flow.component.html.Image;
 import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +40,8 @@ import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromLocal;
+import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
@@ -51,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreImageTest {
 
-	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/tr:n-get_store/test/store/";
+	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/test/store/";
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
@@ -218,29 +222,32 @@ public class StoreImageTest {
 		@DisplayName("POST: '/api/store' new image and new store but with existing name overrides previous image")
 		@DirtiesContext
 		public void newStoreAndImageButNonUniqueNameShouldAddImageTest() {
+			String pathToImage = getRawPathToImage("store/f_lubi.jpg");
+			String urlToImage = getStoreImage("Lubi", storeImages).getImageUrl();
 			// given
-			StoreImage notExpected = getStoreImage("Zabka", storeImages);
-			Image notExpectedImage = notExpected.getImageComponent();
-			StoreRequestDTO request = createStoreRequest("Zabka", "Kasztanowo", "ul. Niewiadoma 1",
-					getRawPathToImage("store/zabka.jpg"));
+			BufferedImage initial_notExpected = getBufferedImageFromWeb(urlToImage);
+			BufferedImage expected = getBufferedImageFromLocal(pathToImage);
+
+			StoreRequestDTO request = createStoreRequest
+					("Lubi", "Kasztanowo", "ul. Niewiadoma 1", pathToImage);
 
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-			Image actualImage = new Image(jdbcTemplate.queryForObject
-					("SELECT image_url FROM store_image WHERE store_name = 'Zabka'", String.class),
-					"No image");
+			String actualJson = postResponse.getBody();
+			BufferedImage actual = getBufferedImageFromLocal
+					(toModel(actualJson, StoreResponseDTO.class).getImage().getImageUrl());
 
 			// then
-			assertThat(actualImage)
-					.withFailMessage("The image was not overriden externally")
-					.isNotEqualTo(notExpectedImage);
+			BufferedImageAssert.assertThat(actual).isNotEqualTo(initial_notExpected);
+			BufferedImageAssert.assertThat(actual).isEqualTo(expected);
 		}
 
 		@ParameterizedTest
 		@CsvSource
 		@DisplayName("POST: '/api/store' [STORE_EXISTS]; only image is different")
 		@DirtiesContext
+		@Disabled
 		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest() {
 
 		}
@@ -249,6 +256,7 @@ public class StoreImageTest {
 		@CsvSource
 		@DisplayName("POST: '/api/store' no image in request should not delete previous one")
 		@DirtiesContext
+		@Disabled
 		public void noImageInRequestShouldNotDeletePreviousOneTest() {
 
 		}
@@ -257,6 +265,7 @@ public class StoreImageTest {
 		@CsvSource
 		@DisplayName("POST: '/api/store' image is connected to new store")
 		@DirtiesContext
+		@Disabled
 		public void imagesShouldBeAssociatedWithNewStoreTest() {
 
 		}
@@ -265,6 +274,7 @@ public class StoreImageTest {
 		@CsvSource
 		@DisplayName("POST: '/api/store' no image for names = no image for new store")
 		@DirtiesContext
+		@Disabled
 		public void newStoreWithNoNameImageRelationShouldHaveNoImageTest() {
 
 		}
