@@ -11,6 +11,7 @@ import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.vaadin.flow.component.html.Image;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -219,26 +220,21 @@ public class StoreImageTest {
 		public void newStoreAndImageButNonUniqueNameShouldAddImageTest() {
 			// given
 			StoreImage notExpected = getStoreImage("Zabka", storeImages);
-			String notExpectedRemoteId = notExpected.getRemoteId();
-//			Image notExpectedImage = notExpected.getImageComponent();
+			Image notExpectedImage = notExpected.getImageComponent();
 			StoreRequestDTO request = createStoreRequest("Zabka", "Kasztanowo", "ul. Niewiadoma 1",
 					getRawPathToImage("store/zabka.jpg"));
 
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-			String actualRemoteId = jdbcTemplate.queryForObject(
-					"SELECT remote_id FROM store_image WHERE store_name = 'Zabka'", String.class);
-//			Image actualImage = new Image(jdbcTemplate.queryForObject
-//					("SELECT image_url FROM store_image WHERE store_name = 'Zabka'", String.class),
-//					"No image");
+			Image actualImage = new Image(jdbcTemplate.queryForObject
+					("SELECT image_url FROM store_image WHERE store_name = 'Zabka'", String.class),
+					"No image");
 
 			// then
-			assertThat(actualRemoteId)
-					.withFailMessage("The image url was null. That probably means it "
-							+ "was not send to the remote server.")
-					.isNotEqualTo(notExpectedRemoteId);
-//			assertThat(actualImage).isNotEqualTo(notExpectedImage);
+			assertThat(actualImage)
+					.withFailMessage("The image was not overriden externally")
+					.isNotEqualTo(notExpectedImage);
 		}
 
 		@ParameterizedTest
@@ -246,6 +242,14 @@ public class StoreImageTest {
 		@DisplayName("POST: '/api/store' [STORE_EXISTS]; only image is different")
 		@DirtiesContext
 		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest() {
+
+		}
+
+		@ParameterizedTest
+		@CsvSource
+		@DisplayName("POST: '/api/store' no image in request should not delete previous one")
+		@DirtiesContext
+		public void noImageInRequestShouldNotDeletePreviousOneTest() {
 
 		}
 
