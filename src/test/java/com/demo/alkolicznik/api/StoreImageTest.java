@@ -73,7 +73,7 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = { 1, 8, 9, 3 })
+		@ValueSource(longs = { 1, 4, 5, 8 })
 		@DisplayName("GET: '/api/store/{store_id}/image'")
 		public void whenGettingStoreImage_thenReturnOKTest(Long storeId) {
 			StoreImage img = getStoreImage(storeId.longValue(), stores);
@@ -106,7 +106,7 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(longs = { 2, 4, 5 })
+		@ValueSource(longs = { 2, 3, 7 })
 		@DisplayName("GET: '/api/store/{store_id}/image' [NO_IMAGE]")
 		public void shouldReturnNotFoundOnBeerWithNoImageTest(Long storeId) {
 			var getResponse = getRequest("/api/store/" + storeId + "/image");
@@ -120,7 +120,7 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = { "Carrefour", "Lidl", "Zabka" })
+		@ValueSource(strings = { "Carrefour", "ABC", "Lubi" })
 		@DisplayName("GET: '/api/image?store_name=?'")
 		public void shouldReturnImageTest(String storeName) {
 			StoreImage image = getStoreImage(storeName, storeImages);
@@ -153,7 +153,7 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = { "Biedronka", "Grosik", "Lubi" })
+		@ValueSource(strings = { "Biedronka", "Grosik", "Lidl" })
 		@DisplayName("GET: '/api/image?store_name=?' [NO_IMAGE]")
 		public void shouldReturn404OnNoImageTest(String storeName) {
 			var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
