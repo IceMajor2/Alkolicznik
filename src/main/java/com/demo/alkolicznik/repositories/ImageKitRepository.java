@@ -46,7 +46,6 @@ public class ImageKitRepository {
 	@SneakyThrows
 	public ImageModel save(String srcPath, String remotePath, String filename, Class<? extends ImageModel> imgClass) {
 		Result result = upload(srcPath, remotePath, filename);
-		System.out.println(result.toString());
 		// get link
 		var options = getOptions(result, imgClass);
 		if (imgClass.equals(StoreImage.class))
