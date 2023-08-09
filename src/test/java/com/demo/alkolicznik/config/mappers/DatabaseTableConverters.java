@@ -109,6 +109,7 @@ public class DatabaseTableConverters {
 	 * @param stores the stores bean
 	 */
 	// O(n**2)
+	// TODO: Remove outer loop and see what happens
 	public static List<StoreImage> convertToStoreImageList(String sql, List<Store> stores) {
 		List<StoreImage> storeImages = jdbcTemplate.query(sql, RowMappers.STORE_IMAGE);
 		for (Store store : stores) {
@@ -173,7 +174,7 @@ enum RowMappers implements RowMapper {
 			storeImage.setStoreName(rs.getString("store_name"));
 			storeImage.setStores(new HashSet<>());
 			storeImage.setId(rs.getLong("id"));
-			storeImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url)));
+			storeImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url), StoreImage.class));
 			return storeImage;
 		}
 	}
@@ -203,7 +204,7 @@ enum ResultSetExtractors implements ResultSetExtractor {
 			BeerImage beerImage = new BeerImage();
 			beerImage.setImageUrl(url);
 			beerImage.setId(rs.getLong("beer_id"));
-			beerImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url)));
+			beerImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url), BeerImage.class));
 			return beerImage;
 		}
 	}

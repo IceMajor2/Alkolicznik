@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.TestUtils;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.BadRequestException;
@@ -142,9 +145,12 @@ public class ImageKitConfig {
 		return url.substring(url.lastIndexOf('/') + 1);
 	}
 
-	public static String getRemoteId(String filename) {
+	public static String getRemoteId(String filename, Class<? extends ImageModel> imgClass) {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
-		getFileListRequest.setPath(imageKitPath + "/beer");
+		String remotePath = imageKitPath + (imgClass.equals(StoreImage.class)
+				? "/store" : imgClass.equals(BeerImage.class)
+				? "/beer" : null);
+		getFileListRequest.setPath(remotePath);
 		ResultList resultList = null;
 		try {
 			resultList = ImageKit.getInstance().getFileList(getFileListRequest);
