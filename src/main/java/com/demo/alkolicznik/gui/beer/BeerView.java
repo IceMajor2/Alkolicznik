@@ -194,7 +194,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private Image getImage(BeerResponseDTO beer) {
 		try {
-			return beerService.getImageComponent(beer.getId());
+			return beerService.getImage(beer.getId()).getImageComponent();
 		}
 		catch (ImageNotFoundException e) {
 			return null;

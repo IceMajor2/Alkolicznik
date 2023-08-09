@@ -12,18 +12,20 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
-import com.vaadin.flow.component.html.Image;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,8 +150,12 @@ public class BeerService {
 		return this.delete(toDelete.getId());
 	}
 
-	public Image getImageComponent(Long beerId) {
-		return imageService.getVaadinBeerImage(beerId);
+	public ImageModel getImage(Long beerId) {
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		BeerImage image = beer.getImage()
+				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
+		return image;
 	}
 
 	private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {

@@ -23,7 +23,6 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
-import com.vaadin.flow.component.html.Image;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -88,13 +87,17 @@ public class ImageService {
 	public void addStoreImage(Store store, String imagePath) {
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
-
 		String storeName = store.getName();
+		StoreImage toOverwrite = storeImageRepository.findByStoreName(storeName)
+				.orElse(null);
+
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(
 				imagePath, "/store", this.createImageFilename(storeName,
 						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
+
 		storeImage.setStoreName(storeName);
 		storeImage.getStores().add(store);
+		storeImage.setId(toOverwrite.getId());
 		store.setImage(storeImage);
 		storeImageRepository.save(storeImage);
 		// updating other stores
@@ -124,45 +127,6 @@ public class ImageService {
 		storeImage.setStores(namedStores);
 		storeRepository.saveAll(namedStores);
 		return new ImageModelResponseDTO(storeImageRepository.save(storeImage));
-	}
-
-	/**
-	 * Call to this method will return Vaadin's {@code Image} component.
-	 * Its fetching type is lazy. If it's the 1st component request for
-	 * this image, then it'll also be created.
-	 * Used for frontend display.
-	 */
-	public Image getVaadinBeerImage(Long beerId) {
-		Beer beer = beerRepository.findById(beerId)
-				.orElseThrow(() -> new BeerNotFoundException(beerId));
-		BeerImage image = beer.getImage()
-				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-
-		// Lazy fetching. Create component (and save), if not done previously.
-		if (image.getImageComponent() == null) {
-			Image component = createJavaImage(image);
-			saveJavaBeerImage(beer, component);
-		}
-		return beer.getImage().get().getImageComponent();
-	}
-
-	/**
-	 * Creates Vaadin component.
-	 */
-	private Image createJavaImage(BeerImage image) {
-		return new Image(image.getImageUrl(), "No image");
-	}
-
-	/**
-	 * Updates the database with actual image as byte array.
-	 *
-	 * @param beer  to get image model from
-	 * @param image to update the image model with
-	 */
-	private void saveJavaBeerImage(Beer beer, Image image) {
-		BeerImage beerImage = beer.getImage().get();
-		beerImage.setImageComponent(image);
-		beerImageRepository.save(beerImage);
 	}
 
 	/**

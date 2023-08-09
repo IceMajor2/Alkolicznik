@@ -32,4 +32,12 @@ public abstract class ImageModel {
 		this.imageUrl = imageUrl;
 		this.remoteId = remoteId;
 	}
+
+	public Image getImageComponent() {
+		if(imageComponent == null) {
+			Image image = new Image(this.imageUrl, "Image");
+			this.imageComponent = image;
+		}
+		return this.imageComponent;
+	}
 }
