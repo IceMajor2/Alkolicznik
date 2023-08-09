@@ -2,6 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -90,13 +91,23 @@ public class ImageService {
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
 		String storeName = store.getName();
 
+		Optional<StoreImage> overwrite = storeImageRepository.findByStoreName(storeName);
+		boolean toOverwrite = overwrite.isPresent();
+		if (toOverwrite) {
+			imageKitRepository.delete(overwrite.get());
+
+		}
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(
 				imagePath, "/store", this.createImageFilename(storeName,
 						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
 
+		if(toOverwrite) {
+			storeImage.setId(overwrite.get().getId());
+		}
 		storeImage.setStoreName(storeName);
 		storeImage.getStores().add(store);
 		store.setImage(storeImage);
+
 		storeImageRepository.save(storeImage);
 		// updating other stores
 		// TODO: do not make this update and see what happens once all the tests are written

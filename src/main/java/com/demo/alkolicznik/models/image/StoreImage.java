@@ -33,7 +33,7 @@ public class StoreImage extends ImageModel implements Serializable {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "store_name")
+	@Column(name = "store_name", unique = true)
 	@NaturalId
 	private String storeName;
 

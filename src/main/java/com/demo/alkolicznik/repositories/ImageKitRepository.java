@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,8 @@ public class ImageKitRepository {
 	@SneakyThrows
 	public ImageModel save(String srcPath, String remotePath, String filename, Class<? extends ImageModel> imgClass) {
 		Result result = upload(srcPath, remotePath, filename);
-		// get link with named transformation
+		System.out.println(result.toString());
+		// get link
 		var options = getOptions(result, imgClass);
 		if (imgClass.equals(StoreImage.class))
 			return new StoreImage(mapUrl(options), result.getFileId());
@@ -55,16 +57,27 @@ public class ImageKitRepository {
 	}
 
 	private static Map<String, Object> getOptions(Result result, Class<? extends ImageModel> imgClass) {
-		List<Map<String, String>> transformation = new ArrayList<>
-				(List.of(Map.of(
-						"named", imgClass.equals(StoreImage.class)
-								? "get_store" : imgClass.equals(BeerImage.class)
-								? "get_beer" : null
-				)));
 		Map<String, Object> options = new HashMap<>();
 		options.put("path", result.getFilePath());
-		options.put("transformation", transformation);
+		options.put("transformation", Collections.EMPTY_LIST);
+
+		if (imgClass.equals(BeerImage.class)) {
+			List<Map<String, String>> transformation = new ArrayList<>
+					(List.of(Map.of("named", "get_beer")));
+			options.put("transformation", transformation);
+		}
+		else if (imgClass.equals(StoreImage.class)) {
+			long epochSeconds = getUpdatedAt(result.getFileId());
+			Map<String, String> queryParams = Map.of("updatedAt", String.valueOf(epochSeconds));
+			options.put("queryParameters", queryParams);
+		}
 		return options;
+	}
+
+	@SneakyThrows
+	private static long getUpdatedAt(String fileId) {
+		Result result = ImageKit.getInstance().getFileDetail(fileId);
+		return result.getUpdatedAt().toInstant().getEpochSecond();
 	}
 
 	@SneakyThrows
@@ -93,6 +106,10 @@ public class ImageKitRepository {
 
 	@SneakyThrows
 	public void delete(ImageModel image) {
+//		DeleteFileVersionRequest deleteRequest = new DeleteFileVersionRequest();
+//		deleteRequest.setFileId(image.getRemoteId());
+//		deleteRequest.setVersionId("version_id");
+//		imageKit.deleteFileVersion(deleteRequest);
 		imageKit.deleteFile(image.getRemoteId());
 	}
 
