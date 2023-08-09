@@ -125,8 +125,8 @@ public class ImageKitRepository {
 	}
 
 	private void setConfig() {
-		String endpoint = "https://ik.imagekit.io/icemajor";
-		String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
+		String endpoint = "https://ik.imagekit.io/alkolicznik";
+		String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
 		try {
 			imageKit.setConfig(new Configuration(publicKey,
 					Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),

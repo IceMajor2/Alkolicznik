@@ -46,7 +46,7 @@ public class ImageKitConfig {
 	);
 
 	private static final List<String> STORE_IMAGES = List.of(
-			"carrefour.png", "lidl.png", "zabka.png"
+			"carrefour.png", "lubi.jpg", "abc.png"
 	);
 
 	private TestUtils testUtils;
@@ -126,8 +126,8 @@ public class ImageKitConfig {
 
 	private void setImageKit() {
 		this.imageKit = ImageKit.getInstance();
-		String endpoint = "https://ik.imagekit.io/icemajor";
-		String publicKey = "public_YpQHYFb3+OX4R5aHScftYE0H0N8=";
+		String endpoint = "https://ik.imagekit.io/alkolicznik";
+		String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
 		try {
 			this.imageKit.setConfig(new io.imagekit.sdk.config.Configuration(publicKey,
 					Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
