@@ -75,23 +75,31 @@ public class ImageKitConfig {
 		LOGGER.info("Reloading ImageKit's directory...");
 		setImageKit();
 		LOGGER.info("Deleting unwanted images from '%s' directory...".formatted(remoteBeerImgPath));
-		deleteFilesIn(remoteBeerImgPath);
+		deleteFilesIn(remoteBeerImgPath, false);
 		LOGGER.info("Deleting unwanted images from '%s' directory...".formatted(remoteStoreImgPath));
-		deleteFilesIn(remoteStoreImgPath);
+		deleteFilesIn(remoteStoreImgPath, true);
 		LOGGER.info("Sending BEER images to remote directory '%s'...".formatted(remoteBeerImgPath));
 		sendImages("/data_img/beer_at_launch", remoteBeerImgPath);
 		LOGGER.info("Sending STORE images to remote directory '%s'...".formatted(remoteStoreImgPath));
 		sendImages("/data_img/store_at_launch", remoteStoreImgPath);
 	}
 
-	private void deleteFilesIn(String path) throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
+	/**
+	 * Deletes all files in a remote, ImageKit's directory.
+	 * You can actually leave out test data (specified in a
+	 * static variable) by passing a boolean parameter.
+	 * @param path remote path that is to be deleted
+	 * @param deleteTestData if true, will delete everything
+	 * from directory - including test data
+	 */
+	private void deleteFilesIn(String path, boolean deleteTestData) throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IllegalAccessException, InstantiationException {
 		GetFileListRequest getFileListRequest = new GetFileListRequest();
 		getFileListRequest.setPath(path);
 		ResultList resultList = this.imageKit.getFileList(getFileListRequest);
 
 		for (BaseFile baseFile : resultList.getResults()) {
-			if (BEER_IMAGES.contains(baseFile.getName())
-					|| STORE_IMAGES.contains(baseFile.getName())) {
+			if (!deleteTestData && (BEER_IMAGES.contains(baseFile.getName())
+					|| STORE_IMAGES.contains(baseFile.getName()))) {
 				LOGGER.info("No need to DELETE. '%s' was found (ID: %s)"
 						.formatted(baseFile.getName(), baseFile.getFileId()));
 				continue;
