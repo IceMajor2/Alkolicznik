@@ -6,13 +6,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -55,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreImageTest {
 
-	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/icemajor/test/store/";
+	public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/alkolicznik/test/store/";
 
 	@Nested
 	@TestMethodOrder(MethodOrderer.Random.class)
@@ -222,21 +222,21 @@ public class StoreImageTest {
 		@DisplayName("POST: '/api/store' new image and new store but with existing name overrides previous image")
 		@DirtiesContext
 		public void newStoreAndImageButNonUniqueNameShouldAddImageTest() {
-			String pathToImage = getRawPathToImage("store/f_lubi.jpg");
-			String urlToImage = getStoreImage("Lubi", storeImages).getImageUrl();
+			String pathToNewImage = getRawPathToImage("store/f_lubi.jpg");
+			String urlToCurrentImage = getStoreImage("Lubi", storeImages).getImageUrl();
 			// given
-			BufferedImage initial_notExpected = getBufferedImageFromWeb(urlToImage);
-			BufferedImage expected = getBufferedImageFromLocal(pathToImage);
+			BufferedImage initial_notExpected = getBufferedImageFromWeb(urlToCurrentImage);
+			BufferedImage expected = getBufferedImageFromLocal(pathToNewImage);
 
 			StoreRequestDTO request = createStoreRequest
-					("Lubi", "Kasztanowo", "ul. Niewiadoma 1", pathToImage);
+					("Lubi", "Kasztanowo", "ul. Niewiadoma 1", pathToNewImage);
 
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 			String actualJson = postResponse.getBody();
-			BufferedImage actual = getBufferedImageFromLocal
-					(toModel(actualJson, StoreResponseDTO.class).getImage().getImageUrl());
+			StoreResponseDTO actualResponseDTO = toModel(actualJson, StoreResponseDTO.class);
+			BufferedImage actual = getBufferedImageFromWeb(actualResponseDTO.getImage().getImageUrl());
 
 			// then
 			BufferedImageAssert.assertThat(actual).isNotEqualTo(initial_notExpected);
