@@ -244,12 +244,23 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@CsvSource
-		@DisplayName("POST: '/api/store' [STORE_EXISTS]; only image is different")
+		@CsvSource({
+				"Lubi, Warszawa, ul. Nowaka 5, f_lubi.jpg",
+				"Carrefour, Olsztyn, ul. Borkowskiego 3, f_carrefour.jpg"
+		})
+		@DisplayName("POST: '/api/store' [STORE_EXISTS] with image differing")
 		@DirtiesContext
-		@Disabled
-		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest() {
-
+		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest(String name, String city, String street, String imageFile) {
+			// given
+			String pathToNewImage = getRawPathToImage("store/" + imageFile);
+			StoreRequestDTO request = createStoreRequest(name, city, street, pathToNewImage);
+			// when
+			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
+			// then
+			assertIsError(postResponse.getBody(),
+					HttpStatus.CONFLICT,
+					"Store already exists",
+					"/api/store");
 		}
 
 		@ParameterizedTest
@@ -258,7 +269,7 @@ public class StoreImageTest {
 		@DirtiesContext
 		@Disabled
 		public void noImageInRequestShouldNotDeletePreviousOneTest() {
-
+			
 		}
 
 		@ParameterizedTest
