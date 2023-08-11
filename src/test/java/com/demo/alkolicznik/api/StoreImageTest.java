@@ -294,7 +294,7 @@ public class StoreImageTest {
 					.withFailMessage("The image was not found in the response")
 					.isNotNull();
 			BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImage().getImageUrl());
-			assertThat(actual).isEqualTo(expected);
+			BufferedImageAssert.assertThat(actual).isEqualTo(expected);
 		}
 
 		@ParameterizedTest
