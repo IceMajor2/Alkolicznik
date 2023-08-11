@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -12,7 +13,6 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import org.junit.jupiter.api.ClassOrderer;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +32,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.JsonUtils.createImageRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
@@ -290,7 +291,6 @@ public class StoreImageTest {
 		})
 		@DisplayName("POST: '/api/store' no image for brand = no image for new store")
 		@DirtiesContext
-		@Disabled
 		public void newStoreWithNoNameImageRelationShouldHaveNoImageTest(String name, String city, String street) {
 			StoreRequestDTO request = createStoreRequest(name, city, street);
 
@@ -299,6 +299,26 @@ public class StoreImageTest {
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 			StoreResponseDTO actual = toModel(postResponse.getBody(), StoreResponseDTO.class);
 			assertThat(actual.getImage()).isNull();
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"Intermarche, f_intermarche.webp",
+				"Groszek, f_groszek.png",
+				"Piotr i Pawel, f_piotr-i-pawel.png"
+		})
+		@DisplayName("POST: '/api/image?store_name=' [STORE_NOT_FOUND]")
+		public void doNotAddImageIfStoreOfNameIsNotFoundTest(String storeName, String imageFile) {
+			// given
+			ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+			// when
+			var postResponse = postRequestAuth
+					("admin", "admin", "/api/image", Map.of("store_name", storeName));
+			// then
+			assertIsError(postResponse.getBody(),
+					HttpStatus.NOT_FOUND,
+					"Unable to find store of '%s' name".formatted(storeName),
+					"/api/image");
 		}
 	}
 }

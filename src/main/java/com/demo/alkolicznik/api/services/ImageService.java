@@ -7,7 +7,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import com.demo.alkolicznik.api.controllers.ImageRequestDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;

@@ -17,6 +17,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
@@ -103,6 +104,12 @@ public class JsonUtils {
 	public static BeerResponseDTO createBeerResponse(Beer beer, ImageModelResponseDTO image) {
 		return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(),
 				image);
+	}
+
+	public static ImageRequestDTO createImageRequest(String srcPath) {
+		ImageRequestDTO request = new ImageRequestDTO();
+		request.setImagePath(srcPath);
+		return request;
 	}
 
 	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {

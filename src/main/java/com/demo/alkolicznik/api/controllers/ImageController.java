@@ -5,6 +5,7 @@ import java.net.URI;
 import com.demo.alkolicznik.api.services.ImageService;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 

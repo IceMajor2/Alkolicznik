@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.api.controllers;
+package com.demo.alkolicznik.dto.image;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
