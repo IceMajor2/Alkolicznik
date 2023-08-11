@@ -289,8 +289,9 @@ public class StoreImageTest {
 			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 			// then
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-			StoreImage actual = toModel(postResponse.getBody(), StoreImage.class);
-			assertThat(actual).isNotNull();
+			StoreResponseDTO actualResponse = toModel(postResponse.getBody(), StoreResponseDTO.class);
+			assertThat(actualResponse.getImage()).isNotNull();
+			BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImage().getImageUrl());
 			assertThat(actual).isEqualTo(expected);
 		}
 
