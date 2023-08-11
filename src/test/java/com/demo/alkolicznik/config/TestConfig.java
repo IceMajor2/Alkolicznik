@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.config;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -82,7 +81,6 @@ public class TestConfig {
 				.convertToStoreImageList(sql, stores);
 		updateStoreImageRemoteId(storeImages);
 		updateStoreImageUrlWithUpdatedAt(storeImages);
-		System.out.println(Arrays.toString(storeImages.toArray()));
 		return storeImages;
 	}
 
