@@ -264,14 +264,6 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@CsvSource
-		@DisplayName("POST: '/api/store' return image in response if previously existed")
-		@DirtiesContext
-		public void shouldReturnImageIfItExistedTest(String name, String city, String street) {
-
-		}
-
-		@ParameterizedTest
 		@CsvSource({
 				"ABC, Kortumowo, ul. Nienackiego 15",
 				"Lubi, Malbork, ul. Zamkowa 1",
