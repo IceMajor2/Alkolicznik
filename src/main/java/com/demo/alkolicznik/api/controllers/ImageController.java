@@ -49,10 +49,13 @@ public class ImageController {
 		return imageService.getStoreImage(storeName);
 	}
 
-	@PostMapping
+	@PostMapping("/image")
 	public ResponseEntity<ImageModelResponseDTO> addStoreImage
 			(@RequestParam("store_name") String storeName,
 					@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
+		// space in a path is represented by '%20' string, thus
+		// we need to replace it with actual space char to get a valid name
+		storeName = storeName.replace("%20", " ");
 		ImageModelResponseDTO
 				response = imageService.addStoreImage(storeName, imageRequestDTO);
 		URI location = ServletUriComponentsBuilder
