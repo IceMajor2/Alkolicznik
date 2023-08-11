@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -176,13 +173,10 @@ public class StoreImageTest {
 
 		private List<StoreImage> storeImages;
 
-		private JdbcTemplate jdbcTemplate;
-
 		@Autowired
-		public PostRequests(List<Store> stores, List<StoreImage> storeImages, DataSource dataSource) {
+		public PostRequests(List<Store> stores, List<StoreImage> storeImages) {
 			this.stores = stores;
 			this.storeImages = storeImages;
-			this.jdbcTemplate = new JdbcTemplate(dataSource);
 		}
 
 		@ParameterizedTest
@@ -249,7 +243,6 @@ public class StoreImageTest {
 				"Carrefour, Olsztyn, ul. Borkowskiego 3, f_carrefour.jpg"
 		})
 		@DisplayName("POST: '/api/store' [STORE_EXISTS] with image differing")
-		@DirtiesContext
 		public void shouldReturn409WhenBodyHasOnlyDifferentImageValueTest(String name, String city, String street, String imageFile) {
 			// given
 			String pathToNewImage = getRawPathToImage("store/" + imageFile);
@@ -290,21 +283,22 @@ public class StoreImageTest {
 		}
 
 		@ParameterizedTest
-		@CsvSource
-		@DisplayName("POST: '/api/store' image is connected to new store")
+		@CsvSource({
+				"Tesco, Wroclaw, ul. Wroclawska 1",
+				"Grosik, Olsztyn, ul. Staromiejska 11",
+				"Lidl, Rzeszow, ul. Polna 15"
+		})
+		@DisplayName("POST: '/api/store' no image for brand = no image for new store")
 		@DirtiesContext
 		@Disabled
-		public void imagesShouldBeAssociatedWithNewStoreTest() {
+		public void newStoreWithNoNameImageRelationShouldHaveNoImageTest(String name, String city, String street) {
+			StoreRequestDTO request = createStoreRequest(name, city, street);
 
-		}
+			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 
-		@ParameterizedTest
-		@CsvSource
-		@DisplayName("POST: '/api/store' no image for names = no image for new store")
-		@DirtiesContext
-		@Disabled
-		public void newStoreWithNoNameImageRelationShouldHaveNoImageTest() {
-
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+			StoreResponseDTO actual = toModel(postResponse.getBody(), StoreResponseDTO.class);
+			assertThat(actual.getImage()).isNull();
 		}
 	}
 }
