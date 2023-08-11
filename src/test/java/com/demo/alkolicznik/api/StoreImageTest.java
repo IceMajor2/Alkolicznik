@@ -280,14 +280,15 @@ public class StoreImageTest {
 		@DisplayName("POST: '/api/store' no image in request should not delete previous one")
 		@DirtiesContext
 		public void noImageInRequestShouldNotDeletePreviousOneTest(String name, String city, String street) {
-			String urlToCurrentImage = getStoreImage(name, storeImages).getImageUrl();
+			String urlToCurrentImage = getStoreImage(name, storeImages)
+					.getImageUrl();
 			BufferedImage expected = getBufferedImageFromWeb(urlToCurrentImage);
 			// given
 			StoreRequestDTO request = createStoreRequest(name, city, street);
 			// when
 			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
 			// then
-			assertThat(postResponse.getStatusCode()).isNotEqualTo(HttpStatus.CREATED);
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 			StoreImage actual = toModel(postResponse.getBody(), StoreImage.class);
 			assertThat(actual).isNotNull();
 			assertThat(actual).isEqualTo(expected);
