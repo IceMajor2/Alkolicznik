@@ -3,13 +3,12 @@ package com.demo.alkolicznik.api.services;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
@@ -90,56 +89,31 @@ public class ImageService {
 		beerImageRepository.save(beerImage);
 	}
 
-	public void addStoreImage(Store store, String imagePath) {
-		File file = new File(imagePath);
-		if (!file.exists()) throw new FileNotFoundException(imagePath);
-		String storeName = store.getName();
-
-		Optional<StoreImage> overwrite = storeImageRepository.findByStoreName(storeName);
-		boolean toOverwrite = overwrite.isPresent();
-		if (toOverwrite) {
-			imageKitRepository.delete(overwrite.get());
-
-		}
-		StoreImage storeImage = (StoreImage) imageKitRepository.save(
-				imagePath, "/store", this.createImageFilename(storeName,
-						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
-
-		if(toOverwrite) {
-			storeImage.setId(overwrite.get().getId());
-		}
-		storeImage.setStoreName(storeName);
-		storeImage.getStores().add(store);
-		store.setImage(storeImage);
-
-		storeImageRepository.save(storeImage);
-		// updating other stores
-		// TODO: do not make this update and see what happens once all the tests are written
-		Set<Store> namedStores = storeRepository.findAllByName(storeName);
-
-		if (namedStores.isEmpty()) return;
-		for (Store namedStore : namedStores) {
-			namedStore.setImage(storeImage);
-		}
-		storeImage.getStores().addAll(namedStores);
-		storeRepository.saveAll(namedStores);
+	public void deleteStoreImage(StoreImage storeImage) {
+		imageKitRepository.delete(storeImage);
+		storeImageRepository.delete(storeImage);
 	}
 
-	public ImageModelResponseDTO addStoreImage(String storeName, ImageRequestDTO imageRequestDTO) {
-		Set<Store> namedStores = storeRepository.findAllByName(storeName);
-		if (namedStores.isEmpty()) throw new StoreNotFoundException(storeName);
-		String imagePath = imageRequestDTO.getImagePath();
+	private StoreImage addStoreImage(String storeName, String imagePath) {
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
-		StoreImage storeImage = (StoreImage) imageKitRepository.save(
-				imagePath, "/store", this.createImageFilename(storeName,
-						this.extractFileExtensionFromPath(imagePath)), StoreImage.class);
-		for (Store store : namedStores) {
-			store.setImage(storeImage);
-		}
-		storeImage.setStores(namedStores);
-		storeRepository.saveAll(namedStores);
-		return new ImageModelResponseDTO(storeImageRepository.save(storeImage));
+
+		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
+				createImageFilename(storeName, extractFileExtensionFromPath(imagePath)), StoreImage.class);
+		storeImage.setStoreName(storeName);
+		return storeImageRepository.save(storeImage);
+	}
+
+	public ImageModelResponseDTO addStoreImage(Store store, String imagePath) {
+		StoreImage added = addStoreImage(store.getName(), imagePath);
+		store.setImage(added);
+		return new ImageModelResponseDTO(added);
+	}
+
+	public ImageModelResponseDTO addStoreImage(String storeName, ImageRequestDTO request) {
+		if (!storeRepository.existsByName(storeName))
+			throw new StoreNotFoundException(storeName);
+		return new ImageModelResponseDTO(addStoreImage(storeName, request.getImagePath()));
 	}
 
 	/**

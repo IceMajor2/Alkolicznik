@@ -53,7 +53,12 @@ public class StoreService {
 		if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
 
 		String imagePath = requestDTO.getImagePath();
-		if (imagePath != null) imageService.addStoreImage(store, imagePath);
+		if (imagePath != null) {
+			if (optImage.isPresent()) {
+				imageService.deleteStoreImage(optImage.get());
+			}
+			imageService.addStoreImage(store, imagePath);
+		}
 		return new StoreResponseDTO(storeRepository.save(store));
 	}
 

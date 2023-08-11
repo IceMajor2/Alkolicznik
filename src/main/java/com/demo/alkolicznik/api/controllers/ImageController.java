@@ -56,8 +56,7 @@ public class ImageController {
 		// space in a path is represented by '%20' string, thus
 		// we need to replace it with actual space char to get a valid name
 		storeName = storeName.replace("%20", " ");
-		ImageModelResponseDTO
-				response = imageService.addStoreImage(storeName, imageRequestDTO);
+		ImageModelResponseDTO response = imageService.addStoreImage(storeName, imageRequestDTO);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.queryParam("store_name", storeName)
