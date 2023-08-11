@@ -320,5 +320,25 @@ public class StoreImageTest {
 					"Unable to find store of '%s' name".formatted(storeName),
 					"/api/image");
 		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"ABC, f_lewiatan.png",
+				"Lubi, f_lubi.jpg",
+				"Carrefour, f_carrefour.jpg"
+		})
+		@DisplayName("POST: '/api/image?store_name=' [IMAGE_ALREADY_EXISTS]")
+		public void shouldReturn409WhenStoreAlreadyHasImageTest(String storeName, String imageFile) {
+			// given
+			ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+			// when
+			var postResponse = postRequestAuth
+					("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
+			// then
+			assertIsError(postResponse.getBody(),
+					HttpStatus.CONFLICT,
+					"Store already has an image.".formatted(storeName),
+					"/api/image");
+		}
 	}
 }
