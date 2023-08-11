@@ -16,9 +16,9 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 		return new BufferedImageAssert(actual);
 	}
 
-	public BufferedImageAssert isEqualTo(BufferedImage compare) {
+	public BufferedImageAssert isEqualTo(BufferedImage expected) {
 		isNotNull();
-		Assertions.assertThat(TestUtils.imageEquals(actual, compare))
+		Assertions.assertThat(TestUtils.imageEquals(actual, expected))
 				.as("equals")
 				.isTrue();
 		return this;
