@@ -10,8 +10,9 @@ import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.ImageProportionsInvalidException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageProportionsInvalidException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
@@ -97,7 +98,7 @@ public class ImageService {
 	private StoreImage addStoreImage(String storeName, String imagePath) {
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
-
+		if(storeImageRepository.existsByStoreName(storeName)) throw new ImageAlreadyExistsException();
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
 				createImageFilename(storeName, extractFileExtensionFromPath(imagePath)), StoreImage.class);
 		storeImage.setStoreName(storeName);

@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.exceptions.classes;
+package com.demo.alkolicznik.exceptions.classes.image;
 
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;

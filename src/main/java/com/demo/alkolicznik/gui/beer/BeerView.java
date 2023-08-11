@@ -10,7 +10,7 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.ImageNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.gui.MainLayout;
