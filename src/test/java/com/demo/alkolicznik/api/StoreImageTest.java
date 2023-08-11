@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequ
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = "enable.image.database=true")
@@ -411,6 +413,13 @@ public class StoreImageTest {
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		class PutRequests {
 
+			private List<Store> stores;
+
+			@Autowired
+			public PutRequests(List<Store> stores) {
+				this.stores = stores;
+			}
+
 			@ParameterizedTest
 			@CsvSource({
 					"5, Primo, Olsztyn, ul. Okulickiego 15",
@@ -420,6 +429,7 @@ public class StoreImageTest {
 			@DirtiesContext
 			public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
 					(Long storeId, String name, String city, String street) {
+				String initalUrl = getStoreImage(storeId, stores).getImageUrl();
 				// given
 				StoreRequestDTO request = createStoreRequest(name, city, street);
 				// when
@@ -431,6 +441,10 @@ public class StoreImageTest {
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store",
 						"/api/image");
+				// asserting that ImageIO.read throws IOException
+				// which would mean the image is not found remotely
+				assertThatExceptionOfType(IOException.class)
+						.isThrownBy(() -> getBufferedImageFromWeb(initalUrl));
 			}
 		}
 	}
