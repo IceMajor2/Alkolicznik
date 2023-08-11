@@ -313,7 +313,7 @@ public class StoreImageTest {
 			ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
 			// when
 			var postResponse = postRequestAuth
-					("admin", "admin", "/api/image", Map.of("store_name", storeName));
+					("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
 			// then
 			assertIsError(postResponse.getBody(),
 					HttpStatus.NOT_FOUND,

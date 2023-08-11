@@ -47,6 +47,14 @@ public class AuthenticatedRequests {
 				.postForEntity(urlTemplate, null, String.class);
 	}
 
+	public static ResponseEntity<String> postRequestAuth(String username, String password, String url,
+			Object request, Map<String, ?> parameters) {
+		String urlTemplate = buildURI(url, parameters);
+		return restTemplate
+				.withBasicAuth(username, password)
+				.postForEntity(urlTemplate, request, String.class);
+	}
+
 	public static ResponseEntity<String> putRequestAuth(String username, String password, String url, Object request) {
 		return restTemplate
 				.withBasicAuth(username, password)
