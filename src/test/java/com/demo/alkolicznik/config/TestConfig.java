@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -11,6 +12,8 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
+import io.imagekit.sdk.ImageKit;
+import io.imagekit.sdk.models.results.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +81,8 @@ public class TestConfig {
 		List<StoreImage> storeImages = DatabaseTableConverters
 				.convertToStoreImageList(sql, stores);
 		updateStoreImageRemoteId(storeImages);
+		updateStoreImageUrlWithUpdatedAt(storeImages);
+		System.out.println(Arrays.toString(storeImages.toArray()));
 		return storeImages;
 	}
 
@@ -157,6 +162,26 @@ public class TestConfig {
 		for(var image : storeImages) {
 			String sql = "UPDATE store_image SET remote_id = ? WHERE store_name = ?";
 			jdbcTemplate.update(sql, image.getRemoteId(), image.getStoreName());
+		}
+	}
+
+	private void updateStoreImageUrlWithUpdatedAt(List<StoreImage> storeImages) {
+		LOGGER.info("Updating 'store_image' table with 'updatedAt' key...");
+		for(var image : storeImages) {
+			long updatedAt = getUpdatedAt(image.getRemoteId());
+			String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
+			String sql = "UPDATE store_image SET url = ? WHERE store_name = ?";
+			jdbcTemplate.update(sql, newURL, image.getStoreName());
+			image.setImageUrl(newURL);
+		}
+	}
+
+	private long getUpdatedAt(String fileId)  {
+		try {
+			Result result = ImageKit.getInstance().getFileDetail(fileId);
+			return result.getUpdatedAt().toInstant().getEpochSecond();
+		} catch(Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
