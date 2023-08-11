@@ -1,7 +1,9 @@
 package com.demo.alkolicznik.api.services;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
@@ -48,11 +50,18 @@ public class StoreService {
 	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
 		Store store = ModelDtoConverter.convertToModelNoImage(requestDTO);
 		if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
+		Optional<ImageModelResponseDTO> currImg = imageService
+				.getStoreImageNoThrow(store.getName());
 
 		String imagePath = requestDTO.getImagePath();
 		if (imagePath != null) imageService.addStoreImage(store, imagePath);
-		StoreResponseDTO storeResponseDTO = new StoreResponseDTO(storeRepository.save(store));
-		return storeResponseDTO;
+		else if (currImg.isPresent()) {
+			StoreResponseDTO storeResponseDTO =
+					new StoreResponseDTO(storeRepository.save(store));
+			storeResponseDTO.setImage(currImg.get());
+			return storeResponseDTO;
+		}
+		return new StoreResponseDTO(storeRepository.save(store));
 	}
 
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {

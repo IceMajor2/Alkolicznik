@@ -68,6 +68,14 @@ public class ImageService {
 		return new ImageModelResponseDTO(image);
 	}
 
+	public Optional<ImageModelResponseDTO> getStoreImageNoThrow(String storeName) {
+		Optional<StoreImage> image = storeImageRepository.findByStoreName(storeName);
+		if(image.isPresent()) {
+			return Optional.of(new ImageModelResponseDTO(image.get()));
+		}
+		return Optional.empty();
+	}
+
 	@SneakyThrows
 	public void addBeerImage(Beer beer, String imagePath) {
 		// instantiate BufferedImage and check its proportions
