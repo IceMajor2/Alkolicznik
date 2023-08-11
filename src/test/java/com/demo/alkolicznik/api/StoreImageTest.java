@@ -265,11 +265,32 @@ public class StoreImageTest {
 
 		@ParameterizedTest
 		@CsvSource
+		@DisplayName("POST: '/api/store' return image in response if previously existed")
+		@DirtiesContext
+		public void shouldReturnImageIfItExistedTest(String name, String city, String street) {
+
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"ABC, Kortumowo, ul. Nienackiego 15",
+				"Lubi, Malbork, ul. Zamkowa 1",
+				"Carrefour, Giby, al. Harcerzow 333"
+		})
 		@DisplayName("POST: '/api/store' no image in request should not delete previous one")
 		@DirtiesContext
-		@Disabled
-		public void noImageInRequestShouldNotDeletePreviousOneTest() {
-			
+		public void noImageInRequestShouldNotDeletePreviousOneTest(String name, String city, String street) {
+			String urlToCurrentImage = getStoreImage(name, storeImages).getImageUrl();
+			BufferedImage expected = getBufferedImageFromWeb(urlToCurrentImage);
+			// given
+			StoreRequestDTO request = createStoreRequest(name, city, street);
+			// when
+			var postResponse = postRequestAuth("admin", "admin", "/api/store", request);
+			// then
+			assertThat(postResponse.getStatusCode()).isNotEqualTo(HttpStatus.CREATED);
+			StoreImage actual = toModel(postResponse.getBody(), StoreImage.class);
+			assertThat(actual).isNotNull();
+			assertThat(actual).isEqualTo(expected);
 		}
 
 		@ParameterizedTest
