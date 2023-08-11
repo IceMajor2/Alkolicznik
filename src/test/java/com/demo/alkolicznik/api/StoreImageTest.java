@@ -337,7 +337,7 @@ public class StoreImageTest {
 			// then
 			assertIsError(postResponse.getBody(),
 					HttpStatus.CONFLICT,
-					"Store already has an image.".formatted(storeName),
+					"Store already has an image".formatted(storeName),
 					"/api/image");
 		}
 	}
