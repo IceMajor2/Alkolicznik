@@ -340,5 +340,33 @@ public class StoreImageTest {
 					"Store already has an image".formatted(storeName),
 					"/api/image");
 		}
+
+		@ParameterizedTest
+		@CsvSource({
+				"Biedronka, f_biedronka.png",
+				"Zabka, f_zabka.jpg"
+		})
+		@DisplayName("POST: '/api/image?store_name=' compare uploaded file with remote")
+		@DirtiesContext
+		public void uploadedFileShouldMatchRemoteTest(String storeName, String imageFile) {
+			// given
+			String pathToNewImg = getRawPathToImage("store/" + imageFile);
+			ImageRequestDTO request = createImageRequest(pathToNewImg);
+			// when
+			var postResponse = postRequestAuth
+					("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
+			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+			var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+			ImageModelResponseDTO actualResponse = toModel
+					(getResponse.getBody(), ImageModelResponseDTO.class);
+			// then
+			BufferedImage expected = getBufferedImageFromLocal(pathToNewImg);
+			BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImageUrl());
+			// NOTE: ImageKit compresses images if their quality is too high,
+			// thus increasing the chance of a false negative. Here, I'm comparing
+			// just the dimensions of the images. It is also flawed as it
+			// increases the chance of a false positive.
+			BufferedImageAssert.assertThat(actual).hasSameDimensionsAs(expected);
+		}
 	}
 }

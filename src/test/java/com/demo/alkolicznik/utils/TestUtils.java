@@ -144,9 +144,7 @@ public class TestUtils {
 	}
 
 	public static boolean imageEquals(BufferedImage imgA, BufferedImage imgB) {
-		if (imgA.getWidth() != imgB.getWidth() || imgA.getHeight() != imgB.getHeight()) {
-			return false;
-		}
+		if(!dimensionsSame(imgA, imgB)) return false;
 		int width = imgA.getWidth();
 		int height = imgA.getHeight();
 		// Loop over every pixel.
@@ -159,6 +157,10 @@ public class TestUtils {
 			}
 		}
 		return true;
+	}
+
+	public static boolean dimensionsSame(BufferedImage imgA, BufferedImage imgB) {
+		return imgA.getWidth() == imgB.getWidth() && imgA.getHeight() == imgB.getHeight();
 	}
 
 	public static String getRawPathToClassPathResource(String resource) {
