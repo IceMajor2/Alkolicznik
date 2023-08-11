@@ -68,12 +68,8 @@ public class ImageService {
 		return new ImageModelResponseDTO(image);
 	}
 
-	public Optional<ImageModelResponseDTO> getStoreImageNoThrow(String storeName) {
-		Optional<StoreImage> image = storeImageRepository.findByStoreName(storeName);
-		if(image.isPresent()) {
-			return Optional.of(new ImageModelResponseDTO(image.get()));
-		}
-		return Optional.empty();
+	Optional<StoreImage> findStoreImage(String storeName) {
+		return storeImageRepository.findByStoreName(storeName);
 	}
 
 	@SneakyThrows

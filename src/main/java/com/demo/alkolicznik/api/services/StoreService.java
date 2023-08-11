@@ -3,7 +3,6 @@ package com.demo.alkolicznik.api.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
@@ -14,6 +13,7 @@ import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import lombok.AllArgsConstructor;
@@ -48,19 +48,12 @@ public class StoreService {
 	}
 
 	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
-		Store store = ModelDtoConverter.convertToModelNoImage(requestDTO);
+		Optional<StoreImage> optImage = imageService.findStoreImage(requestDTO.getName());
+		Store store = ModelDtoConverter.convertToModelWithImage(requestDTO, optImage);
 		if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
-		Optional<ImageModelResponseDTO> currImg = imageService
-				.getStoreImageNoThrow(store.getName());
 
 		String imagePath = requestDTO.getImagePath();
 		if (imagePath != null) imageService.addStoreImage(store, imagePath);
-		else if (currImg.isPresent()) {
-			StoreResponseDTO storeResponseDTO =
-					new StoreResponseDTO(storeRepository.save(store));
-			storeResponseDTO.setImage(currImg.get());
-			return storeResponseDTO;
-		}
 		return new StoreResponseDTO(storeRepository.save(store));
 	}
 

@@ -2,6 +2,7 @@ package com.demo.alkolicznik.utils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
@@ -12,6 +13,7 @@ import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.StoreImage;
 
 public class ModelDtoConverter {
 
@@ -50,6 +52,12 @@ public class ModelDtoConverter {
 		store.setName(storeRequestDTO.getName());
 		store.setCity(storeRequestDTO.getCity());
 		store.setStreet(storeRequestDTO.getStreet());
+		return store;
+	}
+
+	public static Store convertToModelWithImage(StoreRequestDTO storeRequestDTO, Optional<StoreImage> image) {
+		Store store = convertToModelNoImage(storeRequestDTO);
+		image.ifPresent(storeImage -> store.setImage(storeImage));
 		return store;
 	}
 
