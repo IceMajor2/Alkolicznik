@@ -104,7 +104,7 @@ public class ImageKitConfig {
 						.formatted(baseFile.getName(), baseFile.getFileId()));
 				continue;
 			}
-			LOGGER.info("Deleting... '%s' is not an 'at-launch' image"
+			LOGGER.info("Deleting... '%s'"
 					.formatted(baseFile.getName()));
 			this.imageKit.deleteFile(baseFile.getFileId());
 		}
