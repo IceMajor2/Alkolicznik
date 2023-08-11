@@ -43,6 +43,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -402,6 +403,34 @@ public class StoreImageTest {
 				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 				StoreResponseDTO actual = toModel(postResponse.getBody(), StoreResponseDTO.class);
 				assertThat(actual.getImage()).isNull();
+			}
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class PutRequests {
+
+			@ParameterizedTest
+			@CsvSource({
+					"5, Primo, Olsztyn, ul. Okulickiego 15",
+					"4, Dwojka, Gdansk, al. Hallera 121"
+			})
+			@DisplayName("PUT: '/api/store' single store with image replacement removes image")
+			@DirtiesContext
+			public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
+					(Long storeId, String name, String city, String street) {
+				// given
+				StoreRequestDTO request = createStoreRequest(name, city, street);
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequest("/api/image", Map.of("store_name", name));
+				// then
+				assertIsError(getResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this store",
+						"/api/image");
 			}
 		}
 	}
