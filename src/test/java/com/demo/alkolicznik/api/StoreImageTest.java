@@ -290,7 +290,9 @@ public class StoreImageTest {
 			// then
 			assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 			StoreResponseDTO actualResponse = toModel(postResponse.getBody(), StoreResponseDTO.class);
-			assertThat(actualResponse.getImage()).isNotNull();
+			assertThat(actualResponse.getImage())
+					.withFailMessage("The image was not found in the response")
+					.isNotNull();
 			BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImage().getImageUrl());
 			assertThat(actual).isEqualTo(expected);
 		}
