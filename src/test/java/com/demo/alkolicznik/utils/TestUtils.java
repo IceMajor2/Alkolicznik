@@ -129,7 +129,7 @@ public class TestUtils {
 			return image;
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			return null;
 		}
 	}
 

@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.api;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +50,6 @@ import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequ
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = "enable.image.database=true")
@@ -431,25 +429,25 @@ public class StoreImageTest {
 					"5, Primo, Olsztyn, ul. Okulickiego 15",
 					"4, Dwojka, Gdansk, al. Hallera 121"
 			})
-			@DisplayName("PUT: '/api/store' single store with image replacement removes image")
+			@DisplayName("PUT: '/api/store' single store with image replacement with new brand removes image")
 			@DirtiesContext
 			public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
-					(Long storeId, String name, String city, String street) {
+					(Long storeId, String name, String city, String street) throws InterruptedException {
 				Store store = getStore(storeId, stores);
-				String initalUrl = store.getImage().get().getImageUrl();
+				String initialUrl = store.getImage().get().getImageUrl();
 				// given
 				StoreRequestDTO request = createStoreRequest(name, city, street);
 				// when
 				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				var getResponse = getRequest("/api/image", Map.of("store_name", name));
+				var getResponse = getRequest("/api/image", Map.of("store_name", store.getName()));
 				Integer count = jdbcTemplate.queryForObject
 						("SELECT count(*) FROM store_image WHERE store_name = ?",
 						Integer.class, name);
 				// then
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
-						"Unable to find image for this store",
+						"Unable to find store of '%s' name".formatted(store.getName()),
 						"/api/image");
 				// asserting that there's no entity of ${name} in the
 				// store_image table (because it should've been deleted)
@@ -459,8 +457,10 @@ public class StoreImageTest {
 						.isEqualTo(0);
 				// asserting that ImageIO.read throws IOException
 				// which would mean the image is not found remotely
-				assertThatExceptionOfType(IOException.class)
-						.isThrownBy(() -> getBufferedImageFromWeb(initalUrl));
+				Thread.sleep(800);
+				assertThat(getBufferedImageFromWeb(initialUrl))
+						.withFailMessage("Image was supposed to be deleted from remote")
+						.isNull();
 			}
 		}
 	}
