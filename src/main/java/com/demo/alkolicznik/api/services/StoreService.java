@@ -64,17 +64,24 @@ public class StoreService {
 
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {
 		Store toOverwrite = checkForPutConditions(storeId, requestDTO);
-		Store newStore = ModelDtoConverter.convertToModelNoImage(requestDTO);
-		Store overwritten = updateFieldsOnPut(toOverwrite, newStore);
+		Store newStore = ModelDtoConverter.convertToModelWithImage(requestDTO, toOverwrite.getImage());
+		newStore.setId(toOverwrite.getId());
+		newStore.setPrices(toOverwrite.getPrices());
 
-		if (storeRepository.exists(overwritten)) {
+		if (storeRepository.exists(newStore)) {
 			throw new StoreAlreadyExistsException();
 		}
 
 		// for each PUT request all the previous
 		// beer prices in this store MUST be deleted
-		overwritten.deleteAllPrices();
-		return new StoreResponseDTO(storeRepository.save(toOverwrite));
+		newStore.deleteAllPrices();
+
+		if(!newStore.getName().equals(toOverwrite.getName())
+				&& storeRepository.countByName(toOverwrite.getName()) == 1) {
+			toOverwrite.getImage()
+					.ifPresent(storeImage -> imageService.deleteStoreImage(storeImage));
+		}
+		return new StoreResponseDTO(storeRepository.save(newStore));
 	}
 
 	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {

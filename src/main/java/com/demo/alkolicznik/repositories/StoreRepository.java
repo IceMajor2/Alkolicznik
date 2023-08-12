@@ -33,6 +33,8 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 			+ "WHERE s.name = ?1 AND s.city = ?2 AND s.street = ?3")
 	Optional<Store> findByNameAndCityAndStreet(String name, String city, String street);
 
+	long countByName(String name);
+
 	default Optional<Store> findByStoreRequest(StoreRequestDTO storeRequestDTO) {
 		return findByNameAndCityAndStreet(storeRequestDTO.getName(),
 				storeRequestDTO.getCity(),
