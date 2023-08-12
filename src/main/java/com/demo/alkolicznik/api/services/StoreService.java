@@ -77,6 +77,9 @@ public class StoreService {
 			toOverwrite.getImage()
 					.ifPresent(storeImage -> imageService.deleteStoreImage(storeImage));
 		}
+		if(requestDTO.getImagePath() != null) {
+			imageService.replaceStoreImage(overwritten.getName(), requestDTO.getImagePath());
+		}
 		return new StoreResponseDTO(storeRepository.save(overwritten));
 	}
 	

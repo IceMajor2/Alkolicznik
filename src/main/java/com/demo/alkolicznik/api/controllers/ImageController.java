@@ -36,7 +36,7 @@ public class ImageController {
 	@DeleteMapping("/beer/{beer_id}/image")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
 	public ImageDeleteDTO deleteBeerImage(@PathVariable("beer_id") Long beerId) {
-		return imageService.delete(beerId);
+		return imageService.deleteBeerImage(beerId);
 	}
 
 	@GetMapping("/store/{store_id}/image")

@@ -103,7 +103,7 @@ public class BeerService {
 		toOverwrite.deleteAllPrices();
 		// for each PUT request the previous image MUST be deleted
 		if (toOverwrite.getImage().isPresent()) {
-			imageService.delete(toOverwrite);
+			imageService.deleteBeerImage(toOverwrite);
 		}
 		// after deleting previous image, check if there is a replacement
 		// if yes, execute the whole 'addImage' procedure
@@ -139,7 +139,7 @@ public class BeerService {
 		BeerDeleteResponseDTO deleteResponse = new BeerDeleteResponseDTO(toDelete);
 		beerRepository.delete(toDelete);
 		if (toDelete.getImage().isPresent()) {
-			imageService.delete(toDelete);
+			imageService.deleteBeerImage(toDelete);
 		}
 		return deleteResponse;
 	}
@@ -215,7 +215,7 @@ public class BeerService {
 
 	private void updateImage(Beer toUpdate, BeerUpdateDTO updateDTO) {
 		if(toUpdate.getImage().isPresent()) {
-			imageService.delete(toUpdate);
+			imageService.deleteBeerImage(toUpdate);
 		}
 		String imagePath = updateDTO.getImagePath();
 		if (imagePath != null) {

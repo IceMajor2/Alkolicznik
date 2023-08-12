@@ -10,10 +10,10 @@ import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageProportionsInvalidException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
@@ -52,26 +52,6 @@ public class ImageService {
 		return new ImageModelResponseDTO(image);
 	}
 
-	public ImageModelResponseDTO getStoreImage(Long storeId) {
-		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		StoreImage image = store.getImage()
-				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-		return new ImageModelResponseDTO(image);
-	}
-
-	public ImageModelResponseDTO getStoreImage(String storeName) {
-		if (!storeRepository.existsByName(storeName))
-			throw new StoreNotFoundException(storeName);
-		StoreImage image = storeImageRepository.findByStoreName(storeName)
-				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-		return new ImageModelResponseDTO(image);
-	}
-
-	Optional<StoreImage> findStoreImage(String storeName) {
-		return storeImageRepository.findByStoreName(storeName);
-	}
-
 	@SneakyThrows
 	public void addBeerImage(Beer beer, String imagePath) {
 		// instantiate BufferedImage and check its proportions
@@ -90,9 +70,44 @@ public class ImageService {
 		beerImageRepository.save(beerImage);
 	}
 
-	public void deleteStoreImage(StoreImage storeImage) {
-		imageKitRepository.delete(storeImage);
-		storeImageRepository.delete(storeImage);
+	/**
+	 * Deletes beer's image from database.
+	 *
+	 * @throws ImageNotFoundException when passed beer does not have an image assigned
+	 */
+	@SneakyThrows
+	public ImageDeleteDTO deleteBeerImage(Beer beer) {
+		BeerImage beerImage = beer.getImage().orElseThrow(() ->
+				new ImageNotFoundException(BeerImage.class));
+		imageKitRepository.delete(beerImage);
+		beer.setImage(null);
+		beerImageRepository.deleteById(beerImage.getId());
+		return new ImageDeleteDTO(beer);
+	}
+
+	public ImageDeleteDTO deleteBeerImage(Long beerId) {
+		return this.deleteBeerImage(beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId)));
+	}
+
+	public ImageModelResponseDTO getStoreImage(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new StoreNotFoundException(storeId));
+		StoreImage image = store.getImage()
+				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
+		return new ImageModelResponseDTO(image);
+	}
+
+	public ImageModelResponseDTO getStoreImage(String storeName) {
+		if (!storeRepository.existsByName(storeName))
+			throw new StoreNotFoundException(storeName);
+		StoreImage image = storeImageRepository.findByStoreName(storeName)
+				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
+		return new ImageModelResponseDTO(image);
+	}
+
+	Optional<StoreImage> findStoreImage(String storeName) {
+		return storeImageRepository.findByStoreName(storeName);
 	}
 
 	private StoreImage addStoreImage(String storeName, String imagePath) {
@@ -117,24 +132,13 @@ public class ImageService {
 		return new ImageModelResponseDTO(addStoreImage(storeName, request.getImagePath()));
 	}
 
-	/**
-	 * Deletes beer's image from database.
-	 *
-	 * @throws ImageNotFoundException when passed beer does not have an image assigned
-	 */
-	@SneakyThrows
-	public ImageDeleteDTO delete(Beer beer) {
-		BeerImage beerImage = beer.getImage().orElseThrow(() ->
-				new ImageNotFoundException(BeerImage.class));
-		imageKitRepository.delete(beerImage);
-		beer.setImage(null);
-		beerImageRepository.deleteById(beerImage.getId());
-		return new ImageDeleteDTO(beer);
+	public void replaceStoreImage(String storeName, String imagePath) {
+
 	}
 
-	public ImageDeleteDTO delete(Long beerId) {
-		return this.delete(beerRepository.findById(beerId)
-				.orElseThrow(() -> new BeerNotFoundException(beerId)));
+	public void deleteStoreImage(StoreImage storeImage) {
+		imageKitRepository.delete(storeImage);
+		storeImageRepository.delete(storeImage);
 	}
 
 	public <T extends ImageModel> ImageModel save(T image, Class<T> imgClass) {
@@ -164,7 +168,7 @@ public class ImageService {
 		return false;
 	}
 
-	public String createImageFilename(Beer beer, String extension) {
+	private String createImageFilename(Beer beer, String extension) {
 		StringBuilder stringBuilder = new StringBuilder("");
 		stringBuilder
 				.append(beer.getFullName().toLowerCase().replace(' ', '-'))
@@ -184,7 +188,7 @@ public class ImageService {
 		return stringBuilder.toString();
 	}
 
-	public String extractFileExtensionFromPath(String path) {
+	private String extractFileExtensionFromPath(String path) {
 		return path.substring(path.lastIndexOf('.') + 1);
 	}
 }
