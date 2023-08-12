@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,6 +45,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromLocal;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
+import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
@@ -414,10 +418,12 @@ public class StoreImageTest {
 		class PutRequests {
 
 			private List<Store> stores;
+			private JdbcTemplate jdbcTemplate;
 
 			@Autowired
-			public PutRequests(List<Store> stores) {
+			public PutRequests(List<Store> stores, DataSource dataSource) {
 				this.stores = stores;
+				this.jdbcTemplate = new JdbcTemplate(dataSource);
 			}
 
 			@ParameterizedTest
@@ -429,18 +435,28 @@ public class StoreImageTest {
 			@DirtiesContext
 			public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
 					(Long storeId, String name, String city, String street) {
-				String initalUrl = getStoreImage(storeId, stores).getImageUrl();
+				Store store = getStore(storeId, stores);
+				String initalUrl = store.getImage().get().getImageUrl();
 				// given
 				StoreRequestDTO request = createStoreRequest(name, city, street);
 				// when
 				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				var getResponse = getRequest("/api/image", Map.of("store_name", name));
+				Integer count = jdbcTemplate.queryForObject
+						("SELECT count(*) FROM store_image WHERE store_name = ?",
+						Integer.class, name);
 				// then
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store",
 						"/api/image");
+				// asserting that there's no entity of ${name} in the
+				// store_image table (because it should've been deleted)
+				assertThat(count)
+						.withFailMessage("'%s' was found in 'store_image' table"
+								.formatted(store.getName()))
+						.isEqualTo(0);
 				// asserting that ImageIO.read throws IOException
 				// which would mean the image is not found remotely
 				assertThatExceptionOfType(IOException.class)
