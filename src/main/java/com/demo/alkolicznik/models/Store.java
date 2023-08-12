@@ -25,6 +25,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Table(name = "store")
 @Entity(name = "Store")
@@ -32,6 +33,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Store {
 
 	@Id
@@ -59,11 +61,6 @@ public class Store {
 			fetch = FetchType.LAZY)
 	@JsonIgnore
 	private Set<BeerPrice> prices = new HashSet<>();
-
-	@Override
-	public String toString() {
-		return this.name + ", " + this.city + " " + this.street + " (" + this.id + ")";
-	}
 
 	public Optional<StoreImage> getImage() {
 		return Optional.ofNullable(image);

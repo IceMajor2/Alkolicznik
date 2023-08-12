@@ -64,24 +64,29 @@ public class StoreService {
 
 	public StoreResponseDTO replace(Long storeId, StoreRequestDTO requestDTO) {
 		Store toOverwrite = checkForPutConditions(storeId, requestDTO);
-		Store newStore = ModelDtoConverter.convertToModelWithImage(requestDTO, toOverwrite.getImage());
-		newStore.setId(toOverwrite.getId());
-		newStore.setPrices(toOverwrite.getPrices());
+		Store overwritten = createOverwrittenModel(requestDTO, toOverwrite);
 
-		if (storeRepository.exists(newStore)) {
+		if (storeRepository.exists(overwritten)) {
 			throw new StoreAlreadyExistsException();
 		}
-
 		// for each PUT request all the previous
 		// beer prices in this store MUST be deleted
-		newStore.deleteAllPrices();
-
-		if(!newStore.getName().equals(toOverwrite.getName())
+		overwritten.deleteAllPrices();
+		if(!overwritten.getName().equals(toOverwrite.getName())
 				&& storeRepository.countByName(toOverwrite.getName()) == 1) {
 			toOverwrite.getImage()
 					.ifPresent(storeImage -> imageService.deleteStoreImage(storeImage));
 		}
-		return new StoreResponseDTO(storeRepository.save(newStore));
+		return new StoreResponseDTO(storeRepository.save(overwritten));
+	}
+	
+	private Store createOverwrittenModel(StoreRequestDTO requestDTO, Store toOverwrite) {
+		Store overwritten = ModelDtoConverter.convertToModelNoImage(requestDTO);
+		overwritten.setId(toOverwrite.getId());
+		overwritten.setPrices(toOverwrite.getPrices());
+		var newImage = imageService.findStoreImage(requestDTO.getName());
+		newImage.ifPresent(img -> overwritten.setImage(img));
+		return overwritten;
 	}
 
 	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
@@ -127,13 +132,6 @@ public class StoreService {
 			throw new ObjectsAreEqualException();
 		}
 		return store;
-	}
-
-	private Store updateFieldsOnPut(Store toOverwrite, Store newStore) {
-		toOverwrite.setName(newStore.getName());
-		toOverwrite.setCity(newStore.getCity());
-		toOverwrite.setStreet(newStore.getStreet());
-		return toOverwrite;
 	}
 
 	private Store updateFieldsOnPatch(Store toUpdate, StoreUpdateDTO updateDTO) {
