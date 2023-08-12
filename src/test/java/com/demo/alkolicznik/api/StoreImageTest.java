@@ -206,6 +206,7 @@ public class StoreImageTest {
 				// increases the chance of a false positive.
 				BufferedImageAssert.assertThat(actual).hasSameDimensionsAs(expected);
 			}
+			// TODO: Write a test that actually just simply creates a store w/ image
 		}
 	}
 
@@ -416,7 +417,9 @@ public class StoreImageTest {
 		class PutRequests {
 
 			private List<Store> stores;
+
 			private List<StoreImage> storeImages;
+
 			private JdbcTemplate jdbcTemplate;
 
 			@Autowired
@@ -445,7 +448,7 @@ public class StoreImageTest {
 				var getResponse = getRequest("/api/image", Map.of("store_name", store.getName()));
 				Integer count = jdbcTemplate.queryForObject
 						("SELECT count(*) FROM store_image WHERE store_name = ?",
-						Integer.class, name);
+								Integer.class, name);
 				// then
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
@@ -486,6 +489,63 @@ public class StoreImageTest {
 				assertThat(actualImage).isNotNull();
 				assertThat(actualImage.getRemoteId()).isEqualTo(expected.getRemoteId());
 				assertThat(actualImage.getImageUrl()).isEqualTo(expected.getImageUrl());
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"1, Carrefour, Szczecin, ul. Rolna 22, f_carrefour.jpg",
+					"6, Lubi, Olsztyn, ul. Wyzynna 9, f_lubi.jpg"
+			})
+			@DisplayName("PUT: '/api/store' include image to overwrite")
+			@DirtiesContext
+			public void replacingWithImageOverridesIfPreviousExistedTest
+					(Long storeId, String name, String city, String street, String imageFile) {
+				StoreImage prevImg = getStoreImage(name, storeImages);
+				var prevImgDTO = createImageResponse(prevImg);
+				BufferedImage notExpected = getBufferedImageFromWeb(prevImg.getImageUrl());
+				// given
+				StoreRequestDTO request = createStoreRequest
+						(name, city, street, getRawPathToImage("store/" + imageFile));
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				StoreResponseDTO actual = toModel(putResponse.getBody(), StoreResponseDTO.class);
+				ImageModelResponseDTO actualImage = actual.getImage();
+				BufferedImage actualBuffImg = getBufferedImageFromWeb(actualImage.getImageUrl());
+				// then
+				assertThat(actualImage).isNotEqualTo(prevImgDTO);
+				assertThat(actualBuffImg).isNotEqualTo(notExpected);
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"2, Intermarche, Starogard, ul. Gdanska 5, f_intermarche.webp",
+					"9, Lewiatan, Mragowo, ul. Miejska 27, f_lewiatan.png",
+					"3, Piotr i Pawel, Kielce, ul. Liroja 33, f_piotr-i-pawel.png"
+			})
+			@DisplayName("PUT: '/api/store' include image to add")
+			@DirtiesContext
+			public void replacingWithImageCreatesNewIfPreviousNotExistedTest
+					(Long storeId, String name, String city, String street, String imageFile) {
+				// given
+				String pathToImg = getRawPathToImage("store/" + imageFile);
+				StoreRequestDTO request = createStoreRequest
+						(name, city, street, getRawPathToImage(pathToImg));
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				StoreResponseDTO actual = toModel(putResponse.getBody(), StoreResponseDTO.class);
+				ImageModelResponseDTO actualImage = actual.getImage();
+				assertThat(actualImage)
+						.withFailMessage("Image was not found in the response")
+						.isNotNull();
+				BufferedImage actualBuffImg = getBufferedImageFromWeb(actualImage.getImageUrl());
+				// then
+				BufferedImage expected = getBufferedImageFromLocal(pathToImg);
+				assertThat(expected)
+						.withFailMessage("Image was not sent to remote")
+						.isNotNull();
+				BufferedImageAssert.assertThat(actualBuffImg).hasSameDimensionsAs(expected);
 			}
 		}
 	}
