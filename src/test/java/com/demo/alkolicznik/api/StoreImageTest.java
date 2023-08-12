@@ -416,11 +416,13 @@ public class StoreImageTest {
 		class PutRequests {
 
 			private List<Store> stores;
+			private List<StoreImage> storeImages;
 			private JdbcTemplate jdbcTemplate;
 
 			@Autowired
-			public PutRequests(List<Store> stores, DataSource dataSource) {
+			public PutRequests(List<Store> stores, List<StoreImage> storeImages, DataSource dataSource) {
 				this.stores = stores;
+				this.storeImages = storeImages;
 				this.jdbcTemplate = new JdbcTemplate(dataSource);
 			}
 
@@ -461,6 +463,29 @@ public class StoreImageTest {
 				assertThat(getBufferedImageFromWeb(initialUrl))
 						.withFailMessage("Image was supposed to be deleted from remote")
 						.isNull();
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"7, Carrefour, Jedwabno, ul. Dluzna 15",
+					"2, Lubi, Olsztyn, ul. Mazurska 52"
+			})
+			@DisplayName("PUT: '/api/store' no image in dto but image is already uploaded")
+			@DirtiesContext
+			public void replacingEntityWithImagePreviouslyTest(Long storeId, String name, String city, String street) {
+				// given
+				StoreRequestDTO request = createStoreRequest(name, city, street);
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				String actualJson = putResponse.getBody();
+				StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
+				ImageModelResponseDTO actualImage = actual.getImage();
+				// then
+				StoreImage expected = getStoreImage(name, storeImages);
+				assertThat(actualImage).isNotNull();
+				assertThat(actualImage.getRemoteId()).isEqualTo(expected.getRemoteId());
+				assertThat(actualImage.getImageUrl()).isEqualTo(expected.getImageUrl());
 			}
 		}
 	}
