@@ -530,7 +530,7 @@ public class StoreImageTest {
 				// given
 				String pathToImg = getRawPathToImage("store/" + imageFile);
 				StoreRequestDTO request = createStoreRequest
-						(name, city, street, getRawPathToImage(pathToImg));
+						(name, city, street, pathToImg);
 				// when
 				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
