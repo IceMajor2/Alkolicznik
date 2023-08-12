@@ -76,9 +76,16 @@ public class StoreService {
 				&& storeRepository.countByName(toOverwrite.getName()) == 1) {
 			toOverwrite.getImage()
 					.ifPresent(storeImage -> imageService.deleteStoreImage(storeImage));
+			toOverwrite.setImage(null);
 		}
-		if(requestDTO.getImagePath() != null) {
-			imageService.replaceStoreImage(overwritten.getName(), requestDTO.getImagePath());
+		String imagePath = requestDTO.getImagePath();
+		if(imagePath != null) {
+			var brandImage = imageService.findStoreImage(overwritten.getName());
+			if(brandImage.isPresent()) {
+				imageService.replaceStoreImage(overwritten, imagePath);
+			} else {
+				imageService.addStoreImage(overwritten, imagePath);
+			}
 		}
 		return new StoreResponseDTO(storeRepository.save(overwritten));
 	}

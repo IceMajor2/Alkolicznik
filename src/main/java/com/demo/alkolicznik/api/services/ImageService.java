@@ -132,8 +132,12 @@ public class ImageService {
 		return new ImageModelResponseDTO(addStoreImage(storeName, request.getImagePath()));
 	}
 
-	public void replaceStoreImage(String storeName, String imagePath) {
-
+	public ImageModelResponseDTO replaceStoreImage(Store store, String imagePath) {
+		StoreImage image = storeImageRepository.findByStoreName(store.getName()).get();
+		deleteStoreImage(image);
+		StoreImage newImage = addStoreImage(store.getName(), imagePath);
+		store.setImage(newImage);
+		return new ImageModelResponseDTO(newImage);
 	}
 
 	public void deleteStoreImage(StoreImage storeImage) {
