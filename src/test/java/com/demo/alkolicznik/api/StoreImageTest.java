@@ -569,6 +569,29 @@ public class StoreImageTest {
 						"Store already exists",
 						"/api/store/" + storeId);
 			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"9, Zabka, Ilawa, ul. Dworcowa 3, f_zabka.jpg",
+					"5, Lubi, Warszawa, ul. Nowaka 5, f_lubi.jpg",
+					"8, Carrefour, Olsztyn, ul. Borkowskiego 3, f_carrefour.jpg"
+			})
+			@DisplayName("PUT: '/api/store' [OBJECTS_EQUAL] with image new/differing")
+			public void shouldDoNothingWhenReplacingWithSameEntityDifferentImageTest
+					(Long storeId, String name, String city, String street, String imageFile) {
+				// given
+				String pathToImg = getRawPathToImage("store/" + imageFile);
+				StoreRequestDTO request = createStoreRequest
+						(name, city, street, pathToImg);
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+
+				// then
+				assertIsError(putResponse.getBody(),
+						HttpStatus.OK,
+						"Objects are the same: nothing to update",
+						"/api/store/" + storeId);
+			}
 		}
 	}
 }
