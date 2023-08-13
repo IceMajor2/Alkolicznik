@@ -113,7 +113,8 @@ public class ImageService {
 	private StoreImage addStoreImage(String storeName, String imagePath) {
 		File file = new File(imagePath);
 		if (!file.exists()) throw new FileNotFoundException(imagePath);
-		if(storeImageRepository.existsByStoreName(storeName)) throw new ImageAlreadyExistsException();
+		if (storeImageRepository.existsByStoreName(storeName))
+			throw new ImageAlreadyExistsException();
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
 				createImageFilename(storeName, extractFileExtensionFromPath(imagePath)), StoreImage.class);
 		storeImage.setStoreName(storeName);
@@ -132,10 +133,23 @@ public class ImageService {
 		return new ImageModelResponseDTO(addStoreImage(storeName, request.getImagePath()));
 	}
 
-	public ImageModelResponseDTO replaceStoreImage(Store store, String imagePath) {
-		StoreImage image = storeImageRepository.findByStoreName(store.getName()).get();
+	public ImageModelResponseDTO updateStoreImage(String storeName, ImageRequestDTO imageRequestDTO) {
+		if (!storeRepository.existsByName(storeName))
+			throw new StoreNotFoundException(storeName);
+		if (!storeImageRepository.existsByStoreName(storeName))
+			throw new ImageNotFoundException(StoreImage.class);
+		return new ImageModelResponseDTO(replaceStoreImage(storeName, imageRequestDTO.getImagePath()));
+	}
+
+	private StoreImage replaceStoreImage(String storeName, String imagePath) {
+		StoreImage image = storeImageRepository.findByStoreName(storeName).get();
 		deleteStoreImage(image);
-		StoreImage newImage = addStoreImage(store.getName(), imagePath);
+		StoreImage newImage = addStoreImage(storeName, imagePath);
+		return newImage;
+	}
+
+	public ImageModelResponseDTO replaceStoreImage(Store store, String imagePath) {
+		StoreImage newImage = replaceStoreImage(store.getName(), imagePath);
 		store.setImage(newImage);
 		return new ImageModelResponseDTO(newImage);
 	}
