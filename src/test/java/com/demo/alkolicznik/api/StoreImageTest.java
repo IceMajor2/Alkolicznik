@@ -41,11 +41,14 @@ import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
+import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromLocal;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
@@ -671,6 +674,45 @@ public class StoreImageTest {
 						HttpStatus.OK,
 						"Objects are the same: nothing to update",
 						"/api/store/" + storeId);
+			}
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class DeleteRequests {
+
+			private List<Store> stores;
+
+			@Autowired
+			public DeleteRequests(List<Store> stores) {
+				this.stores = stores;
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 1, 8 })
+			@DisplayName("DELETE: '/api/store/{store_id}'")
+			@DirtiesContext
+			public void deletingOneOfMultipleStoresShouldNotDeleteImageTest(Long storeId) {
+				Store store = getStore(storeId.longValue(), stores);
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequestAuth("admin", "admin", "/api/store");
+				System.out.println(getResponse.getBody());
+				List<String> actualURLs =
+						toModelList(getResponse.getBody(), StoreResponseDTO.class)
+								.stream()
+								.filter(storeResponse ->
+										storeResponse.getName().equals(store.getName()))
+								.map(storeResponse -> storeResponse.getImage().getImageUrl())
+								.toList();
+				BufferedImage actualComp = getBufferedImageFromWeb(actualURLs.get(0));
+				// then
+				String expectedURL = store.getImage().get().getImageUrl();
+				BufferedImage expectedComp = getBufferedImageFromWeb(expectedURL);
+				assertThat(actualURLs).containsOnly(expectedURL);
+				BufferedImageAssert.assertThat(actualComp).isEqualTo(expectedComp);
 			}
 		}
 	}
