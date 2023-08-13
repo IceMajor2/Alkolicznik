@@ -267,6 +267,25 @@ public class StoreImageTest {
 						"Unable to find store of '%s' name".formatted(storeName),
 						"/api/image");
 			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"Tesco, f_tesco.png",
+					"Biedronka, f_biedronka.webp",
+			})
+			@DisplayName("PUT: '/api/image?store_name=' [IMAGE_NOT_FOUND]")
+			public void shouldReturn404WhenImageIsNotFoundTest(String storeName, String imgFile) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
+						Map.of("store_name", storeName));
+				// then
+				assertIsError(patchResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this store".formatted(storeName),
+						"/api/image");
+			}
 		}
 	}
 
