@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.api.controllers;
 
 import java.net.URI;
+import java.util.List;
 
 import com.demo.alkolicznik.api.services.ImageService;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
@@ -43,6 +44,12 @@ public class ImageController {
 	@GetMapping("/store/{store_id}/image")
 	public ImageModelResponseDTO getStoreImage(@PathVariable("store_id") Long storeId) {
 		return imageService.getStoreImage(storeId);
+	}
+
+	@GetMapping("/store/image")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	public List<ImageModelResponseDTO> getStoreImages() {
+		return imageService.getAllStoreImages();
 	}
 
 	@GetMapping("/image")

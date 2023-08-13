@@ -2,6 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -108,6 +109,12 @@ public class ImageService {
 
 	Optional<StoreImage> findStoreImage(String storeName) {
 		return storeImageRepository.findByStoreName(storeName);
+	}
+
+	public List<ImageModelResponseDTO> getAllStoreImages() {
+		return storeImageRepository.findAll().stream()
+				.map(ImageModelResponseDTO::new)
+				.toList();
 	}
 
 	private StoreImage addStoreImage(String storeName, String imagePath) {
