@@ -24,6 +24,14 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 		return this;
 	}
 
+	public BufferedImageAssert hasDifferentDimensionsAs(BufferedImage compare) {
+		isNotNull();
+		Assertions.assertThat(TestUtils.dimensionsSame(actual, compare))
+				.as("Comparing only dimensions of the image")
+				.isFalse();
+		return this;
+	}
+
 	public BufferedImageAssert isEqualTo(BufferedImage expected) {
 		isNotNull();
 		Assertions.assertThat(TestUtils.imageEquals(actual, expected))

@@ -213,6 +213,40 @@ public class StoreImageTest {
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		class PutRequests {
 
+			private List<StoreImage> storeImages;
+
+			@Autowired
+			public PutRequests(List<StoreImage> storeImages) {
+				this.storeImages = storeImages;
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"Carrefour, f_carrefour.jpg",
+					"Lubi, f_lubi.jpg"
+			})
+			@DisplayName("PUT: '/api/image?store_name=' successful replacement with image")
+			@DirtiesContext
+			public void successfulReplacementOfImageEntityTest(String storeName, String imgFile) {
+				StoreImage prevImg = getStoreImage(storeName, storeImages);
+				BufferedImage prevImgComponent = getBufferedImageFromWeb(prevImg.getImageUrl());
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/image", request,
+						Map.of("store_name", storeName));
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				ImageModelResponseDTO actual = toModel(putResponse.getBody(), ImageModelResponseDTO.class);
+				// then
+				BufferedImage actualComponent = getBufferedImageFromWeb(actual.getImageUrl());
+				assertThat(actual.getImageUrl())
+						.withFailMessage("Image was not uploaded to remote")
+						.isNotEqualTo(prevImg.getImageUrl());
+				BufferedImageAssert.assertThat(actualComponent)
+						.withFailMessage("Image is same as the previous one")
+						.hasDifferentDimensionsAs(prevImgComponent);
+			}
+
 			@ParameterizedTest
 			@CsvSource({
 					"jhosrei, f_piotr-i-pawel.png",
@@ -224,7 +258,7 @@ public class StoreImageTest {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var putResponse = putRequestAuth("admin", "admin", "/api/image",
+				var putResponse = putRequestAuth("admin", "admin", "/api/image", request,
 						Map.of("store_name", storeName));
 				// then
 				assertIsError(putResponse.getBody(),
