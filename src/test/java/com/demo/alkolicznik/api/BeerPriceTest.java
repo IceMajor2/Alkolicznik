@@ -1340,14 +1340,6 @@ public class BeerPriceTest {
 				assertThat(pricesOfStore).isEmpty();
 			}
 		}
-
-		@Nested
-		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-		@TestMethodOrder(MethodOrderer.Random.class)
-		class ImageRequests {
-			// TODO: write analogical tests with images
-		}
-
 	}
 
 	private void sortByBeerIdPriceAndStoreId(List<BeerPriceResponseDTO> pricesDTO) {
