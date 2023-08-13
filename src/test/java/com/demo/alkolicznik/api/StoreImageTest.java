@@ -318,13 +318,39 @@ public class StoreImageTest {
 				// then
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
-						"Image was not found for this store",
+						"Unable to find image for this store",
 						"/api/image");
 				// waiting for ImageKit
 				Thread.sleep(1000);
 				assertThat(getBufferedImageFromWeb(notExpectedURL))
 						.withFailMessage("Image was not deleted remotely")
 						.isNull();
+			}
+
+			@ParameterizedTest
+			@ValueSource(strings = { "gs1krjn", "ski3jao" })
+			@DisplayName("DELETE: '/api/image?store_name=' [STORE_NOT_FOUND]")
+			public void shouldReturn404OnStoreNotFoundTest(String storeName) {
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
+						Map.of("store_name", storeName));
+
+				assertIsError(deleteResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find store of '%s' name".formatted(storeName),
+						"/api/image");
+			}
+
+			@ParameterizedTest
+			@ValueSource(strings = { "Tesco", "Zabka" })
+			@DisplayName("DELETE: '/api/image?store_name=' [IMAGE_NOT_FOUND]")
+			public void shouldReturn404OnImageNotFoundTest(String storeName) {
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
+						Map.of("store_name", storeName));
+
+				assertIsError(deleteResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this store",
+						"/api/image");
 			}
 		}
 	}
