@@ -31,6 +31,8 @@ import lombok.SneakyThrows;
 
 import org.springframework.stereotype.Service;
 
+// TODO: separate this class into StoreImageService & BeerImageService
+
 @Service
 @AllArgsConstructor
 public class ImageService {
