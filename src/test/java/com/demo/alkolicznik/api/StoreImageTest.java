@@ -207,6 +207,32 @@ public class StoreImageTest {
 				BufferedImageAssert.assertThat(actual).hasSameDimensionsAs(expected);
 			}
 		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class PutRequests {
+
+			@ParameterizedTest
+			@CsvSource({
+					"jhosrei, f_piotr-i-pawel.png",
+					"erijagoe4, f_intermarche.webp",
+					"eiw0-szmfcjwe, f_biedronka.png"
+			})
+			@DisplayName("PUT: '/api/image?store_name=' [STORE_NOT_FOUND]")
+			public void shouldReturn404WhenStoreIsNotFoundTest(String storeName, String imgFile) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/image",
+						Map.of("store_name", storeName));
+				// then
+				assertIsError(putResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find store of '%s' name".formatted(storeName),
+						"/api/image");
+			}
+		}
 	}
 
 	@Nested
