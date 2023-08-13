@@ -808,7 +808,7 @@ public class BeerTest {
 		@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 		public void updateRemoveTypeTest() {
 			// given
-			BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, " ", null);
 			// when
 			var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
 			assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -867,7 +867,7 @@ public class BeerTest {
 		@Test
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [NO_PROPERTY_SPECIFIED]")
 		public void updateWithEmptyBodyTest() {
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, null);
 			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/6", request);
 
 			String jsonResponse = putResponse.getBody();
@@ -904,7 +904,7 @@ public class BeerTest {
 		@ValueSource(doubles = { -0.9, 0d, -15d })
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [VOLUME_NON_POSITIVE]")
 		public void updateVolumeNonPositiveTest(Double volume) {
-			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
 			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/4", request);
 
 			String jsonResponse = putResponse.getBody();
@@ -921,7 +921,7 @@ public class BeerTest {
 		@ValueSource(longs = { 0, -23, 9998 })
 		@DisplayName("PATCH: '/api/beer/{beer_id}' [BEER_NOT_FOUND]")
 		public void updateBeerNotFoundTest(Long id) {
-			BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null, null);
+			BeerUpdateDTO request = createBeerUpdateRequest(null, "Chmielowe", null);
 			var putResponse = patchRequestAuth("admin", "admin", "/api/beer/" + id, request);
 
 			String jsonResponse = putResponse.getBody();

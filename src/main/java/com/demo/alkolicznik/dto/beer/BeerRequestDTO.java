@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.dto.beer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -25,8 +24,8 @@ public class BeerRequestDTO {
 	@Positive(message = "Volume must be a positive number")
 	private Double volume;
 
-	@JsonProperty("image_path")
-	private String imagePath;
+//	@JsonProperty("image_path")
+//	private String imagePath;
 
 	@JsonIgnore
 	public String getFullName() {

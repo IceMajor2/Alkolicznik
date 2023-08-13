@@ -8,11 +8,13 @@ import java.util.Set;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
 
 public class ModelDtoConverter {
@@ -57,13 +59,25 @@ public class ModelDtoConverter {
 
 	public static Store convertToModelWithImage(StoreRequestDTO storeRequestDTO, Optional<StoreImage> image) {
 		Store store = convertToModelNoImage(storeRequestDTO);
-		image.ifPresent(storeImage -> store.setImage(storeImage));
+		image.ifPresent(store::setImage);
 		return store;
 	}
 
 	public static List<BeerPriceResponseDTO> beerPriceSetToDtoListKeepOrder(Set<BeerPrice> prices) {
 		return prices.stream()
 				.map(BeerPriceResponseDTO::new)
+				.toList();
+	}
+
+	public static List<ImageModelResponseDTO> storeImageListToDtoList(List<StoreImage> storeImages) {
+		return storeImages.stream()
+				.map(ImageModelResponseDTO::new)
+				.toList();
+	}
+
+	public static List<ImageModelResponseDTO> beerImageListToDtoList(List<BeerImage> beerImages) {
+		return beerImages.stream()
+				.map(ImageModelResponseDTO::new)
 				.toList();
 	}
 }

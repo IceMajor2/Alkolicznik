@@ -6,7 +6,6 @@ import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
@@ -29,27 +28,19 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
 	@Positive(message = "Volume must be a positive number")
 	private Double volume;
 
-	@JsonProperty("image_path")
-	private String imagePath;
-
 	public BeerUpdateDTO(BeerRequestDTO requestDTO) {
 		this.brand = requestDTO.getBrand();
 		this.type = requestDTO.getType();
 		this.volume = requestDTO.getVolume();
-		this.imagePath = requestDTO.getImagePath();
 	}
 
 	@Override
 	public boolean propertiesMissing() {
-		return brand == null && type == null && volume == null && imagePath == null;
+		return brand == null && type == null && volume == null; //&& imagePath == null;
 	}
 
 	@Override
 	public boolean anythingToUpdate(Beer beer) {
-		// for now: not going to compare external image with the new, requested one
-		if (this.imagePath != null) {
-			return true;
-		}
 		String currBrand = beer.getBrand();
 		String currType = beer.getType();
 		Double currVolume = beer.getVolume();

@@ -28,7 +28,7 @@ public class StoreService {
 
 	private StoreRepository storeRepository;
 
-	private ImageService imageService;
+	private StoreImageService imageService;
 
 	public List<StoreResponseDTO> getStores(String city) {
 		if (!storeRepository.existsByCity(city)) {
@@ -48,17 +48,9 @@ public class StoreService {
 	}
 
 	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
-		Optional<StoreImage> optImage = imageService.findStoreImage(requestDTO.getName());
+		Optional<StoreImage> optImage = imageService.findByStoreName(requestDTO.getName());
 		Store store = ModelDtoConverter.convertToModelWithImage(requestDTO, optImage);
 		if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
-
-		String imagePath = requestDTO.getImagePath();
-		if (imagePath != null) {
-			if (optImage.isPresent()) {
-				imageService.deleteStoreImage(optImage.get());
-			}
-			imageService.addStoreImage(store, imagePath);
-		}
 		return new StoreResponseDTO(storeRepository.save(store));
 	}
 
@@ -70,33 +62,17 @@ public class StoreService {
 			throw new StoreAlreadyExistsException();
 		}
 		// for each PUT request all the previous
-		// beer prices in this store MUST be deleted
+		// beer prices MUST be deleted
 		overwritten.deleteAllPrices();
-		if(!overwritten.getName().equals(toOverwrite.getName())
+		// if the name of the store was unique and is being
+		// changed right now, then delete previous image
+		if (!overwritten.getName().equals(toOverwrite.getName())
 				&& storeRepository.countByName(toOverwrite.getName()) == 1) {
 			toOverwrite.getImage()
-					.ifPresent(storeImage -> imageService.deleteStoreImage(storeImage));
+					.ifPresent(storeImage -> imageService.delete(storeImage.getStoreName()));
 			toOverwrite.setImage(null);
 		}
-		String imagePath = requestDTO.getImagePath();
-		if(imagePath != null) {
-			var brandImage = imageService.findStoreImage(overwritten.getName());
-			if(brandImage.isPresent()) {
-				imageService.replaceStoreImage(overwritten, imagePath);
-			} else {
-				imageService.addStoreImage(overwritten, imagePath);
-			}
-		}
 		return new StoreResponseDTO(storeRepository.save(overwritten));
-	}
-	
-	private Store createOverwrittenModel(StoreRequestDTO requestDTO, Store toOverwrite) {
-		Store overwritten = ModelDtoConverter.convertToModelNoImage(requestDTO);
-		overwritten.setId(toOverwrite.getId());
-		overwritten.setPrices(toOverwrite.getPrices());
-		var newImage = imageService.findStoreImage(requestDTO.getName());
-		newImage.ifPresent(img -> overwritten.setImage(img));
-		return overwritten;
 	}
 
 	public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
@@ -113,10 +89,10 @@ public class StoreService {
 		Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
 		toDelete.deleteAllPrices();
-		if(storeRepository.countByName(toDelete.getName()) == 1) {
+		if (storeRepository.countByName(toDelete.getName()) == 1) {
 			toDelete.getImage().ifPresent(
-					storeImage -> imageService.deleteStoreImage(storeImage));
-			toDelete.setImage(null);
+					storeImage -> imageService.delete(storeImage.getStoreName()));
+//			toDelete.setImage(null);
 		}
 		storeRepository.delete(toDelete);
 		return new StoreDeleteDTO(toDelete);
@@ -124,7 +100,8 @@ public class StoreService {
 
 	public StoreDeleteDTO delete(StoreRequestDTO store) {
 		Store toDelete = storeRepository.findByStoreRequest(store)
-				.orElseThrow(() -> new StoreNotFoundException(store.getName(), store.getCity(), store.getStreet()));
+				.orElseThrow(() -> new StoreNotFoundException
+						(store.getName(), store.getCity(), store.getStreet()));
 		return this.delete(toDelete.getId());
 	}
 
@@ -163,5 +140,13 @@ public class StoreService {
 			toUpdate.setStreet(updatedStreet);
 		}
 		return toUpdate;
+	}
+
+	private Store createOverwrittenModel(StoreRequestDTO requestDTO, Store toOverwrite) {
+		Optional<StoreImage> image = imageService.findByStoreName(requestDTO.getName());
+		Store overwritten = ModelDtoConverter.convertToModelWithImage(requestDTO, image);
+		overwritten.setId(toOverwrite.getId());
+		overwritten.setPrices(toOverwrite.getPrices());
+		return overwritten;
 	}
 }

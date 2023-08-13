@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api.services;
 
-import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -11,8 +10,6 @@ import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
@@ -21,30 +18,23 @@ import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.vaadin.flow.component.html.Image;
+import lombok.AllArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class BeerService {
 
 	private BeerRepository beerRepository;
 
 	private StoreRepository storeRepository;
 
-	private ImageService imageService;
-
-	@Autowired
-	public BeerService(BeerRepository beerRepository, StoreRepository storeRepository, ImageService imageService) {
-		this.beerRepository = beerRepository;
-		this.storeRepository = storeRepository;
-		this.imageService = imageService;
-	}
+	private BeerImageService imageService;
 
 	public BeerResponseDTO get(Long beerId) {
 		Beer beer = beerRepository.findById(beerId).orElseThrow(
@@ -74,18 +64,10 @@ public class BeerService {
 		return ModelDtoConverter.beerListToDtoList(beerRepository.findAllByOrderByIdAsc());
 	}
 
-	// TODO: probably should be a transaction
 	public BeerResponseDTO add(BeerRequestDTO requestDTO) {
 		Beer beer = ModelDtoConverter.convertToModelNoImage(requestDTO);
-
 		if (beerRepository.exists(beer)) {
 			throw new BeerAlreadyExistsException();
-		}
-		// After beer's validation, we can begin (if passed)
-		// the uploading of image and attaching it to beer object.
-		String imagePath = requestDTO.getImagePath();
-		if (imagePath != null) {
-			imageService.addBeerImage(beer, imagePath);
 		}
 		return new BeerResponseDTO(beerRepository.save(beer));
 	}
@@ -94,22 +76,13 @@ public class BeerService {
 		Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
 		Beer newBeer = ModelDtoConverter.convertToModelNoImage(requestDTO);
 		Beer overwritten = updateFieldsOnPut(toOverwrite, newBeer);
-
-		if (beerRepository.exists(overwritten)) {
-			throw new BeerAlreadyExistsException();
-		}
+		if (beerRepository.exists(overwritten)) throw new BeerAlreadyExistsException();
 		// for each PUT request all the previous
 		// beer prices for this beer MUST be deleted
 		toOverwrite.deleteAllPrices();
 		// for each PUT request the previous image MUST be deleted
 		if (toOverwrite.getImage().isPresent()) {
-			imageService.deleteBeerImage(toOverwrite);
-		}
-		// after deleting previous image, check if there is a replacement
-		// if yes, execute the whole 'addImage' procedure
-		String imagePath = requestDTO.getImagePath();
-		if (imagePath != null) {
-			imageService.addBeerImage(toOverwrite, imagePath);
+			imageService.delete(toOverwrite);
 		}
 		return new BeerResponseDTO(beerRepository.save(toOverwrite));
 	}
@@ -118,9 +91,8 @@ public class BeerService {
 		Beer beer = checkForPatchConditions(beerId, updateDTO);
 		Beer updated = updateFieldsOnPatch(beer, updateDTO);
 
-		if (beerRepository.exists(updated) && updateDTO.getImagePath() == null) {
+		if (beerRepository.exists(updated))
 			throw new BeerAlreadyExistsException();
-		}
 		// deleting prices on conditions
 		if (this.pricesToDelete(updateDTO)) {
 			beer.deleteAllPrices();
@@ -128,7 +100,7 @@ public class BeerService {
 		// deleting image on conditions and
 		// reuploading if it was requested
 		if (this.imageToDelete(updated, updateDTO)) {
-			updateImage(updated, updateDTO);
+			imageService.delete(beerId);
 		}
 		return new BeerResponseDTO(beerRepository.save(beer));
 	}
@@ -136,12 +108,9 @@ public class BeerService {
 	public BeerDeleteResponseDTO delete(Long beerId) {
 		Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
 				new BeerNotFoundException(beerId));
-		BeerDeleteResponseDTO deleteResponse = new BeerDeleteResponseDTO(toDelete);
 		beerRepository.delete(toDelete);
-		if (toDelete.getImage().isPresent()) {
-			imageService.deleteBeerImage(toDelete);
-		}
-		return deleteResponse;
+		if (toDelete.getImage().isPresent()) imageService.delete(toDelete);
+		return new BeerDeleteResponseDTO(toDelete);
 	}
 
 	public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
@@ -153,11 +122,7 @@ public class BeerService {
 	public Image getImageComponent(Long beerId) {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
-		BeerImage image = beer.getImage()
-				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-		Image imageComponent = image.getImageComponent();
-		imageService.save(image, BeerImage.class);
-		return imageComponent;
+		return imageService.getComponent(beer);
 	}
 
 	private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
@@ -203,37 +168,16 @@ public class BeerService {
 	}
 
 	private Beer checkForPutConditions(Long beerId, BeerRequestDTO requestDTO) {
-		String imagePath = requestDTO.getImagePath();
-		if(imagePath != null) {
-			File file = new File(imagePath);
-			if(!file.exists()) {
-				throw new FileNotFoundException(imagePath);
-			}
-		}
 		return checkForUpdateConditions(beerId, new BeerUpdateDTO(requestDTO));
 	}
 
-	private void updateImage(Beer toUpdate, BeerUpdateDTO updateDTO) {
-		if(toUpdate.getImage().isPresent()) {
-			imageService.deleteBeerImage(toUpdate);
-		}
-		String imagePath = updateDTO.getImagePath();
-		if (imagePath != null) {
-			imageService.addBeerImage(toUpdate, imagePath);
-		}
-	}
-
 	private boolean imageToDelete(Beer toUpdate, BeerUpdateDTO updateDTO) {
-		// if updated field is *ONLY* volume, then do not delete image
+		// if updated field is ONLY volume, then do not delete image
 		if (updateDTO.getBrand() == null
-				&& updateDTO.getType() == null
-				&& updateDTO.getImagePath() == null) {
+				&& updateDTO.getType() == null) {
 			return false;
 		}
 		if (toUpdate.getImage().isPresent()) {
-			return true;
-		}
-		if(updateDTO.getImagePath() != null) {
 			return true;
 		}
 		return false;

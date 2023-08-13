@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.dto.store;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,7 @@ public class StoreRequestDTO {
     @NotBlank(message = "Street was not specified")
     private String street;
 
-	@JsonProperty("image_path")
-	private String imagePath;
+//	@JsonProperty("image_path")
+//	private String imagePath;
 
 }

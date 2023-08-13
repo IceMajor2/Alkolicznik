@@ -41,22 +41,16 @@ public class JsonUtils {
 
 	private static ObjectMapper mapper = new ObjectMapper();
 
-	public static StoreRequestDTO createStoreRequest(String name, String city,
-			String street, String imagePath) {
+	public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
 		StoreRequestDTO request = new StoreRequestDTO();
 		request.setName(name);
 		request.setCity(city);
 		request.setStreet(street);
-		request.setImagePath(imagePath);
 		return request;
 	}
 
 	public static StoreRequestDTO createStoreRequest(Store store) {
-		return createStoreRequest(store.getName(), store.getCity(), store.getStreet(), null);
-	}
-
-	public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
-		return createStoreRequest(name, city, street, null);
+		return createStoreRequest(store.getName(), store.getCity(), store.getStreet());
 	}
 
 	public static StoreResponseDTO createStoreResponse(Integer id, String name,
@@ -151,36 +145,23 @@ public class JsonUtils {
 	}
 
 	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
-		return createImageResponse(image, null);
-	}
-
-	public static ImageModelResponseDTO createImageResponse(ImageModel image, String storeName) {
-		if (image != null) {
-			ImageModelResponseDTO response = new ImageModelResponseDTO();
-			response.setImageUrl(image.getImageUrl());
-			response.setRemoteId(image.getRemoteId());
-			response.setStoreName(storeName);
-			return response;
+		if(image != null) {
+			return new ImageModelResponseDTO(image);
 		}
 		return null;
 	}
 
 	public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume) {
-		return createBeerRequest(brand, type, volume, null);
-	}
-
-	public static BeerRequestDTO createBeerRequest(String brand, String type, Double volume, String imagePath) {
 		BeerRequestDTO request = new BeerRequestDTO();
 		request.setBrand(brand);
 		request.setType(type);
 		request.setVolume(volume);
-		request.setImagePath(imagePath);
 		return request;
 	}
 
 	public static BeerRequestDTO createBeerRequest(Beer beer) {
 		BeerRequestDTO request =
-				createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume(), null);
+				createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
 		return request;
 	}
 
@@ -228,15 +209,10 @@ public class JsonUtils {
 	}
 
 	public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume) {
-		return createBeerUpdateRequest(brand, type, volume, null);
-	}
-
-	public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume, String pathToImage) {
 		BeerUpdateDTO request = new BeerUpdateDTO();
 		request.setBrand(brand);
 		request.setType(type);
 		request.setVolume(volume);
-		request.setImagePath(pathToImage);
 		return request;
 	}
 

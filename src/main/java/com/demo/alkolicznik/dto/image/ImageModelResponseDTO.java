@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.dto.image;
 
+import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,7 +19,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-@JsonPropertyOrder({ "url", "remote_id" })
+@JsonPropertyOrder({ "store_name", "beer_name", "url", "remote_id" })
 public class ImageModelResponseDTO {
 
 	@JsonProperty("url")
@@ -31,13 +32,17 @@ public class ImageModelResponseDTO {
 	@JsonProperty("store_name")
 	private String storeName;
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("beer_name")
+	private String beerName;
+
 	public ImageModelResponseDTO(ImageModel image) {
 		this.imageUrl = image.getImageUrl();
 		this.remoteId = image.getRemoteId();
-	}
-
-	public ImageModelResponseDTO(StoreImage storeImage) {
-		this((ImageModel) storeImage);
-		this.storeName = storeImage.getStoreName();
+		if (image instanceof BeerImage) {
+			this.beerName = ((BeerImage) image).getBeer().getFullName();
+		} else if (image instanceof StoreImage) {
+			this.storeName = ((StoreImage) image).getStoreName();
+		}
 	}
 }
