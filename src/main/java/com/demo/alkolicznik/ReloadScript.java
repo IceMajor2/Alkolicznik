@@ -1,8 +1,11 @@
 package com.demo.alkolicznik;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -12,6 +15,7 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
+import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.NotFoundException;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.AllArgsConstructor;
@@ -29,6 +33,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
+
+import static com.demo.alkolicznik.repositories.ImageKitRepository.getUpdatedAt;
 
 /**
  * Launching this class reloads everything initial data
@@ -58,21 +64,21 @@ public class ReloadScript implements CommandLineRunner {
 
 	private StoreImageRepository storeImageRepository;
 
-	private String imageKitPath;
-
 	@Override
 	public void run(String... args) throws Exception {
 		if (turnOn) {
 			LOGGER.info("Reloading ImageKit directory");
-			LOGGER.info("Deleting remote directory '%s'...".formatted(imageKitPath));
+			LOGGER.info("Deleting remote directory '%s'...".formatted("/main"));
 			deleteFolder("");
 			LOGGER.info("Sending BEER images to remote...");
 			sendImages("/images/beer", "/beer", BeerImage.class);
 			LOGGER.info("Sending STORE images to remote...");
 			sendImages("/images/store", "/store", StoreImage.class);
-			LOGGER.info("Updating database table with remote IDs...");
+			LOGGER.info("Updating image tables with remote IDs...");
 			updateBeerImagesWithRemoteIDs("/beer");
 			updateStoreImageWithRemoteIDs("/store");
+			LOGGER.info("Updating 'store_image' table with 'updatedAt' key...");
+			updateStoreImageWithUpdatedAt();
 			LOGGER.info("Successfully reloaded ImageKit directory");
 		}
 	}
@@ -97,7 +103,9 @@ public class ReloadScript implements CommandLineRunner {
 	private void deleteFolder(String path) {
 		try {
 			imageKitRepository.deleteFolder(path);
-		} catch (NotFoundException e) {}
+		}
+		catch (NotFoundException e) {
+		}
 	}
 
 	@SneakyThrows
@@ -110,14 +118,14 @@ public class ReloadScript implements CommandLineRunner {
 
 	private void updateBeerImagesWithRemoteIDs(String remoteBeerImgDir) {
 		List<BaseFile> externalFiles = imageKitRepository.findAllIn(remoteBeerImgDir);
-		Map<BaseFile, String> externalFilesWithMappedURLs = imageKitRepository
-				.bulkRemoteUrlMappings(externalFiles, "get_beer");
+		Map<BaseFile, String> externalFilesWithMappedURLs = bulkRemoteUrlMappings
+				(externalFiles, "get_beer");
 
 		for (var entry : externalFilesWithMappedURLs.entrySet()) {
-			BaseFile keyBaseFile = entry.getKey();
+			BaseFile baseFile = entry.getKey();
 			String mappedURL = entry.getValue();
 
-			String externalId = keyBaseFile.getFileId();
+			String externalId = baseFile.getFileId();
 			beerImageRepository.findByImageUrl(mappedURL).ifPresent(beerImage -> {
 				if (beerImage.getRemoteId() == null) {
 					beerImage.setRemoteId(externalId);
@@ -129,20 +137,34 @@ public class ReloadScript implements CommandLineRunner {
 
 	private void updateStoreImageWithRemoteIDs(String remoteStoreImgDir) {
 		List<BaseFile> externalFiles = imageKitRepository.findAllIn(remoteStoreImgDir);
-		Map<BaseFile, String> externalFilesWithMappedURLs = imageKitRepository
-				.bulkRemoteUrlMappings(externalFiles, "get_store");
 
-		for (var entry : externalFilesWithMappedURLs.entrySet()) {
-			BaseFile keyBaseFile = entry.getKey();
-			String mappedURL = entry.getValue();
-
-			String externalId = keyBaseFile.getFileId();
-			storeImageRepository.findByImageUrl(mappedURL).ifPresent(storeImage -> {
+		for (var file : externalFiles) {
+			String externalId = file.getFileId();
+			storeImageRepository.findByImageUrl(file.getUrl()).ifPresent(storeImage -> {
 				if (storeImage.getRemoteId() == null) {
 					storeImage.setRemoteId(externalId);
 					storeImageRepository.save(storeImage);
 				}
 			});
 		}
+	}
+
+	private void updateStoreImageWithUpdatedAt() {
+		for(var image : storeImageRepository.findAll()) {
+			long updatedAt = getUpdatedAt(image.getRemoteId());
+			String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
+			image.setImageUrl(newURL);
+			storeImageRepository.save(image);
+		}
+	}
+
+	private Map<BaseFile, String> bulkRemoteUrlMappings(List<BaseFile> files, String transformationName) {
+		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", transformationName)));
+		return files.stream().collect(Collectors.toMap(key -> key, value -> {
+			Map<String, Object> options = new HashMap<>();
+			options.put("path", value.getFilePath());
+			options.put("transformation", transformation);
+			return ImageKit.getInstance().getUrl(options);
+		}));
 	}
 }

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
@@ -74,7 +73,7 @@ public class ImageKitRepository {
 	}
 
 	@SneakyThrows
-	private static long getUpdatedAt(String fileId) {
+	public static long getUpdatedAt(String fileId) {
 		Result result = ImageKit.getInstance().getFileDetail(fileId);
 		return result.getUpdatedAt().toInstant().getEpochSecond();
 	}
@@ -105,10 +104,6 @@ public class ImageKitRepository {
 
 	@SneakyThrows
 	public void delete(ImageModel image) {
-//		DeleteFileVersionRequest deleteRequest = new DeleteFileVersionRequest();
-//		deleteRequest.setFileId(image.getRemoteId());
-//		deleteRequest.setVersionId("version_id");
-//		imageKit.deleteFileVersion(deleteRequest);
 		imageKit.deleteFile(image.getRemoteId());
 	}
 
@@ -128,16 +123,6 @@ public class ImageKitRepository {
 		DeleteFolderRequest deleteFolderRequest = new DeleteFolderRequest();
 		deleteFolderRequest.setFolderPath(imageKitPath + path);
 		imageKit.deleteFolder(deleteFolderRequest);
-	}
-
-	public Map<BaseFile, String> bulkRemoteUrlMappings(List<BaseFile> files, String transformationName) {
-		List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", transformationName)));
-		return files.stream().collect(Collectors.toMap(key -> key, value -> {
-			Map<String, Object> options = new HashMap<>();
-			options.put("path", value.getFilePath());
-			options.put("transformation", transformation);
-			return imageKit.getUrl(options);
-		}));
 	}
 
 	private void setConfig() {
