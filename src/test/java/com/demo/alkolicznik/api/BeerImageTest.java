@@ -177,6 +177,38 @@ public class BeerImageTest {
 				// then
 				BufferedImageAssert.assertThat(actual).hasDifferentDimensionsAs(prevComp);
 			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { -589723, 0, 96341 })
+			@DisplayName("PATCH: '/api/beer/{beer_id}/image'")
+			public void shouldReturn404OnBeerNotFoundTest(Long beerId) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("beer/namyslow.png"));
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(patchResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find beer of '%d' id".formatted(beerId),
+						"/api/beer/" + beerId + "/image");
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 1, 8, 7 })
+			@DisplayName("PATCH: '/api/beer/{beer_id}/image'")
+			public void shouldReturn404OnImageNotFoundTest(Long beerId) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("beer/namyslow.png"));
+				// when
+				var patchResponse = patchRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(patchResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this beer",
+						"/api/beer/" + beerId + "/image");
+			}
 		}
 
 		@Nested
