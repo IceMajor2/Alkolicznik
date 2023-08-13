@@ -89,7 +89,7 @@ public class StoreImageTest {
 				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(image);
+				ImageModelResponseDTO expected = createImageResponse(image, storeName);
 				String expectedJson = toJsonString(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 				assertThat(actual).isEqualTo(expected);
@@ -298,7 +298,7 @@ public class StoreImageTest {
 				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(img);
+				ImageModelResponseDTO expected = createImageResponse(img, img.getStoreName());
 				String expectedJson = toJsonString(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 				assertThat(actual).isEqualTo(expected);
@@ -375,7 +375,7 @@ public class StoreImageTest {
 								+ "probably was not send to the remote server.")
 						.isNotNull();
 				StoreResponseDTO expected = createStoreResponse(stores.size() + 1, name,
-						city, street, createImageResponse(expectedFilename, actual.getImage(),
+						city, street, createImageResponse(expectedFilename, name, actual.getImage(),
 								StoreImage.class));
 				String expectedJson = toJsonString(expected);
 				assertThat(actual).isEqualTo(expected);

@@ -113,6 +113,10 @@ public class JsonUtils {
 	}
 
 	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {
+		return createImageResponse(filename, null, actual, imgClass);
+	}
+
+	public static ImageModelResponseDTO createImageResponse(String filename, String storeName, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {
 		ImageModelResponseDTO response = new ImageModelResponseDTO();
 		response.setImageUrl(
 				(imgClass.equals(StoreImage.class)
@@ -127,6 +131,7 @@ public class JsonUtils {
 		if (actual.getRemoteId() != null) {
 			response.setRemoteId(actual.getRemoteId());
 		}
+		response.setStoreName(storeName);
 		return response;
 	}
 
@@ -146,10 +151,15 @@ public class JsonUtils {
 	}
 
 	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
+		return createImageResponse(image, null);
+	}
+
+	public static ImageModelResponseDTO createImageResponse(ImageModel image, String storeName) {
 		if (image != null) {
 			ImageModelResponseDTO response = new ImageModelResponseDTO();
 			response.setImageUrl(image.getImageUrl());
 			response.setRemoteId(image.getRemoteId());
+			response.setStoreName(storeName);
 			return response;
 		}
 		return null;
