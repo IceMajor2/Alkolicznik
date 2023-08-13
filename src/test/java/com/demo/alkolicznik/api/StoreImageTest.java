@@ -46,6 +46,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -211,12 +212,12 @@ public class StoreImageTest {
 		@Nested
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-		class PutRequests {
+		class PatchRequests {
 
 			private List<StoreImage> storeImages;
 
 			@Autowired
-			public PutRequests(List<StoreImage> storeImages) {
+			public PatchRequests(List<StoreImage> storeImages) {
 				this.storeImages = storeImages;
 			}
 
@@ -225,7 +226,7 @@ public class StoreImageTest {
 					"Carrefour, f_carrefour.jpg",
 					"Lubi, f_lubi.jpg"
 			})
-			@DisplayName("PUT: '/api/image?store_name=' successful replacement with image")
+			@DisplayName("PATCH: '/api/image?store_name=' successful replacement with image")
 			@DirtiesContext
 			public void successfulReplacementOfImageEntityTest(String storeName, String imgFile) {
 				StoreImage prevImg = getStoreImage(storeName, storeImages);
@@ -233,10 +234,10 @@ public class StoreImageTest {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var putResponse = putRequestAuth("admin", "admin", "/api/image", request,
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
 						Map.of("store_name", storeName));
-				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				ImageModelResponseDTO actual = toModel(putResponse.getBody(), ImageModelResponseDTO.class);
+				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				ImageModelResponseDTO actual = toModel(patchResponse.getBody(), ImageModelResponseDTO.class);
 				// then
 				BufferedImage actualComponent = getBufferedImageFromWeb(actual.getImageUrl());
 				assertThat(actual.getImageUrl())
@@ -258,10 +259,10 @@ public class StoreImageTest {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var putResponse = putRequestAuth("admin", "admin", "/api/image", request,
+				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
 						Map.of("store_name", storeName));
 				// then
-				assertIsError(putResponse.getBody(),
+				assertIsError(patchResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(storeName),
 						"/api/image");

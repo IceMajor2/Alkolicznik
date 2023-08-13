@@ -75,6 +75,12 @@ public class AuthenticatedRequests {
 	}
 
 	public static ResponseEntity<String> patchRequestAuth(String username, String password,
+			String url, Object request, Map<String, ?> parameters) {
+		String urlTemplate = buildURI(url, parameters);
+		return patchRequestAuth(username, password, urlTemplate, request);
+	}
+
+	public static ResponseEntity<String> patchRequestAuth(String username, String password,
 			String url, Map<String, ?> parameters) {
 		String urlTemplate = buildURI(url, parameters);
 		return patchRequestAuth(username, password, urlTemplate);
