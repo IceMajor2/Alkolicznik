@@ -285,7 +285,25 @@ public class BeerImageTest {
 						"/api/beer");
 			}
 
-			// TODO: beer exists but with different (or empty) image. expect: 400
+			@ParameterizedTest
+			@CsvSource(value = {
+					"Perla, Chmielowa Pils, null, perla-chmielowa-pils_2.webp",
+					"Komes, Porter Malinowy, 0.33, namyslow.png",
+					"Zubr, null, null, zywiec-jasne-0.33.jpg"
+			}, nullValues = "null")
+			@DisplayName("POST: '/api/beer' [BEER_EXISTS] but different image")
+			public void whenAddingExistingBeerWithUniqueImage_thenExpect409Test
+					(String brand, String type, Double volume, String imageFile) {
+				// given
+				BeerRequestDTO request = createBeerRequest(brand, type, volume, getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.CONFLICT,
+						"Beer already exists",
+						"/api/beer");
+			}
 		}
 
 		@Nested
