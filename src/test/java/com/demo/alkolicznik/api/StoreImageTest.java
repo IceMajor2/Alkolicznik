@@ -718,7 +718,7 @@ public class StoreImageTest {
 			@ValueSource(longs = { 4, 5 })
 			@DisplayName("DELETE: '/api/store/{store_id}' last-entity-standing")
 			@DirtiesContext
-			public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) {
+			public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) throws InterruptedException {
 				Store store = getStore(storeId.longValue(), stores);
 				// when
 				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
@@ -732,6 +732,7 @@ public class StoreImageTest {
 								.map(storeResponse -> storeResponse.getImage().getImageUrl())
 								.toList();
 				// then
+				Thread.sleep(1000);
 				assertThat(actualURLs)
 						.withFailMessage("Store was supposed to be deleted")
 						.isEmpty();

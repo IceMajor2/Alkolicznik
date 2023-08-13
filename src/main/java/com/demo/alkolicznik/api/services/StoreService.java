@@ -113,6 +113,11 @@ public class StoreService {
 		Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId));
 		toDelete.deleteAllPrices();
+		if(storeRepository.countByName(toDelete.getName()) == 1) {
+			toDelete.getImage().ifPresent(
+					storeImage -> imageService.deleteStoreImage(storeImage));
+			toDelete.setImage(null);
+		}
 		storeRepository.delete(toDelete);
 		return new StoreDeleteDTO(toDelete);
 	}
