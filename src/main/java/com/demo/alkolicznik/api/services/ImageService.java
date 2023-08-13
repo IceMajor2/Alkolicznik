@@ -154,9 +154,18 @@ public class ImageService {
 		return new ImageModelResponseDTO(newImage);
 	}
 
-	public void deleteStoreImage(StoreImage storeImage) {
+	public ImageDeleteDTO deleteStoreImage(StoreImage storeImage) {
 		imageKitRepository.delete(storeImage);
 		storeImageRepository.delete(storeImage);
+		return new ImageDeleteDTO(storeImage.getStoreName());
+	}
+
+	public ImageDeleteDTO deleteStoreImage(String storeName) {
+		if (!storeRepository.existsByName(storeName))
+			throw new StoreNotFoundException(storeName);
+		StoreImage storeImage = storeImageRepository.findByStoreName(storeName)
+				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
+		return deleteStoreImage(storeImage);
 	}
 
 	public <T extends ImageModel> ImageModel save(T image, Class<T> imgClass) {

@@ -51,9 +51,9 @@ public class ImageController {
 	}
 
 	@PostMapping("/image")
-	public ResponseEntity<ImageModelResponseDTO> addStoreImage
-			(@RequestParam("store_name") String storeName,
-					@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
+	public ResponseEntity<ImageModelResponseDTO> addStoreImage(
+			@RequestParam("store_name") String storeName,
+			@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
 		// space in a path is represented by '%20' string, thus
 		// we need to replace it with actual space char to get a valid name
 		storeName = storeName.replace("%20", " ");
@@ -69,10 +69,18 @@ public class ImageController {
 	}
 
 	@PatchMapping("/image")
-	public ImageModelResponseDTO updateStoreImage
-			(@RequestParam("store_name") String storeName,
-					@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
+	public ImageModelResponseDTO updateStoreImage(
+			@RequestParam("store_name") String storeName,
+			@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
 		storeName = storeName.replace("%20", " ");
 		return imageService.updateStoreImage(storeName, imageRequestDTO);
+	}
+
+	@DeleteMapping("/image")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	public ImageDeleteDTO deleteStoreImage(
+			@RequestParam("store_name") String storeName) {
+		storeName = storeName.replace("%20", " ");
+		return imageService.deleteStoreImage(storeName);
 	}
 }
