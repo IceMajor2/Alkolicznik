@@ -290,6 +290,43 @@ public class StoreImageTest {
 						"/api/image");
 			}
 		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class DeleteRequests {
+
+			private List<StoreImage> storeImages;
+
+			@Autowired
+			public DeleteRequests(List<StoreImage> storeImages) {
+				this.storeImages = storeImages;
+			}
+
+			@ParameterizedTest
+			@ValueSource(strings = { "ABC", "Carrefour", "Lubi" })
+			@DisplayName("DELETE: '/api/image?store_name='")
+			@DirtiesContext
+			public void successfulDeletionTest(String storeName) throws InterruptedException {
+				StoreImage notExpected = getStoreImage(storeName, storeImages);
+				String notExpectedURL = notExpected.getImageUrl();
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
+						Map.of("store_name", storeName));
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				// then
+				assertIsError(getResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Image was not found for this store",
+						"/api/image");
+				// waiting for ImageKit
+				Thread.sleep(1000);
+				assertThat(getBufferedImageFromWeb(notExpectedURL))
+						.withFailMessage("Image was not deleted remotely")
+						.isNull();
+			}
+		}
 	}
 
 	@Nested
