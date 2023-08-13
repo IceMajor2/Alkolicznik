@@ -206,7 +206,6 @@ public class StoreImageTest {
 				// increases the chance of a false positive.
 				BufferedImageAssert.assertThat(actual).hasSameDimensionsAs(expected);
 			}
-			// TODO: Write a test that actually just simply creates a store w/ image
 		}
 	}
 
@@ -462,7 +461,7 @@ public class StoreImageTest {
 						.isEqualTo(0);
 				// asserting that ImageIO.read throws IOException
 				// which would mean the image is not found remotely
-				Thread.sleep(800);
+				Thread.sleep(900);
 				assertThat(getBufferedImageFromWeb(initialUrl))
 						.withFailMessage("Image was supposed to be deleted from remote")
 						.isNull();
@@ -546,6 +545,29 @@ public class StoreImageTest {
 						.withFailMessage("Image was not sent to remote")
 						.isNotNull();
 				BufferedImageAssert.assertThat(actualBuffImg).hasSameDimensionsAs(expected);
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+					"7, Zabka, Ilawa, ul. Dworcowa 3, f_zabka.jpg",
+					"4, Lubi, Warszawa, ul. Nowaka 5, f_lubi.jpg",
+					"3, Carrefour, Olsztyn, ul. Borkowskiego 3, f_carrefour.jpg"
+			})
+			@DisplayName("PUT: '/api/store' [STORE_EXISTS] with image new/differing")
+			public void shouldReturn409OnSameEnitityDifferentImageTest
+					(Long storeId, String name, String city, String street, String imageFile) {
+				// given
+				String pathToImg = getRawPathToImage("store/" + imageFile);
+				StoreRequestDTO request = createStoreRequest
+						(name, city, street, pathToImg);
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
+
+				// then
+				assertIsError(putResponse.getBody(),
+						HttpStatus.CONFLICT,
+						"Store already exists",
+						"/api/store/" + storeId);
 			}
 		}
 	}
