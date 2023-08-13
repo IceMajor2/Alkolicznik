@@ -542,9 +542,9 @@ public class StoreImageTest {
 						.withFailMessage("'%s' was found in 'store_image' table"
 								.formatted(store.getName()))
 						.isEqualTo(0);
-				// asserting that ImageIO.read throws IOException
+				// asserting that ImageIO.read returns null
 				// which would mean the image is not found remotely
-				Thread.sleep(900);
+				Thread.sleep(1000);
 				assertThat(getBufferedImageFromWeb(initialUrl))
 						.withFailMessage("Image was supposed to be deleted from remote")
 						.isNull();
@@ -699,7 +699,6 @@ public class StoreImageTest {
 				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
 				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				var getResponse = getRequestAuth("admin", "admin", "/api/store");
-				System.out.println(getResponse.getBody());
 				List<String> actualURLs =
 						toModelList(getResponse.getBody(), StoreResponseDTO.class)
 								.stream()
@@ -713,6 +712,33 @@ public class StoreImageTest {
 				BufferedImage expectedComp = getBufferedImageFromWeb(expectedURL);
 				assertThat(actualURLs).containsOnly(expectedURL);
 				BufferedImageAssert.assertThat(actualComp).isEqualTo(expectedComp);
+			}
+
+			@ParameterizedTest
+			@ValueSource(longs = { 4, 5 })
+			@DisplayName("DELETE: '/api/store/{store_id}' last-entity-standing")
+			@DirtiesContext
+			public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) {
+				Store store = getStore(storeId.longValue(), stores);
+				// when
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
+				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequestAuth("admin", "admin", "/api/store");
+				List<String> actualURLs =
+						toModelList(getResponse.getBody(), StoreResponseDTO.class)
+								.stream()
+								.filter(storeResponse ->
+										storeResponse.getName().equals(store.getName()))
+								.map(storeResponse -> storeResponse.getImage().getImageUrl())
+								.toList();
+				// then
+				assertThat(actualURLs)
+						.withFailMessage("Store was supposed to be deleted")
+						.isEmpty();
+				String urlExpectedToNotExist = store.getImage().get().getImageUrl();
+				assertThat(getBufferedImageFromWeb(urlExpectedToNotExist))
+						.withFailMessage("Image was not deleted remotely")
+						.isNull();
 			}
 		}
 	}
