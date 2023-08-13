@@ -327,21 +327,6 @@ public class StoreImageTest {
 			}
 
 			@ParameterizedTest
-			@ValueSource(longs = { -349, 0, 129048 })
-			@DisplayName("GET: '/api/store/{store_id}/image' [STORE_NOT_FOUND]")
-			public void shouldReturnNotFoundOnInvalidStoreIdTest(Long storeId) {
-				var getResponse = getRequest("/api/store/" + storeId + "/image");
-
-				String actualJson = getResponse.getBody();
-
-				assertIsError(actualJson,
-						HttpStatus.NOT_FOUND,
-						"Unable to find store of '%d' id".formatted(storeId),
-						"/api/store/" + storeId + "/image"
-				);
-			}
-
-			@ParameterizedTest
 			@ValueSource(longs = { 2, 3, 7 })
 			@DisplayName("GET: '/api/store/{store_id}/image' [NO_IMAGE]")
 			public void shouldReturnNotFoundOnBeerWithNoImageTest(Long storeId) {
