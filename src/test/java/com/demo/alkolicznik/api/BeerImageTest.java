@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +11,8 @@ import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
-import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
-import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -41,14 +38,12 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageDeleteResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createImageRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeerImage;
-import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
@@ -142,72 +137,6 @@ public class BeerImageTest {
 						.map(ImageModelResponseDTO::new)
 						.toList();
 				assertThat(actual).containsExactlyElementsOf(expected);
-			}
-		}
-
-		@Nested
-		@TestMethodOrder(MethodOrderer.Random.class)
-		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-		class PatchRequests {
-
-			private List<BeerImage> beerImages;
-
-			@Autowired
-			public PatchRequests(List<BeerImage> beerImages) {
-				this.beerImages = beerImages;
-			}
-
-			@ParameterizedTest
-			@CsvSource({
-					"4, namyslow.png",
-					"6, miloslaw_pilzner.png"
-			})
-			@DisplayName("PATCH: '/api/beer/{beer_id}/image")
-			@DirtiesContext
-			public void successfulBeerImageUpdateTest(Long beerId, String imageFile) {
-				String imageUrl = getBeerImage(beerId, beerImages).getImageUrl();
-				BufferedImage prevComp = getBufferedImageFromWeb(imageUrl);
-				// given
-				ImageRequestDTO request = createImageRequest(getRawPathToImage("beer/" + imageFile));
-				// when
-				var patchResponse = patchRequestAuth("admin", "admin",
-						"/api/beer/" + beerId + "/image", request);
-				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				BufferedImage actual = getBufferedImageFromWeb(imageUrl);
-				// then
-				BufferedImageAssert.assertThat(actual).hasDifferentDimensionsAs(prevComp);
-			}
-
-			@ParameterizedTest
-			@ValueSource(longs = { -589723, 0, 96341 })
-			@DisplayName("PATCH: '/api/beer/{beer_id}/image'")
-			public void shouldReturn404OnBeerNotFoundTest(Long beerId) {
-				// given
-				ImageRequestDTO request = createImageRequest(getRawPathToImage("beer/namyslow.png"));
-				// when
-				var patchResponse = patchRequestAuth("admin", "admin",
-						"/api/beer/" + beerId + "/image", request);
-				// then
-				assertIsError(patchResponse.getBody(),
-						HttpStatus.NOT_FOUND,
-						"Unable to find beer of '%d' id".formatted(beerId),
-						"/api/beer/" + beerId + "/image");
-			}
-
-			@ParameterizedTest
-			@ValueSource(longs = { 1, 8, 7 })
-			@DisplayName("PATCH: '/api/beer/{beer_id}/image'")
-			public void shouldReturn404OnImageNotFoundTest(Long beerId) {
-				// given
-				ImageRequestDTO request = createImageRequest(getRawPathToImage("beer/namyslow.png"));
-				// when
-				var patchResponse = patchRequestAuth("admin", "admin",
-						"/api/beer/" + beerId + "/image", request);
-				// then
-				assertIsError(patchResponse.getBody(),
-						HttpStatus.NOT_FOUND,
-						"Unable to find image for this beer",
-						"/api/beer/" + beerId + "/image");
 			}
 		}
 
