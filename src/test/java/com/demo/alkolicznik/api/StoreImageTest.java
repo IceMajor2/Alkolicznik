@@ -126,6 +126,21 @@ public class StoreImageTest {
 						"Unable to find image for this store",
 						"/api/image");
 			}
+
+			@Test
+			@DisplayName("GET: '/api/store/image'")
+			public void shouldReturnAllImagesTest() {
+				// when
+				var getResponse = getRequestAuth("admin", "admin", "/api/store/image");
+				assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				List<ImageModelResponseDTO> actual = toModelList(getResponse.getBody(),
+						ImageModelResponseDTO.class);
+				// then
+				List<ImageModelResponseDTO> expected = storeImages.stream()
+						.map(ImageModelResponseDTO::new)
+						.toList();
+				assertThat(actual).containsExactlyElementsOf(expected);
+			}
 		}
 
 		@Nested
