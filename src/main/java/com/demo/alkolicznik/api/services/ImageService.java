@@ -53,6 +53,12 @@ public class ImageService {
 		return new ImageModelResponseDTO(image);
 	}
 
+	public List<ImageModelResponseDTO> getAllBeerImages() {
+		return beerImageRepository.findAll().stream()
+				.map(ImageModelResponseDTO::new)
+				.toList();
+	}
+
 	@SneakyThrows
 	public void addBeerImage(Beer beer, String imagePath) {
 		// instantiate BufferedImage and check its proportions

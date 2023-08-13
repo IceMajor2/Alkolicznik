@@ -35,6 +35,12 @@ public class ImageController {
 		return imageService.getBeerImage(beerId);
 	}
 
+	@GetMapping("/beer/image")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	public List<ImageModelResponseDTO> getAllBeerImages() {
+		return imageService.getAllBeerImages();
+	}
+
 	@DeleteMapping("/beer/{beer_id}/image")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
 	public ImageDeleteDTO deleteBeerImage(@PathVariable("beer_id") Long beerId) {
@@ -48,7 +54,7 @@ public class ImageController {
 
 	@GetMapping("/store/image")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
-	public List<ImageModelResponseDTO> getStoreImages() {
+	public List<ImageModelResponseDTO> getAllStoreImages() {
 		return imageService.getAllStoreImages();
 	}
 
