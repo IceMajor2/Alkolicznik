@@ -28,6 +28,7 @@ public class ImageModelResponseDTO {
 	private String remoteId;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("store_name")
 	private String storeName;
 
 	public ImageModelResponseDTO(ImageModel image) {
