@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.demo.alkolicznik.api.services.BeerImageService;
 import com.demo.alkolicznik.api.services.StoreImageService;
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
@@ -45,9 +46,18 @@ public class ImageController {
 	}
 
 	@PostMapping("/beer/{beer_id}/image")
-	public ImageModelResponseDTO addBeerImage(@PathVariable("beer_id") Long beerId,
+	public ResponseEntity<BeerResponseDTO> addBeerImage(
+			@PathVariable("beer_id") Long beerId,
 			@RequestBody @Valid ImageRequestDTO request) {
-		return null;
+		BeerResponseDTO response = beerImageService.add(beerId, request);
+		URI location = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(response.getId())
+				.toUri();
+		return ResponseEntity
+				.created(location)
+				.body(response);
 	}
 
 	@DeleteMapping("/beer/{beer_id}/image")

@@ -2,14 +2,16 @@ package com.demo.alkolicznik.api.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
+import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageProportionsInvalidException;
 import com.demo.alkolicznik.models.Beer;
@@ -48,14 +50,21 @@ public class BeerImageService {
 		return beerImageListToDtoList(beerImageRepository.findAll());
 	}
 
-	public void add(Beer beer, String imagePath) throws IOException {
+	public BeerResponseDTO add(Long beerId, ImageRequestDTO request) {
+		String imagePath = request.getImagePath();
 		File file = new File(imagePath);
 		fileCheck(file);
-		BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, "/beer",
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		if (beerImageRepository.existsById(beerId))
+			throw new ImageAlreadyExistsException(BeerImage.class);
+
+		BeerImage image = (BeerImage) imageKitRepository.save(imagePath, "/beer",
 				createFilename(beer, getExtensionFromPath(imagePath)), BeerImage.class);
-		beer.setImage(beerImage);
-		beerImage.setBeer(beer);
-		beerImageRepository.save(beerImage);
+		beer.setImage(image);
+		image.setBeer(beer);
+		beerImageRepository.save(image);
+		return new BeerResponseDTO(beer);
 	}
 
 	public ImageDeleteDTO delete(BeerImage image) {
@@ -86,7 +95,7 @@ public class BeerImageService {
 	private void fileCheck(File file) {
 		if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
 		BufferedImage image = getImage(file);
-		if(image == null) throw new FileIsNotImageException();
+		if (image == null) throw new FileIsNotImageException();
 		if (!proportionsValid(image)) throw new ImageProportionsInvalidException();
 	}
 

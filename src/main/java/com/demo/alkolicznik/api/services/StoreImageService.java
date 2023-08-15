@@ -74,7 +74,8 @@ public class StoreImageService {
 		fileCheck(file);
 		// TODO: adjust image's size
 		if (storeImageRepository.existsByStoreName(storeName))
-			throw new ImageAlreadyExistsException();
+			throw new ImageAlreadyExistsException(StoreImage.class);
+
 		StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
 				createFilename(storeName, getExtensionFromPath(imagePath)), StoreImage.class);
 		storeImage.setStoreName(storeName);
