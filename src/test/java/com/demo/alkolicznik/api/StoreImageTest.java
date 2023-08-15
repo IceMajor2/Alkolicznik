@@ -226,20 +226,40 @@ public class StoreImageTest {
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"Tesco, not_image_1.rar",
+					"Grosik, not_image_2.rtf"
 			})
 			@DisplayName("POST: '/api/store/image?name=' [FILE_NOT_IMAGE]")
-			public void addBeerImage_givenNotImageTest() {
-
+			public void addBeerImage_givenNotImageTest(String storeName, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage(imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/store/image", request, Map.of("name", storeName));
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.UNPROCESSABLE_ENTITY,
+						"Attached file is not an image",
+						"/api/store/image");
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"Biedronka, iosdr9045.png",
+					"Zabka, 92nmj3js.jpg"
 			})
 			@DisplayName("POST: '/api/store/image?name=' [FILE_NOT_FOUND]")
-			public void addStoreImage_givenFileNotFoundTest() {
-
+			public void addStoreImage_givenFileNotFoundTest(String storeName, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/store/image", request, Map.of("name", storeName));
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.UNPROCESSABLE_ENTITY,
+						"Attached file is not an image",
+						"/api/store/image");
 			}
 		}
 
