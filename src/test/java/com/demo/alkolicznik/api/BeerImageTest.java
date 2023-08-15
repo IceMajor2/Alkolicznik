@@ -140,6 +140,68 @@ public class BeerImageTest {
 		@Nested
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+		class PostRequests {
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image'")
+			@DirtiesContext
+			public void addBeerImageTest(Long beerId, String imageFile) {
+				// given
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image' [IMAGE_ALREADY_EXISTS]")
+			public void addBeerImage_imageAlreadyExistsTest() {
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image' [FILE_NOT_IMAGE]")
+			public void addBeerImage_givenNotImageTest() {
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image' [PROPORTIONS_INVALID]")
+			public void addBeerImage_givenInvalidProportionsTest() {
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image' [FILE_NOT_FOUND]")
+			public void addBeerImage_givenFileNotFoundTest() {
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/beer/{beer_id}/image' [BEER_NOT_FOUND]")
+			public void addBeerImage_beerNotFoundTest() {
+
+			}
+		}
+
+		@Nested
+		@TestMethodOrder(MethodOrderer.Random.class)
+		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		class DeleteRequests {
 
 			private List<Beer> beers;
@@ -169,7 +231,6 @@ public class BeerImageTest {
 						"/api/beer/" + beerId + "/image");
 
 				// then
-				beer.setImage(null);
 				ImageDeleteDTO expected = createImageDeleteResponse(beer,
 						"Image was deleted successfully!");
 				String expectedJson = toJsonString(expected);

@@ -48,7 +48,6 @@ import static com.demo.alkolicznik.utils.TestUtils.getStore;
 import static com.demo.alkolicznik.utils.TestUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
@@ -81,12 +80,12 @@ public class StoreImageTest {
 
 			@ParameterizedTest
 			@ValueSource(strings = { "Carrefour", "ABC", "Lubi" })
-			@DisplayName("GET: '/api/image?store_name=?'")
+			@DisplayName("GET: '/api/store/image?name='")
 			public void shouldReturnImageTest(String storeName) {
 				StoreImage image = getStoreImage(storeName, storeImages);
 
 				// when
-				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 				String actualJson = getResponse.getBody();
 				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
 
@@ -99,31 +98,31 @@ public class StoreImageTest {
 
 			@ParameterizedTest
 			@ValueSource(strings = { "ikjgsde", "032ka", "fsdkasfgd" })
-			@DisplayName("GET: '/api/image?store_name=?' [STORE_NOT_FOUND]")
+			@DisplayName("GET: '/api/store/image?name=' [STORE_NOT_FOUND]")
 			public void shouldReturn404OnNameNotFoundTest(String storeName) {
-				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 
 				String actualJson = getResponse.getBody();
 
 				assertIsError(actualJson,
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(storeName),
-						"/api/image"
+						"/api/store/image"
 				);
 			}
 
 			@ParameterizedTest
 			@ValueSource(strings = { "Biedronka", "Grosik", "Lidl" })
-			@DisplayName("GET: '/api/image?store_name=?' [NO_IMAGE]")
+			@DisplayName("GET: '/api/store/image?name=' [NO_IMAGE]")
 			public void shouldReturn404OnNoImageTest(String storeName) {
-				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 
 				String actualJson = getResponse.getBody();
 
 				assertIsError(actualJson,
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store",
-						"/api/image");
+						"/api/store/image");
 			}
 
 			@Test
@@ -163,18 +162,18 @@ public class StoreImageTest {
 					"Groszek, f_groszek.png",
 					"Piotr i Pawel, f_piotr-i-pawel.png"
 			})
-			@DisplayName("POST: '/api/image?store_name=' [STORE_NOT_FOUND]")
+			@DisplayName("POST: '/api/store/image?name=' [STORE_NOT_FOUND]")
 			public void doNotAddImageIfStoreOfNameIsNotFoundTest(String storeName, String imageFile) {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
 				// when
 				var postResponse = postRequestAuth
-						("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
+						("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
 				// then
 				assertIsError(postResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(storeName),
-						"/api/image");
+						"/api/store/image");
 			}
 
 			@ParameterizedTest
@@ -183,18 +182,18 @@ public class StoreImageTest {
 					"Lubi, f_lubi.jpg",
 					"Carrefour, f_carrefour.jpg"
 			})
-			@DisplayName("POST: '/api/image?store_name=' [IMAGE_ALREADY_EXISTS]")
+			@DisplayName("POST: '/api/store/image?name=' [IMAGE_ALREADY_EXISTS]")
 			public void shouldReturn409WhenStoreAlreadyHasImageTest(String storeName, String imageFile) {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
 				// when
 				var postResponse = postRequestAuth
-						("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
+						("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
 				// then
 				assertIsError(postResponse.getBody(),
 						HttpStatus.CONFLICT,
 						"Store already has an image".formatted(storeName),
-						"/api/image");
+						"/api/store/image");
 			}
 
 			@ParameterizedTest
@@ -202,7 +201,7 @@ public class StoreImageTest {
 					"Biedronka, f_biedronka.png",
 					"Zabka, f_zabka.jpg"
 			})
-			@DisplayName("POST: '/api/image?store_name=' compare uploaded file with remote")
+			@DisplayName("POST: '/api/store/image?name=' compare uploaded file with remote")
 			@DirtiesContext
 			public void uploadedFileShouldMatchRemoteTest(String storeName, String imageFile) {
 				// given
@@ -210,9 +209,9 @@ public class StoreImageTest {
 				ImageRequestDTO request = createImageRequest(pathToNewImg);
 				// when
 				var postResponse = postRequestAuth
-						("admin", "admin", "/api/image", request, Map.of("store_name", storeName));
+						("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
 				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 				ImageModelResponseDTO actualResponse = toModel
 						(getResponse.getBody(), ImageModelResponseDTO.class);
 				// then
@@ -224,17 +223,35 @@ public class StoreImageTest {
 				// increases the chance of a false positive.
 				BufferedImageAssert.assertThat(actual).hasSameDimensionsAs(expected);
 			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/store/image?name=' [FILE_NOT_IMAGE]")
+			public void addBeerImage_givenNotImageTest() {
+
+			}
+
+			@ParameterizedTest
+			@CsvSource({
+
+			})
+			@DisplayName("POST: '/api/store/image?name=' [FILE_NOT_FOUND]")
+			public void addStoreImage_givenFileNotFoundTest() {
+
+			}
 		}
 
 		@Nested
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-		class PatchRequests {
+		class PutRequests {
 
 			private List<StoreImage> storeImages;
 
 			@Autowired
-			public PatchRequests(List<StoreImage> storeImages) {
+			public PutRequests(List<StoreImage> storeImages) {
 				this.storeImages = storeImages;
 			}
 
@@ -243,7 +260,7 @@ public class StoreImageTest {
 					"Carrefour, f_carrefour.jpg",
 					"Lubi, f_lubi.jpg"
 			})
-			@DisplayName("PATCH: '/api/image?store_name=' successful replacement with image")
+			@DisplayName("PATCH: '/api/store/image?name=' successful replacement with image")
 			@DirtiesContext
 			public void successfulReplacementOfImageEntityTest(String storeName, String imgFile) {
 				StoreImage prevImg = getStoreImage(storeName, storeImages);
@@ -251,10 +268,10 @@ public class StoreImageTest {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
-						Map.of("store_name", storeName));
-				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				ImageModelResponseDTO actual = toModel(patchResponse.getBody(), ImageModelResponseDTO.class);
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
+						Map.of("name", storeName));
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				ImageModelResponseDTO actual = toModel(putResponse.getBody(), ImageModelResponseDTO.class);
 				// then
 				BufferedImage actualComponent = getBufferedImageFromWeb(actual.getImageUrl());
 				assertThat(actual.getImageUrl())
@@ -271,18 +288,18 @@ public class StoreImageTest {
 					"erijagoe4, f_intermarche.webp",
 					"eiw0-szmfcjwe, f_biedronka.png"
 			})
-			@DisplayName("PUT: '/api/image?store_name=' [STORE_NOT_FOUND]")
+			@DisplayName("PUT: '/api/store/image?name=' [STORE_NOT_FOUND]")
 			public void shouldReturn404WhenStoreIsNotFoundTest(String storeName, String imgFile) {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
-						Map.of("store_name", storeName));
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
+						Map.of("name", storeName));
 				// then
-				assertIsError(patchResponse.getBody(),
+				assertIsError(putResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(storeName),
-						"/api/image");
+						"/api/store/image");
 			}
 
 			@ParameterizedTest
@@ -290,18 +307,18 @@ public class StoreImageTest {
 					"Tesco, f_tesco.png",
 					"Biedronka, f_biedronka.webp",
 			})
-			@DisplayName("PUT: '/api/image?store_name=' [IMAGE_NOT_FOUND]")
+			@DisplayName("PUT: '/api/store/image?name=' [IMAGE_NOT_FOUND]")
 			public void shouldReturn404WhenImageIsNotFoundTest(String storeName, String imgFile) {
 				// given
 				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
 				// when
-				var patchResponse = patchRequestAuth("admin", "admin", "/api/image", request,
-						Map.of("store_name", storeName));
+				var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
+						Map.of("name", storeName));
 				// then
-				assertIsError(patchResponse.getBody(),
+				assertIsError(putResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store".formatted(storeName),
-						"/api/image");
+						"/api/store/image");
 			}
 		}
 
@@ -319,21 +336,21 @@ public class StoreImageTest {
 
 			@ParameterizedTest
 			@ValueSource(strings = { "ABC", "Carrefour", "Lubi" })
-			@DisplayName("DELETE: '/api/image?store_name='")
+			@DisplayName("DELETE: '/api/store/image?name='")
 			@DirtiesContext
 			public void successfulDeletionTest(String storeName) throws InterruptedException {
 				StoreImage notExpected = getStoreImage(storeName, storeImages);
 				String notExpectedURL = notExpected.getImageUrl();
 				// when
-				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
-						Map.of("store_name", storeName));
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/image",
+						Map.of("name", storeName));
 				assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				var getResponse = getRequest("/api/image", Map.of("store_name", storeName));
+				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 				// then
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store",
-						"/api/image");
+						"/api/store/image");
 				// waiting for ImageKit
 				Thread.sleep(2000);
 				assertThat(getBufferedImageFromWeb(notExpectedURL))
@@ -343,28 +360,28 @@ public class StoreImageTest {
 
 			@ParameterizedTest
 			@ValueSource(strings = { "gs1krjn", "ski3jao" })
-			@DisplayName("DELETE: '/api/image?store_name=' [STORE_NOT_FOUND]")
+			@DisplayName("DELETE: '/api/store/image?name=' [STORE_NOT_FOUND]")
 			public void shouldReturn404OnStoreNotFoundTest(String storeName) {
-				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
-						Map.of("store_name", storeName));
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/image",
+						Map.of("name", storeName));
 
 				assertIsError(deleteResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(storeName),
-						"/api/image");
+						"/api/store/image");
 			}
 
 			@ParameterizedTest
 			@ValueSource(strings = { "Tesco", "Zabka" })
-			@DisplayName("DELETE: '/api/image?store_name=' [IMAGE_NOT_FOUND]")
+			@DisplayName("DELETE: '/api/store/image?name=' [IMAGE_NOT_FOUND]")
 			public void shouldReturn404OnImageNotFoundTest(String storeName) {
-				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/image",
-						Map.of("store_name", storeName));
+				var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/image",
+						Map.of("name", storeName));
 
 				assertIsError(deleteResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find image for this store",
-						"/api/image");
+						"/api/store/image");
 			}
 		}
 	}
@@ -513,7 +530,7 @@ public class StoreImageTest {
 				// when
 				var putResponse = putRequestAuth("admin", "admin", "/api/store/" + storeId, request);
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				var getResponse = getRequest("/api/image", Map.of("store_name", store.getName()));
+				var getResponse = getRequest("/api/store/image", Map.of("name", store.getName()));
 				Integer count = jdbcTemplate.queryForObject
 						("SELECT count(*) FROM store_image WHERE store_name = ?",
 								Integer.class, name);
@@ -521,7 +538,7 @@ public class StoreImageTest {
 				assertIsError(getResponse.getBody(),
 						HttpStatus.NOT_FOUND,
 						"Unable to find store of '%s' name".formatted(store.getName()),
-						"/api/image");
+						"/api/store/image");
 				// asserting that there's no entity of ${name} in the
 				// store_image table (because it should've been deleted)
 				assertThat(count)
