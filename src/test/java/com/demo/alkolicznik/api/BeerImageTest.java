@@ -191,192 +191,11 @@ public class BeerImageTest {
 	@TestClassOrder(ClassOrderer.Random.class)
 	class BeerAPI {
 
-//		@Nested
-//		@TestMethodOrder(MethodOrderer.Random.class)
-//		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-//		class PostRequests {
-//
-//			private List<Beer> beers;
-//
-//			@Autowired
-//			public PostRequests(List<Beer> beers) {
-//				this.beers = beers;
-//			}
-//
-//			@ParameterizedTest
-//			@CsvSource(value = {
-//					"Perla, Chmielowa Pils, 0.6, perla-chmielowa-pils_2.webp, perla-chmielowa-pils-0.6.webp",
-//					"Zywiec, Jasne, 0.33, zywiec-jasne-0.33.jpg, zywiec-jasne-0.33.jpg",
-//					"Namyslow, null, null, namyslow.png, namyslow-0.5.png"
-//			}, nullValues = "null")
-//			@DisplayName("POST: '/api/beer'")
-//			@DirtiesContext
-//			public void whenAddingBeerWithImage_thenReturnOKTest(String brand, String type,
-//					Double volume, String filename, String expectedFilename) {
-//				// given
-//				BeerRequestDTO request = createBeerRequest(brand, type, volume);
-//
-//				// when
-//				var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
-//				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-//				String actualJson = postResponse.getBody();
-//				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-//
-//				// then
-//				assertThat(actual.getImage().getImageUrl())
-//						.withFailMessage("The image's remote id was null. That means it "
-//								+ "probably was not send to the remote server.")
-//						.isNotNull();
-//				volume = volume == null ? 0.5 : volume;
-//				BeerResponseDTO expected = createBeerResponse(beers.size() + 1, brand, type,
-//						volume, createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
-//				String expectedJson = toJsonString(expected);
-//				assertThat(actual).isEqualTo(expected);
-//				assertThat(actualJson).isEqualTo(expectedJson);
-//
-//				// when
-//				var getResponse = getRequest("/api/beer/" + (beers.size() + 1) + "/image");
-//				actualJson = getResponse.getBody();
-//				ImageModelResponseDTO actual_2 = toModel(actualJson, ImageModelResponseDTO.class);
-//
-//				// then
-//				ImageModelResponseDTO expected_2 = expected.getImage();
-//				expectedJson = toJsonString(expected_2);
-//				assertThat(actualJson).isEqualTo(expectedJson);
-//				assertThat(actual_2).isEqualTo(expected_2);
-//			}
-//
-//			@ParameterizedTest
-//			@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
-//			@DisplayName("POST: '/api/beer' [INVALID_PROPORTIONS]")
-//			public void givenInvalidImage_whenAddingBeerImage_thenReturn400Test(String filename) {
-//				var postResponse = postRequestAuth("admin", "admin", "/api/beer",
-//						createBeerRequest("Heineken", null, 0.33));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(jsonResponse,
-//						HttpStatus.BAD_REQUEST,
-//						"Image proportions are invalid",
-//						"/api/beer");
-//			}
-//
-//			@Test
-//			@DisplayName("POST: '/api/beer' [FILE_NOT_FOUND]")
-//			public void givenInvalidPath_whenAddingBeerImage_thenReturn404Test() {
-//				String imgPath = getRawPathToImage("beer/kljhvdfsur.png");
-//				var postResponse = postRequestAuth("admin", "admin", "/api/beer",
-//						createBeerRequest("Lomza", null, null));
-//
-//				String jsonResponse = postResponse.getBody();
-//
-//				assertIsError(jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"File was not found (Path: '%s')".formatted(imgPath),
-//						"/api/beer");
-//			}
-//
-//			@ParameterizedTest
-//			@CsvSource(value = {
-//					"Perla, Chmielowa Pils, null, perla-chmielowa-pils_2.webp",
-//					"Komes, Porter Malinowy, 0.33, namyslow.png",
-//					"Zubr, null, null, zywiec-jasne-0.33.jpg"
-//			}, nullValues = "null")
-//			@DisplayName("POST: '/api/beer' [BEER_EXISTS] but different image")
-//			public void whenAddingExistingBeerWithUniqueImage_thenExpect409Test
-//					(String brand, String type, Double volume, String imageFile) {
-//				// given
-//				BeerRequestDTO request = createBeerRequest(brand, type, volume, getRawPathToImage("beer/" + imageFile));
-//				// when
-//				var postResponse = postRequestAuth("admin", "admin", "/api/beer", request);
-//				// then
-//				assertIsError(postResponse.getBody(),
-//						HttpStatus.CONFLICT,
-//						"Beer already exists",
-//						"/api/beer");
-//			}
-//		}
-
 		@Nested
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		class PutRequests {
 			// TODO: successful replacement should delete previous image
-
-//			@ParameterizedTest
-//			@CsvSource(value = {
-//					"2, Miloslaw, Pilzner, 0.5, miloslaw-pilzner.png, miloslaw-pilzner-0.5.png",
-//					"4, Zywiec, Jasne, 0.33, zywiec-jasne-0.33.jpg, zywiec-jasne-0.33.jpg",
-//					"6, Namyslow, null, null, namyslow.png, namyslow-0.5.png"
-//			}, nullValues = "null")
-//			@DisplayName("PUT: '/api/beer/{beer_id}'")
-//			@DirtiesContext
-//			public void replacingBeerWithBeerWithImageShouldReturnOkTest(Long replaceId, String brand,
-//					String type, Double volume, String filename, String expectedFilename) {
-//				// given
-//				BeerRequestDTO request =
-//						createBeerRequest(brand, type, volume, getRawPathToImage("beer/" + filename));
-//
-//				// when
-//				var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + replaceId, request);
-//				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//				String actualJson = putResponse.getBody();
-//				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-//
-//				// then
-//				assertThat(actual.getImage().getRemoteId())
-//						.withFailMessage("The image's external id was null. That means it "
-//								+ "probably was not send to the remote server.")
-//						.isNotNull();
-//				volume = volume == null ? 0.5 : volume;
-//				BeerResponseDTO expected = createBeerResponse(replaceId, brand, type, volume,
-//						createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
-//				String expectedJson = toJsonString(expected);
-//				assertThat(actual).isEqualTo(expected);
-//				assertThat(actualJson).isEqualTo(expectedJson);
-//
-//				// when
-//				var getResponse = getRequest("/api/beer/" + replaceId + "/image");
-//				actualJson = getResponse.getBody();
-//				ImageModelResponseDTO actual_2 = toModel(actualJson, ImageModelResponseDTO.class);
-//
-//				// then
-//				ImageModelResponseDTO expected_2 = expected.getImage();
-//				expectedJson = toJsonString(expected_2);
-//				assertThat(actualJson).isEqualTo(expectedJson);
-//				assertThat(actual_2).isEqualTo(expected_2);
-//			}
-
-//			@Test
-//			@DisplayName("PUT: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
-//			public void givenNoImage_whenUpdatingBeerImage_thenReturn404Test() {
-//				String path = getRawPathToImage("beer/gdfijh.webp");
-//				var putResponse = putRequestAuth("admin", "admin", "/api/beer/5",
-//						createBeerRequest("Karpackie", null, 0.5, path));
-//
-//				String jsonResponse = putResponse.getBody();
-//
-//				assertIsError(jsonResponse,
-//						HttpStatus.NOT_FOUND,
-//						"File was not found (Path: '%s')".formatted(path),
-//						"/api/beer/5");
-//			}
-
-//			@ParameterizedTest
-//			@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
-//			@DisplayName("PUT: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
-//			public void givenInvalidProportions_whenReplacingBeer_thenReturn400Test(String filename) {
-//				String path = getRawPathToImage("beer/" + filename);
-//				var putResponse = putRequestAuth("admin", "admin", "/api/beer/2",
-//						createBeerRequest("Debowe", "Mocne", null, path));
-//
-//				String jsonResponse = putResponse.getBody();
-//
-//				assertIsError(jsonResponse,
-//						HttpStatus.BAD_REQUEST,
-//						"Image proportions are invalid",
-//						"/api/beer/2");
-//			}
 		}
 
 		@Nested
@@ -390,39 +209,6 @@ public class BeerImageTest {
 			public PatchRequests(List<Beer> beers) {
 				this.beers = beers;
 			}
-
-//			@ParameterizedTest
-//			@CsvSource(value = {
-//					"7, 0.5, namyslow.png, guinness-0.5.png",
-//					"4, null, kasztelan-niepasteryzowane-0.5.png, zubr-0.5.png",
-//					"5, 0.33, zywiec-jasne-0.33.jpg, komes-porter-malinowy-0.33.jpg"
-//			}, nullValues = "null")
-//			@DisplayName("PATCH: '/api/beer/{beer_id}'")
-//			@DirtiesContext
-//			public void updateBeerWithImageTest(Long beerId, Double volume,
-//					String filename, String expectedFilename) {
-//				Beer beer = getBeer(beerId, beers);
-//				// given
-//				BeerUpdateDTO request = createBeerUpdateRequest
-//						(null, null, volume, getRawPathToImage("beer/" + filename));
-//
-//				// when
-//				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
-//				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//				String actualJson = patchResponse.getBody();
-//				BeerResponseDTO actual = toModel(actualJson, BeerResponseDTO.class);
-//
-//				// then
-//				assertThat(actual.getImage().getRemoteId())
-//						.withFailMessage("The image's external id was null. That means it "
-//								+ "probably was not send to the remote server.")
-//						.isNotNull();
-//				BeerResponseDTO expected = createBeerResponse(beer,
-//						createImageResponse(expectedFilename, actual.getImage(), BeerImage.class));
-//				String expectedJson = toJsonString(expected);
-//				assertThat(actual).isEqualTo(expected);
-//				assertThat(actualJson).isEqualTo(expectedJson);
-//			}
 
 			@ParameterizedTest
 			@CsvSource(value = {
@@ -450,43 +236,6 @@ public class BeerImageTest {
 				assertThat(actual.getImage()).isNull();
 			}
 
-//			@ParameterizedTest
-//			@CsvSource(value = {
-//					"1, namyslow.png",
-//					"5, kasztelan-niepasteryzowane-0.5.png",
-//					"9, zywiec-jasne-0.33.jpg"
-//			})
-//			@DisplayName("PATCH: '/api/beer/{beer_id}' image update does not remove prices")
-//			@DirtiesContext
-//			public void updateImageShouldNotRemovePricesTest(Long beerId, String filename) {
-//				// given
-//				Beer beer = getBeer(beerId.longValue(), beers);
-//				var prices = beer.getPrices();
-//				assertThat(prices).isNotEmpty();
-//				BeerUpdateDTO request =
-//						createBeerUpdateRequest(null, null, null, getRawPathToImage("beer/" + filename));
-//
-//				// when
-//				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
-//				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//				ImageModelResponseDTO actualImg = toModel(patchResponse.getBody(), BeerResponseDTO.class).getImage();
-//
-//				var getResponse = getRequestAuth("admin", "admin", "/api/beer/" + beerId + "/beer-price");
-//				assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-//				String actualJson = getResponse.getBody();
-//				List<BeerPriceResponseDTO> actualPrices = toModelList(actualJson, BeerPriceResponseDTO.class);
-//
-//				// then
-//				List<BeerPriceResponseDTO> expectedPrices = prices.stream()
-//						.map(price -> {
-//							BeerPriceResponseDTO dto = new BeerPriceResponseDTO(price);
-//							dto.getBeer().setImage(actualImg);
-//							return dto;
-//						})
-//						.collect(Collectors.toList());
-//				assertThat(actualPrices).hasSameElementsAs(expectedPrices);
-//			}
-
 			@ParameterizedTest
 			@CsvSource({
 					"3, 0.5",
@@ -510,42 +259,6 @@ public class BeerImageTest {
 				ImageModelResponseDTO expected = createImageResponse(beer.getImage().get());
 				assertThat(actual).isEqualTo(expected);
 			}
-
-//			@Test
-//			@DisplayName("PATCH: '/api/beer/{beer_id}' [FILE_NOT_FOUND]")
-//			public void updateBeerImageFileNotFoundTest() {
-//				// given
-//				String imgPath = getRawPathToImage("beer/kljhvdfsur.png");
-//				BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, imgPath);
-//
-//				// when
-//				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/2", request);
-//				String actualJson = patchResponse.getBody();
-//
-//				// then
-//				assertIsError(actualJson,
-//						HttpStatus.NOT_FOUND,
-//						"File was not found (Path: '%s')".formatted(imgPath),
-//						"/api/beer/2");
-//			}
-
-//			@ParameterizedTest
-//			@ValueSource(strings = { "prop_heineken.webp", "prop_guinness.jpg", "prop_hopfe.webp" })
-//			@DisplayName("PATCH: '/api/beer/{beer_id}' [INVALID_PROPORTIONS]")
-//			public void updateBeerImageInvalidProportionsTest(String filename) {
-//				// given
-//				BeerUpdateDTO request = createBeerUpdateRequest(null, null, null, getRawPathToImage("beer/" + filename));
-//
-//				// when
-//				var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/5", request);
-//				String actualJson = patchResponse.getBody();
-//
-//				// then
-//				assertIsError(actualJson,
-//						HttpStatus.BAD_REQUEST,
-//						"Image proportions are invalid",
-//						"/api/beer/5");
-//			}
 		}
 
 		@Nested
