@@ -12,6 +12,7 @@ import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -195,7 +196,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		try {
 			return beerService.getImageComponent(beerDTO.getId());
 		}
-		catch (NullPointerException e) {
+		catch (ImageNotFoundException e) {
 			return null;
 		}
 	}
