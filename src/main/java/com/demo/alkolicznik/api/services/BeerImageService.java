@@ -58,18 +58,21 @@ public class BeerImageService {
 		beerImageRepository.save(beerImage);
 	}
 
-	public ImageDeleteDTO delete(Beer beer) {
-		BeerImage beerImage = beer.getImage().orElseThrow(() ->
-				new ImageNotFoundException(BeerImage.class));
-		imageKitRepository.delete(beerImage);
-		beer.setImage(null);
-		beerImageRepository.deleteById(beerImage.getId());
-		return new ImageDeleteDTO(beer);
+	public ImageDeleteDTO delete(BeerImage image) {
+		ImageDeleteDTO response = new ImageDeleteDTO(image.getBeer());
+		imageKitRepository.delete(image);
+		image.getBeer().setImage(null);
+		image.setBeer(null);
+		beerImageRepository.deleteById(image.getId());
+		return response;
 	}
 
 	public ImageDeleteDTO delete(Long beerId) {
-		return this.delete(beerRepository.findById(beerId)
-				.orElseThrow(() -> new BeerNotFoundException(beerId)));
+		Beer beer = beerRepository.findById(beerId)
+				.orElseThrow(() -> new BeerNotFoundException(beerId));
+		BeerImage image = beer.getImage()
+				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
+		return this.delete(image);
 	}
 
 	public Image getComponent(Beer beer) {

@@ -40,4 +40,6 @@ public abstract class ImageModel {
 		}
 		return this.imageComponent;
 	}
+
+	public abstract Long getId();
 }

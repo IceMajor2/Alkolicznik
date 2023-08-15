@@ -64,11 +64,9 @@ public class ImageKitRepository {
 					(List.of(Map.of("named", "get_beer")));
 			options.put("transformation", transformation);
 		}
-		else if (imgClass.equals(StoreImage.class)) {
-			long epochSeconds = getUpdatedAt(result.getFileId());
-			Map<String, String> queryParams = Map.of("updatedAt", String.valueOf(epochSeconds));
-			options.put("queryParameters", queryParams);
-		}
+		long epochSeconds = getUpdatedAt(result.getFileId());
+		Map<String, String> queryParams = Map.of("updatedAt", String.valueOf(epochSeconds));
+		options.put("queryParameters", queryParams);
 		return options;
 	}
 

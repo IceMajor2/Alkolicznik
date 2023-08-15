@@ -82,7 +82,7 @@ public class BeerService {
 		toOverwrite.deleteAllPrices();
 		// for each PUT request the previous image MUST be deleted
 		if (toOverwrite.getImage().isPresent()) {
-			imageService.delete(toOverwrite);
+			imageService.delete(toOverwrite.getImage().get());
 		}
 		return new BeerResponseDTO(beerRepository.save(toOverwrite));
 	}
@@ -109,7 +109,7 @@ public class BeerService {
 		Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
 				new BeerNotFoundException(beerId));
 		beerRepository.delete(toDelete);
-		if (toDelete.getImage().isPresent()) imageService.delete(toDelete);
+		if (toDelete.getImage().isPresent()) imageService.delete(toDelete.getImage().get());
 		return new BeerDeleteResponseDTO(toDelete);
 	}
 
