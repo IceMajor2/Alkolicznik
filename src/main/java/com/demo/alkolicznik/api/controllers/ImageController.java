@@ -30,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ImageController {
 
 	private StoreImageService storeImageService;
+
 	private BeerImageService beerImageService;
 
 	@GetMapping("/beer/{beer_id}/image")
@@ -43,8 +44,9 @@ public class ImageController {
 		return beerImageService.getAll();
 	}
 
-	@PostMapping("/beer/image")
-	public ImageModelResponseDTO addBeerImage(@RequestBody @Valid ImageRequestDTO request) {
+	@PostMapping("/beer/{beer_id}/image")
+	public ImageModelResponseDTO addBeerImage(@PathVariable("beer_id") Long beerId,
+			@RequestBody @Valid ImageRequestDTO request) {
 		return null;
 	}
 
@@ -65,15 +67,15 @@ public class ImageController {
 		return storeImageService.getAll();
 	}
 
-	@GetMapping("/store/image")
-	public ImageModelResponseDTO getStoreImage(@RequestParam("store_name") String storeName) {
+	@GetMapping(value = "/store/image", params = "name")
+	public ImageModelResponseDTO getStoreImage(@RequestParam("name") String storeName) {
 		storeName = storeName.replace("%20", " ");
 		return storeImageService.get(storeName);
 	}
 
 	@PostMapping("/store/image")
 	public ResponseEntity<ImageModelResponseDTO> addStoreImage(
-			@RequestParam("store_name") String storeName,
+			@RequestParam("name") String storeName,
 			@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
 		// space in a path is represented by '%20' string, thus
 		// we need to replace it with actual space char to get a valid name
@@ -81,7 +83,7 @@ public class ImageController {
 		ImageModelResponseDTO response = storeImageService.add(storeName, imageRequestDTO);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()
-				.queryParam("store_name", storeName)
+				.queryParam("name", storeName)
 				.build()
 				.toUri();
 		return ResponseEntity
@@ -90,8 +92,7 @@ public class ImageController {
 	}
 
 	@PutMapping("/store/image")
-	public ImageModelResponseDTO updateStoreImage(
-			@RequestParam("store_name") String storeName,
+	public ImageModelResponseDTO updateStoreImage(@RequestParam("name") String storeName,
 			@RequestBody @Valid ImageRequestDTO imageRequestDTO) {
 		storeName = storeName.replace("%20", " ");
 		return storeImageService.update(storeName, imageRequestDTO);
@@ -99,8 +100,7 @@ public class ImageController {
 
 	@DeleteMapping("/store/image")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
-	public ImageDeleteDTO deleteStoreImage(
-			@RequestParam("store_name") String storeName) {
+	public ImageDeleteDTO deleteStoreImage(@RequestParam("name") String storeName) {
 		storeName = storeName.replace("%20", " ");
 		return storeImageService.delete(storeName);
 	}
