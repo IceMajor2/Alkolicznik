@@ -166,8 +166,8 @@ public class BeerImageTest {
 				var postResponse = postRequestAuth("admin", "admin",
 						"/api/beer/" + beerId + "/image", request);
 				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-				ImageModelResponseDTO actual = toModel(postResponse.getBody(), ImageModelResponseDTO.class);
-				BufferedImage actualImg = getBufferedImageFromWeb(actual.getImageUrl());
+				BeerResponseDTO actual = toModel(postResponse.getBody(), BeerResponseDTO.class);
+				BufferedImage actualImg = getBufferedImageFromWeb(actual.getImage().getImageUrl());
 				// then
 				assertThat(actualImg)
 						.withFailMessage("Image was not uploaded to remote")
@@ -193,7 +193,7 @@ public class BeerImageTest {
 				// then
 				assertIsError(postResponse.getBody(),
 						HttpStatus.CONFLICT,
-						"Image already exists",
+						"Beer already has an image",
 						"/api/beer/" + beerId + "/image");
 			}
 
@@ -206,14 +206,14 @@ public class BeerImageTest {
 			public void addBeerImage_givenNotImageTest(Long beerId, String imageFile) {
 				// given
 				ImageRequestDTO request = createImageRequest
-						(getRawPathToImage("beer/" + imageFile));
+						(getRawPathToImage(imageFile));
 				// when
 				var postResponse = postRequestAuth("admin", "admin",
 						"/api/beer/" + beerId + "/image", request);
 				// then
 				assertIsError(postResponse.getBody(),
-						HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-						"The attached file is not an image",
+						HttpStatus.UNPROCESSABLE_ENTITY,
+						"Attached file is not an image",
 						"/api/beer/" + beerId + "/image");
 			}
 
@@ -234,7 +234,7 @@ public class BeerImageTest {
 				// then
 				assertIsError(postResponse.getBody(),
 						HttpStatus.BAD_REQUEST,
-						"The attached file is not an image",
+						"Image proportions are invalid",
 						"/api/beer/" + beerId + "/image");
 			}
 

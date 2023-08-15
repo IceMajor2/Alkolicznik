@@ -182,7 +182,7 @@ public class TestUtils {
 		catch (IOException e) {
 			try {
 				uri = resourceLoader.getResource("classpath:data_img").getURI();
-				return Paths.get(uri).toAbsolutePath().toString() + '/' + imageFilename;
+				return Paths.get(uri).toAbsolutePath().toString() + '\\' + imageFilename;
 			}
 			catch (IOException ex) {
 				throw new RuntimeException(ex);
