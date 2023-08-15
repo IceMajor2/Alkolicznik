@@ -20,8 +20,4 @@ public class StoreRequestDTO {
 
     @NotBlank(message = "Street was not specified")
     private String street;
-
-//	@JsonProperty("image_path")
-//	private String imagePath;
-
 }

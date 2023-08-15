@@ -48,14 +48,6 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
         return false;
     }
 
-	public Store convertToModel() {
-		Store store = new Store();
-		store.setName(this.name);
-		store.setCity(this.city);
-		store.setStreet(this.street);
-		return store;
-	}
-
 	public static StoreUpdateDTO convertFromRequest(StoreRequestDTO requestDTO) {
 		StoreUpdateDTO updateDTO = new StoreUpdateDTO();
 		updateDTO.setName(requestDTO.getName());

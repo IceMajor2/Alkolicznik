@@ -24,9 +24,6 @@ public class BeerRequestDTO {
 	@Positive(message = "Volume must be a positive number")
 	private Double volume;
 
-//	@JsonProperty("image_path")
-//	private String imagePath;
-
 	@JsonIgnore
 	public String getFullName() {
 		StringBuilder sb = new StringBuilder(this.brand);
