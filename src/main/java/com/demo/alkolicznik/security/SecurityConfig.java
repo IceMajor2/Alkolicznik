@@ -48,9 +48,12 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.PATCH, "/api/store/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.POST, "/api/store/*/beer-price").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.PATCH, "/api/beer-price/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.requestMatchers(HttpMethod.POST, "/api/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.requestMatchers(HttpMethod.PUT, "/api/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.requestMatchers(HttpMethod.PATCH, "/api/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.POST, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.PUT, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.PUT, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.POST, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
+						.requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
                         .anyRequest().permitAll()
                 );
         return http.build();
