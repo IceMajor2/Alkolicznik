@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
@@ -75,10 +76,12 @@ public class ReloadScript implements CommandLineRunner {
 			LOGGER.info("Sending STORE images to remote...");
 			sendImages("/images/store", "/store", StoreImage.class);
 			LOGGER.info("Updating image tables with remote IDs...");
-			updateBeerImagesWithRemoteIDs("/beer");
-			updateStoreImageWithRemoteIDs("/store");
-			LOGGER.info("Updating 'store_image' table with 'updatedAt' key...");
-			updateStoreImageWithUpdatedAt();
+			updateBeerImageWithRemoteIDs();
+			updateStoreImageWithRemoteIDs();
+			LOGGER.info("Updating 'store_image' URLs with 'updatedAt' key...");
+			updateUrlWithUpdatedAt(storeImageRepository);
+			LOGGER.info("Updating 'beer_image' URLs with 'updatedAt' key...");
+			updateUrlWithUpdatedAt(beerImageRepository);
 			LOGGER.info("Successfully reloaded ImageKit directory");
 		}
 	}
@@ -116,8 +119,8 @@ public class ReloadScript implements CommandLineRunner {
 		}
 	}
 
-	private void updateBeerImagesWithRemoteIDs(String remoteBeerImgDir) {
-		List<BaseFile> externalFiles = imageKitRepository.findAllIn(remoteBeerImgDir);
+	private void updateBeerImageWithRemoteIDs() {
+		List<BaseFile> externalFiles = imageKitRepository.findAllIn("/beer");
 		Map<BaseFile, String> externalFilesWithMappedURLs = bulkRemoteUrlMappings
 				(externalFiles, "get_beer");
 
@@ -135,8 +138,8 @@ public class ReloadScript implements CommandLineRunner {
 		}
 	}
 
-	private void updateStoreImageWithRemoteIDs(String remoteStoreImgDir) {
-		List<BaseFile> externalFiles = imageKitRepository.findAllIn(remoteStoreImgDir);
+	private void updateStoreImageWithRemoteIDs() {
+		List<BaseFile> externalFiles = imageKitRepository.findAllIn("/store");
 
 		for (var file : externalFiles) {
 			String externalId = file.getFileId();
@@ -149,12 +152,12 @@ public class ReloadScript implements CommandLineRunner {
 		}
 	}
 
-	private void updateStoreImageWithUpdatedAt() {
-		for(var image : storeImageRepository.findAll()) {
+	private <T extends ImageModel> void updateUrlWithUpdatedAt(CrudRepository<T, Long> imageRepository) {
+		for (var image : imageRepository.findAll()) {
 			long updatedAt = getUpdatedAt(image.getRemoteId());
 			String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
 			image.setImageUrl(newURL);
-			storeImageRepository.save(image);
+			imageRepository.save(image);
 		}
 	}
 
