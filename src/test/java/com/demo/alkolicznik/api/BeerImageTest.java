@@ -10,8 +10,10 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -36,16 +38,20 @@ import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageDeleteResponse;
+import static com.demo.alkolicznik.utils.JsonUtils.createImageRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeerImage;
+import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromLocal;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
+import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -144,58 +150,133 @@ public class BeerImageTest {
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"1, perla-chmielowa-pils-0.5.webp",
+					"9, perla-chmielowa-pils_2.webp",
+					"8, namyslow.png"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image'")
 			@DirtiesContext
 			public void addBeerImageTest(Long beerId, String imageFile) {
 				// given
-
+				BufferedImage toUpload = getBufferedImageFromLocal
+						(getRawPathToImage("beer/" + imageFile));
+				ImageRequestDTO request = createImageRequest
+						(getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+				ImageModelResponseDTO actual = toModel(postResponse.getBody(), ImageModelResponseDTO.class);
+				BufferedImage actualImg = getBufferedImageFromWeb(actual.getImageUrl());
+				// then
+				assertThat(actualImg)
+						.withFailMessage("Image was not uploaded to remote")
+						.isNotNull();
+				BufferedImageAssert.assertThat(actualImg)
+						.withFailMessage("Remote image do not match the one uploaded")
+						.hasSameDimensionsAs(toUpload);
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"3, miloslaw-pilzner.png",
+					"4, kasztelan-niepasteryzowane-0.5.png"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image' [IMAGE_ALREADY_EXISTS]")
-			public void addBeerImage_imageAlreadyExistsTest() {
-
+			public void addBeerImage_imageAlreadyExistsTest(Long beerId, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest
+						(getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.CONFLICT,
+						"Image already exists",
+						"/api/beer/" + beerId + "/image");
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"2, not_image_1.rar",
+					"7, not_image_2.rtf"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image' [FILE_NOT_IMAGE]")
-			public void addBeerImage_givenNotImageTest() {
-
+			public void addBeerImage_givenNotImageTest(Long beerId, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest
+						(getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+						"The attached file is not an image",
+						"/api/beer/" + beerId + "/image");
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"8, prop_hopfe.webp",
+					"7, prop_guinness.jpg",
+					"1, prop_heineken.webp"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image' [PROPORTIONS_INVALID]")
-			public void addBeerImage_givenInvalidProportionsTest() {
-
+			public void addBeerImage_givenInvalidProportionsTest(Long beerId, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest
+						(getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.BAD_REQUEST,
+						"The attached file is not an image",
+						"/api/beer/" + beerId + "/image");
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"7, jsdeepor.webp",
+					"1, kjs8.jpg"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image' [FILE_NOT_FOUND]")
-			public void addBeerImage_givenFileNotFoundTest() {
-
+			public void addBeerImage_givenFileNotFoundTest(Long beerId, String imageFile) {
+				// given
+				String pathToImg = getRawPathToImage(imageFile);
+				ImageRequestDTO request = createImageRequest(pathToImg);
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"File was not found (Path: '%s')".formatted(pathToImg),
+						"/api/beer/" + beerId + "/image");
 			}
 
 			@ParameterizedTest
 			@CsvSource({
-
+					"0, miloslaw-pilzner.png",
+					"-3259023, zywiec-jasne-0.33.jpg",
+					"823459, namyslow.png"
 			})
 			@DisplayName("POST: '/api/beer/{beer_id}/image' [BEER_NOT_FOUND]")
-			public void addBeerImage_beerNotFoundTest() {
-
+			public void addBeerImage_beerNotFoundTest(Long beerId, String imageFile) {
+				// given
+				ImageRequestDTO request = createImageRequest
+						(getRawPathToImage("beer/" + imageFile));
+				// when
+				var postResponse = postRequestAuth("admin", "admin",
+						"/api/beer/" + beerId + "/image", request);
+				// then
+				assertIsError(postResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find beer of '%d' id".formatted(beerId),
+						"/api/beer/" + beerId + "/image");
 			}
 		}
 
