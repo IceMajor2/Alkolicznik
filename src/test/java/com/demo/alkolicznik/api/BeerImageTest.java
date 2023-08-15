@@ -1,9 +1,11 @@
 package com.demo.alkolicznik.api;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
@@ -31,6 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
+import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createImageResponse;
@@ -39,9 +42,11 @@ import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeerImage;
+import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
+import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -195,7 +200,42 @@ public class BeerImageTest {
 		@TestMethodOrder(MethodOrderer.Random.class)
 		@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 		class PutRequests {
-			// TODO: successful replacement should delete previous image
+
+			private List<BeerImage> beerImages;
+
+			@Autowired
+			public PutRequests(List<BeerImage> beerImages) {
+				this.beerImages = beerImages;
+			}
+
+			@ParameterizedTest
+			@CsvSource(value = {
+					"4, Lech, Premium, null",
+					"3, Ksiazece, IPA, 0.33",
+					"6, Namyslow, null, null"
+			}, nullValues = "null")
+			@DisplayName("PUT: '/api/beer/{beer_id}' successful replacement removes previous image")
+			@DirtiesContext
+			public void replacingBeerRemovesPreviousImageTest(Long beerId, String brand,
+					String type, Double volume) throws InterruptedException {
+				// given
+				BeerRequestDTO request = createBeerRequest(brand, type, volume);
+				String previous_urlToDelete = getBeerImage(beerId, beerImages).getImageUrl();
+				// when
+				var putResponse = putRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+				var getResponse = getRequest("/api/beer/" + beerId + "/image");
+				// then
+				assertIsError(getResponse.getBody(),
+						HttpStatus.NOT_FOUND,
+						"Unable to find image for this beer",
+						"/api/beer/" + beerId + "/image");
+				Thread.sleep(2000);
+				BufferedImage expectedRemoved = getBufferedImageFromWeb(previous_urlToDelete);
+				assertThat(expectedRemoved)
+						.withFailMessage("Image was expected to be deleted from remote")
+						.isNull();
+			}
 		}
 
 		@Nested
