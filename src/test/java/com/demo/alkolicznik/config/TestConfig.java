@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -141,12 +142,12 @@ public class TestConfig {
 	}
 
 	@Bean("correctPasswords")
-	public String[] correctPasswords() {
-		LOGGER.info("Creating 'correctPasswords' bean...");
-		String[] randomPasswords = new String[] { "kl;jdvba;gbirjea",
-				"3rt90qw4gmkvsvr", "ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
-				"dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF", "32dsajivq4oipvfeWK" };
-		return randomPasswords;
+	public List<String> correctPasswords() {
+//		LOGGER.info("Creating 'correctPasswords' bean...");
+		return Arrays.asList("kl;jdvba;gbirjea", "3rt90qw4gmkvsvr",
+				"ojpeaipqe4903-qAP[WC", "IJWQ[O;EJFIVKvjifdibs3", "2jiof43qpv4kcvlsA",
+				"dsamkfaiovero33", "FOKJp[ewc[vrewvrv", "j39dasvp4q2adcfrvbEWSF",
+				"32dsajivq4oipvfeWK");
 	}
 
 	private void updateBeerImageRemoteId(List<BeerImage> beerImages) {
@@ -159,7 +160,7 @@ public class TestConfig {
 
 	private void updateStoreImageRemoteId(List<StoreImage> storeImages) {
 		LOGGER.info("Updating 'store_image' table with remote IDs...");
-		for(var image : storeImages) {
+		for (var image : storeImages) {
 			String sql = "UPDATE store_image SET remote_id = ? WHERE store_name = ?";
 			jdbcTemplate.update(sql, image.getRemoteId(), image.getStoreName());
 		}
@@ -167,7 +168,7 @@ public class TestConfig {
 
 	private void updateUrlsWithUpdatedAt(List<? extends ImageModel> images, String tableName, String idColumn) {
 		LOGGER.info("Updating '%s' table with 'updatedAt' key...".formatted(tableName));
-		for(var image : images) {
+		for (var image : images) {
 			long updatedAt = getUpdatedAt(image.getRemoteId());
 			String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
 			String sql = "UPDATE %s m SET url = ? WHERE %s = ?".formatted(tableName, idColumn);
@@ -176,11 +177,12 @@ public class TestConfig {
 		}
 	}
 
-	private long getUpdatedAt(String fileId)  {
+	private long getUpdatedAt(String fileId) {
 		try {
 			Result result = ImageKit.getInstance().getFileDetail(fileId);
 			return result.getUpdatedAt().toInstant().getEpochSecond();
-		} catch(Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
