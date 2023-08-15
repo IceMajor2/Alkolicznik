@@ -10,6 +10,7 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.models.results.Result;
@@ -68,6 +69,7 @@ public class TestConfig {
 		List<BeerImage> beerImages = DatabaseTableConverters
 				.convertToBeerImageList(sql, beers);
 		updateBeerImageRemoteId(beerImages);
+		updateUrlsWithUpdatedAt(beerImages, "beer_image", "beer_id");
 		return beerImages;
 	}
 
@@ -80,7 +82,7 @@ public class TestConfig {
 		List<StoreImage> storeImages = DatabaseTableConverters
 				.convertToStoreImageList(sql, stores);
 		updateStoreImageRemoteId(storeImages);
-		updateStoreImageUrlWithUpdatedAt(storeImages);
+		updateUrlsWithUpdatedAt(storeImages, "store_image", "id");
 		return storeImages;
 	}
 
@@ -163,13 +165,13 @@ public class TestConfig {
 		}
 	}
 
-	private void updateStoreImageUrlWithUpdatedAt(List<StoreImage> storeImages) {
-		LOGGER.info("Updating 'store_image' table with 'updatedAt' key...");
-		for(var image : storeImages) {
+	private void updateUrlsWithUpdatedAt(List<? extends ImageModel> images, String tableName, String idColumn) {
+		LOGGER.info("Updating '%s' table with 'updatedAt' key...".formatted(tableName));
+		for(var image : images) {
 			long updatedAt = getUpdatedAt(image.getRemoteId());
 			String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
-			String sql = "UPDATE store_image SET url = ? WHERE store_name = ?";
-			jdbcTemplate.update(sql, newURL, image.getStoreName());
+			String sql = "UPDATE %s m SET url = ? WHERE %s = ?".formatted(tableName, idColumn);
+			jdbcTemplate.update(sql, newURL, image.getId());
 			image.setImageUrl(newURL);
 		}
 	}
