@@ -48,6 +48,7 @@ import static com.demo.alkolicznik.utils.TestUtils.getBeerImage;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromLocal;
 import static com.demo.alkolicznik.utils.TestUtils.getBufferedImageFromWeb;
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToImage;
+import static com.demo.alkolicznik.utils.TestUtils.removeTransformationFromURL;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
@@ -167,7 +168,9 @@ public class BeerImageTest {
 						"/api/beer/" + beerId + "/image", request);
 				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 				BeerResponseDTO actual = toModel(postResponse.getBody(), BeerResponseDTO.class);
-				BufferedImage actualImg = getBufferedImageFromWeb(actual.getImage().getImageUrl());
+				String urlNoTransformation = removeTransformationFromURL
+						(actual.getImage().getImageUrl(), "get_beer");
+				BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
 				// then
 				assertThat(actualImg)
 						.withFailMessage("Image was not uploaded to remote")

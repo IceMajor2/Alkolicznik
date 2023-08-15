@@ -191,4 +191,8 @@ public class TestUtils {
 		String rawPath = Paths.get(uri).toAbsolutePath().toString();
 		return rawPath;
 	}
+
+	public static String removeTransformationFromURL(String url, String transformation) {
+		return url.replace("/tr:n-" + transformation, "");
+	}
 }
