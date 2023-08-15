@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.store;
 
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -19,7 +19,7 @@ public class StoreResponseDTO {
     private String city;
     private String street;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private ImageModelResponseDTO image;
+	private ImageResponseDTO image;
 
     public StoreResponseDTO(Store store) {
         this.id = store.getId();
@@ -27,7 +27,7 @@ public class StoreResponseDTO {
         this.city = store.getCity();
         this.street = store.getStreet();
 		if(store.getImage().isPresent()) {
-			this.image = new ImageModelResponseDTO(store.getImage().get());
+			this.image = new ImageResponseDTO(store.getImage().get());
 		}
     }
 }

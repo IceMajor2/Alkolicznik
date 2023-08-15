@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
@@ -36,36 +36,36 @@ public class StoreImageService {
 
 	private ImageKitRepository imageKitRepository;
 
-	public ImageModelResponseDTO get(Long storeId) {
+	public ImageResponseDTO get(Long storeId) {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		StoreImage image = store.getImage()
 				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-		return new ImageModelResponseDTO(image);
+		return new ImageResponseDTO(image);
 	}
 
-	public ImageModelResponseDTO get(String storeName) {
+	public ImageResponseDTO get(String storeName) {
 		if (!storeRepository.existsByName(storeName))
 			throw new StoreNotFoundException(storeName);
 		StoreImage image = storeImageRepository.findByStoreName(storeName)
 				.orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-		return new ImageModelResponseDTO(image);
+		return new ImageResponseDTO(image);
 	}
 
-	public List<ImageModelResponseDTO> getAll() {
+	public List<ImageResponseDTO> getAll() {
 		return storeImageListToDtoList(storeImageRepository.findAll());
 	}
 
-	public ImageModelResponseDTO add(Store store, String imagePath) {
+	public ImageResponseDTO add(Store store, String imagePath) {
 		StoreImage added = this.add(store.getName(), imagePath);
 		store.setImage(added);
-		return new ImageModelResponseDTO(added);
+		return new ImageResponseDTO(added);
 	}
 
-	public ImageModelResponseDTO add(String storeName, ImageRequestDTO request) {
+	public ImageResponseDTO add(String storeName, ImageRequestDTO request) {
 		if (!storeRepository.existsByName(storeName))
 			throw new StoreNotFoundException(storeName);
-		return new ImageModelResponseDTO(
+		return new ImageResponseDTO(
 				this.add(storeName, request.getImagePath()));
 	}
 
@@ -82,7 +82,7 @@ public class StoreImageService {
 		return storeImageRepository.save(storeImage);
 	}
 
-	public ImageModelResponseDTO update(String storeName, ImageRequestDTO request) {
+	public ImageResponseDTO update(String storeName, ImageRequestDTO request) {
 		if (!storeRepository.existsByName(storeName))
 			throw new StoreNotFoundException(storeName);
 		StoreImage image = storeImageRepository.findByStoreName(storeName)

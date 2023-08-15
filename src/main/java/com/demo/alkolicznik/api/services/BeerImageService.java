@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
@@ -38,15 +38,15 @@ public class BeerImageService {
 
 	private ImageKitRepository imageKitRepository;
 
-	public ImageModelResponseDTO get(Long beerId) {
+	public ImageResponseDTO get(Long beerId) {
 		Beer beer = beerRepository.findById(beerId)
 				.orElseThrow(() -> new BeerNotFoundException(beerId));
 		BeerImage image = beer.getImage()
 				.orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-		return new ImageModelResponseDTO(image);
+		return new ImageResponseDTO(image);
 	}
 
-	public List<ImageModelResponseDTO> getAll() {
+	public List<ImageResponseDTO> getAll() {
 		return beerImageListToDtoList(beerImageRepository.findAll());
 	}
 

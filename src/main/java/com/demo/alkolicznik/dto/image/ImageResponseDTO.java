@@ -20,8 +20,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @JsonPropertyOrder({ "store_name", "beer_name", "url", "remote_id" })
-// TODO: Rename this class to 'ImageResponseDTO'
-public class ImageModelResponseDTO {
+public class ImageResponseDTO {
 
 	@JsonProperty("url")
 	private String imageUrl;
@@ -37,7 +36,7 @@ public class ImageModelResponseDTO {
 	@JsonProperty("beer_name")
 	private String beerName;
 
-	public ImageModelResponseDTO(ImageModel image) {
+	public ImageResponseDTO(ImageModel image) {
 		this.imageUrl = image.getImageUrl();
 		this.remoteId = image.getRemoteId();
 		if (image instanceof BeerImage) {

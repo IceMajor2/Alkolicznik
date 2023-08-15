@@ -8,7 +8,7 @@ import java.util.Set;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Beer;
@@ -69,15 +69,15 @@ public class ModelDtoConverter {
 				.toList();
 	}
 
-	public static List<ImageModelResponseDTO> storeImageListToDtoList(List<StoreImage> storeImages) {
+	public static List<ImageResponseDTO> storeImageListToDtoList(List<StoreImage> storeImages) {
 		return storeImages.stream()
-				.map(ImageModelResponseDTO::new)
+				.map(ImageResponseDTO::new)
 				.toList();
 	}
 
-	public static List<ImageModelResponseDTO> beerImageListToDtoList(List<BeerImage> beerImages) {
+	public static List<ImageResponseDTO> beerImageListToDtoList(List<BeerImage> beerImages) {
 		return beerImages.stream()
-				.map(ImageModelResponseDTO::new)
+				.map(ImageResponseDTO::new)
 				.toList();
 	}
 }

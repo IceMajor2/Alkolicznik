@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
@@ -87,10 +87,10 @@ public class StoreImageTest {
 				// when
 				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
 				String actualJson = getResponse.getBody();
-				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
+				ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(image);
+				ImageResponseDTO expected = createImageResponse(image);
 				String expectedJson = toJsonString(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 				assertThat(actual).isEqualTo(expected);
@@ -131,11 +131,11 @@ public class StoreImageTest {
 				// when
 				var getResponse = getRequestAuth("admin", "admin", "/api/store/image");
 				assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				List<ImageModelResponseDTO> actual = toModelList(getResponse.getBody(),
-						ImageModelResponseDTO.class);
+				List<ImageResponseDTO> actual = toModelList(getResponse.getBody(),
+						ImageResponseDTO.class);
 				// then
-				List<ImageModelResponseDTO> expected = storeImages.stream()
-						.map(ImageModelResponseDTO::new)
+				List<ImageResponseDTO> expected = storeImages.stream()
+						.map(ImageResponseDTO::new)
 						.toList();
 				assertThat(actual).containsExactlyElementsOf(expected);
 			}
@@ -212,8 +212,8 @@ public class StoreImageTest {
 						("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
 				assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 				var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
-				ImageModelResponseDTO actualResponse = toModel
-						(getResponse.getBody(), ImageModelResponseDTO.class);
+				ImageResponseDTO actualResponse = toModel
+						(getResponse.getBody(), ImageResponseDTO.class);
 				// then
 				BufferedImage expected = getBufferedImageFromLocal(pathToNewImg);
 				BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImageUrl());
@@ -292,7 +292,7 @@ public class StoreImageTest {
 				var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
 						Map.of("name", storeName));
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				ImageModelResponseDTO actual = toModel(putResponse.getBody(), ImageModelResponseDTO.class);
+				ImageResponseDTO actual = toModel(putResponse.getBody(), ImageResponseDTO.class);
 				// then
 				BufferedImage actualComponent = getBufferedImageFromWeb(actual.getImageUrl());
 				assertThat(actual.getImageUrl())
@@ -432,10 +432,10 @@ public class StoreImageTest {
 				// when
 				var getResponse = getRequest("/api/store/" + storeId + "/image");
 				String actualJson = getResponse.getBody();
-				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
+				ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(img);
+				ImageResponseDTO expected = createImageResponse(img);
 				String expectedJson = toJsonString(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 				assertThat(actual).isEqualTo(expected);
@@ -589,7 +589,7 @@ public class StoreImageTest {
 				assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 				String actualJson = putResponse.getBody();
 				StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
-				ImageModelResponseDTO actualImage = actual.getImage();
+				ImageResponseDTO actualImage = actual.getImage();
 				// then
 				StoreImage expected = getStoreImage(name, storeImages);
 				assertThat(actualImage).isNotNull();

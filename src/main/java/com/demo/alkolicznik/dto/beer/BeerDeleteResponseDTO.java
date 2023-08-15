@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,14 +26,14 @@ public class BeerDeleteResponseDTO {
 	private String status = "Beer was deleted successfully!";
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private ImageModelResponseDTO image;
+	private ImageResponseDTO image;
 
 	public BeerDeleteResponseDTO(Beer beer) {
 		this.id = beer.getId();
 		this.fullName = beer.getFullName();
 		this.volume = beer.getVolume();
 		if (beer.getImage().isPresent()) {
-			this.image = new ImageModelResponseDTO(beer.getImage().get());
+			this.image = new ImageResponseDTO(beer.getImage().get());
 		}
 	}
 
@@ -43,7 +43,7 @@ public class BeerDeleteResponseDTO {
 		this.volume = beer.getVolume();
 		this.status = status;
 		if (beer.getImage().isPresent()) {
-			this.image = new ImageModelResponseDTO(beer.getImage().get());
+			this.image = new ImageResponseDTO(beer.getImage().get());
 		}
 	}
 }

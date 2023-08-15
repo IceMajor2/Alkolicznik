@@ -9,7 +9,7 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
@@ -91,10 +91,10 @@ public class BeerImageTest {
 				// when
 				var getResponse = getRequest("/api/beer/" + beerId + "/image");
 				String actualJson = getResponse.getBody();
-				ImageModelResponseDTO actual = toModel(actualJson, ImageModelResponseDTO.class);
+				ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(img);
+				ImageResponseDTO expected = createImageResponse(img);
 				String expectedJson = toJsonString(expected);
 				assertThat(actualJson).isEqualTo(expectedJson);
 				assertThat(actual).isEqualTo(expected);
@@ -134,11 +134,11 @@ public class BeerImageTest {
 				// when
 				var getResponse = getRequestAuth("admin", "admin", "/api/beer/image");
 				assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-				List<ImageModelResponseDTO> actual = toModelList(getResponse.getBody(),
-						ImageModelResponseDTO.class);
+				List<ImageResponseDTO> actual = toModelList(getResponse.getBody(),
+						ImageResponseDTO.class);
 				// then
-				List<ImageModelResponseDTO> expected = beerImages.stream()
-						.map(ImageModelResponseDTO::new)
+				List<ImageResponseDTO> expected = beerImages.stream()
+						.map(ImageResponseDTO::new)
 						.toList();
 				assertThat(actual).containsExactlyElementsOf(expected);
 			}
@@ -438,10 +438,10 @@ public class BeerImageTest {
 				assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 				var getResponse = getRequest("/api/beer/" + beerId + "/image");
-				ImageModelResponseDTO actual = toModel(getResponse.getBody(), ImageModelResponseDTO.class);
+				ImageResponseDTO actual = toModel(getResponse.getBody(), ImageResponseDTO.class);
 
 				// then
-				ImageModelResponseDTO expected = createImageResponse(beer.getImage().get());
+				ImageResponseDTO expected = createImageResponse(beer.getImage().get());
 				assertThat(actual).isEqualTo(expected);
 			}
 		}

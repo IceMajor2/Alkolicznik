@@ -16,7 +16,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -54,7 +54,7 @@ public class JsonUtils {
 	}
 
 	public static StoreResponseDTO createStoreResponse(Integer id, String name,
-			String city, String street, ImageModelResponseDTO imageDTO) {
+			String city, String street, ImageResponseDTO imageDTO) {
 		StoreResponseDTO store = new StoreResponseDTO();
 		store.setId(id.longValue());
 		store.setName(name);
@@ -74,7 +74,7 @@ public class JsonUtils {
 				store.getCity(), store.getStreet(), createImageResponse(store.getImage().orElse(null)));
 	}
 
-	public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageModelResponseDTO imageDTO) {
+	public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageResponseDTO imageDTO) {
 		BeerResponseDTO response = new BeerResponseDTO();
 		response.setId(id);
 		response.setBrand(brand);
@@ -95,7 +95,7 @@ public class JsonUtils {
 		);
 	}
 
-	public static BeerResponseDTO createBeerResponse(Beer beer, ImageModelResponseDTO image) {
+	public static BeerResponseDTO createBeerResponse(Beer beer, ImageResponseDTO image) {
 		return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(),
 				image);
 	}
@@ -106,12 +106,12 @@ public class JsonUtils {
 		return request;
 	}
 
-	public static ImageModelResponseDTO createImageResponse(String filename, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {
+	public static ImageResponseDTO createImageResponse(String filename, ImageResponseDTO actual, Class<? extends ImageModel> imgClass) {
 		return createImageResponse(filename, null, actual, imgClass);
 	}
 
-	public static ImageModelResponseDTO createImageResponse(String filename, String storeName, ImageModelResponseDTO actual, Class<? extends ImageModel> imgClass) {
-		ImageModelResponseDTO response = new ImageModelResponseDTO();
+	public static ImageResponseDTO createImageResponse(String filename, String storeName, ImageResponseDTO actual, Class<? extends ImageModel> imgClass) {
+		ImageResponseDTO response = new ImageResponseDTO();
 		response.setImageUrl(
 				(imgClass.equals(StoreImage.class)
 						? StoreImageTest.IMG_TRANSFORMED_URL : imgClass.equals(BeerImage.class)
@@ -133,8 +133,8 @@ public class JsonUtils {
 		return url.substring(url.lastIndexOf('=') + 1);
 	}
 
-	public static ImageModelResponseDTO createImageResponse(String filename, String remoteId, Class<? extends ImageModel> imgClass) {
-		ImageModelResponseDTO response = new ImageModelResponseDTO();
+	public static ImageResponseDTO createImageResponse(String filename, String remoteId, Class<? extends ImageModel> imgClass) {
+		ImageResponseDTO response = new ImageResponseDTO();
 		response.setImageUrl(
 				(imgClass.equals(StoreImage.class)
 						? StoreImageTest.IMG_TRANSFORMED_URL : imgClass.equals(BeerImage.class)
@@ -144,9 +144,9 @@ public class JsonUtils {
 		return response;
 	}
 
-	public static ImageModelResponseDTO createImageResponse(ImageModel image) {
+	public static ImageResponseDTO createImageResponse(ImageModel image) {
 		if(image != null) {
-			return new ImageModelResponseDTO(image);
+			return new ImageResponseDTO(image);
 		}
 		return null;
 	}

@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.demo.alkolicznik.dto.image.ImageModelResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -31,7 +31,7 @@ public class BeerResponseDTO {
 	private Double volume;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private ImageModelResponseDTO image;
+	private ImageResponseDTO image;
 
 	public BeerResponseDTO(Beer beer) {
 		this.id = beer.getId();
@@ -39,7 +39,7 @@ public class BeerResponseDTO {
 		this.type = beer.getType();
 		this.volume = beer.getVolume();
 		if (beer.getImage().isPresent()) {
-			this.image = new ImageModelResponseDTO(beer.getImage().get());
+			this.image = new ImageResponseDTO(beer.getImage().get());
 		}
 	}
 
