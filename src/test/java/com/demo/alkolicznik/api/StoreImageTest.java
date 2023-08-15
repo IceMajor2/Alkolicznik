@@ -251,14 +251,15 @@ public class StoreImageTest {
 			@DisplayName("POST: '/api/store/image?name=' [FILE_NOT_FOUND]")
 			public void addStoreImage_givenFileNotFoundTest(String storeName, String imageFile) {
 				// given
-				ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+				String pathToImg = getRawPathToImage("store\\" + imageFile);
+				ImageRequestDTO request = createImageRequest(pathToImg);
 				// when
 				var postResponse = postRequestAuth("admin", "admin",
 						"/api/store/image", request, Map.of("name", storeName));
 				// then
 				assertIsError(postResponse.getBody(),
-						HttpStatus.UNPROCESSABLE_ENTITY,
-						"Attached file is not an image",
+						HttpStatus.NOT_FOUND,
+						"File was not found (Path: '%s')".formatted(pathToImg),
 						"/api/store/image");
 			}
 		}
