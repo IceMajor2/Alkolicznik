@@ -97,7 +97,7 @@ public class StoreTest {
 
 		@ParameterizedTest
 		@ValueSource(strings = { "Warszawa", "Olsztyn", "Gdansk" })
-		@DisplayName("GET: '/api/store' of city")
+		@DisplayName("GET: '/api/store?city=' order by city then id")
 		public void getStoreFromCityArrayTest(String city) {
 			var getResponse = getRequest("/api/store", Map.of("city", city));
 			assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -108,15 +108,15 @@ public class StoreTest {
 			List<StoreResponseDTO> expected = stores.stream()
 					.filter(store -> store.getCity().equals(city))
 					.map(StoreResponseDTO::new)
+					.sorted(Comparator.comparing(StoreResponseDTO::getCity)
+							.thenComparing(StoreResponseDTO::getId))
 					.toList();
-			assertThat(actual)
-					.withFailMessage("Elements were not the same or the order of actual array was not ascending by id")
-					.containsExactlyElementsOf(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 
 		@ParameterizedTest
 		@ValueSource(strings = { "Przemysl", "", "Olecko" })
-		@DisplayName("GET: '/api/store/{store_id}' of city [CITY_NOT_FOUND]")
+		@DisplayName("GET: '/api/store?city=' [CITY_NOT_FOUND]")
 		public void getStoreFromCityNotExistsArrayTest(String city) {
 			var getResponse = getRequest("/api/store", Map.of("city", city));
 
@@ -129,7 +129,7 @@ public class StoreTest {
 		}
 
 		@Test
-		@DisplayName("GET: '/api/store' order id asc")
+		@DisplayName("GET: '/api/store' order by city and then id")
 		public void getStoresAllTest() {
 			List<StoreResponseDTO> expected = stores.stream()
 					.map(StoreResponseDTO::new)
@@ -141,9 +141,7 @@ public class StoreTest {
 			String actualJson = getResponse.getBody();
 			List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
-			assertThat(actual)
-					//.withFailMessage("Elements were not the same or the order of actual array was not ascending by id")
-					.containsExactlyElementsOf(expected);
+			assertThat(actual).containsExactlyElementsOf(expected);
 		}
 	}
 
