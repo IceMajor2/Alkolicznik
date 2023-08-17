@@ -29,9 +29,9 @@ public class SecurityConfig {
 
 	private static final String[] ACCOUNTANT_AUTHORITIES = new String[] { "ADMIN", "ACCOUNTANT" };
 
-	@Order(Ordered.HIGHEST_PRECEDENCE + 8)
 	@Bean
-	public SecurityFilterChain restApiSecurityFilterChain(HttpSecurity http) throws Exception {
+	@Order(Ordered.HIGHEST_PRECEDENCE + 8)
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.exceptionHandling(excHandler -> excHandler
 						.authenticationEntryPoint(authenticationEntryPoint)
@@ -42,6 +42,10 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests((auth) -> auth
 						.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/error").permitAll()
+						// secured endpoints that request a valid body
+						// needs to be specified below
+						.requestMatchers(HttpMethod.POST, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.PUT, "/api/beer/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.DELETE, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.POST, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
@@ -53,12 +57,10 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.PATCH, "/api/beer-price/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.POST, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.PUT, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.requestMatchers(HttpMethod.PUT, "/api/store/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.POST, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
-						.anyRequest().permitAll()
-				).sessionManagement(sessionManager -> sessionManager
+						.anyRequest().authenticated())
+				.sessionManagement(sessionManager -> sessionManager
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
