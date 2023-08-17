@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS store_image (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS _user (
+    id BIGINT NOT NULL,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    account_non_locked BOOLEAN,
-    roles VARCHAR(255) ARRAY
+    role VARCHAR(255) CHECK (role in ('USER', 'ACCOUNTANT', 'ADMIN')),
+    PRIMARY KEY (id)
 );
