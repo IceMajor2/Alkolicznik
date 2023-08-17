@@ -4,6 +4,8 @@ import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.models.User;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,24 +15,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private AuthService authService;
+	private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
-
-    @PostMapping("/signup")
-    public ResponseEntity<AuthResponseDTO> registerUser
-			(@RequestBody @Valid SignupRequestDTO userDTO) {
-        User saved = authService.registerUser(userDTO);
-        UserResponseDTO responseDTO = new UserResponseDTO(saved);
-        return ResponseEntity.created(ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(saved.getId())
-                        .toUri())
-                .body(responseDTO);
-    }
+	@PostMapping("/signup")
+	public ResponseEntity<AuthResponseDTO> signup
+			(@RequestBody @Valid SignupRequestDTO request) {
+		AuthResponseDTO response = authService.register(request);
+		return ResponseEntity.created(ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.build()
+				.toUri()
+		).body(response);
+	}
 }
