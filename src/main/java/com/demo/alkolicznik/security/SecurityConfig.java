@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.security;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -14,15 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
     private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
-
-    public SecurityConfig(RestAuthenticationEntryPoint authenticationEntryPoint) {
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
 
     @Order(Ordered.HIGHEST_PRECEDENCE + 8)
     @Bean
