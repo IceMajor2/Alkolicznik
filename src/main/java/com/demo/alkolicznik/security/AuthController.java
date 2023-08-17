@@ -1,10 +1,11 @@
 package com.demo.alkolicznik.security;
 
+import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
-import com.demo.alkolicznik.models.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.atmosphere.config.service.Post;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,5 +30,10 @@ public class AuthController {
 				.build()
 				.toUri()
 		).body(response);
+	}
+
+	@PostMapping("/authenticate")
+	public AuthResponseDTO authenticate(@RequestBody AuthRequestDTO request) {
+		return authService.authenticate(request);
 	}
 }

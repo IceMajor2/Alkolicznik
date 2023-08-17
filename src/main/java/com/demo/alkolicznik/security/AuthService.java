@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.security;
 
+import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
@@ -9,6 +10,8 @@ import com.demo.alkolicznik.repositories.UserRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final JwtService jwtService;
+
+	private final AuthenticationManager authManager;
 
 	public AuthResponseDTO register(SignupRequestDTO request) {
 		if (userRepository.existsByUsername(request.getUsername())) {
@@ -50,5 +55,17 @@ public class AuthService {
 	private void assignRoles(User user) {
 		if (userRepository.count() == 0) user.setRole(Roles.ADMIN);
 		else user.setRole(Roles.USER);
+	}
+
+	public AuthResponseDTO authenticate(AuthRequestDTO request) {
+		authManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+						request.getUsername(),
+						request.getPassword()
+				)
+		);
+		User user = userRepository.findByUsername(request.getUsername()).get();
+		String jwt = jwtService.generateToken(user);
+		return new AuthResponseDTO(jwt);
 	}
 }
