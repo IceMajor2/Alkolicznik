@@ -1,56 +1,54 @@
 package com.demo.alkolicznik.security;
 
+import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationContext authenticationContext;
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+	private final AuthenticationContext authenticationContext;
 
-    public AuthService(AuthenticationContext authenticationContext,
-                       UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
-        this.authenticationContext = authenticationContext;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+	private final UserRepository userRepository;
 
-    public User registerUser(SignupRequestDTO userDTO) {
-        if (userRepository.existsByUsername(userDTO.getUsername())) {
-            throw new UserAlreadyExistsException();
-        }
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+	private final PasswordEncoder passwordEncoder;
 
-        User user = new User(userDTO);
-        assignRole(user);
+	private final JwtService jwtService;
 
-        User saved = userRepository.save(user);
-        return saved;
-    }
+	public AuthResponseDTO register(SignupRequestDTO request) {
+		if (userRepository.existsByUsername(request.getUsername())) {
+			throw new UserAlreadyExistsException();
+		}
+		User user = new User();
+		user.setUsername(request.getUsername());
+		user.setPassword(passwordEncoder
+				.encode(request.getPassword()));
+		assignRoles(user);
+		userRepository.save(user);
+		String jwt = jwtService.generateToken(user);
+		return new AuthResponseDTO(jwt);
+	}
 
-    public UserDetails getAuthenticatedUser() {
-        return authenticationContext.getAuthenticatedUser(UserDetails.class).orElse(null);
-    }
+	public UserDetails getAuthenticatedUser() {
+		return authenticationContext.getAuthenticatedUser(UserDetails.class).orElse(null);
+	}
 
-    public void logout() {
-        authenticationContext.logout();
-    }
+	public void logout() {
+		authenticationContext.logout();
+	}
 
-    private void assignRole(User user) {
-        if (userRepository.count() == 0) {
-            user.getRoles().add(Roles.ADMIN);
-            return;
-        }
-        user.getRoles().add(Roles.USER);
-    }
+	private void assignRoles(User user) {
+		if (userRepository.count() == 0) user.setRole(Roles.ADMIN);
+		else user.setRole(Roles.USER);
+	}
 }
