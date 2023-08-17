@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.templates;
 
-import com.demo.alkolicznik.security.UserDetailsImpl;
+import com.demo.alkolicznik.security.config.UserDetailsImpl;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;

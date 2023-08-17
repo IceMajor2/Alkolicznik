@@ -1,7 +1,8 @@
-package com.demo.alkolicznik.security;
+package com.demo.alkolicznik.security.config;
 
 import java.io.IOException;
 
+import com.demo.alkolicznik.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

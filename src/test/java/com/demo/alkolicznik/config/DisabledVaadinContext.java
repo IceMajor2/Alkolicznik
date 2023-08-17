@@ -2,7 +2,7 @@ package com.demo.alkolicznik.config;
 
 import com.demo.alkolicznik.security.AuthController;
 import com.demo.alkolicznik.security.AuthService;
-import com.demo.alkolicznik.security.SecurityVaadinConfig;
+import com.demo.alkolicznik.security.config.SecurityVaadinConfig;
 import com.vaadin.flow.spring.SpringBootAutoConfiguration;
 import com.vaadin.flow.spring.SpringSecurityAutoConfiguration;
 import com.vaadin.flow.spring.VaadinScopesConfig;

@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security;
+package com.demo.alkolicznik.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security;
+package com.demo.alkolicznik.security.config;
 
 import com.demo.alkolicznik.gui.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;

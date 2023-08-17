@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.security;
 
+import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.user.UserRequestDTO;
 import com.demo.alkolicznik.dto.user.UserResponseDTO;
 import com.demo.alkolicznik.models.User;
@@ -22,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody @Valid UserRequestDTO userDTO) {
+    public ResponseEntity<AuthResponseDTO> registerUser(@RequestBody @Valid UserRequestDTO userDTO) {
         User saved = authService.registerUser(userDTO);
         UserResponseDTO responseDTO = new UserResponseDTO(saved);
         return ResponseEntity.created(ServletUriComponentsBuilder

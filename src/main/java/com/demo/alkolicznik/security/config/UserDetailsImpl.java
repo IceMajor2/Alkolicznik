@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security;
+package com.demo.alkolicznik.security.config;
 
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
