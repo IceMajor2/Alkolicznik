@@ -1,46 +1,69 @@
 package com.demo.alkolicznik.models;
 
-import com.demo.alkolicznik.dto.security.SignupRequestDTO;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@SequenceGenerator(
-        name = "userIdSeq",
-        sequenceName = "user_id_seq",
-        allocationSize = 1
-)
-public class User implements Serializable {
+@AllArgsConstructor
+@Entity
+@Table(name = "_user")
+public class User implements UserDetails {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userIdSeq")
-    private Long id;
-    @NotBlank
-    private String username;
-    @NotBlank
-    private String password;
-    @NotEmpty
-    @Enumerated(EnumType.STRING)
-    private Set<Roles> roles;
-    private boolean accountNonLocked = true;
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String username;
+	private String password;
+	@Enumerated(EnumType.STRING)
+	private Roles role;
 
-    public User(SignupRequestDTO signupRequestDTO) {
-        this.username = signupRequestDTO.getUsername();
-        this.password = signupRequestDTO.getPassword();
-        this.roles = new HashSet<>();
-    }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return Set.of(new SimpleGrantedAuthority(role.name()));
+	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.username;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }

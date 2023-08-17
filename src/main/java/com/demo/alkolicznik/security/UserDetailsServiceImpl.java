@@ -2,7 +2,6 @@ package com.demo.alkolicznik.security;
 
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
-import com.demo.alkolicznik.security.config.UserDetailsImpl;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
