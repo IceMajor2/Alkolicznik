@@ -46,6 +46,7 @@ public class SecurityConfig {
 						.permitAll())
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests((auth) -> auth
+						.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers(HttpMethod.PUT, "/api/beer/*").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.DELETE, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
 						.requestMatchers(HttpMethod.POST, "/api/beer").hasAnyAuthority(ACCOUNTANT_AUTHORITIES)
