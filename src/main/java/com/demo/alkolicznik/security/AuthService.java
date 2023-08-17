@@ -7,20 +7,16 @@ import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
-import com.vaadin.flow.spring.security.AuthenticationContext;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
-	private final AuthenticationContext authenticationContext;
 
 	private final UserRepository userRepository;
 
@@ -42,14 +38,6 @@ public class AuthService {
 		userRepository.save(user);
 		String jwt = jwtService.generateToken(user);
 		return new AuthResponseDTO(jwt);
-	}
-
-	public UserDetails getAuthenticatedUser() {
-		return authenticationContext.getAuthenticatedUser(UserDetails.class).orElse(null);
-	}
-
-	public void logout() {
-		authenticationContext.logout();
 	}
 
 	private void assignRoles(User user) {
