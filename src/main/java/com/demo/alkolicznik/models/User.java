@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.models;
 
-import com.demo.alkolicznik.dto.user.UserRequestDTO;
+import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -38,9 +38,9 @@ public class User implements Serializable {
     private Set<Roles> roles;
     private boolean accountNonLocked = true;
 
-    public User(UserRequestDTO userRequestDTO) {
-        this.username = userRequestDTO.getUsername();
-        this.password = userRequestDTO.getPassword();
+    public User(SignupRequestDTO signupRequestDTO) {
+        this.username = signupRequestDTO.getUsername();
+        this.password = signupRequestDTO.getPassword();
         this.roles = new HashSet<>();
     }
 }

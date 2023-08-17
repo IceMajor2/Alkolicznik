@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.dto.user.UserRequestDTO;
+import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
@@ -25,7 +25,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserRequestDTO userDTO) {
+    public User registerUser(SignupRequestDTO userDTO) {
         if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new UserAlreadyExistsException();
         }

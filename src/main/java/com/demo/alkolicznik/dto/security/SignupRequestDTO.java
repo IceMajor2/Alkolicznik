@@ -1,15 +1,15 @@
-package com.demo.alkolicznik.dto.user;
+package com.demo.alkolicznik.dto.security;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class UserRequestDTO {
+public class SignupRequestDTO {
 
     @NotBlank
     private String username;

@@ -22,8 +22,7 @@ import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.user.UserRequestDTO;
-import com.demo.alkolicznik.dto.user.UserResponseDTO;
+import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Roles;
@@ -256,11 +255,11 @@ public class JsonUtils {
 		return createBeerPriceDeleteResponse(beerResponseDTO, storeResponseDTO, price, status);
 	}
 
-	public static UserRequestDTO createUserRequest(String username, String password) {
-		UserRequestDTO userRequestDTO = new UserRequestDTO();
-		userRequestDTO.setUsername(username);
-		userRequestDTO.setPassword(password);
-		return userRequestDTO;
+	public static SignupRequestDTO createUserRequest(String username, String password) {
+		SignupRequestDTO signupRequestDTO = new SignupRequestDTO();
+		signupRequestDTO.setUsername(username);
+		signupRequestDTO.setPassword(password);
+		return signupRequestDTO;
 	}
 
 	public static UserResponseDTO createUserResponse(String username, Roles... roles) {
