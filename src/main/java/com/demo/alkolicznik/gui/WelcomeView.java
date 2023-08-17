@@ -1,5 +1,8 @@
 package com.demo.alkolicznik.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.demo.alkolicznik.security.AuthService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -10,10 +13,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Route("")
 @PageTitle("Alkolicznik")
@@ -53,8 +55,9 @@ public class WelcomeView extends VerticalLayout {
 
     private Button getAuthButton() {
         Button loginout;
-        if (authService.getAuthenticatedUser() != null) {
-            loginout = new Button("Wyloguj się", click -> authService.logout());
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+//            loginout = new Button("Wyloguj się", click -> authService.logout());
+			loginout = new Button("Wyloguj się");
         } else {
             loginout = new Button("Zaloguj się", click -> UI.getCurrent().navigate("login"));
         }

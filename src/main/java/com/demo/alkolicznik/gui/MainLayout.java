@@ -55,7 +55,8 @@ public class MainLayout extends AppLayout {
     }
 
     private Button getAuthButton() {
-        Button loginout = new Button("Wyloguj się", click -> authService.logout());
-        return loginout;
+//        Button loginout = new Button("Wyloguj się", click -> authService.logout());
+//        return loginout;
+		return new Button("Wyloguj się");
     }
 }

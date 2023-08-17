@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui.templates;
 
+import com.demo.alkolicznik.models.User;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
-    protected UserDetailsImpl loggedUser;
+    protected User loggedUser;
 
     protected TextField filterCity;
     protected H2 displayText;
@@ -22,7 +23,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     protected String textModel;
 
     public ViewTemplate(String textModel) {
-        this.loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        this.loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         this.textModel = textModel;
     }
 
