@@ -19,6 +19,7 @@ repositories {
 
 ext {
 	set('vaadinVersion', "24.1.3")
+	set('jjwtVersion', "0.11.5")
 }
 
 dependencies {
@@ -48,6 +49,11 @@ dependencies {
 	// enable handling of .webp images
 	implementation 'com.github.imagekit-developer:imagekit-java:2.0.0'
 	implementation group: 'org.sejda.imageio', name: 'webp-imageio', version: '0.1.6'
+
+	// JWT
+	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
 }
 
 dependencyManagement {
