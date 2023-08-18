@@ -2,7 +2,6 @@ package com.demo.alkolicznik.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import com.demo.alkolicznik.api.BeerImageTest;
 import com.demo.alkolicznik.api.StoreImageTest;
@@ -16,16 +15,15 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
-import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
-import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
@@ -260,13 +258,6 @@ public class JsonUtils {
 		signupRequestDTO.setUsername(username);
 		signupRequestDTO.setPassword(password);
 		return signupRequestDTO;
-	}
-
-	public static UserResponseDTO createUserResponse(String username, Roles... roles) {
-		UserResponseDTO userResponseDTO = new UserResponseDTO();
-		userResponseDTO.setUsername(username);
-		userResponseDTO.setRoles(Set.of(roles));
-		return userResponseDTO;
 	}
 
 	public static ImageDeleteDTO createImageDeleteResponse(Beer beer, String message) {
