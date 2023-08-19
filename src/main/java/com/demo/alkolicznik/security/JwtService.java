@@ -13,14 +13,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
 
-	// TODO: Store it on a third-party service
-	private static final String SECRET_KEY = "7253486947646342373574456a524d493077575331433850584446366b756552";
+	@Value("${jwt.key}")
+	private String jwtKey;
+
+	public static final int EXPIRATION_4_HOURS_IN_MS = 1000 * 60 * 60 * 4; // 4 hours
 
 	public String extractUsername(String jwt) {
 		return extractClaim(jwt, Claims::getSubject);
@@ -49,7 +52,7 @@ public class JwtService {
 				.setSubject(userDetails.getUsername())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				// expiration is 4 hours
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 4))
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_4_HOURS_IN_MS))
 				.signWith(getSigningKey(), SignatureAlgorithm.HS256)
 				.compact();
 	}
@@ -64,7 +67,7 @@ public class JwtService {
 	}
 
 	private Key getSigningKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+		byte[] keyBytes = Decoders.BASE64.decode(jwtKey);
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
