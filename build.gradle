@@ -33,6 +33,11 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	// helpful in sending HTTPS requests
+	implementation 'org.springframework:spring-webflux'
+	implementation 'io.netty:netty-handler:4.1.96.Final'
+	implementation 'io.projectreactor.netty:reactor-netty:1.1.10'
+
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 	implementation 'org.javamoney:moneta:1.4.2'
