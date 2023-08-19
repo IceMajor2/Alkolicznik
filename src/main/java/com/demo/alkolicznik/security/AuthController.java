@@ -3,9 +3,10 @@ package com.demo.alkolicznik.security;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.atmosphere.config.service.Post;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,19 @@ public class AuthController {
 	}
 
 	@PostMapping("/authenticate")
-	public AuthResponseDTO authenticate(@RequestBody AuthRequestDTO request) {
-		return authService.authenticate(request);
+	public AuthResponseDTO authenticate(@RequestBody AuthRequestDTO request,
+			HttpServletResponse response) {
+		AuthResponseDTO tokenDTO = authService.authenticate(request);
+		response.addCookie(createAuthCookie(tokenDTO.getToken()));
+		return tokenDTO;
+	}
+
+	private Cookie createAuthCookie(String token) {
+		Cookie cookie = new Cookie("token", token);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setPath("/");
+		cookie.setDomain("");
+		return cookie;
 	}
 }
