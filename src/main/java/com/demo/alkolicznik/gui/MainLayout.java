@@ -4,6 +4,8 @@ import com.demo.alkolicznik.gui.beer.BeerView;
 import com.demo.alkolicznik.gui.beerprice.BeerPriceView;
 import com.demo.alkolicznik.gui.store.StoreView;
 import com.demo.alkolicznik.security.AuthService;
+import com.demo.alkolicznik.security.AuthenticatedUser;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -13,14 +15,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MainLayout extends AppLayout {
 
+	private AuthenticatedUser authenticatedUser;
     private AuthService authService;
 
-    public MainLayout(@Autowired AuthService authService) {
+    public MainLayout(AuthenticatedUser authenticatedUser, AuthService authService) {
         this.authService = authService;
+		this.authenticatedUser = authenticatedUser;
 
         createHeader();
         createDrawer();
@@ -55,8 +58,13 @@ public class MainLayout extends AppLayout {
     }
 
     private Button getAuthButton() {
-//        Button loginout = new Button("Wyloguj się", click -> authService.logout());
-//        return loginout;
-		return new Button("Wyloguj się");
+		Button authButton;
+		if(authenticatedUser.authenticated()) {
+			authButton = new Button("Wyloguj się");
+		} else {
+			authButton = new Button("Zaloguj się", click ->
+					UI.getCurrent().navigate("login"));
+		}
+		return authButton;
     }
 }

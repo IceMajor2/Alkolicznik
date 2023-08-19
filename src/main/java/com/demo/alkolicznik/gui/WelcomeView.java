@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.demo.alkolicznik.security.AuthService;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -14,69 +15,69 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 @Route("")
 @PageTitle("Alkolicznik")
 @AnonymousAllowed
 public class WelcomeView extends VerticalLayout {
 
-    private AuthService authService;
+	private AuthService authService;
 
-    public WelcomeView(@Autowired AuthService authService) {
-        this.authService = authService;
+	private AuthenticatedUser authenticatedUser;
 
-        HorizontalLayout hl = getHorizontalLayout();
-        VerticalLayout vl = getMainLayout();
+	public WelcomeView(AuthenticatedUser authenticatedUser, AuthService authService) {
+		this.authService = authService;
+		this.authenticatedUser = authenticatedUser;
 
-        add(hl, vl);
-    }
+		HorizontalLayout hl = getHorizontalLayout();
+		VerticalLayout vl = getMainLayout();
 
-    private HorizontalLayout getHorizontalLayout() {
-        HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidthFull();
-        hl.setJustifyContentMode(JustifyContentMode.END);
+		add(hl, vl);
+	}
 
-        Button button = getAuthButton();
-        hl.add(button);
-        return hl;
-    }
+	private HorizontalLayout getHorizontalLayout() {
+		HorizontalLayout hl = new HorizontalLayout();
+		hl.setWidthFull();
+		hl.setJustifyContentMode(JustifyContentMode.END);
 
-    private VerticalLayout getMainLayout() {
-        VerticalLayout vl = new VerticalLayout();
-        vl.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+		Button button = getAuthButton();
+		hl.add(button);
+		return hl;
+	}
 
-        var components = getMainComponents();
-        vl.add(components);
+	private VerticalLayout getMainLayout() {
+		VerticalLayout vl = new VerticalLayout();
+		vl.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        return vl;
-    }
+		var components = getMainComponents();
+		vl.add(components);
 
-    private Button getAuthButton() {
-        Button loginout;
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-//            loginout = new Button("Wyloguj się", click -> authService.logout());
-			loginout = new Button("Wyloguj się");
-        } else {
-            loginout = new Button("Zaloguj się", click -> UI.getCurrent().navigate("login"));
-        }
-        return loginout;
-    }
+		return vl;
+	}
+
+	private Button getAuthButton() {
+		Button authButton;
+		if (authenticatedUser.authenticated()) {
+			authButton = new Button("Wyloguj się");
+		} else {
+			authButton = new Button("Zaloguj się", click ->
+					UI.getCurrent().navigate("login"));
+		}
+		return authButton;
+	}
 
 
-    private List<Component> getMainComponents() {
-        List<Component> components = new ArrayList<>();
+	private List<Component> getMainComponents() {
+		List<Component> components = new ArrayList<>();
 
-        H1 header = new H1("Alkolicznik");
-        Button beers = new Button("Piwa", click -> UI.getCurrent().navigate("beer"));
-        Button stores = new Button("Sklepy", click -> UI.getCurrent().navigate("store"));
-        Button button = new Button("Ceny", click -> UI.getCurrent().navigate("beer-price"));
+		H1 header = new H1("Alkolicznik");
+		Button beers = new Button("Piwa", click -> UI.getCurrent().navigate("beer"));
+		Button stores = new Button("Sklepy", click -> UI.getCurrent().navigate("store"));
+		Button button = new Button("Ceny", click -> UI.getCurrent().navigate("beer-price"));
 
-        components.add(header);
-        components.add(beers);
-        components.add(stores);
-        components.add(button);
-        return components;
-    }
+		components.add(header);
+		components.add(beers);
+		components.add(stores);
+		components.add(button);
+		return components;
+	}
 }
