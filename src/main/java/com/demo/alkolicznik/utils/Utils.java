@@ -6,7 +6,18 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import jakarta.servlet.http.Cookie;
+
 public class Utils {
+
+	public static Cookie createTokenCookie(String token) {
+		Cookie cookie = new Cookie("token", token);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setPath("/");
+		cookie.setDomain("");
+		return cookie;
+	}
 
 	public static String getExtensionFromPath(String path) {
 		return path.substring(path.lastIndexOf('.') + 1);
