@@ -3,7 +3,7 @@ package com.demo.alkolicznik.security;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
-import com.demo.alkolicznik.utils.Utils;
+import com.demo.alkolicznik.utils.RequestUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class AuthController {
 	public AuthResponseDTO authenticate(@RequestBody AuthRequestDTO request,
 			HttpServletResponse response) {
 		AuthResponseDTO tokenDTO = authService.authenticate(request);
-		response.addCookie(Utils.createTokenCookie(tokenDTO.getToken()));
+		response.addCookie(RequestUtils.createTokenCookie(tokenDTO.getToken()));
 		return tokenDTO;
 	}
 }
