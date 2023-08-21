@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class CookieAuthenticationFilter extends OncePerRequestFilter {
 
-	private static final String JWT_COOKIE_NAME = "token";
+	public static final String JWT_COOKIE_NAME = "token";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
