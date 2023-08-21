@@ -1,10 +1,14 @@
 package com.demo.alkolicznik.gui.beer;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
+import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -16,15 +20,25 @@ import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
+import com.demo.alkolicznik.utils.RequestUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinService;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw | Alkolicznik")
@@ -33,13 +47,16 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-	private BeerService beerService;
-
 	private BeerForm wizard;
 
-	public BeerView(BeerService beerService) {
+	private BeerService beerService;
+
+	private WebClient webClient;
+
+	public BeerView(BeerService beerService, WebClient webClient) {
 		super("Piwa");
 		this.beerService = beerService;
+		this.webClient = webClient;
 
 		setSizeFull();
 		add(
@@ -113,7 +130,10 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			return;
 		}
 		try {
-			var beers = beerService.getBeers(city);
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
+					Map.of("city", city), authCookie,
+					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
 			this.grid.setItems(beers);
 		}
 		catch (NoSuchCityException e) {
@@ -143,7 +163,20 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			return;
 		}
 		try {
-			beerService.delete(deleteRequest);
+			String jwtCookie = Stream.of(VaadinService.getCurrentRequest().getCookies())
+					.filter(cookie -> CookieAuthenticationFilter.JWT_COOKIE_NAME.equals(cookie.getName()))
+					.findFirst().get().getValue();
+			System.out.println(jwtCookie);
+			var response = webClient.method(HttpMethod.DELETE)
+					.uri("/api/beer")
+					.cookie("token", jwtCookie)
+					.contentType(MediaType.APPLICATION_JSON)
+					.bodyValue(deleteRequest)
+					.retrieve()
+					.bodyToMono(BeerDeleteResponseDTO.class)
+					.block();
+			System.out.println(response);
+			//beerService.delete(deleteRequest);
 		}
 		catch (BeerNotFoundException e) {
 			showError(e.getMessage());
@@ -222,4 +255,22 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		}
 		return violation.getMessage();
 	}
+
+//	private <T> T request(HttpMethod method, String endpoint, Object body, Map<String, String> parameters, Class<T> responseClass) {
+//		Cookie jwtCookie = CookieUtils.getAuthCookie(VaadinService.getCurrentRequest());
+//		return webClient.method(method)
+//				.uri(uriBuilder -> {
+//					uriBuilder.path(endpoint);
+//					for(var entry : parameters.entrySet()) {
+//						uriBuilder.queryParam(entry.getKey(), entry.getValue());
+//					}
+//					return uriBuilder.build();
+//				})
+//				.cookie(jwtCookie.getName(), jwtCookie.getValue())
+//				.contentType(MediaType.APPLICATION_JSON)
+//				.bodyValue(body)
+//				.retrieve()
+//				.bodyToMono(responseClass)
+//				.block();
+//	}
 }
