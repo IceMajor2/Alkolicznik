@@ -25,6 +25,8 @@ public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+	private final CookieAuthenticationFilter cookieAuthenticationFilter;
+
 	private final AuthenticationProvider authenticationProvider;
 
 	private static final String[] ACCOUNTANT_AUTHORITIES = new String[] { "ADMIN", "ACCOUNTANT" };
@@ -63,6 +65,7 @@ public class SecurityConfig {
 				.sessionManagement(sessionManager -> sessionManager
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
+				.addFilterBefore(cookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
