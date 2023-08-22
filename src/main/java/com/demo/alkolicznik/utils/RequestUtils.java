@@ -64,8 +64,10 @@ public class RequestUtils {
 		return webClient.method(method)
 				.uri(uriBuilder -> {
 					uriBuilder.path(endpoint);
-					for (var entry : parameters.entrySet()) {
-						uriBuilder.queryParam(entry.getKey(), entry.getValue());
+					if(parameters != null) {
+						for (var entry : parameters.entrySet()) {
+							uriBuilder.queryParam(entry.getKey(), entry.getValue());
+						}
 					}
 					return uriBuilder.build();
 				})
@@ -89,5 +91,10 @@ public class RequestUtils {
 				.retrieve()
 				.bodyToMono(responseClass)
 				.block();
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint, Cookie cookie,
+			ParameterizedTypeReference<T> responseClass) {
+		return request(method, endpoint, null, cookie, responseClass);
 	}
 }
