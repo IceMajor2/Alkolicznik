@@ -12,7 +12,6 @@ import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
@@ -39,11 +38,14 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw | Alkolicznik")
 @PermitAll
 public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
+
+	private static final String DEFAULT_CITY = "Olsztyn";
 
 	private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -135,8 +137,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 					Map.of("city", city), authCookie,
 					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
 			this.grid.setItems(beers);
-		}
-		catch (NoSuchCityException e) {
+		} catch (WebClientResponseException e) {
 			this.grid.setItems(Collections.EMPTY_LIST);
 		}
 		updateDisplayText(city);
@@ -144,14 +145,16 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	@Override
 	protected void updateList() {
-		if (!loggedUser.isUser()) {
-			var beers = beerService.getBeers();
+		if (loggedUser.hasAccountantRole()) {
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie,
+					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
 			this.grid.setItems(beers);
 			updateDisplayText("cała Polska");
 		}
 		else {
-			updateList("Olsztyn");
-			updateDisplayText("Olsztyn");
+			updateList(DEFAULT_CITY);
+			updateDisplayText(DEFAULT_CITY);
 		}
 	}
 
