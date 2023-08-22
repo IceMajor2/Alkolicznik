@@ -82,6 +82,11 @@ public class RequestUtils {
 		return request(method, endpoint, null, cookie, responseClass);
 	}
 
+	public static <T> T request(HttpMethod method, String endpoint, Cookie cookie,
+			Class<T> responseClass) {
+		return request(method, endpoint, null, cookie, responseClass);
+	}
+
 	public static <T> T request(HttpMethod method, String endpoint, Object body,
 			Cookie cookie, Class<T> responseClass) {
 		return request(method, endpoint, null, body, cookie, responseClass);

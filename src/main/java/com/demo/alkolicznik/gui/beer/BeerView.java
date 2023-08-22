@@ -11,9 +11,7 @@ import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -26,13 +24,9 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Route(value = "beer", layout = MainLayout.class)
@@ -42,18 +36,10 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private static final String DEFAULT_CITY = "Olsztyn";
 
-	private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
 	private BeerForm wizard;
 
-	private BeerService beerService;
-
-	private WebClient webClient;
-
-	public BeerView(BeerService beerService, WebClient webClient) {
+	public BeerView(BeerService beerService) {
 		super("Piwa");
-		this.beerService = beerService;
-		this.webClient = webClient;
 
 		setSizeFull();
 		add(
@@ -132,7 +118,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 					Map.of("city", city), authCookie,
 					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
 			this.grid.setItems(beers);
-		} catch (WebClientResponseException e) {
+		}
+		catch (WebClientResponseException e) {
 			this.grid.setItems(Collections.EMPTY_LIST);
 		}
 		updateDisplayText(city);
@@ -161,7 +148,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
 			RequestUtils.request(HttpMethod.DELETE, "/api/beer", null, deleteRequest,
 					authCookie, BeerDeleteResponseDTO.class);
-		} catch (WebClientResponseException e) {
+		}
+		catch (WebClientResponseException e) {
 			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
@@ -172,14 +160,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private void createBeer(BeerForm.CreateEvent event) {
 		var request = event.getBeer();
-		if (!validate(request)) {
-			return;
-		}
 		try {
-			beerService.add(request);
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.POST, "/api/beer", null, request,
+					authCookie, BeerResponseDTO.class);
 		}
-		catch (BeerAlreadyExistsException e) {
-			showError(e.getMessage());
+		catch (WebClientResponseException e) {
+			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
 		updateList();
@@ -193,15 +180,18 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			return;
 		}
 		Long beerToUpdateId = selection.get().getId();
-		BeerUpdateDTO request = convertToUpdate(event.getBeer());
-		if (!validate(request)) {
-			return;
-		}
+		BeerUpdateDTO requestBody = convertToUpdate(event.getBeer());
 		try {
-			beerService.update(beerToUpdateId, request);
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			var response = RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
+					requestBody, authCookie, BeerResponseDTO.class);
 		}
-		catch (ObjectsAreEqualException e) {
-			showError(e.getMessage());
+		// TODO: The below WebClientResponseException is not thrown
+		//       in case of exceptions of different codes than 4xx or 5xx.
+		//       Fix that: any exception thrown by the service should be
+		//       converted into WebClientResponseException
+		catch (WebClientResponseException e) {
+			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
 		updateList();
@@ -210,50 +200,18 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private Image getImage(BeerResponseDTO beerDTO) {
 		try {
-			return beerService.getImageComponent(beerDTO.getId());
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			var imageDTO = RequestUtils.request(HttpMethod.GET,
+					"/api/beer/" + beerDTO.getId() + "/image",
+					authCookie, ImageResponseDTO.class);
+			return new Image(imageDTO.getImageUrl(), "Image");
 		}
-		catch (ImageNotFoundException e) {
+		catch (WebClientResponseException e) {
 			return null;
 		}
-	}
-
-	private boolean validate(Object object) {
-		String errorMessage = getErrorMessage(object);
-		if (!errorMessage.isEmpty()) {
-			showError(errorMessage);
-			return false;
-		}
-		return true;
 	}
 
 	private void showError(String message) {
 		Notification.show(message, 4000, Notification.Position.BOTTOM_END);
 	}
-
-	private String getErrorMessage(Object object) {
-		var errors = validator.validate(object);
-		ConstraintViolation violation = errors.stream().findFirst().orElse(null);
-		if (violation == null) {
-			return "";
-		}
-		return violation.getMessage();
-	}
-
-//	private <T> T request(HttpMethod method, String endpoint, Object body, Map<String, String> parameters, Class<T> responseClass) {
-//		Cookie jwtCookie = CookieUtils.getAuthCookie(VaadinService.getCurrentRequest());
-//		return webClient.method(method)
-//				.uri(uriBuilder -> {
-//					uriBuilder.path(endpoint);
-//					for(var entry : parameters.entrySet()) {
-//						uriBuilder.queryParam(entry.getKey(), entry.getValue());
-//					}
-//					return uriBuilder.build();
-//				})
-//				.cookie(jwtCookie.getName(), jwtCookie.getValue())
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.bodyValue(body)
-//				.retrieve()
-//				.bodyToMono(responseClass)
-//				.block();
-//	}
 }
