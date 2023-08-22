@@ -1,8 +1,10 @@
 package com.demo.alkolicznik.utils;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.demo.alkolicznik.exceptions.ApiError;
 import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.servlet.http.Cookie;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriBuilder;
 
 @Component
 public class RequestUtils {
@@ -44,13 +48,7 @@ public class RequestUtils {
 	public static <T> T request(HttpMethod method, String endpoint,
 			Map<String, String> parameters, Object body, Cookie cookie, Class<T> responseClass) {
 		return webClient.method(method)
-				.uri(uriBuilder -> {
-					uriBuilder.path(endpoint);
-					for (var entry : parameters.entrySet()) {
-						uriBuilder.queryParam(entry.getKey(), entry.getValue());
-					}
-					return uriBuilder.build();
-				})
+				.uri(uriBuilder -> buildUriWithParameters(uriBuilder, endpoint, parameters))
 				.cookie(cookie.getName(), cookie.getValue())
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(body)
@@ -62,15 +60,7 @@ public class RequestUtils {
 	public static <T> T request(HttpMethod method, String endpoint,
 			Map<String, String> parameters, Cookie cookie, ParameterizedTypeReference<T> responseClass) {
 		return webClient.method(method)
-				.uri(uriBuilder -> {
-					uriBuilder.path(endpoint);
-					if(parameters != null) {
-						for (var entry : parameters.entrySet()) {
-							uriBuilder.queryParam(entry.getKey(), entry.getValue());
-						}
-					}
-					return uriBuilder.build();
-				})
+				.uri(uriBuilder -> buildUriWithParameters(uriBuilder, endpoint, parameters))
 				.cookie(cookie.getName(), cookie.getValue())
 				.retrieve()
 				.bodyToMono(responseClass)
@@ -80,13 +70,7 @@ public class RequestUtils {
 	public static <T> T request(HttpMethod method, String endpoint,
 			Map<String, String> parameters, Cookie cookie, Class<T> responseClass) {
 		return webClient.method(method)
-				.uri(uriBuilder -> {
-					uriBuilder.path(endpoint);
-					for (var entry : parameters.entrySet()) {
-						uriBuilder.queryParam(entry.getKey(), entry.getValue());
-					}
-					return uriBuilder.build();
-				})
+				.uri(uriBuilder -> buildUriWithParameters(uriBuilder, endpoint, parameters))
 				.cookie(cookie.getName(), cookie.getValue())
 				.retrieve()
 				.bodyToMono(responseClass)
@@ -96,5 +80,26 @@ public class RequestUtils {
 	public static <T> T request(HttpMethod method, String endpoint, Cookie cookie,
 			ParameterizedTypeReference<T> responseClass) {
 		return request(method, endpoint, null, cookie, responseClass);
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint, Object body,
+			Cookie cookie, Class<T> responseClass) {
+		return request(method, endpoint, null, body, cookie, responseClass);
+	}
+
+	public static String extractErrorMessage(WebClientResponseException e) {
+		ApiError error = e.getResponseBodyAs(ApiError.class);
+		return error.getMessage();
+	}
+
+	private static URI buildUriWithParameters(UriBuilder uriBuilder, String endpoint,
+			Map<String, String> parameters) {
+		uriBuilder.path(endpoint);
+		if (parameters != null) {
+			for (var entry : parameters.entrySet()) {
+				uriBuilder.queryParam(entry.getKey(), entry.getValue());
+			}
+		}
+		return uriBuilder.build();
 	}
 }

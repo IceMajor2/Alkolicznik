@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
@@ -14,12 +13,10 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
-import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
 import com.demo.alkolicznik.utils.RequestUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
@@ -27,7 +24,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.ConstraintViolation;
@@ -36,7 +32,6 @@ import jakarta.validation.Validator;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -162,27 +157,12 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		var request = event.getBeer();
 		var deleteRequest = new BeerDeleteRequestDTO(request.getBrand(),
 				request.getType(), request.getVolume());
-		if (!validate(request)) {
-			return;
-		}
 		try {
-			String jwtCookie = Stream.of(VaadinService.getCurrentRequest().getCookies())
-					.filter(cookie -> CookieAuthenticationFilter.JWT_COOKIE_NAME.equals(cookie.getName()))
-					.findFirst().get().getValue();
-			System.out.println(jwtCookie);
-			var response = webClient.method(HttpMethod.DELETE)
-					.uri("/api/beer")
-					.cookie("token", jwtCookie)
-					.contentType(MediaType.APPLICATION_JSON)
-					.bodyValue(deleteRequest)
-					.retrieve()
-					.bodyToMono(BeerDeleteResponseDTO.class)
-					.block();
-			System.out.println(response);
-			//beerService.delete(deleteRequest);
-		}
-		catch (BeerNotFoundException e) {
-			showError(e.getMessage());
+			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.DELETE, "/api/beer", null, deleteRequest,
+					authCookie, BeerDeleteResponseDTO.class);
+		} catch (WebClientResponseException e) {
+			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
 		updateList();
