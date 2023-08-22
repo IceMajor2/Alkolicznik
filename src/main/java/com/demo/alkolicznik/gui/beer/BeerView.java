@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerDeleteResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
@@ -15,7 +14,8 @@ import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
-import com.demo.alkolicznik.utils.RequestUtils;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,7 +27,8 @@ import jakarta.servlet.http.Cookie;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw | Alkolicznik")
@@ -36,10 +37,16 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private static final String DEFAULT_CITY = "Olsztyn";
 
+	private static final ParameterizedTypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
+			new ParameterizedTypeReference<>() {};
+
+	private RestTemplate restTemplate;
+
 	private BeerForm wizard;
 
-	public BeerView(BeerService beerService) {
+	public BeerView(RestTemplate restTemplate) {
 		super("Piwa");
+		this.restTemplate = restTemplate;
 
 		setSizeFull();
 		add(
@@ -113,14 +120,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			return;
 		}
 		try {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
-					Map.of("city", city), authCookie,
-					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
-			this.grid.setItems(beers);
+					Map.of("city", city), null, authCookie, BEERS_DTO_REF);
+			grid.setItems(beers.getBody());
 		}
-		catch (WebClientResponseException e) {
-			this.grid.setItems(Collections.EMPTY_LIST);
+		catch (HttpClientErrorException e) {
+			grid.setItems(Collections.EMPTY_LIST);
 		}
 		updateDisplayText(city);
 	}
@@ -128,10 +134,10 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	@Override
 	protected void updateList() {
 		if (loggedUser.hasAccountantRole()) {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie,
-					new ParameterizedTypeReference<List<BeerResponseDTO>>() {});
-			this.grid.setItems(beers);
+					BEERS_DTO_REF);
+			this.grid.setItems(beers.getBody());
 			updateDisplayText("cała Polska");
 		}
 		else {
@@ -145,11 +151,11 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		var deleteRequest = new BeerDeleteRequestDTO(request.getBrand(),
 				request.getType(), request.getVolume());
 		try {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			RequestUtils.request(HttpMethod.DELETE, "/api/beer", null, deleteRequest,
 					authCookie, BeerDeleteResponseDTO.class);
 		}
-		catch (WebClientResponseException e) {
+		catch (HttpClientErrorException e) {
 			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
@@ -159,13 +165,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 
 	private void createBeer(BeerForm.CreateEvent event) {
-		var request = event.getBeer();
+		var requestBody = event.getBeer();
 		try {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
-			RequestUtils.request(HttpMethod.POST, "/api/beer", null, request,
-					authCookie, BeerResponseDTO.class);
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.POST, "/api/beer", requestBody, authCookie,
+					BeerResponseDTO.class);
 		}
-		catch (WebClientResponseException e) {
+		catch (HttpClientErrorException e) {
 			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
@@ -182,15 +188,15 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		Long beerToUpdateId = selection.get().getId();
 		BeerUpdateDTO requestBody = convertToUpdate(event.getBeer());
 		try {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
-			var response = RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
 					requestBody, authCookie, BeerResponseDTO.class);
 		}
 		// TODO: The below WebClientResponseException is not thrown
 		//       in case of exceptions of different codes than 4xx or 5xx.
 		//       Fix that: any exception thrown by the service should be
 		//       converted into WebClientResponseException
-		catch (WebClientResponseException e) {
+		catch (HttpClientErrorException e) {
 			showError(RequestUtils.extractErrorMessage(e));
 			return;
 		}
@@ -200,13 +206,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private Image getImage(BeerResponseDTO beerDTO) {
 		try {
-			Cookie authCookie = RequestUtils.getAuthCookie(VaadinRequest.getCurrent());
-			var imageDTO = RequestUtils.request(HttpMethod.GET,
-					"/api/beer/" + beerDTO.getId() + "/image",
-					authCookie, ImageResponseDTO.class);
-			return new Image(imageDTO.getImageUrl(), "Image");
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			var response = RequestUtils.request(HttpMethod.GET,
+					"/api/beer/" + beerDTO.getId() + "/image", authCookie,
+					ImageResponseDTO.class);
+			return new Image(response.getBody().getImageUrl(), "Image");
 		}
-		catch (WebClientResponseException e) {
+		catch (HttpClientErrorException e) {
 			return null;
 		}
 	}

@@ -2,6 +2,7 @@ package com.demo.alkolicznik.utils.request;
 
 import java.util.Map;
 
+import com.demo.alkolicznik.exceptions.ApiError;
 import jakarta.servlet.http.Cookie;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,14 +27,37 @@ public class RequestUtils {
 	}
 
 	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Map<String, ?> params, Cookie cookie, ParameterizedTypeReference<T> responseClass) {
+			Map<String, ?> params, Object body, Cookie cookie, ParameterizedTypeReference<T> responseClass) {
 		String endpointWithParams = buildURI(endpoint, params);
-		return restTemplate.exchange(endpointWithParams, method, getHttpEntityWith(cookie),
-				responseClass, params);
+		return restTemplate.exchange(endpointWithParams, method, getHttpEntityWith(body, cookie),
+				responseClass);
 	}
 
-	private static HttpEntity getHttpEntityWith(Cookie cookie) {
-		return getHttpEntityWith(null, cookie);
+	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
+			Cookie cookie, ParameterizedTypeReference<T> responseClass) {
+		return request(method, endpoint, null, null, cookie, responseClass);
+	}
+
+	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
+			Map<String, ?> params, Object body, Cookie cookie, Class<T> responseClass) {
+		String endpointWithParams = buildURI(endpoint, params);
+		return restTemplate.exchange(endpointWithParams, method, getHttpEntityWith(body, cookie),
+				responseClass);
+	}
+
+	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
+			Cookie cookie, Class<T> responseClass) {
+		return request(method, endpoint, null, null, cookie, responseClass);
+	}
+
+	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
+			Object body, Cookie cookie, Class<T> responseClass) {
+		return request(method, endpoint, null, body, cookie, responseClass);
+	}
+
+	public static String extractErrorMessage(HttpClientErrorException e) {
+		ApiError error = e.getResponseBodyAs(ApiError.class);
+		return error.getMessage();
 	}
 
 	private static HttpEntity getHttpEntityWith(Object body, Cookie cookie) {
@@ -42,6 +67,7 @@ public class RequestUtils {
 	}
 
 	private static String buildURI(String uriString, Map<String, ?> parameters) {
+		if (parameters == null) return uriString;
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
 		for (var entry : parameters.entrySet()) {
 			builder
