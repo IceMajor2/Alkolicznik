@@ -70,4 +70,8 @@ public class User implements UserDetails {
 	public boolean isUser() {
 		return Roles.USER == this.role;
 	}
+
+	public boolean hasAccountantRole() {
+		return Roles.ACCOUNTANT == this.role || Roles.ADMIN == this.role;
+	}
 }
