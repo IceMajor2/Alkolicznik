@@ -1,9 +1,5 @@
 package com.demo.alkolicznik.security.config;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
@@ -22,7 +18,7 @@ public class RestTemplateConfig {
 	private final CloseableHttpClient httpClient;
 
 	@Bean
-	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+	public RestTemplate restTemplate() {
 		RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
 		restTemplate.setUriTemplateHandler
 				(new DefaultUriBuilderFactory("https://127.0.0.1:8433"));
@@ -30,7 +26,7 @@ public class RestTemplateConfig {
 	}
 
 	@Bean
-	public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+	public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
 				new HttpComponentsClientHttpRequestFactory();
 		clientHttpRequestFactory.setHttpClient(httpClient);
