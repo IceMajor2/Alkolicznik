@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import org.springframework.http.HttpStatus;
 
@@ -14,7 +15,9 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ApiError {
+@ToString
+// TODO: rename to 'ApiException'
+public class ApiError extends RuntimeException {
 
     private ZonedDateTime timestamp;
     private int status;
