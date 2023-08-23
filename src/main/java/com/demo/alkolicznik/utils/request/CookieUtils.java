@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.servlet.http.Cookie;
+import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 
 public class CookieUtils {
 
@@ -14,6 +15,16 @@ public class CookieUtils {
 		cookie.setSecure(true);
 		cookie.setPath("/");
 		cookie.setDomain("");
+		return cookie;
+	}
+
+	public static BasicClientCookie createApacheTokenCookie(String token) {
+		BasicClientCookie cookie = new BasicClientCookie("token", token);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setPath("/");
+		// TODO: property
+		cookie.setDomain("127.0.0.1");
 		return cookie;
 	}
 

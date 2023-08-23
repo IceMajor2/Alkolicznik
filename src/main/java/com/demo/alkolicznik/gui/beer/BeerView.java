@@ -11,6 +11,7 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.exceptions.ApiError;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -24,11 +25,11 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw | Alkolicznik")
@@ -40,13 +41,13 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	private static final ParameterizedTypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
 			new ParameterizedTypeReference<>() {};
 
-	private RestTemplate restTemplate;
+	private CloseableHttpClient httpClient;
 
 	private BeerForm wizard;
 
-	public BeerView(RestTemplate restTemplate) {
+	public BeerView(CloseableHttpClient httpClient) {
 		super("Piwa");
-		this.restTemplate = restTemplate;
+		this.httpClient = httpClient;
 
 		setSizeFull();
 		add(
@@ -163,7 +164,6 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		closeEditor();
 	}
 
-
 	private void createBeer(BeerForm.CreateEvent event) {
 		var requestBody = event.getBeer();
 		try {
@@ -188,16 +188,11 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		Long beerToUpdateId = selection.get().getId();
 		BeerUpdateDTO requestBody = convertToUpdate(event.getBeer());
 		try {
-			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
-					requestBody, authCookie, BeerResponseDTO.class);
-		}
-		// TODO: The below WebClientResponseException is not thrown
-		//       in case of exceptions of different codes than 4xx or 5xx.
-		//       Fix that: any exception thrown by the service should be
-		//       converted into WebClientResponseException
-		catch (HttpClientErrorException e) {
-			showError(RequestUtils.extractErrorMessage(e));
+			Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			BeerResponseDTO response = RequestUtils.patchRequest("/api/beer/" + beerToUpdateId,
+					requestBody, cookie, BeerResponseDTO.class);
+		} catch (ApiError e) {
+			showError(e.getMessage());
 			return;
 		}
 		updateList();
