@@ -131,6 +131,7 @@ public class HttpClientConfig {
 		return HttpClients.custom()
 				.setDefaultRequestConfig(requestConfig())
 				.setConnectionManager(poolingHttpClientConnectionManager())
+				.setConnectionManagerShared(true)
 				.setKeepAliveStrategy(connectionKeepAliveStrategy())
 				.build();
 	}
