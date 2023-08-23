@@ -46,11 +46,12 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 
 	// required for TestRestTemplate to disable redirects
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 
-	// enable handling of .webp images
+	// ImageKit API + enable handling of .webp images
 	implementation 'com.github.imagekit-developer:imagekit-java:2.0.0'
 	implementation group: 'org.sejda.imageio', name: 'webp-imageio', version: '0.1.6'
 
