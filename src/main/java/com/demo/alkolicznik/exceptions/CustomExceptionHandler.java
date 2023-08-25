@@ -30,16 +30,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   WebRequest request) {
         String message = getMessage(e.getFieldErrors());
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, message, path);
+        ApiException error = new ApiException(HttpStatus.BAD_REQUEST, message, path);
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException e,
+    public ResponseEntity<ApiException> handleConstraintViolationException(ConstraintViolationException e,
                                                                      WebRequest request) {
         String message = getMessage(e.getConstraintViolations());
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, message, path);
+        ApiException error = new ApiException(HttpStatus.BAD_REQUEST, message, path);
         return ResponseEntity.badRequest().body(error);
     }
 

@@ -11,7 +11,7 @@ import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
-import com.demo.alkolicznik.exceptions.ApiError;
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
@@ -191,7 +191,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			BeerResponseDTO response = RequestUtils.patchRequest("/api/beer/" + beerToUpdateId,
 					requestBody, cookie, BeerResponseDTO.class);
-		} catch (ApiError e) {
+		} catch (ApiException e) {
 			showError(e.getMessage());
 			return;
 		}

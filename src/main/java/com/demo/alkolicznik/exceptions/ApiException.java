@@ -16,8 +16,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 @ToString
-// TODO: rename to 'ApiException'
-public class ApiError extends RuntimeException {
+public class ApiException extends RuntimeException {
 
     private ZonedDateTime timestamp;
     private int status;
@@ -25,7 +24,7 @@ public class ApiError extends RuntimeException {
     private String message;
     private String path;
 
-    public ApiError(HttpStatus status, String message, String path) {
+    public ApiException(HttpStatus status, String message, String path) {
 		// TODO: adjust zone id to user
 		this.timestamp = ZonedDateTime.now(ZoneId.of("Poland"));
         this.status = status.value();

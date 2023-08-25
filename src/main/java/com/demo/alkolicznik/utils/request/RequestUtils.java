@@ -3,7 +3,7 @@ package com.demo.alkolicznik.utils.request;
 import java.io.IOException;
 import java.util.Map;
 
-import com.demo.alkolicznik.exceptions.ApiError;
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,7 +65,7 @@ public class RequestUtils {
 	}
 
 	public static <T> T patchRequest(String endpoint, Object requestBody, Cookie cookie,
-			Class<T> classRef) throws ApiError {
+			Class<T> classRef) throws ApiException {
 		String jsonRequest = getAsJson(requestBody);
 		HttpPatch httpPatch = new HttpPatch(BASE_URL + endpoint);
 		httpPatch.setEntity(new StringEntity(jsonRequest, ContentType.APPLICATION_JSON));
@@ -92,7 +92,7 @@ public class RequestUtils {
 		}
 		catch (DatabindException e) {
 			try {
-				throw mapper.readValue(json, ApiError.class);
+				throw mapper.readValue(json, ApiException.class);
 			}
 			catch (JsonProcessingException ex) {
 				throw new RuntimeException(ex);
@@ -164,7 +164,7 @@ public class RequestUtils {
 
 	@Deprecated
 	public static String extractErrorMessage(HttpClientErrorException e) {
-		ApiError error = e.getResponseBodyAs(ApiError.class);
+		ApiException error = e.getResponseBodyAs(ApiException.class);
 		return error.getMessage();
 	}
 
