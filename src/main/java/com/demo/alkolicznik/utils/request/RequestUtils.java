@@ -87,6 +87,11 @@ public class RequestUtils {
 		return request(method, endpoint, null, requestBody, cookie, classRef);
 	}
 
+	public static <T> T request(HttpMethod method, String endpoint, Map<String, ?> parameters,
+			Cookie cookie, Class<T> classRef) throws ApiException {
+		return request(method, endpoint, parameters, null, cookie, classRef);
+	}
+
 	private static String executeRequest(HttpMethod method, String endpoint,
 			Map<String, ?> parameters, Object requestBody, Cookie cookie) {
 		String uri = buildURI(endpoint, parameters);

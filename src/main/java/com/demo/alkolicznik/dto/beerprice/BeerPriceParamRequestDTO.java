@@ -18,4 +18,12 @@ public class BeerPriceParamRequestDTO {
     @NotNull(message = "Price was not specified")
     @Positive(message = "Price must be a positive number")
     private Double price;
+
+	public Long getLongStoreId() {
+		return this.storeId.longValue();
+	}
+
+	public Long getLongBeerId() {
+		return this.beerId.longValue();
+	}
 }

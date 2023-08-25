@@ -1,12 +1,13 @@
 package com.demo.alkolicznik.gui.beerprice;
 
 import java.util.Collections;
+import java.util.Map;
 
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
@@ -14,12 +15,19 @@ import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.Cookie;
+
+import org.springframework.http.HttpMethod;
 
 @Route(value = "beer-price", layout = MainLayout.class)
 @PageTitle("Baza cen | Alkolicznik")
@@ -126,20 +134,15 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
 
     private void updatePrice(BeerPriceForm.UpdateEvent event) {
         BeerPriceParamRequestDTO request = event.getPrice();
-        try {
-            beerPriceService.update(request.getStoreId().longValue(),
-                    request.getBeerId().longValue(),
-                    null
-            );
-        } catch (ObjectsAreEqualException e) {
-            Notification.show("Nowe wartości są takie same jak poprzednie", 4000, Notification.Position.BOTTOM_END);
-            return;
-        } catch (BeerPriceNotFoundException | BeerNotFoundException |
-				 StoreNotFoundException e) {
-            Notification.show("Edytować można jedynie cenę (relacja sklep-piwo musi już istnieć)",
-                    4000, Notification.Position.BOTTOM_END);
-            return;
-        }
+		try {
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.PATCH, "/api/beer-price", Map.of("store_id",
+					request.getLongStoreId(), "beer_id", request.getLongBeerId(), "price",
+					request.getPrice()), authCookie, BeerPriceResponseDTO.class);
+		} catch(ApiException e) {
+			GuiUtils.showError(e.getMessage());
+			return;
+		}
         updateList();
         closeEditor();
     }
