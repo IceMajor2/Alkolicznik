@@ -15,13 +15,13 @@ import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
@@ -144,7 +144,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 					BeerDeleteResponseDTO.class);
 		}
 		catch (ApiException e) {
-			showError(e.getMessage());
+			GuiUtils.showError(e.getMessage());
 			return;
 		}
 		updateList();
@@ -159,7 +159,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 					BeerResponseDTO.class);
 		}
 		catch (ApiException e) {
-			showError(e.getMessage());
+			GuiUtils.showError(e.getMessage());
 			return;
 		}
 		updateList();
@@ -169,7 +169,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	private void updateBeer(BeerForm.UpdateEvent event) {
 		Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
 		if (selection.isEmpty()) {
-			showError("First select the beer to update from the grid");
+			GuiUtils.showError("First select the beer to update from the grid");
 			return;
 		}
 		Long beerToUpdateId = selection.get().getId();
@@ -181,7 +181,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 					requestBody, cookie, BeerResponseDTO.class);
 		}
 		catch (ApiException e) {
-			showError(e.getMessage());
+			GuiUtils.showError(e.getMessage());
 			return;
 		}
 		updateList();
@@ -199,9 +199,5 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		catch (ApiException e) {
 			return null;
 		}
-	}
-
-	private void showError(String message) {
-		Notification.show(message, 4000, Notification.Position.BOTTOM_END);
 	}
 }
