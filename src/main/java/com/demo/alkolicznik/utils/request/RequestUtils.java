@@ -10,13 +10,16 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.servlet.http.Cookie;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -24,21 +27,12 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class RequestUtils {
-
-	// TODO: to be removed completely
-	private static RestTemplate restTemplate;
 
 	// TODO: autowire this
 	private static final String BASE_URL = "https://127.0.0.1:8433";
@@ -61,55 +55,83 @@ public class RequestUtils {
 		RequestUtils.httpClient = httpClient;
 	}
 
-	@Autowired
-	public void setRestTemplate(RestTemplate restTemplate) {
-		RequestUtils.restTemplate = restTemplate;
+	public static <T> T request(HttpMethod method, String endpoint,
+			Map<String, ?> parameters, Object requestBody, Cookie cookie,
+			Class<T> classRef) throws ApiException {
+		String jsonResponse = executeRequest(method, endpoint, parameters, requestBody, cookie);
+		return parseToModel(jsonResponse, classRef);
 	}
 
-	public static <T> T patchRequest(String endpoint, Object requestBody, Cookie cookie,
+	public static <T> T request(HttpMethod method, String endpoint,
+			Map<String, ?> parameters, Object requestBody, Cookie cookie,
+			TypeReference<T> classRef) throws ApiException {
+		String jsonResponse = executeRequest(method, endpoint, parameters, requestBody, cookie);
+		return parseToModel(jsonResponse, classRef);
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint,
+			Map<String, ?> parameters, Cookie cookie,
+			TypeReference<T> classRef) throws ApiException {
+		return request(method, endpoint, parameters, null, cookie, classRef);
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint, Cookie cookie,
+			TypeReference<T> classRef) throws ApiException {
+		return request(method, endpoint, null, null, cookie, classRef);
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint, Cookie cookie,
 			Class<T> classRef) throws ApiException {
+		return request(method, endpoint, null, null, cookie, classRef);
+	}
+
+	public static <T> T request(HttpMethod method, String endpoint, Object requestBody,
+			Cookie cookie, Class<T> classRef) throws ApiException {
+		return request(method, endpoint, null, requestBody, cookie, classRef);
+	}
+
+	private static String executeRequest(HttpMethod method, String endpoint,
+			Map<String, ?> parameters, Object requestBody, Cookie cookie) {
+		String uri = buildURI(endpoint, parameters);
 		String jsonRequest = getAsJson(requestBody);
-		HttpPatch httpPatch = new HttpPatch(BASE_URL + endpoint);
-		httpPatch.setEntity(new StringEntity(jsonRequest, ContentType.APPLICATION_JSON));
+		HttpUriRequestBase httpRequest = getHttpRequestObject(method, BASE_URL + uri);
+		httpRequest.setEntity(new StringEntity(jsonRequest, ContentType.APPLICATION_JSON));
 		HttpContext httpContext = getHttpContextWith(cookie);
 
 		StringBuilder jsonResponse = new StringBuilder();
 		try (CloseableHttpClient httpClient1 = RequestUtils.httpClient) {
-			ClassicHttpResponse httpResponse = httpClient1.execute
-					(httpPatch, httpContext, response -> {
-						jsonResponse.append(EntityUtils.toString(response.getEntity()));
-						return response;
-					});
+			httpClient1.execute(httpRequest, httpContext, response -> {
+				jsonResponse.append(EntityUtils.toString(response.getEntity()));
+				return response;
+			});
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		final String result = jsonResponse.toString();
-		return parseToModel(result, classRef);
+		return result;
 	}
 
-	public static <T> T getRequest(String endpoint, Map<String, ?> parameters, Cookie cookie,
-			TypeReference<T> classRef) throws ApiException {
-		String uri = buildURI(endpoint, parameters);
-		HttpGet httpGet = new HttpGet(BASE_URL + uri);
-		HttpContext httpContext = getHttpContextWith(cookie);
-
-		StringBuilder jsonResponse = new StringBuilder();
-		try (CloseableHttpClient httpClient1 = RequestUtils.httpClient) {
-			ClassicHttpResponse httpResponse = httpClient1.execute
-					(httpGet, httpContext, response -> {
-						jsonResponse.append(EntityUtils.toString(response.getEntity()));
-						return response;
-					});
-		} catch(IOException e) {
-			throw new RuntimeException(e);
+	private static HttpUriRequestBase getHttpRequestObject(HttpMethod method, String endpoint) {
+		switch (method.name()) {
+			case "GET" -> {
+				return new HttpGet(endpoint);
+			}
+			case "POST" -> {
+				return new HttpPost(endpoint);
+			}
+			case "PUT" -> {
+				return new HttpPut(endpoint);
+			}
+			case "PATCH" -> {
+				return new HttpPatch(endpoint);
+			}
+			case "DELETE" -> {
+				return new HttpDelete(endpoint);
+			}
 		}
-		final String result = jsonResponse.toString();
-		return parseToModel(result, classRef);
-	}
-
-	public static <T> T getRequest(String endpoint, Cookie cookie, TypeReference<T> classRef) throws ApiException {
-		return getRequest(endpoint, null, cookie, classRef);
+		throw new RuntimeException("The requested HttpMethod = '%s' is not supported"
+				.formatted(method.name()));
 	}
 
 	private static <T> T parseToModel(String json, Class<T> modelClass) {
@@ -146,6 +168,7 @@ public class RequestUtils {
 		}
 	}
 
+	// TODO: move to CookieUtils
 	private static HttpContext getHttpContextWith(Cookie cookie) {
 		BasicCookieStore cookieStore = createCookieStoreWith(cookie);
 		HttpContext localContext = HttpClientContext.create();
@@ -153,6 +176,7 @@ public class RequestUtils {
 		return localContext;
 	}
 
+	// TODO: move to CookieUtils
 	private static BasicCookieStore createCookieStoreWith(Cookie cookie) {
 		BasicCookieStore cookieStore = new BasicCookieStore();
 		BasicClientCookie clientCookie = CookieUtils.createApacheTokenCookie(cookie.getValue());
@@ -167,55 +191,6 @@ public class RequestUtils {
 		catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-
-	@Deprecated
-	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Map<String, ?> params, Object body, Cookie cookie, ParameterizedTypeReference<T> responseClass) {
-		String endpointWithParams = buildURI(endpoint, params);
-		return restTemplate.exchange(endpointWithParams, method, getHttpEntityWith(body, cookie),
-				responseClass);
-	}
-
-	@Deprecated
-	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Cookie cookie, ParameterizedTypeReference<T> responseClass) {
-		return request(method, endpoint, null, null, cookie, responseClass);
-	}
-
-	@Deprecated
-	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Map<String, ?> params, Object body, Cookie cookie, Class<T> responseClass) {
-		String endpointWithParams = buildURI(endpoint, params);
-		ResponseEntity<T> object = restTemplate.exchange(endpointWithParams, method, getHttpEntityWith(body, cookie),
-				responseClass);
-		return object;
-	}
-
-	@Deprecated
-	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Cookie cookie, Class<T> responseClass) {
-		return request(method, endpoint, null, null, cookie, responseClass);
-	}
-
-	@Deprecated
-	public static <T> ResponseEntity<T> request(HttpMethod method, String endpoint,
-			Object body, Cookie cookie, Class<T> responseClass) {
-		return request(method, endpoint, null, body, cookie, responseClass);
-	}
-
-	@Deprecated
-	public static String extractErrorMessage(HttpClientErrorException e) {
-		ApiException error = e.getResponseBodyAs(ApiException.class);
-		return error.getMessage();
-	}
-
-	@Deprecated
-	private static HttpEntity getHttpEntityWith(Object body, Cookie cookie) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Cookie", cookie.getName() + "=" + cookie.getValue());
-		return new HttpEntity(body, headers);
 	}
 
 	private static String buildURI(String uriString, Map<String, ?> parameters) {

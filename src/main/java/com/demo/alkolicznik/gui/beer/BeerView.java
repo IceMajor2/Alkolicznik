@@ -29,7 +29,6 @@ import jakarta.servlet.http.Cookie;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Route(value = "beer", layout = MainLayout.class)
 @PageTitle("Baza piw | Alkolicznik")
@@ -122,8 +121,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		}
 		try {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			List<BeerResponseDTO> beers = RequestUtils.getRequest("/api/beer", Map.of
-					("city", city), authCookie, BEERS_DTO_REF);
+			List<BeerResponseDTO> beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
+					Map.of("city", city), authCookie, BEERS_DTO_REF);
 			grid.setItems(beers);
 		}
 		catch (ApiException e) {
@@ -136,7 +135,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	protected void updateList() {
 		if (loggedUser.hasAccountantRole()) {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			var beers = RequestUtils.getRequest("/api/beer", authCookie, BEERS_DTO_REF);
+			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie, BEERS_DTO_REF);
 			this.grid.setItems(beers);
 			updateDisplayText("cała Polska");
 		}
@@ -152,11 +151,11 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 				request.getType(), request.getVolume());
 		try {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			RequestUtils.request(HttpMethod.DELETE, "/api/beer", null, deleteRequest,
-					authCookie, BeerDeleteResponseDTO.class);
+			RequestUtils.request(HttpMethod.DELETE, "/api/beer", deleteRequest, authCookie,
+					BeerDeleteResponseDTO.class);
 		}
-		catch (HttpClientErrorException e) {
-			showError(RequestUtils.extractErrorMessage(e));
+		catch (ApiException e) {
+			showError(e.getMessage());
 			return;
 		}
 		updateList();
@@ -170,8 +169,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			RequestUtils.request(HttpMethod.POST, "/api/beer", requestBody, authCookie,
 					BeerResponseDTO.class);
 		}
-		catch (HttpClientErrorException e) {
-			showError(RequestUtils.extractErrorMessage(e));
+		catch (ApiException e) {
+			showError(e.getMessage());
 			return;
 		}
 		updateList();
@@ -188,8 +187,9 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		BeerUpdateDTO requestBody = convertToUpdate(event.getBeer());
 		try {
 			Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			BeerResponseDTO response = RequestUtils.patchRequest("/api/beer/" + beerToUpdateId,
-					requestBody, cookie, BeerResponseDTO.class);
+			BeerResponseDTO response = RequestUtils.request
+					(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId, requestBody,
+							cookie, BeerResponseDTO.class);
 		}
 		catch (ApiException e) {
 			showError(e.getMessage());
@@ -205,9 +205,9 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			var response = RequestUtils.request(HttpMethod.GET,
 					"/api/beer/" + beerDTO.getId() + "/image", authCookie,
 					ImageResponseDTO.class);
-			return new Image(response.getBody().getImageUrl(), "Image");
+			return new Image(response.getImageUrl(), "Image");
 		}
-		catch (HttpClientErrorException e) {
+		catch (ApiException e) {
 			return null;
 		}
 	}
