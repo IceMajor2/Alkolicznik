@@ -15,6 +15,7 @@ import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -98,19 +99,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	@Override
 	protected BeerRequestDTO convertToRequest(BeerResponseDTO beerResponse) {
-		BeerRequestDTO beerRequest = new BeerRequestDTO();
-		beerRequest.setBrand(beerResponse.getBrand());
-		beerRequest.setType(beerResponse.getType());
-		beerRequest.setVolume(beerResponse.getVolume());
-		return beerRequest;
-	}
-
-	private BeerUpdateDTO convertToUpdate(BeerRequestDTO beer) {
-		BeerUpdateDTO beerUpdate = new BeerUpdateDTO();
-		beerUpdate.setBrand(beer.getBrand());
-		beerUpdate.setType(beer.getType());
-		beerUpdate.setVolume(beer.getVolume());
-		return beerUpdate;
+		return ModelDtoConverter.convertToRequest(beerResponse);
 	}
 
 	@Override
@@ -184,12 +173,12 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			return;
 		}
 		Long beerToUpdateId = selection.get().getId();
-		BeerUpdateDTO requestBody = convertToUpdate(event.getBeer());
+		BeerUpdateDTO requestBody = ModelDtoConverter
+				.convertToUpdate(event.getBeer());
 		try {
 			Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			BeerResponseDTO response = RequestUtils.request
-					(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId, requestBody,
-							cookie, BeerResponseDTO.class);
+			RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
+					requestBody, cookie, BeerResponseDTO.class);
 		}
 		catch (ApiException e) {
 			showError(e.getMessage());
