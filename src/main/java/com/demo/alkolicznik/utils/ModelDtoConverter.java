@@ -1,10 +1,5 @@
 package com.demo.alkolicznik.utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -13,11 +8,17 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class ModelDtoConverter {
 
@@ -105,5 +106,21 @@ public class ModelDtoConverter {
 		priceRequest.setStoreId(Double.valueOf(priceResponse.getStore().getId()));
 		priceRequest.setPrice(priceResponse.getAmountOnly());
 		return priceRequest;
+	}
+
+	public static StoreUpdateDTO convertToUpdate(StoreRequestDTO store) {
+		StoreUpdateDTO storeUpdate = new StoreUpdateDTO();
+		storeUpdate.setName(store.getName());
+		storeUpdate.setCity(store.getCity());
+		storeUpdate.setStreet(store.getStreet());
+		return storeUpdate;
+	}
+
+	public static StoreRequestDTO convertToRequest(StoreResponseDTO store) {
+		StoreRequestDTO storeRequest = new StoreRequestDTO();
+		storeRequest.setName(store.getName());
+		storeRequest.setCity(store.getCity());
+		storeRequest.setStreet(store.getStreet());
+		return storeRequest;
 	}
 }
