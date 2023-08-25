@@ -3,7 +3,6 @@ package com.demo.alkolicznik.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.demo.alkolicznik.security.AuthService;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -20,14 +19,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 public class WelcomeView extends VerticalLayout {
 
-	private AuthService authService;
-
-	private AuthenticatedUser authenticatedUser;
-
-	public WelcomeView(AuthenticatedUser authenticatedUser, AuthService authService) {
-		this.authService = authService;
-		this.authenticatedUser = authenticatedUser;
-
+	public WelcomeView() {
 		HorizontalLayout hl = getHorizontalLayout();
 		VerticalLayout vl = getMainLayout();
 
@@ -56,9 +48,10 @@ public class WelcomeView extends VerticalLayout {
 
 	private Button getAuthButton() {
 		Button authButton;
-		if (authenticatedUser.authenticated()) {
+		if (AuthenticatedUser.isAuthenticated()) {
 			authButton = new Button("Wyloguj się");
-		} else {
+		}
+		else {
 			authButton = new Button("Zaloguj się", click ->
 					UI.getCurrent().navigate("login"));
 		}

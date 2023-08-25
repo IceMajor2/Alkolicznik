@@ -16,6 +16,7 @@ import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
@@ -27,7 +28,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import org.springframework.http.HttpMethod;
 
@@ -41,13 +41,10 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	private static final TypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
 			new TypeReference<List<BeerResponseDTO>>() {};
 
-	private CloseableHttpClient httpClient;
-
 	private BeerForm wizard;
 
-	public BeerView(CloseableHttpClient httpClient) {
+	public BeerView() {
 		super("Piwa");
-		this.httpClient = httpClient;
 
 		setSizeFull();
 		add(
@@ -77,7 +74,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		this.grid = new Grid<>();
 		grid.setSizeFull();
 
-		if (!loggedUser.isUser()) {
+		if (!AuthenticatedUser.isUser()) {
 			grid.addColumn(beer -> beer.getId()).setHeader("Id");
 		}
 		grid.addComponentColumn(beer -> this.getImage(beer)).setHeader("Zdjęcie");
@@ -86,7 +83,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");
 		grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-		if (!loggedUser.isUser()) {
+		if (!AuthenticatedUser.isUser()) {
 			grid.asSingleSelect().addValueChangeListener(event -> {
 				if (wizard == null) {
 					wizard = new BeerForm();
@@ -122,7 +119,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	@Override
 	protected void updateList() {
-		if (loggedUser.hasAccountantRole()) {
+		if (AuthenticatedUser.hasAccountantRole()) {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie, BEERS_DTO_REF);
 			this.grid.setItems(beers);

@@ -1,24 +1,25 @@
 package com.demo.alkolicznik.gui.store;
 
+import java.util.Collections;
+import java.util.Optional;
+
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
-import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-
-import java.util.Collections;
-import java.util.Optional;
 
 @Route(value = "store", layout = MainLayout.class)
 @PageTitle("Baza sklepów | Alkolicznik")
@@ -45,7 +46,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
     @Override
     protected void updateList() {
-        if (!loggedUser.isUser()) {
+        if (!AuthenticatedUser.isUser()) {
             var store = storeService.getStores();
             this.grid.setItems(store);
             updateDisplayText("cała Polska");
@@ -75,7 +76,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         this.grid = new Grid<>();
         grid.setSizeFull();
 
-        if (!loggedUser.isUser()) {
+        if (!AuthenticatedUser.isUser()) {
             grid.addColumn(store -> store.getId()).setHeader("Id");
         }
         grid.addColumn(store -> store.getName()).setHeader("Sklep");
@@ -83,7 +84,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         grid.addColumn(store -> store.getStreet()).setHeader("Ulica");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-        if (!loggedUser.isUser()) {
+        if (!AuthenticatedUser.isUser()) {
             grid.asSingleSelect().addValueChangeListener(event -> {
                 if (!(wizard instanceof StoreForm)) {
                     wizard = new StoreForm();

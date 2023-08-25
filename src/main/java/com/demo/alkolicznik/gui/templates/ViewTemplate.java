@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.templates;
 
-import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,11 +9,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
-
-    protected User loggedUser;
 
     protected TextField filterCity;
     protected H2 displayText;
@@ -22,10 +19,9 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
     protected String textModel;
 
-    public ViewTemplate(String textModel) {
-        this.loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        this.textModel = textModel;
-    }
+	public ViewTemplate(String textModel) {
+		this.textModel = textModel;
+	}
 
     protected Component getSearchText() {
         this.displayText = new H2("%s w: ".formatted(textModel));
@@ -41,7 +37,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
             updateList(filterCity.getValue());
         });
 
-        if (loggedUser.isUser()) {
+        if (AuthenticatedUser.isUser()) {
             return new HorizontalLayout(filterCity);
         }
 
@@ -55,7 +51,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
     protected Component getContent() {
         HorizontalLayout content;
-        if (loggedUser.isUser()) {
+        if (AuthenticatedUser.isUser()) {
             content = new HorizontalLayout(getGrid());
         } else {
             wizard = getForm();
@@ -96,7 +92,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     }
 
     protected void updateDisplayText() {
-        if (loggedUser.isUser()) {
+        if (AuthenticatedUser.isUser()) {
             updateDisplayText("Olsztyn");
         } else {
             updateDisplayText("cała Polska");
