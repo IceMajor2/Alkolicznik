@@ -8,6 +8,7 @@ import java.util.Set;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -96,5 +97,13 @@ public class ModelDtoConverter {
 		beerRequest.setType(beerResponse.getType());
 		beerRequest.setVolume(beerResponse.getVolume());
 		return beerRequest;
+	}
+
+	public static BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
+		BeerPriceParamRequestDTO priceRequest = new BeerPriceParamRequestDTO();
+		priceRequest.setBeerId(Double.valueOf(priceResponse.getBeer().getId()));
+		priceRequest.setStoreId(Double.valueOf(priceResponse.getStore().getId()));
+		priceRequest.setPrice(priceResponse.getAmountOnly());
+		return priceRequest;
 	}
 }

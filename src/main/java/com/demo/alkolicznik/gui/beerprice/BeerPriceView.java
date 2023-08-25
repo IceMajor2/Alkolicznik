@@ -5,7 +5,6 @@ import java.util.Collections;
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
@@ -15,6 +14,7 @@ import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
@@ -81,11 +81,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
 
     @Override
     protected BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
-        BeerPriceParamRequestDTO priceRequest = new BeerPriceParamRequestDTO();
-        priceRequest.setBeerId(Double.valueOf(priceResponse.getBeer().getId()));
-        priceRequest.setStoreId(Double.valueOf(priceResponse.getStore().getId()));
-        priceRequest.setPrice(priceResponse.getAmountOnly());
-        return priceRequest;
+        return ModelDtoConverter.convertToRequest(priceResponse);
     }
 
     @Override
@@ -130,7 +126,6 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
 
     private void updatePrice(BeerPriceForm.UpdateEvent event) {
         BeerPriceParamRequestDTO request = event.getPrice();
-        BeerPriceUpdateDTO update = convertToUpdate(request);
         try {
             beerPriceService.update(request.getStoreId().longValue(),
                     request.getBeerId().longValue(),
@@ -167,12 +162,6 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
         }
         updateList();
         closeEditor();
-    }
-
-    private BeerPriceUpdateDTO convertToUpdate(BeerPriceParamRequestDTO priceRequest) {
-        BeerPriceUpdateDTO priceUpdate = new BeerPriceUpdateDTO();
-        priceUpdate.setPrice(priceRequest.getPrice());
-        return priceUpdate;
     }
 
     private void setColumnsForAdmin() {

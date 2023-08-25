@@ -13,7 +13,6 @@ import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceUpdateDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
