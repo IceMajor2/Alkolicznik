@@ -29,6 +29,7 @@ public class LoginView extends VerticalLayout {
 //	@Value("${trust.store.password}")
 //	private String trustStorePassword;
 
+	// TODO: use Apache HttpClient for API calls
 	private WebClient webClient;
 
 	private TextField username;
