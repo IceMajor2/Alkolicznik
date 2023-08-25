@@ -3,8 +3,8 @@ package com.demo.alkolicznik.gui;
 import com.demo.alkolicznik.gui.beer.BeerView;
 import com.demo.alkolicznik.gui.beerprice.BeerPriceView;
 import com.demo.alkolicznik.gui.store.StoreView;
-import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.security.AuthService;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -16,16 +16,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 public class MainLayout extends AppLayout {
 
-	private User loggedUser;
+	private AuthenticatedUser authenticatedUser;
     private AuthService authService;
 
-    public MainLayout(AuthService authService) {
-		this.loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public MainLayout(AuthenticatedUser authenticatedUser, AuthService authService) {
         this.authService = authService;
+		this.authenticatedUser = authenticatedUser;
 
         createHeader();
         createDrawer();
@@ -61,7 +59,7 @@ public class MainLayout extends AppLayout {
 
     private Button getAuthButton() {
 		Button authButton;
-		if(loggedUser != null) {
+		if(authenticatedUser.authenticated()) {
 			authButton = new Button("Wyloguj się");
 		} else {
 			authButton = new Button("Zaloguj się", click ->

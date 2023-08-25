@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -79,5 +80,21 @@ public class ModelDtoConverter {
 		return beerImages.stream()
 				.map(ImageResponseDTO::new)
 				.toList();
+	}
+
+	public static BeerUpdateDTO convertToUpdate(BeerRequestDTO beer) {
+		BeerUpdateDTO beerUpdate = new BeerUpdateDTO();
+		beerUpdate.setBrand(beer.getBrand());
+		beerUpdate.setType(beer.getType());
+		beerUpdate.setVolume(beer.getVolume());
+		return beerUpdate;
+	}
+
+	public static BeerRequestDTO convertToRequest(BeerResponseDTO beerResponse) {
+		BeerRequestDTO beerRequest = new BeerRequestDTO();
+		beerRequest.setBrand(beerResponse.getBrand());
+		beerRequest.setType(beerResponse.getType());
+		beerRequest.setVolume(beerResponse.getVolume());
+		return beerRequest;
 	}
 }
