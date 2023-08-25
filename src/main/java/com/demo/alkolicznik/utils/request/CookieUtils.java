@@ -5,7 +5,10 @@ import java.util.Arrays;
 import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.servlet.http.Cookie;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.protocol.HttpContext;
 
 public class CookieUtils {
 
@@ -34,5 +37,19 @@ public class CookieUtils {
 						CookieAuthenticationFilter.JWT_COOKIE_NAME.equals(cookie.getName()))
 				.findFirst()
 				.orElse(null);
+	}
+
+	public static HttpContext getHttpContextWith(Cookie cookie) {
+		BasicCookieStore cookieStore = createCookieStoreWith(cookie);
+		HttpContext localContext = HttpClientContext.create();
+		localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
+		return localContext;
+	}
+
+	public static BasicCookieStore createCookieStoreWith(Cookie cookie) {
+		BasicCookieStore cookieStore = new BasicCookieStore();
+		BasicClientCookie clientCookie = CookieUtils.createApacheTokenCookie(cookie.getValue());
+		cookieStore.addCookie(clientCookie);
+		return cookieStore;
 	}
 }

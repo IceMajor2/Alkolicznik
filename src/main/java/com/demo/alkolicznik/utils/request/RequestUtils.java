@@ -16,10 +16,7 @@ import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -96,7 +93,7 @@ public class RequestUtils {
 		String jsonRequest = getAsJson(requestBody);
 		HttpUriRequestBase httpRequest = getHttpRequestObject(method, BASE_URL + uri);
 		httpRequest.setEntity(new StringEntity(jsonRequest, ContentType.APPLICATION_JSON));
-		HttpContext httpContext = getHttpContextWith(cookie);
+		HttpContext httpContext = CookieUtils.getHttpContextWith(cookie);
 
 		StringBuilder jsonResponse = new StringBuilder();
 		try (CloseableHttpClient httpClient1 = RequestUtils.httpClient) {
@@ -166,22 +163,6 @@ public class RequestUtils {
 		catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	// TODO: move to CookieUtils
-	private static HttpContext getHttpContextWith(Cookie cookie) {
-		BasicCookieStore cookieStore = createCookieStoreWith(cookie);
-		HttpContext localContext = HttpClientContext.create();
-		localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-		return localContext;
-	}
-
-	// TODO: move to CookieUtils
-	private static BasicCookieStore createCookieStoreWith(Cookie cookie) {
-		BasicCookieStore cookieStore = new BasicCookieStore();
-		BasicClientCookie clientCookie = CookieUtils.createApacheTokenCookie(cookie.getValue());
-		cookieStore.addCookie(clientCookie);
-		return cookieStore;
 	}
 
 	private static String getAsJson(Object requestBody) {
