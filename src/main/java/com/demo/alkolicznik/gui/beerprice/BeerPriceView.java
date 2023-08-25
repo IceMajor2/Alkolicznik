@@ -1,26 +1,25 @@
 package com.demo.alkolicznik.gui.beerprice;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import com.demo.alkolicznik.api.services.BeerPriceService;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
+import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
-import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
+import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
@@ -34,157 +33,165 @@ import org.springframework.http.HttpMethod;
 @PermitAll
 public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPriceResponseDTO> {
 
-    private BeerPriceService beerPriceService;
-    private BeerPriceForm wizard;
+	private static final TypeReference<List<BeerPriceResponseDTO>> PRICES_DTO_REF =
+			new TypeReference<List<BeerPriceResponseDTO>>() {};
 
-    public BeerPriceView(BeerPriceService beerPriceService) {
-        super("Ceny");
-        this.beerPriceService = beerPriceService;
+	private BeerPriceForm wizard;
 
-        setSizeFull();
-        add(
-                getToolbar(new BeerPriceParamRequestDTO()),
-                getSearchText(),
-                getContent()
-        );
-        updateList();
-        updateDisplayText();
-        closeEditor();
-    }
+	public BeerPriceView() {
+		super("Ceny");
 
-    @Override
-    protected FormTemplate<BeerPriceParamRequestDTO> getForm() {
-        wizard = new BeerPriceForm();
-        wizard.setWidth("25em");
+		setSizeFull();
+		add(
+				getToolbar(new BeerPriceParamRequestDTO()),
+				getSearchText(),
+				getContent()
+		);
+		updateList();
+		updateDisplayText();
+		closeEditor();
+	}
 
-        wizard.addCreateListener(this::createPrice);
-        wizard.addUpdateListener(this::updatePrice);
-        wizard.addDeleteListener(this::deletePrice);
-        wizard.addCloseListener(event -> closeEditor());
-        return wizard;
-    }
+	@Override
+	protected FormTemplate<BeerPriceParamRequestDTO> getForm() {
+		wizard = new BeerPriceForm();
+		wizard.setWidth("25em");
 
-    @Override
-    protected Grid<BeerPriceResponseDTO> getGrid() {
-        this.grid = new Grid<>();
-        grid.setSizeFull();
+		wizard.addCreateListener(this::createPrice);
+		wizard.addUpdateListener(this::updatePrice);
+		wizard.addDeleteListener(this::deletePrice);
+		wizard.addCloseListener(event -> closeEditor());
+		return wizard;
+	}
 
-        if (!loggedUser.isUser()) {
-            setColumnsForAdmin();
-        } else {
-            setColumnsForUser();
-        }
-        grid.getColumns().forEach(col -> col.setAutoWidth(true));
+	@Override
+	protected Grid<BeerPriceResponseDTO> getGrid() {
+		this.grid = new Grid<>();
+		grid.setSizeFull();
 
-        if (!loggedUser.isUser()) {
-            grid.asSingleSelect().addValueChangeListener(event -> {
-                if (!(wizard instanceof BeerPriceForm)) {
-                    wizard = new BeerPriceForm();
-                }
-                editModel(event.getValue());
-            });
-        }
-        return grid;
-    }
+		if (!AuthenticatedUser.isUser()) {
+			setColumnsForAdmin();
+		}
+		else {
+			setColumnsForUser();
+		}
+		grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-    @Override
-    protected BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
-        return ModelDtoConverter.convertToRequest(priceResponse);
-    }
+		if (!AuthenticatedUser.isUser()) {
+			grid.asSingleSelect().addValueChangeListener(event -> {
+				if (!(wizard instanceof BeerPriceForm)) {
+					wizard = new BeerPriceForm();
+				}
+				editModel(event.getValue());
+			});
+		}
+		return grid;
+	}
 
-    @Override
-    protected void updateList(String city) {
-        if (city.isBlank()) {
-            updateList();
-            return;
-        }
-        try {
-            var prices = beerPriceService.getAllByCity(city);
-            this.grid.setItems(prices);
-        } catch (NoSuchCityException e) {
-            this.grid.setItems(Collections.EMPTY_LIST);
-        }
-        updateDisplayText(city);
-    }
+	@Override
+	protected BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
+		return ModelDtoConverter.convertToRequest(priceResponse);
+	}
 
-    @Override
-    protected void updateList() {
-        if (!loggedUser.isUser()) {
-            var prices = beerPriceService.getAll();
-            this.grid.setItems(prices);
-            updateDisplayText("cała Polska");
-        } else {
-            updateList("Olsztyn");
-            updateDisplayText("Olsztyn");
-        }
-    }
+	@Override
+	protected void updateList(String city) {
+		if (city.isBlank()) {
+			updateList();
+			return;
+		}
+		try {
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			List<BeerPriceResponseDTO> prices = RequestUtils.request(HttpMethod.GET,
+					"/api/beer-price", Map.of("city", city), authCookie, PRICES_DTO_REF);
+			this.grid.setItems(prices);
+		}
+		catch (NoSuchCityException e) {
+			this.grid.setItems(Collections.EMPTY_LIST);
+		}
+		updateDisplayText(city);
+	}
 
-    private void deletePrice(BeerPriceForm.DeleteEvent event) {
-        BeerPriceParamRequestDTO request = event.getPrice();
-        try {
-            beerPriceService.delete(request.getStoreId().longValue(),
-                    request.getBeerId().longValue());
-        } catch (BeerPriceNotFoundException e) {
-            Notification.show("Nie znaleziono takiej relacji", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
+	@Override
+	protected void updateList() {
+		if (!AuthenticatedUser.isUser()) {
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			List<BeerPriceResponseDTO> prices = RequestUtils.request(HttpMethod.GET,
+					"/api/beer-price", authCookie, PRICES_DTO_REF);
+			this.grid.setItems(prices);
+			updateDisplayText("cała Polska");
+		}
+		else {
+			updateList("Olsztyn");
+			updateDisplayText("Olsztyn");
+		}
+	}
 
-    private void updatePrice(BeerPriceForm.UpdateEvent event) {
-        BeerPriceParamRequestDTO request = event.getPrice();
+	private void deletePrice(BeerPriceForm.DeleteEvent event) {
+		BeerPriceParamRequestDTO request = event.getPrice();
+		try {
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.DELETE, "/api/beer-price", Map.of("store_id",
+							request.getLongStoreId(), "beer_id", request.getLongBeerId()),
+					authCookie, BeerPriceDeleteDTO.class);
+		}
+		catch (ApiException e) {
+			GuiUtils.showError(e.getMessage());
+			return;
+		}
+		updateList();
+		closeEditor();
+	}
+
+	private void updatePrice(BeerPriceForm.UpdateEvent event) {
+		BeerPriceParamRequestDTO request = event.getPrice();
 		try {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			RequestUtils.request(HttpMethod.PATCH, "/api/beer-price", Map.of("store_id",
 					request.getLongStoreId(), "beer_id", request.getLongBeerId(), "price",
 					request.getPrice()), authCookie, BeerPriceResponseDTO.class);
-		} catch(ApiException e) {
+		}
+		catch (ApiException e) {
 			GuiUtils.showError(e.getMessage());
 			return;
 		}
-        updateList();
-        closeEditor();
-    }
+		updateList();
+		closeEditor();
+	}
 
-    private void createPrice(BeerPriceForm.CreateEvent event) {
-        BeerPriceParamRequestDTO request = event.getPrice();
-        try {
-            beerPriceService.addByParam(request.getStoreId().longValue(),
-                    request.getBeerId().longValue(),
-                    request.getPrice());
-        } catch (BeerPriceAlreadyExistsException e) {
-            Notification.show("Relacja już istnieje", 4000, Notification.Position.BOTTOM_END);
-            return;
-        } catch (StoreNotFoundException e) {
-            Notification.show("Nie znaleziono sklepu o tym id", 4000, Notification.Position.BOTTOM_END);
-            return;
-        } catch (BeerNotFoundException e) {
-            Notification.show("Nie znaleziono piwa o tym id", 4000, Notification.Position.BOTTOM_END);
-            return;
-        }
-        updateList();
-        closeEditor();
-    }
+	private void createPrice(BeerPriceForm.CreateEvent event) {
+		BeerPriceParamRequestDTO request = event.getPrice();
+		try {
+			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+			RequestUtils.request(HttpMethod.POST, "/api/store/" + request.getLongStoreId()
+					+ "/beer-price", Map.of("beer_id", request.getLongBeerId(), "beer_price",
+					request.getPrice()), authCookie, BeerPriceRequestDTO.class);
+		}
+		catch (ApiException e) {
+			GuiUtils.showError(e.getMessage());
+			return;
+		}
+		updateList();
+		closeEditor();
+	}
 
-    private void setColumnsForAdmin() {
-        grid.addColumn(price -> price.getStore().getId()).setHeader("Id sklepu");
-        grid.addColumn(price -> price.getBeer().getId()).setHeader("Id piwa");
-        grid.addColumn(price -> price.getStore().getName()).setHeader("Sklep");
-        grid.addColumn(price -> price.getStore().getCity()).setHeader("Miasto");
-        grid.addColumn(price -> price.getStore().getStreet()).setHeader("Ulica");
-        grid.addColumn(price -> price.getBeer().getBrand()).setHeader("Piwo");
-        grid.addColumn(price -> price.getBeer().getType()).setHeader("Typ");
-        grid.addColumn(price -> price.getBeer().getVolume()).setHeader("Objętość");
-        grid.addColumn(price -> price.getPrice()).setHeader("Cena");
-    }
+	private void setColumnsForAdmin() {
+		grid.addColumn(price -> price.getStore().getId()).setHeader("Id sklepu");
+		grid.addColumn(price -> price.getBeer().getId()).setHeader("Id piwa");
+		grid.addColumn(price -> price.getStore().getName()).setHeader("Sklep");
+		grid.addColumn(price -> price.getStore().getCity()).setHeader("Miasto");
+		grid.addColumn(price -> price.getStore().getStreet()).setHeader("Ulica");
+		grid.addColumn(price -> price.getBeer().getBrand()).setHeader("Piwo");
+		grid.addColumn(price -> price.getBeer().getType()).setHeader("Typ");
+		grid.addColumn(price -> price.getBeer().getVolume()).setHeader("Objętość");
+		grid.addColumn(price -> price.getPrice()).setHeader("Cena");
+	}
 
-    private void setColumnsForUser() {
-        grid.addColumn(price -> price.getStore().getName()).setHeader("Sklep");
-        grid.addColumn(price -> price.getStore().getStreet()).setHeader("Ulica");
-        grid.addColumn(price -> price.getBeer().getBrand()).setHeader("Piwo");
-        grid.addColumn(price -> price.getBeer().getType()).setHeader("Typ");
-        grid.addColumn(price -> price.getBeer().getVolume()).setHeader("Objętość");
-        grid.addColumn(price -> price.getPrice()).setHeader("Cena");
-    }
+	private void setColumnsForUser() {
+		grid.addColumn(price -> price.getStore().getName()).setHeader("Sklep");
+		grid.addColumn(price -> price.getStore().getStreet()).setHeader("Ulica");
+		grid.addColumn(price -> price.getBeer().getBrand()).setHeader("Piwo");
+		grid.addColumn(price -> price.getBeer().getType()).setHeader("Typ");
+		grid.addColumn(price -> price.getBeer().getVolume()).setHeader("Objętość");
+		grid.addColumn(price -> price.getPrice()).setHeader("Cena");
+	}
 }
