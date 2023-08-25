@@ -5,10 +5,12 @@ import java.util.Map;
 
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.servlet.http.Cookie;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -86,7 +88,48 @@ public class RequestUtils {
 		return parseToModel(result, classRef);
 	}
 
+	public static <T> T getRequest(String endpoint, Map<String, ?> parameters, Cookie cookie,
+			TypeReference<T> classRef) throws ApiException {
+		String uri = buildURI(endpoint, parameters);
+		HttpGet httpGet = new HttpGet(BASE_URL + uri);
+		HttpContext httpContext = getHttpContextWith(cookie);
+
+		StringBuilder jsonResponse = new StringBuilder();
+		try (CloseableHttpClient httpClient1 = RequestUtils.httpClient) {
+			ClassicHttpResponse httpResponse = httpClient1.execute
+					(httpGet, httpContext, response -> {
+						jsonResponse.append(EntityUtils.toString(response.getEntity()));
+						return response;
+					});
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+		final String result = jsonResponse.toString();
+		return parseToModel(result, classRef);
+	}
+
+	public static <T> T getRequest(String endpoint, Cookie cookie, TypeReference<T> classRef) throws ApiException {
+		return getRequest(endpoint, null, cookie, classRef);
+	}
+
 	private static <T> T parseToModel(String json, Class<T> modelClass) {
+		try {
+			return mapper.readValue(json, modelClass);
+		}
+		catch (DatabindException e) {
+			try {
+				throw mapper.readValue(json, ApiException.class);
+			}
+			catch (JsonProcessingException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+		catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static <T> T parseToModel(String json, TypeReference<T> modelClass) {
 		try {
 			return mapper.readValue(json, modelClass);
 		}

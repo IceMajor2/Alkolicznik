@@ -17,6 +17,7 @@ import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,7 +28,6 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -38,8 +38,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
 	private static final String DEFAULT_CITY = "Olsztyn";
 
-	private static final ParameterizedTypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
-			new ParameterizedTypeReference<>() {};
+	private static final TypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
+			new TypeReference<List<BeerResponseDTO>>() {};
 
 	private CloseableHttpClient httpClient;
 
@@ -122,11 +122,11 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 		}
 		try {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
-					Map.of("city", city), null, authCookie, BEERS_DTO_REF);
-			grid.setItems(beers.getBody());
+			List<BeerResponseDTO> beers = RequestUtils.getRequest("/api/beer", Map.of
+					("city", city), authCookie, BEERS_DTO_REF);
+			grid.setItems(beers);
 		}
-		catch (HttpClientErrorException e) {
+		catch (ApiException e) {
 			grid.setItems(Collections.EMPTY_LIST);
 		}
 		updateDisplayText(city);
@@ -136,9 +136,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 	protected void updateList() {
 		if (loggedUser.hasAccountantRole()) {
 			Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-			var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie,
-					BEERS_DTO_REF);
-			this.grid.setItems(beers.getBody());
+			var beers = RequestUtils.getRequest("/api/beer", authCookie, BEERS_DTO_REF);
+			this.grid.setItems(beers);
 			updateDisplayText("cała Polska");
 		}
 		else {
@@ -191,7 +190,8 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 			Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
 			BeerResponseDTO response = RequestUtils.patchRequest("/api/beer/" + beerToUpdateId,
 					requestBody, cookie, BeerResponseDTO.class);
-		} catch (ApiException e) {
+		}
+		catch (ApiException e) {
 			showError(e.getMessage());
 			return;
 		}
