@@ -91,6 +91,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         if (!AuthenticatedUser.isUser()) {
             grid.addColumn(store -> store.getId()).setHeader("Id");
         }
+        grid.addComponentColumn(GuiUtils::getVaadinImage).setHeader("Zdjęcie");
         grid.addColumn(store -> store.getName()).setHeader("Sklep");
         grid.addColumn(store -> store.getCity()).setHeader("Miasto");
         grid.addColumn(store -> store.getStreet()).setHeader("Ulica");
