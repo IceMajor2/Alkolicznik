@@ -140,7 +140,6 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
     }
 
     private void deleteStore(StoreForm.DeleteEvent event) {
-        // TODO: Add new API endpoint for deleting by object
         try {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.DELETE, "/api/store", event.getStore(), authCookie, StoreDeleteDTO.class);

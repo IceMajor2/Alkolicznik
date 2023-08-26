@@ -1,8 +1,5 @@
 package com.demo.alkolicznik.api.controllers;
 
-import java.net.URI;
-import java.util.List;
-
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -15,20 +12,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/store")
@@ -159,8 +149,12 @@ public class StoreController {
 	@DeleteMapping("/{store_id}")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
-	public StoreDeleteDTO delete(@PathVariable("store_id") Long storeId) {
+	public StoreDeleteDTO deleteByParam(@PathVariable("store_id") Long storeId) {
 		return storeService.delete(storeId);
 	}
 
+	@DeleteMapping
+	public StoreDeleteDTO deleteByObject(@RequestBody @Valid StoreRequestDTO request) {
+		return storeService.delete(request);
+	}
 }
