@@ -1,21 +1,22 @@
 package com.demo.alkolicznik.exceptions;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.springframework.http.HttpStatus;
 
-@JsonPropertyOrder({"timestamp", "status", "error", "message", "path"})
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
+@JsonIncludeProperties({"timestamp", "status", "error", "message", "path"})
+@JsonPropertyOrder({"timestamp", "status", "error", "message", "path"})
 public class ApiException extends RuntimeException {
 
     private ZonedDateTime timestamp;
