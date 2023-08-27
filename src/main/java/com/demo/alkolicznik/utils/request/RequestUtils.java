@@ -92,10 +92,15 @@ public class RequestUtils {
         return request(method, endpoint, null, classRef);
     }
 
+    public static <T> T request(HttpMethod method, String endpoint,
+                                Object requestBody, Class<T> classRef) throws ApiException {
+        return request(method, endpoint, null, requestBody, null, classRef);
+    }
+
     private static String executeRequest(HttpMethod method, String endpoint,
                                          Map<String, ?> parameters, Object requestBody, Cookie cookie) {
         String uri = buildURI(endpoint, parameters);
-        String jsonRequest = getAsJson(requestBody);
+        String jsonRequest = (requestBody instanceof String) ? requestBody.toString() : getAsJson(requestBody);
         HttpUriRequestBase httpRequest = getHttpRequestObject(method, BASE_URL + uri);
         httpRequest.setEntity(new StringEntity(jsonRequest, ContentType.APPLICATION_JSON));
         HttpContext httpContext = cookie == null ? HttpClientContext.create()
