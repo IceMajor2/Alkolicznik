@@ -1,5 +1,6 @@
 package com.demo.alkolicznik;
 
+import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
@@ -76,10 +77,9 @@ public class ReloadScript implements CommandLineRunner {
             LOGGER.info("Updating image tables with remote IDs...");
             updateBeerImageWithRemoteIDs();
             updateStoreImageWithRemoteIDs();
-            LOGGER.info("Updating 'store_image' URLs with 'updatedAt' key...");
-            updateUrlWithUpdatedAt(storeImageRepository);
-            LOGGER.info("Updating 'beer_image' URLs with 'updatedAt' key...");
-            updateUrlWithUpdatedAt(beerImageRepository);
+            LOGGER.info("Mapping image tables with 'updatedAt' parameter and transformations in the URLs...");
+            updateBeerImageWithNamedTransformation();
+            updateStoreImageWithScaledTransformation();
             LOGGER.info("Successfully reloaded ImageKit directory");
         }
     }
@@ -116,17 +116,38 @@ public class ReloadScript implements CommandLineRunner {
         }
     }
 
+    private void updateBeerImageWithNamedTransformation() {
+        List<BaseFile> externalFiles = imageKitRepository.findAllIn("/beer");
+        for (var remoteFile : externalFiles) {
+            beerImageRepository.findByImageUrl(remoteFile.getUrl()).ifPresent(beerImage -> {
+                String mappedUrl = imageKitRepository
+                        .namedTransformation(remoteFile.getFileId(), "get_beer");
+                beerImage.setImageUrl(mappedUrl);
+                beerImageRepository.save(beerImage);
+            });
+        }
+    }
+
+    private void updateStoreImageWithScaledTransformation() {
+        List<BaseFile> externalFiles = imageKitRepository.findAllIn("/store");
+
+        for (var remoteFile : externalFiles) {
+            storeImageRepository.findByImageUrl(remoteFile.getUrl()).ifPresent(storeImage -> {
+                int[] dimensions = GuiUtils.getNewDimensions(storeImage);
+                String mappedUrl = imageKitRepository
+                        .scaleTransformation(remoteFile.getFileId(), dimensions[0], dimensions[1]);
+                storeImage.setImageUrl(mappedUrl);
+                storeImageRepository.save(storeImage);
+            });
+        }
+    }
+
     private void updateBeerImageWithRemoteIDs() {
         List<BaseFile> externalFiles = imageKitRepository.findAllIn("/beer");
-        Map<BaseFile, String> externalFilesWithMappedURLs = bulkRemoteUrlMappings
-                (externalFiles, "get_beer");
 
-        for (var entry : externalFilesWithMappedURLs.entrySet()) {
-            BaseFile baseFile = entry.getKey();
-            String mappedURL = entry.getValue();
-
-            String externalId = baseFile.getFileId();
-            beerImageRepository.findByImageUrl(mappedURL).ifPresent(beerImage -> {
+        for (var remoteFile : externalFiles) {
+            String externalId = remoteFile.getFileId();
+            beerImageRepository.findByImageUrl(remoteFile.getUrl()).ifPresent(beerImage -> {
                 if (beerImage.getRemoteId() == null) {
                     beerImage.setRemoteId(externalId);
                     beerImageRepository.save(beerImage);
