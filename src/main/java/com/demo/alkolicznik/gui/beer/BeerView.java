@@ -1,7 +1,6 @@
 package com.demo.alkolicznik.gui.beer;
 
 import com.demo.alkolicznik.dto.beer.*;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
@@ -13,7 +12,6 @@ import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
@@ -174,17 +172,5 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         }
         updateList();
         closeEditor();
-    }
-
-    private Image getImage(BeerResponseDTO beerDTO) {
-        try {
-            Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-            var response = RequestUtils.request(HttpMethod.GET,
-                    "/api/beer/" + beerDTO.getId() + "/image", authCookie,
-                    ImageResponseDTO.class);
-            return new Image(response.getImageUrl(), "Image");
-        } catch (ApiException e) {
-            return null;
-        }
     }
 }
