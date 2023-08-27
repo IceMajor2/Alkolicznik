@@ -4,10 +4,14 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
+import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.Utils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.http.HttpMethod;
+
+import java.awt.image.BufferedImage;
 
 public class GuiUtils {
 
@@ -19,7 +23,7 @@ public class GuiUtils {
         try {
             var response = RequestUtils.request(HttpMethod.GET, "/api/store/" +
                     store.getId() + "/image", ImageResponseDTO.class);
-            return new Image(response.getImageUrl(), "Store image");
+            return new Image(response.getStoreImage().getImageUrl(), "Store image");
         } catch (ApiException e) {
             return null;
         }
@@ -29,9 +33,24 @@ public class GuiUtils {
         try {
             var response = RequestUtils.request(HttpMethod.GET, "/api/beer/" +
                     beer.getId() + "/image", ImageResponseDTO.class);
-            return new Image(response.getImageUrl(), "Beer image");
+            return new Image(response.getBeerImage().getImageUrl(), "Beer image");
         } catch (ApiException e) {
             return null;
         }
+    }
+
+    public static int[] getNewDimensions(StoreImage storeImage) {
+        BufferedImage image = Utils.getBufferedImageFromWeb(storeImage.getImageUrl());
+        int height = image.getHeight();
+        int width = image.getWidth();
+        if (height * 3.5 < width) throw new RuntimeException("Image is too wide");
+
+        if (height <= 80) return new int[]{height, width};
+
+        double resizeBy = height / 80.0;
+
+        height = (int) (height / resizeBy);
+        width = (int) (width / resizeBy);
+        return new int[]{height, width};
     }
 }
