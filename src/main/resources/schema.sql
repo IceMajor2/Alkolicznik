@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS store_image (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS _user (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT NOT NULL,
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,

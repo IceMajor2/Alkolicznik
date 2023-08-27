@@ -46,9 +46,9 @@ INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES 
 INSERT INTO beer_price (store_id, beer_id, price_amount, price_currency) VALUES (6, 10, 3.89, 'PLN');
 
 -- users
-INSERT INTO _user (ID, USERNAME, PASSWORD, ROLE)
+INSERT INTO users (ID, USERNAME, PASSWORD, ROLE)
    VALUES (1, 'admin', '$2a$13$30DIvESARokaAl6jws6zz.7d6aH3QH7KW4SvVurPDU739U90UUiwu', 'ADMIN');
-INSERT INTO _user (ID, USERNAME, PASSWORD, ROLE)
+INSERT INTO users (ID, USERNAME, PASSWORD, ROLE)
    VALUES (2, 'user', '$2a$13$f/negBSxX5/nlzkFv/M7fOzS/b5AeuKYD/1ZqoES.zbPQiMGrL97y', 'USER');
-INSERT INTO _user (ID, USERNAME, PASSWORD, ROLE) -- 'user1', 'abcdef'
+INSERT INTO users (ID, USERNAME, PASSWORD, ROLE) -- 'user1', 'abcdef'
    VALUES (3, 'user1', '$2a$13$wiQL5II41f2vVVbnp1/5dOVkFNd9FuW6T/psofnp8p2YIVyLLu30y', 'ACCOUNTANT');
