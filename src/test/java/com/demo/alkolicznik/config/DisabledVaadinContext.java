@@ -8,6 +8,7 @@ import com.vaadin.flow.spring.SpringSecurityAutoConfiguration;
 import com.vaadin.flow.spring.VaadinScopesConfig;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
 
 @EnableAutoConfiguration(exclude = {
         VaadinScopesConfig.class,
@@ -24,4 +25,7 @@ public class DisabledVaadinContext {
 
     @MockBean
     private SecurityVaadinConfig securityVaadinConfig;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
 }
