@@ -1,20 +1,14 @@
 package com.demo.alkolicznik.models.image;
 
-import java.util.Objects;
-
 import com.demo.alkolicznik.models.Beer;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Objects;
 
 @Entity(name = "BeerImage")
 @Table(name = "beer_image")
@@ -31,10 +25,12 @@ public class BeerImage extends ImageModel {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "beer_id")
+    @JsonIgnore
+    @ToString.Exclude
     private Beer beer;
 
     public BeerImage(String imageUrl, String remoteId) {
-		super(imageUrl, remoteId);
+        super(imageUrl, remoteId);
     }
 
     @Override
