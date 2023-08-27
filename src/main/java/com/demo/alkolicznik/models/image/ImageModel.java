@@ -17,29 +17,33 @@ import org.hibernate.validator.constraints.URL;
 @ToString
 public abstract class ImageModel {
 
-	@Column(name = "remote_id")
-	protected String remoteId;
+    @Column(name = "remote_id")
+    protected String remoteId;
 
-	@Column(name = "url")
-	@URL
-	protected String imageUrl;
+    @Column(name = "url")
+    @URL
+    protected String imageUrl;
 
-	@JsonIgnore
-	@Column(name = "image_component")
-	protected Image imageComponent;
+    @JsonIgnore
+    @Column(name = "image_component")
+    protected Image imageComponent;
 
-	public ImageModel(String imageUrl, String remoteId) {
-		this.imageUrl = imageUrl;
-		this.remoteId = remoteId;
-	}
+    public ImageModel(String imageUrl, String remoteId) {
+        this.imageUrl = imageUrl;
+        this.remoteId = remoteId;
+    }
 
-	public Image getImageComponent() {
-		if(imageComponent == null) {
-			Image image = new Image(this.imageUrl, "Image");
-			this.imageComponent = image;
-		}
-		return this.imageComponent;
-	}
+    public Image getImageComponent() {
+        return getImageComponent(false);
+    }
 
-	public abstract Long getId();
+    public Image getImageComponent(boolean loadComponent) {
+        if (loadComponent && imageComponent == null) {
+            Image image = new Image(this.imageUrl, "Image");
+            this.imageComponent = image;
+        }
+        return this.imageComponent;
+    }
+
+    public abstract Long getId();
 }
