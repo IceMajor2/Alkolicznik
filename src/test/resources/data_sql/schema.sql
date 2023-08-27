@@ -49,10 +49,9 @@ CREATE TABLE store_image (
 
 CREATE TABLE users (
     id BIGINT IDENTITY PRIMARY KEY,
-    username VARCHAR(32) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    account_non_locked BOOLEAN,
-    roles VARCHAR(255) ARRAY
+    role VARCHAR(255) CHECK (role in ('USER', 'ACCOUNTANT', 'ADMIN'))
 );
 
 CREATE SEQUENCE user_id_seq START WITH 7 INCREMENT BY 1;
