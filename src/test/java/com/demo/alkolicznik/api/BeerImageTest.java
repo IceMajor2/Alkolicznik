@@ -31,6 +31,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -405,12 +406,36 @@ public class BeerImageTest {
             @DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove image")
             @DirtiesContext
             public void updateVolumeShouldNotRemoveImageTest(Long beerId, Double volume) {
-                Beer beer = getBeer(beerId.longValue(), beers);
                 // given
+                Beer beer = getBeer(beerId.longValue(), beers);
                 BeerUpdateDTO request = createBeerUpdateRequest(null, null, volume);
 
                 // when
                 var patchResponse = patchRequestAuth("admin", "admin", "/api/beer/" + beerId, request);
+                assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+                var getResponse = getRequest("/api/beer/" + beerId + "/image");
+                ImageResponseDTO actual = toModel(getResponse.getBody(), ImageResponseDTO.class);
+
+                // then
+                ImageResponseDTO expected = createImageResponse(beer.getImage().get());
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "3, Tyskie, Gronie, 0.33",
+                    "4, Zubr, null, 0.6"
+            }, nullValues = "null")
+            @DisplayName("PATCH: '/api/beer/{beer_id}' volume update does not remove image 2")
+            @DirtiesContext
+            public void shouldNotRemoveImageOnVolumeUpdateTest(Long beerId, String brand, String type, Double volume) {
+                // given
+                Beer beer = getBeer(beerId.longValue(), beers);
+                BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
+
+                // when
+                var patchResponse = patchRequest("/api/beer/" + beerId, request);
                 assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
