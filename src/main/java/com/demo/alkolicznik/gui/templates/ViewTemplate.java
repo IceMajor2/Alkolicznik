@@ -19,18 +19,18 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
     protected String textModel;
 
-	public ViewTemplate(String textModel) {
-		this.textModel = textModel;
-	}
+    public ViewTemplate(String textModel) {
+        this.textModel = textModel;
+    }
 
     protected Component getSearchText() {
-        this.displayText = new H2("%s w: ".formatted(textModel));
+        this.displayText = new H2("%s in: ".formatted(textModel));
         return displayText;
     }
 
     protected Component getToolbar(REQUEST emptyRequest) {
         filterCity = new TextField();
-        filterCity.setPlaceholder("Wpisz miasto...");
+        filterCity.setPlaceholder("Enter a city...");
         filterCity.setClearButtonVisible(true);
         filterCity.setValueChangeMode(ValueChangeMode.LAZY);
         filterCity.addValueChangeListener(event -> {
@@ -41,7 +41,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
             return new HorizontalLayout(filterCity);
         }
 
-        Button editorButton = new Button("Otwórz edytor");
+        Button editorButton = new Button("Open editor");
         editorButton.addClickListener(click -> {
             grid.asSingleSelect().clear();
             openEditor(emptyRequest);
@@ -65,14 +65,14 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     }
 
     protected void openEditor(REQUEST model) {
-        if(wizard != null) {
+        if (wizard != null) {
             wizard.setModel(model);
             wizard.setVisible(true);
         }
     }
 
     protected void closeEditor() {
-        if(wizard != null) {
+        if (wizard != null) {
             wizard.setModel(null);
             wizard.setVisible(false);
         }
@@ -88,14 +88,14 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     }
 
     protected void updateDisplayText(String city) {
-        this.displayText.setText("%s w: %s".formatted(textModel, city));
+        this.displayText.setText("%s in: %s".formatted(textModel, city));
     }
 
     protected void updateDisplayText() {
         if (AuthenticatedUser.isUser()) {
             updateDisplayText("Olsztyn");
         } else {
-            updateDisplayText("cała Polska");
+            updateDisplayText("entire Poland");
         }
     }
 

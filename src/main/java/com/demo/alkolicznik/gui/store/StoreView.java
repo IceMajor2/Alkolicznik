@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Route(value = "store", layout = MainLayout.class)
-@PageTitle("Baza sklepów | Alkolicznik")
+@PageTitle("StoreBase | Alkolicznik")
 @PermitAll
 public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
@@ -39,7 +39,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
     private StoreForm wizard;
 
     public StoreView() {
-        super("Sklepy");
+        super("Stores");
 
         setSizeFull();
         add(
@@ -59,7 +59,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             List<StoreResponseDTO> stores = RequestUtils.request(HttpMethod.GET,
                     "/api/store", authCookie, STORES_DTO_REF);
             this.grid.setItems(stores);
-            updateDisplayText("cała Polska");
+            updateDisplayText("entire Poland");
         } else {
             updateList("Olsztyn");
             updateDisplayText("Olsztyn");
@@ -89,12 +89,12 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
         grid.setSizeFull();
 
         if (!AuthenticatedUser.isUser()) {
-            grid.addColumn(store -> store.getId()).setHeader("Id");
+            grid.addColumn(store -> store.getId()).setHeader("ID");
         }
-        grid.addComponentColumn(GuiUtils::getVaadinImage).setHeader("Zdjęcie");
-        grid.addColumn(store -> store.getName()).setHeader("Sklep");
-        grid.addColumn(store -> store.getCity()).setHeader("Miasto");
-        grid.addColumn(store -> store.getStreet()).setHeader("Ulica");
+        grid.addComponentColumn(GuiUtils::getVaadinImage).setHeader("Image");
+        grid.addColumn(store -> store.getName()).setHeader("Store");
+        grid.addColumn(store -> store.getCity()).setHeader("City");
+        grid.addColumn(store -> store.getStreet()).setHeader("Street");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
         if (!AuthenticatedUser.isUser()) {

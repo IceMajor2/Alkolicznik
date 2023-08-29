@@ -36,10 +36,10 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
-        RouterLink homeView = new RouterLink("Strona główna", WelcomeView.class);
-        RouterLink beerView = new RouterLink("Piwa", BeerView.class);
-        RouterLink storeView = new RouterLink("Sklepy", StoreView.class);
-        RouterLink pricesView = new RouterLink("Ceny", BeerPriceView.class);
+        RouterLink homeView = new RouterLink("Home", WelcomeView.class);
+        RouterLink beerView = new RouterLink("Beers", BeerView.class);
+        RouterLink storeView = new RouterLink("Stores", StoreView.class);
+        RouterLink pricesView = new RouterLink("Prices", BeerPriceView.class);
         beerView.setHighlightCondition(HighlightConditions.sameLocation());
 
         addToDrawer(new VerticalLayout(
@@ -51,13 +51,13 @@ public class MainLayout extends AppLayout {
     }
 
     private Button getAuthButton() {
-		Button authButton;
-		if(AuthenticatedUser.isAuthenticated()) {
-			authButton = new Button("Wyloguj się");
-		} else {
-			authButton = new Button("Zaloguj się", click ->
-					UI.getCurrent().navigate("login"));
-		}
-		return authButton;
+        Button authButton;
+        if (AuthenticatedUser.isAuthenticated()) {
+            authButton = new Button("Sign out");
+        } else {
+            authButton = new Button("Log in", click ->
+                    UI.getCurrent().navigate("login"));
+        }
+        return authButton;
     }
 }

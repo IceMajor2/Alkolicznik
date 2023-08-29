@@ -15,10 +15,10 @@ public abstract class FormTemplate<REQUEST> extends FormLayout {
 
     protected Binder<REQUEST> binder;
 
-    protected Button create = new Button("Dodaj");
-    protected Button update = new Button("Modyfikuj");
-    protected Button delete = new Button("Usuń");
-    protected Button close = new Button("Zamknij");
+    protected Button create = new Button("Add");
+    protected Button update = new Button("Modify");
+    protected Button delete = new Button("Delete");
+    protected Button close = new Button("Close");
 
     protected void setModel(REQUEST model) {
         binder.setBean(model);

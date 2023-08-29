@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Route(value = "beer", layout = MainLayout.class)
-@PageTitle("Baza piw | Alkolicznik")
+@PageTitle("BeerBase | Alkolicznik")
 @PermitAll
 public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
@@ -38,7 +38,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     private BeerForm wizard;
 
     public BeerView() {
-        super("Piwa");
+        super("Beers");
 
         setSizeFull();
         add(
@@ -69,12 +69,12 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
         grid.setSizeFull();
 
         if (!AuthenticatedUser.isUser()) {
-            grid.addColumn(beer -> beer.getId()).setHeader("Id");
+            grid.addColumn(beer -> beer.getId()).setHeader("ID");
         }
-        grid.addComponentColumn(GuiUtils::getVaadinImage).setHeader("Zdjęcie");
-        grid.addColumn(beer -> beer.getBrand()).setHeader("Marka");
-        grid.addColumn(beer -> beer.getType()).setHeader("Typ");
-        grid.addColumn(beer -> beer.getVolume()).setHeader("Objętość");
+        grid.addComponentColumn(GuiUtils::getVaadinImage).setHeader("Image");
+        grid.addColumn(beer -> beer.getBrand()).setHeader("Brand");
+        grid.addColumn(beer -> beer.getType()).setHeader("Type");
+        grid.addColumn(beer -> beer.getVolume()).setHeader("Volume");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
         if (!AuthenticatedUser.isUser()) {
@@ -116,7 +116,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie, BEERS_DTO_REF);
             this.grid.setItems(beers);
-            updateDisplayText("cała Polska");
+            updateDisplayText("entire Poland");
         } else {
             updateList(DEFAULT_CITY);
             updateDisplayText(DEFAULT_CITY);

@@ -10,9 +10,9 @@ import com.vaadin.flow.shared.Registration;
 
 public class BeerPriceForm extends FormTemplate<BeerPriceParamRequestDTO> {
 
-    private NumberField storeId = new NumberField("Id sklepu");
-    private NumberField beerId = new NumberField("Id piwa");
-    private NumberField price = new NumberField("Cena");
+    private NumberField storeId = new NumberField("Store ID");
+    private NumberField beerId = new NumberField("Beer ID");
+    private NumberField price = new NumberField("Price");
 
     protected BeerPriceForm() {
         super(BeerPriceParamRequestDTO.class);

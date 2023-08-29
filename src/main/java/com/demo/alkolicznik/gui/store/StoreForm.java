@@ -10,9 +10,9 @@ import com.vaadin.flow.shared.Registration;
 
 public class StoreForm extends FormTemplate<StoreRequestDTO> {
 
-    private TextField name = new TextField("Sklep");
-    private TextField city = new TextField("Miasto");
-    private TextField street = new TextField("Ulica");
+    private TextField name = new TextField("Store");
+    private TextField city = new TextField("City");
+    private TextField street = new TextField("Street");
 
     public StoreForm() {
         super(StoreRequestDTO.class);

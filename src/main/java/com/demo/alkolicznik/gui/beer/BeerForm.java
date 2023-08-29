@@ -11,9 +11,9 @@ import com.vaadin.flow.shared.Registration;
 
 public class BeerForm extends FormTemplate<BeerRequestDTO> {
 
-    private TextField brand = new TextField("Marka");
-    private TextField type = new TextField("Typ");
-    private NumberField volume = new NumberField("Objętość");
+    private TextField brand = new TextField("Brand");
+    private TextField type = new TextField("Type");
+    private NumberField volume = new NumberField("Volume");
 
     public BeerForm() {
         super(BeerRequestDTO.class);
