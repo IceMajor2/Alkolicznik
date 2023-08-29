@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.security.config;
 
+import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
+import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
 public class SecurityConfig {
 
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
@@ -32,8 +35,7 @@ public class SecurityConfig {
     private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 8)
-    @ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
+    @Order(Ordered.HIGHEST_PRECEDENCE - 8)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic(httpBasic -> httpBasic
