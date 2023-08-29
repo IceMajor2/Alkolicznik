@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "enable.image.database=true")
 @Import(DisabledVaadinContext.class)
-@ActiveProfiles({"main", "image"})
+@ActiveProfiles({"main", "image", "no-security"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreImageTest {
 
@@ -196,7 +196,8 @@ public class StoreImageTest {
                         (getResponse.getBody(), ImageResponseDTO.class);
                 // then
                 BufferedImage expected = getBufferedImageFromLocal(pathToNewImg);
-                BufferedImage actual = getBufferedImageFromWeb(actualResponse.getStoreImage().getImageUrl());
+                String noTransformationURL = removeTransformationFromURL(actualResponse.getStoreImage().getImageUrl());
+                BufferedImage actual = getBufferedImageFromWeb(noTransformationURL);
                 // NOTE: ImageKit compresses images if their quality is too high,
                 // thus increasing the chance of a false negative. Here, I'm comparing
                 // just the dimensions of the images. It is also flawed as it

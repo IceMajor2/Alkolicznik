@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "enable.image.database=true")
 @Import(DisabledVaadinContext.class)
-@ActiveProfiles({"main", "image"})
+@ActiveProfiles({"main", "image", "no-security"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class BeerImageTest {
 
@@ -145,7 +145,7 @@ public class BeerImageTest {
                 assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
                 BeerResponseDTO actual = toModel(postResponse.getBody(), BeerResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
-                        (actual.getImage().getBeerImage().getImageUrl(), "get_beer");
+                        (actual.getImage().getBeerImage().getImageUrl());
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
                 assertThat(actualImg)
