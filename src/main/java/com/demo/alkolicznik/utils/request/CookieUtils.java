@@ -1,14 +1,14 @@
 package com.demo.alkolicznik.utils.request;
 
-import java.util.Arrays;
-
-import com.demo.alkolicznik.security.config.CookieAuthenticationFilter;
+import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.servlet.http.Cookie;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
+
+import java.util.Arrays;
 
 public class CookieUtils {
 
