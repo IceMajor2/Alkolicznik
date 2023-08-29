@@ -18,10 +18,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     private final JwtService jwtService;
 
@@ -34,15 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null && (authHeader == null || !authHeader.startsWith("Bearer "))) {
+        
+        if ((auth == null || isAnonymousUser(auth)) && (authHeader == null || !authHeader.startsWith("Bearer "))) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt = extractJWT(authHeader, auth);
         final String username = jwtService.extractUsername(jwt);
-        if (username != null
-            /*&& SecurityContextHolder.getContext().getAuthentication() == null*/) {
+        if (username != null /*&& auth == null*/) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(userDetails,
@@ -53,6 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isAnonymousUser(@NonNull final Authentication authentication) {
+        return Objects.equals(authentication.getPrincipal(), ANONYMOUS_USER);
     }
 
     private String extractJWT(String authHeader, Authentication authObject) {
