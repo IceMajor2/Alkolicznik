@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
@@ -10,17 +9,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
 @RequiredArgsConstructor
 // TODO: rename class and organize it better
-public class BeanConfig {
+public class RedirectConfig {
 
     private final static String SECURITY_USER_CONSTRAINT = "CONFIDENTIAL";
 
@@ -30,36 +24,7 @@ public class BeanConfig {
 
     private final static String CONNECTOR_SCHEME = "http";
 
-    private final UserRepository userRepository;
-
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException
-                        ("User '%s' was not found".formatted(username)));
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-//    @Bean
-//    public AuthenticationManager authenticationManager
-//            (AuthenticationConfiguration config) throws Exception {
-//        return config.getAuthenticationManager();
-//    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(13);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
     public TomcatServletWebServerFactory servletWebServerFactory() {
         TomcatServletWebServerFactory tomcat =
                 new TomcatServletWebServerFactory() {
