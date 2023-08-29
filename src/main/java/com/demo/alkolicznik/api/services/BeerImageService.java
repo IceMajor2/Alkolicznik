@@ -64,6 +64,7 @@ public class BeerImageService {
         String transformedUrl = imageKitRepository.namedTransformation
                 (beerImage.getRemoteId(), "get_beer");
         beerImage.setImageUrl(transformedUrl);
+        beerImage.setImageComponent();
         beerImageRepository.save(beerImage);
         return new BeerResponseDTO(beer);
     }

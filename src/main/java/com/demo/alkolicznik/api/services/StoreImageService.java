@@ -84,6 +84,7 @@ public class StoreImageService {
         String transformedUrl = imageKitRepository.scaleTransformation
                 (storeImage.getRemoteId(), newImageDimensions[0], newImageDimensions[1]);
         storeImage.setImageUrl(transformedUrl);
+        storeImage.setImageComponent();
         return storeImageRepository.save(storeImage);
     }
 
