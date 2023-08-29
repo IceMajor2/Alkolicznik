@@ -7,7 +7,6 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
-import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.NotFoundException;
 import io.imagekit.sdk.models.BaseFile;
 import lombok.AllArgsConstructor;
@@ -21,20 +20,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.demo.alkolicznik.repositories.ImageKitRepository.getUpdatedAt;
 
 /**
  * Launching this class reloads everything initial data
@@ -80,6 +72,8 @@ public class ReloadScript implements CommandLineRunner {
             LOGGER.info("Mapping image tables with 'updatedAt' parameter and transformations in the URLs...");
             updateBeerImageWithNamedTransformation();
             updateStoreImageWithScaledTransformation();
+            LOGGER.info("Setting image components...");
+            setImageComponents();
             LOGGER.info("Successfully reloaded ImageKit directory");
         }
     }
@@ -113,6 +107,17 @@ public class ReloadScript implements CommandLineRunner {
         File[] imageDirectory = new File(new ClassPathResource(srcPath).getURI().getRawPath()).listFiles();
         for (File image : imageDirectory) {
             imageKitRepository.save(image.getAbsolutePath(), remoteDir, image.getName(), imgClass);
+        }
+    }
+
+    private void setImageComponents() {
+        for(var image : storeImageRepository.findAll()) {
+            image.setImageComponent();
+            storeImageRepository.save(image);
+        }
+        for(var image : beerImageRepository.findAll()) {
+            image.setImageComponent();
+            beerImageRepository.save(image);
         }
     }
 
@@ -168,24 +173,5 @@ public class ReloadScript implements CommandLineRunner {
                 }
             });
         }
-    }
-
-    private <T extends ImageModel> void updateUrlWithUpdatedAt(CrudRepository<T, Long> imageRepository) {
-        for (var image : imageRepository.findAll()) {
-            long updatedAt = getUpdatedAt(image.getRemoteId());
-            String newURL = image.getImageUrl() + "?updatedAt=" + updatedAt;
-            image.setImageUrl(newURL);
-            imageRepository.save(image);
-        }
-    }
-
-    private Map<BaseFile, String> bulkRemoteUrlMappings(List<BaseFile> files, String transformationName) {
-        List<Map<String, String>> transformation = new ArrayList<>(List.of(Map.of("named", transformationName)));
-        return files.stream().collect(Collectors.toMap(key -> key, value -> {
-            Map<String, Object> options = new HashMap<>();
-            options.put("path", value.getFilePath());
-            options.put("transformation", transformation);
-            return ImageKit.getInstance().getUrl(options);
-        }));
     }
 }
