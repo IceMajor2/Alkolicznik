@@ -33,16 +33,9 @@ public abstract class ImageModel {
         this.remoteId = remoteId;
     }
 
-    public Image getImageComponent() {
-        return getImageComponent(false);
-    }
-
-    public Image getImageComponent(boolean loadComponent) {
-        if (loadComponent && imageComponent == null) {
-            Image image = new Image(this.imageUrl, "Image");
-            this.imageComponent = image;
-        }
-        return this.imageComponent;
+    public void setImageComponent() {
+        if (this.imageComponent == null)
+            this.imageComponent = new Image(this.imageUrl, "Image");
     }
 
     public abstract Long getId();
