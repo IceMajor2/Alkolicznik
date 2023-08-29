@@ -1,6 +1,6 @@
-package com.demo.alkolicznik.security.config;
+package com.demo.alkolicznik.security.filters;
 
-import com.demo.alkolicznik.security.JwtService;
+import com.demo.alkolicznik.security.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null && (authHeader == null || !authHeader.startsWith("Bearer "))) {
+        if (/*auth == null && */(authHeader == null || !authHeader.startsWith("Bearer "))) {
             filterChain.doFilter(request, response);
             return;
         }
