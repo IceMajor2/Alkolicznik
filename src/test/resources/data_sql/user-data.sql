@@ -10,3 +10,5 @@ INSERT INTO users (ID, USERNAME, PASSWORD, ROLE) -- "heckler", "Gaziwubalu66"
     VALUES (5, 'heckler', '$2y$13$z951BviP1jqU7jfpJ7j8g.jISs7hOcZxJH/dTqzy/NSfaGcT0/vNu', 'USER');
 INSERT INTO users (ID, USERNAME, PASSWORD, ROLE) -- "accountant", "accountant"
     VALUES (6, 'accountant', '$2a$13$5N9imk4bqMeSw1HJoxGgS.KIi.rbG0PxgnrJXmLaaNkNWbSowP5yK', 'ACCOUNTANT');
+INSERT INTO users (ID, USERNAME, PASSWORD, ROLE) -- "beer4life", "pantadeusz"
+    VALUES (7, 'beer4life', '$2a$13$lTjEiIQkG0BfyR.JVLruReBgNXpGC3.FOQ1ofBA0o8JwmBc8lDwL2', 'ADMIN');
