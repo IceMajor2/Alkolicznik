@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "test-controller", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
-public class LoginTest {
+public class AuthenticateTest {
 
     private static final HttpStatusCode TEST_ENDPOINT_OK_CODE = HttpStatus.I_AM_A_TEAPOT;
     private static String TEST_ENDPOINT_BODY = "Access granted, ";
