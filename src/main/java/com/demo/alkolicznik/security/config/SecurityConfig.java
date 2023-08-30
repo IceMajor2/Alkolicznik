@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-@ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
+@ConditionalOnMissingBean(type = "com.demo.alkolicznik.config.NoSecurityConfig")
 public class SecurityConfig {
 
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
