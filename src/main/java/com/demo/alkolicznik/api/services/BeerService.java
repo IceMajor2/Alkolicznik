@@ -12,7 +12,6 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
-import com.vaadin.flow.component.html.Image;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -89,8 +88,8 @@ public class BeerService {
         if (this.pricesToDelete(updateDTO)) {
             beer.deleteAllPrices();
         }
-        // deleting image on conditions and
-        if (this.imageToDelete(beer, updated)) {
+        // deleting image on conditions
+        if (this.imageToDelete(beer, updateDTO)) {
             imageService.delete(beerId);
         }
         return new BeerResponseDTO(beerRepository.save(beer));
@@ -110,28 +109,26 @@ public class BeerService {
         return this.delete(toDelete.getId());
     }
 
-    public Image getImageComponent(Long beerId) {
-        Beer beer = beerRepository.findById(beerId)
-                .orElseThrow(() -> new BeerNotFoundException(beerId));
-        return imageService.getComponent(beer);
-    }
-
     private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
+        Beer updated = new Beer();
+        updated.setId(toUpdate.getId());
+        toUpdate.getImage().ifPresent(image -> updated.setImage(image));
+        updated.setPrices(toUpdate.getPrices());
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
 
         if (updatedBrand != null) {
-            toUpdate.setBrand(updatedBrand);
+            updated.setBrand(updatedBrand);
         }
         if (updatedType != null) {
-            if (updatedType.isBlank()) toUpdate.setType(null);
-            else toUpdate.setType(updatedType);
+            if (updatedType.isBlank()) updated.setType(null);
+            else updated.setType(updatedType);
         }
         if (updatedVolume != null) {
-            toUpdate.setVolume(updatedVolume);
+            updated.setVolume(updatedVolume);
         }
-        return toUpdate;
+        return updated;
     }
 
     private Beer updateFieldsOnPut(Beer toOverwrite, Beer newBeer) {
@@ -162,18 +159,15 @@ public class BeerService {
         return checkForUpdateConditions(beerId, new BeerUpdateDTO(requestDTO));
     }
 
-    private boolean imageToDelete(Beer beforeUpdate, Beer afterUpdate) {
-        // if updated field is ONLY volume, then do not delete image
-        // OR if volume is the only field differing
-        if (afterUpdate.getBrand() == null
-                && afterUpdate.getType() == null) {
-            return false;
+    /**
+     * If updated field is ONLY volume, then do not delete image
+     */
+    private boolean imageToDelete(Beer beforeUpdate, BeerUpdateDTO updateDTO) {
+        if (beforeUpdate.getImage().isEmpty()) return false;
+        if (updateDTO.getBrand() != null && !Objects.equals(beforeUpdate.getBrand(), updateDTO.getBrand())) {
+            return true;
         }
-        if (Objects.equals(beforeUpdate.getBrand(), afterUpdate.getBrand())
-                && Objects.equals(beforeUpdate.getType(), afterUpdate.getType())) {
-            return false;
-        }
-        if (beforeUpdate.getImage().isPresent()) {
+        if (updateDTO.getType() != null && !Objects.equals(beforeUpdate.getType(), updateDTO.getType())) {
             return true;
         }
         return false;
