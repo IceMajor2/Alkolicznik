@@ -22,7 +22,7 @@ public class JwtService {
     @Value("${jwt.key}")
     private String jwtKey;
 
-    public static final int EXPIRATION_4_HOURS_IN_MS = 1000 * 60 * 60 * 4; // 4 hours
+    public static final int FOUR_HOURS_IN_MS = 1000 * 60 * 60 * 4; // 4 hours
 
     public String extractUsername(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
@@ -51,7 +51,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 // expiration is 4 hours
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_4_HOURS_IN_MS))
+                .setExpiration(new Date(System.currentTimeMillis() + FOUR_HOURS_IN_MS))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
