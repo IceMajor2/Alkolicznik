@@ -21,7 +21,7 @@ public class CookieUtils {
 		return cookie;
 	}
 
-	public static BasicClientCookie createApacheTokenCookie(String token) {
+	private static BasicClientCookie createApacheTokenCookie(String token) {
 		BasicClientCookie cookie = new BasicClientCookie("token", token);
 		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
@@ -39,7 +39,7 @@ public class CookieUtils {
 				.orElse(null);
 	}
 
-	public static HttpContext getHttpContextWith(Cookie cookie) {
+	protected static HttpContext getHttpContextWith(Cookie cookie) {
 		BasicCookieStore cookieStore = createCookieStoreWith(cookie);
 		HttpContext localContext = HttpClientContext.create();
 		localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
