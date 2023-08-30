@@ -9,6 +9,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
@@ -32,6 +33,10 @@ import java.util.List;
 public class JsonUtils {
 
     private static ObjectMapper mapper = new ObjectMapper();
+
+    public static AuthRequestDTO createAuthRequest(String username, String password) {
+        return new AuthRequestDTO(username, password);
+    }
 
     public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
