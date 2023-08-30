@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.security.beer_controller.authorized;
 
-import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -11,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,9 +19,8 @@ import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DisabledVaadinContext.class)
 @TestMethodOrder(MethodOrderer.Random.class)
-@ActiveProfiles("main")
+@ActiveProfiles({"main", "no-vaadin"})
 public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest

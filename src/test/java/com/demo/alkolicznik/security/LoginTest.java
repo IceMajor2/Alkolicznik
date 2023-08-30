@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.security;
 
-import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import org.junit.jupiter.api.ClassOrderer;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,8 +21,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"main", "test-endpoints"})
-@Import(DisabledVaadinContext.class)
+@ActiveProfiles({"main", "test-endpoints", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class LoginTest {
 

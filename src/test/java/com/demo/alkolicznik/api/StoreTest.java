@@ -32,8 +32,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DisabledVaadinContext.class)
-@ActiveProfiles({"main", "no-security"})
+@ActiveProfiles({"main", "no-security", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreTest {
 

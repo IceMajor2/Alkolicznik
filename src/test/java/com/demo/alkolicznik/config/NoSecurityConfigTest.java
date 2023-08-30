@@ -6,7 +6,6 @@ import com.demo.alkolicznik.models.Beer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,8 +18,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(DisabledVaadinContext.class)
-@ActiveProfiles({"main", "no-security"})
+@ActiveProfiles({"main", "no-security", "no-vaadin"})
 public class NoSecurityConfigTest {
 
     private List<Beer> beers;
