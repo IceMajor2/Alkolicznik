@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.beer_controller.unauthorized;
+package com.demo.alkolicznik.security.beer_controller.authorized;
 
 import com.demo.alkolicznik.config.DisabledVaadinContext;
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
