@@ -18,8 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.deleteRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.deleteRequest;
 

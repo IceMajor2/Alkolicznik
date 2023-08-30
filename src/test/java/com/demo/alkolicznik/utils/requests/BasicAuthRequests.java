@@ -12,13 +12,13 @@ import java.util.Map;
 import static com.demo.alkolicznik.utils.TestUtils.buildURI;
 
 @Component
-public class AuthenticatedRequests {
+public class BasicAuthRequests {
 
     private static TestRestTemplate testRestTemplate;
 
     @Autowired
     public void setTestRestTemplate(TestRestTemplate testRestTemplate) {
-        AuthenticatedRequests.testRestTemplate = testRestTemplate;
+        BasicAuthRequests.testRestTemplate = testRestTemplate;
     }
 
     public static ResponseEntity<String> getRequestAuth(String username, String password, String url) {
