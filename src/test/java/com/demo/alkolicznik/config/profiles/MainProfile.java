@@ -1,9 +1,4 @@
-package com.demo.alkolicznik.config;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.sql.DataSource;
+package com.demo.alkolicznik.config.profiles;
 
 import com.demo.alkolicznik.config.mappers.DatabaseTableConverters;
 import com.demo.alkolicznik.models.Beer;
@@ -17,23 +12,22 @@ import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.models.results.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
+import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @Profile("main")
-public class TestConfig {
+public class MainProfile {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MainProfile.class);
 
 	@Autowired
 	private ApplicationContext context;
@@ -42,7 +36,7 @@ public class TestConfig {
 
 	@Bean
 	public void setJdbcTemplate() {
-		TestConfig.jdbcTemplate = new JdbcTemplate(dataSource());
+		MainProfile.jdbcTemplate = new JdbcTemplate(dataSource());
 	}
 
 	@Bean

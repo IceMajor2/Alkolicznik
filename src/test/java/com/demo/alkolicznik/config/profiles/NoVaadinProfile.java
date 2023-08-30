@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.config;
+package com.demo.alkolicznik.config.profiles;
 
 import com.demo.alkolicznik.security.config.SecurityVaadinConfig;
 import com.vaadin.flow.spring.SpringBootAutoConfiguration;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Profile;
         SpringSecurityAutoConfiguration.class,
 })
 @Profile("no-vaadin")
-public class DisabledVaadinContext {
+public class NoVaadinProfile {
 
     @MockBean
     SecurityVaadinConfig securityVaadinConfig;

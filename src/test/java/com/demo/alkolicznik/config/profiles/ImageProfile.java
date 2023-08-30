@@ -1,4 +1,24 @@
-package com.demo.alkolicznik.config;
+package com.demo.alkolicznik.config.profiles;
+
+import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.ImageModel;
+import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.TestUtils;
+import io.imagekit.sdk.ImageKit;
+import io.imagekit.sdk.exceptions.*;
+import io.imagekit.sdk.models.BaseFile;
+import io.imagekit.sdk.models.FileCreateRequest;
+import io.imagekit.sdk.models.GetFileListRequest;
+import io.imagekit.sdk.models.results.Result;
+import io.imagekit.sdk.models.results.ResultList;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,40 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.demo.alkolicznik.models.image.BeerImage;
-import com.demo.alkolicznik.models.image.ImageModel;
-import com.demo.alkolicznik.models.image.StoreImage;
-import com.demo.alkolicznik.utils.TestUtils;
-import io.imagekit.sdk.ImageKit;
-import io.imagekit.sdk.exceptions.BadRequestException;
-import io.imagekit.sdk.exceptions.ForbiddenException;
-import io.imagekit.sdk.exceptions.InternalServerException;
-import io.imagekit.sdk.exceptions.TooManyRequestsException;
-import io.imagekit.sdk.exceptions.UnauthorizedException;
-import io.imagekit.sdk.exceptions.UnknownException;
-import io.imagekit.sdk.models.BaseFile;
-import io.imagekit.sdk.models.FileCreateRequest;
-import io.imagekit.sdk.models.GetFileListRequest;
-import io.imagekit.sdk.models.results.Result;
-import io.imagekit.sdk.models.results.ResultList;
-import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-
 import static com.demo.alkolicznik.utils.TestUtils.getRawPathToClassPathResource;
 
 @Configuration
 @Profile("image")
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class ImageKitConfig {
+public class ImageProfile {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ImageKitConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImageProfile.class);
 
 	private static final List<String> BEER_IMAGES = List.of(
 			"tyskie-gronie-0.65.png", "zubr-0.5.png",
@@ -59,13 +53,13 @@ public class ImageKitConfig {
 	private ImageKit imageKit;
 
 	@Autowired
-	public ImageKitConfig(TestUtils testUtils) {
+	public ImageProfile(TestUtils testUtils) {
 		this.testUtils = testUtils;
 	}
 
 	@Autowired
 	public void setImageKitPath(String imageKitPath) {
-		ImageKitConfig.imageKitPath = imageKitPath;
+		ImageProfile.imageKitPath = imageKitPath;
 	}
 
 	@PostConstruct

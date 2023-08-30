@@ -21,7 +21,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"main", "test-endpoints", "no-vaadin"})
+@ActiveProfiles({"main", "test-controller", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class LoginTest {
 

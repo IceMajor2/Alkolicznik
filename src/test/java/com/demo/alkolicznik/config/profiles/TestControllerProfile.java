@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.config;
+package com.demo.alkolicznik.config.profiles;
 
 import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Profile;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/test")
-@Profile("test-endpoints")
-public class TestController {
+@Profile("test-controller")
+public class TestControllerProfile {
 
     private static final String WELCOME_MESSAGE_START = "Access granted, ";
 

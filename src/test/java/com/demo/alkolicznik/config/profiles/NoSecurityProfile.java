@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.config;
+package com.demo.alkolicznik.config.profiles;
 
 import org.junit.jupiter.api.Order;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = false)
 @Profile("no-security")
-public class NoSecurityConfig {
+public class NoSecurityProfile {
 
     @Bean
     @Primary

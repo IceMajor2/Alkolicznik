@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.config;
+package com.demo.alkolicznik.config.profiles;
 
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
@@ -19,12 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "no-security", "no-vaadin"})
-public class NoSecurityConfigTest {
+public class NoSecurityProfileTest {
 
     private List<Beer> beers;
 
     @Autowired
-    public NoSecurityConfigTest(List<Beer> beers) {
+    public NoSecurityProfileTest(List<Beer> beers) {
         this.beers = beers;
     }
 
