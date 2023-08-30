@@ -18,21 +18,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Profile("no-security")
 public class NoSecurityConfig {
 
-//    private final RestAuthenticationEntryPoint authenticationEntryPoint;
-//
-//    @Autowired
-//    public NoSecurityConfig(RestAuthenticationEntryPoint authenticationEntryPoint) {
-//        this.authenticationEntryPoint = authenticationEntryPoint;
-//    }
-
     @Bean
     @Primary
     @Order(Ordered.HIGHEST_PRECEDENCE - 8)
     public SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
         http
-//                .exceptionHandling(excHandler -> excHandler
-//                        .authenticationEntryPoint(authenticationEntryPoint)
-//                        .accessDeniedHandler(authenticationEntryPoint))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/**").permitAll()
