@@ -2,42 +2,14 @@ package com.demo.alkolicznik.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.test.web.servlet.ResultActions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Component
-public class CustomAssertions {
-
-    public static PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        CustomAssertions.passwordEncoder = passwordEncoder;
-    }
-
-    public static String assertMockRequest(ResultActions mockResponse,
-                                           HttpStatus expectedStatus,
-                                           String expectedJson) {
-        String actualJson = null;
-        try {
-            actualJson = mockResponse
-                    .andExpect(status().is(expectedStatus.value()))
-                    .andExpect(content().json(expectedJson))
-                    .andReturn().getResponse().getContentAsString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return actualJson;
-    }
+public class CustomErrorAssertion {
 
     /**
      * Helper function for asserting that the response is an error.
@@ -95,13 +67,5 @@ public class CustomAssertions {
             fail("'timestamp' key is not present");
         }
         assertThat(actual.length()).isEqualTo(5);
-    }
-
-    public static void assertPasswordHashed(String rawPassword, String encodedPassword) {
-        assertThat(rawPassword).withFailMessage("The provided 'raw password' is null").isNotNull();
-        assertThat(encodedPassword).withFailMessage("The encoded password is null").isNotNull();
-        assertThat(passwordEncoder.matches(rawPassword, encodedPassword))
-                .withFailMessage("The password's hash does not stand for request's raw one")
-                .isTrue();
     }
 }

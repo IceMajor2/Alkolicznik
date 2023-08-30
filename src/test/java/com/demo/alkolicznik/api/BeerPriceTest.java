@@ -36,7 +36,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
+import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
 import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
