@@ -3,7 +3,7 @@ package com.demo.alkolicznik.config.profiles;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
-import com.demo.alkolicznik.utils.TestUtils;
+import com.demo.alkolicznik.utils.FindingUtils;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.exceptions.*;
 import io.imagekit.sdk.models.BaseFile;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.demo.alkolicznik.utils.TestUtils.getRawPathToClassPathResource;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 
 @Configuration
 @Profile("image")
@@ -46,15 +46,15 @@ public class ImageProfile {
 			"carrefour.png", "lubi.jpg", "abc.png"
 	);
 
-	private TestUtils testUtils;
+	private FindingUtils findingUtils;
 
 	private static String imageKitPath;
 
 	private ImageKit imageKit;
 
 	@Autowired
-	public ImageProfile(TestUtils testUtils) {
-		this.testUtils = testUtils;
+	public ImageProfile(FindingUtils findingUtils) {
+		this.findingUtils = findingUtils;
 	}
 
 	@Autowired

@@ -25,8 +25,10 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
-import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
+import static com.demo.alkolicznik.utils.FindingUtils.getBeerImage;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;

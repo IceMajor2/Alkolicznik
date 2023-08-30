@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getBeersInCity;
+import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
+import static com.demo.alkolicznik.utils.FindingUtils.getBeersInCity;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,12 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -17,18 +10,11 @@ import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
-import org.junit.jupiter.api.ClassOrderer;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestClassOrder;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -36,28 +22,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerDeleteRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceDeleteResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerPriceResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createBeerUpdateRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createStoreRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.createStoreResponse;
-import static com.demo.alkolicznik.utils.JsonUtils.createStoreUpdateRequest;
-import static com.demo.alkolicznik.utils.JsonUtils.toJsonString;
-import static com.demo.alkolicznik.utils.JsonUtils.toModel;
-import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
-import static com.demo.alkolicznik.utils.TestUtils.getBeer;
-import static com.demo.alkolicznik.utils.TestUtils.getBeerPrice;
-import static com.demo.alkolicznik.utils.TestUtils.getStore;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.deleteRequestAuth;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.getRequestAuth;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.patchRequestAuth;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.postRequestAuth;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.putRequestAuth;
+import static com.demo.alkolicznik.utils.FindingUtils.*;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
