@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.beer_controller.unauthorized;
+package com.demo.alkolicznik.security.beer_controller;
 
 import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
