@@ -27,7 +27,7 @@ import static com.demo.alkolicznik.utils.CustomAssertions.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeersInCity;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.*;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 

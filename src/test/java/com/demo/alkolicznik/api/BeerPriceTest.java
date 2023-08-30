@@ -55,11 +55,11 @@ import static com.demo.alkolicznik.utils.JsonUtils.toModelList;
 import static com.demo.alkolicznik.utils.TestUtils.getBeer;
 import static com.demo.alkolicznik.utils.TestUtils.getBeerPrice;
 import static com.demo.alkolicznik.utils.TestUtils.getStore;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.deleteRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.getRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.patchRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.postRequestAuth;
-import static com.demo.alkolicznik.utils.requests.AuthenticatedRequests.putRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.deleteRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.getRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.patchRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.postRequestAuth;
+import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.putRequestAuth;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 

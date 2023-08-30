@@ -38,8 +38,6 @@ public class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE - 8)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic(httpBasic -> httpBasic
-                        .authenticationEntryPoint(authenticationEntryPoint))
                 .exceptionHandling(excHandler -> excHandler
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(authenticationEntryPoint))
