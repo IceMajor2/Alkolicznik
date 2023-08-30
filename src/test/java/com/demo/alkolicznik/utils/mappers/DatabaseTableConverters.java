@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.config.mappers;
+package com.demo.alkolicznik.utils.mappers;
 
 import com.demo.alkolicznik.models.*;
 import com.demo.alkolicznik.models.image.BeerImage;

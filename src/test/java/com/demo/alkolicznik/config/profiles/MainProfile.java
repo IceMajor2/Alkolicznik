@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.config.profiles;
 
-import com.demo.alkolicznik.config.mappers.DatabaseTableConverters;
+import com.demo.alkolicznik.utils.mappers.DatabaseTableConverters;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
