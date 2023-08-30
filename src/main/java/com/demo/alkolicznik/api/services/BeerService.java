@@ -93,8 +93,6 @@ public class BeerService {
         if (this.imageToDelete(original, updateDTO)) {
             imageService.delete(beer.getImage().get());
         }
-        System.out.println(beer);
-        System.out.println(original);
         return new BeerResponseDTO(beerRepository.save(beer));
     }
 
