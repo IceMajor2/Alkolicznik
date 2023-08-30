@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/test")
 @Profile("test-endpoints")
 public class TestController {
-    public TestController() {
-        System.out.println("hi");
-    }
+
+    private static final String WELCOME_MESSAGE_START = "Access granted, ";
 
     @GetMapping("/all")
     @PermitAll
     public ResponseEntity<String> anonymous() {
         return ResponseEntity
                 .status(HttpStatus.I_AM_A_TEAPOT)
-                .body("Access permitted, anon!");
+                .body(WELCOME_MESSAGE_START + "anon!");
     }
 
     @GetMapping("/user")
@@ -30,7 +29,7 @@ public class TestController {
     public ResponseEntity<String> user() {
         return ResponseEntity
                 .status(HttpStatus.I_AM_A_TEAPOT)
-                .body("Access permitted, user!");
+                .body(WELCOME_MESSAGE_START + "user!");
     }
 
     @GetMapping("/accountant")
@@ -38,7 +37,7 @@ public class TestController {
     public ResponseEntity<String> accountant() {
         return ResponseEntity
                 .status(HttpStatus.I_AM_A_TEAPOT)
-                .body("Access permitted, accountant!");
+                .body(WELCOME_MESSAGE_START + "accountant!");
     }
 
     @GetMapping("/admin")
@@ -46,6 +45,6 @@ public class TestController {
     public ResponseEntity<String> admin() {
         return ResponseEntity
                 .status(HttpStatus.I_AM_A_TEAPOT)
-                .body("Access permitted, admin!");
+                .body(WELCOME_MESSAGE_START + "admin!");
     }
 }
