@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("main")
 @TestClassOrder(ClassOrderer.Random.class)
-public class SecuredEndpointTests {
+public class SecuredEndpointTest {
 
 	@Nested
 	@TestClassOrder(ClassOrderer.Random.class)
