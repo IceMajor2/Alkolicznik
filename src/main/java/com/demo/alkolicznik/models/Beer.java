@@ -19,7 +19,7 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
-public class Beer {
+public class Beer implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -110,6 +110,15 @@ public class Beer {
                 && Objects.equals(type, beer.getType())
                 && Objects.equals(volume, beer.getVolume())
                 && Objects.equals(image, beer.getImage().orElse(null));
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            return (Beer) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

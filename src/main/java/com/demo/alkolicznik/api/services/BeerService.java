@@ -92,7 +92,7 @@ public class BeerService {
         if (this.imageToDelete(beer, updateDTO)) {
             imageService.delete(beerId);
         }
-        return new BeerResponseDTO(beerRepository.save(beer));
+        return new BeerResponseDTO(beerRepository.save(updated));
     }
 
     public BeerDeleteResponseDTO delete(Long beerId) {
@@ -110,10 +110,7 @@ public class BeerService {
     }
 
     private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
-        Beer updated = new Beer();
-        updated.setId(toUpdate.getId());
-        toUpdate.getImage().ifPresent(image -> updated.setImage(image));
-        updated.setPrices(toUpdate.getPrices());
+        Beer updated = (Beer) toUpdate.clone();
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
