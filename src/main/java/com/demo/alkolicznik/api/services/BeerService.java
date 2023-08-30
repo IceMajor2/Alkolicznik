@@ -80,19 +80,22 @@ public class BeerService {
 
     public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
         Beer beer = checkForPatchConditions(beerId, updateDTO);
-        Beer updated = updateFieldsOnPatch(beer, updateDTO);
+        Beer original = (Beer) beer.clone();
+        updateFieldsOnPatch(beer, updateDTO);
 
-        if (beerRepository.exists(updated))
+        if (beerRepository.exists(beer))
             throw new BeerAlreadyExistsException();
         // deleting prices on conditions
         if (this.pricesToDelete(updateDTO)) {
             beer.deleteAllPrices();
         }
         // deleting image on conditions
-        if (this.imageToDelete(beer, updateDTO)) {
-            imageService.delete(beerId);
+        if (this.imageToDelete(original, updateDTO)) {
+            imageService.delete(beer.getImage().get());
         }
-        return new BeerResponseDTO(beerRepository.save(updated));
+        System.out.println(beer);
+        System.out.println(original);
+        return new BeerResponseDTO(beerRepository.save(beer));
     }
 
     public BeerDeleteResponseDTO delete(Long beerId) {
@@ -109,23 +112,21 @@ public class BeerService {
         return this.delete(toDelete.getId());
     }
 
-    private Beer updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
-        Beer updated = (Beer) toUpdate.clone();
+    private void updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
         String updatedBrand = updateDTO.getBrand();
         String updatedType = updateDTO.getType();
         Double updatedVolume = updateDTO.getVolume();
 
         if (updatedBrand != null) {
-            updated.setBrand(updatedBrand);
+            toUpdate.setBrand(updatedBrand);
         }
         if (updatedType != null) {
-            if (updatedType.isBlank()) updated.setType(null);
-            else updated.setType(updatedType);
+            if (updatedType.isBlank()) toUpdate.setType(null);
+            else toUpdate.setType(updatedType);
         }
         if (updatedVolume != null) {
-            updated.setVolume(updatedVolume);
+            toUpdate.setVolume(updatedVolume);
         }
-        return updated;
     }
 
     private Beer updateFieldsOnPut(Beer toOverwrite, Beer newBeer) {
