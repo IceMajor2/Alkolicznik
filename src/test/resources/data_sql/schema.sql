@@ -33,7 +33,7 @@ CREATE TABLE beer_image (
     beer_id BIGINT NOT NULL,
     remote_id VARCHAR(255),
     url VARCHAR(255),
-    image_component BLOB(1024),
+    image_component LONGVARBINARY,
     PRIMARY KEY (beer_id),
     FOREIGN KEY (beer_id) REFERENCES beer(id)
 );
@@ -43,7 +43,7 @@ CREATE TABLE store_image (
 	store_name VARCHAR(255) NOT NULL UNIQUE,
     url VARCHAR(255) NOT NULL,
     remote_id VARCHAR(255),
-    image_component BLOB(1024),
+    image_component LONGVARBINARY,
     PRIMARY KEY (id)
 );
 
