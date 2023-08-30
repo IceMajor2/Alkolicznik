@@ -3,9 +3,10 @@ package com.demo.alkolicznik.utils;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -101,13 +102,8 @@ public class TestUtils {
         return null;
     }
 
-    public static User getUser(int id, List<User> users) {
-        for (User user : users) {
-            if (user.getId().intValue() == id) {
-                return user;
-            }
-        }
-        return null;
+    public static Cookie createTokenCookie(String token) {
+        return CookieUtils.createTokenCookie(token);
     }
 
     public static String buildURI(String uriString, Map<String, ?> parameters) {
