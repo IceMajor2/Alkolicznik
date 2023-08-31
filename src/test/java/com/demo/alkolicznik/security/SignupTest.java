@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_BODY;
@@ -33,14 +34,15 @@ public class SignupTest {
             "D3F3t!, WjwWmjrjAaheZg"
     })
     @DisplayName("POST: '/api/auth/signup'")
+    @DirtiesContext
     public void shouldCreateNewUserWhenSignupWithRequirementsInCheck(String username, String password) {
         // given
         SignupRequestDTO request = createSignupRequest(username, password);
         // when
         var response = postRequest("/api/auth/signup", request);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         SignupResponseDTO actual = toModel(response.getBody(), SignupResponseDTO.class);
-        String role = actual.getRole();
+        String role = actual.getRole().toLowerCase();
         String token = actual.getToken();
         // then
         response = getRequestJWT("/api/test/" + role, createTokenCookie(token));
