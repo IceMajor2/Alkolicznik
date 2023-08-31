@@ -35,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
-    public AuthResponseDTO authenticate(@RequestBody AuthRequestDTO request,
+    public AuthResponseDTO authenticate(@RequestBody @Valid AuthRequestDTO request,
                                         HttpServletResponse response) {
         AuthResponseDTO tokenDTO = authService.authenticate(request);
         response.addCookie(CookieUtils.createTokenCookie(tokenDTO.getToken()));
