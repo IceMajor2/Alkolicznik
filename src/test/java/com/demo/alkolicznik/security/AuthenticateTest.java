@@ -99,4 +99,24 @@ public class AuthenticateTest {
                 "/api/auth/authenticate"
         );
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "zubron, ' \n \t '",
+            "oedipus, null",
+            "master2000, ''",
+    }, nullValues = "null")
+    @DisplayName("POST: '/api/auth/authenticate' password missing")
+    public void shouldReturn400OnMissingPasswordInLoginProcess(String username, String password) {
+        // given
+        AuthRequestDTO credentials = createAuthRequest(username, password);
+        // when
+        var response = postRequest("/api/auth/authenticate", credentials);
+        // then
+        assertIsError(response.getBody(),
+                HttpStatus.BAD_REQUEST,
+                "You did not specify a password",
+                "/api/auth/authenticate"
+        );
+    }
 }
