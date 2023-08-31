@@ -25,17 +25,16 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
-import static com.demo.alkolicznik.utils.TestUtils.*;
-import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeerImage;
+import static com.demo.alkolicznik.utils.JsonUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "enable.image.database=true")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class BeerImageTest {

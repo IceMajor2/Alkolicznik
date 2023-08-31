@@ -32,8 +32,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static com.demo.alkolicznik.utils.TestUtils.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "enable.image.database=true")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreImageTest {
