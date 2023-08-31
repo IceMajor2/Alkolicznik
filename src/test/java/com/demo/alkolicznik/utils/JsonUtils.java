@@ -38,6 +38,10 @@ public class JsonUtils {
         return new AuthRequestDTO(username, password);
     }
 
+    public static SignupRequestDTO createSignupRequest(String username, String password) {
+        return new SignupRequestDTO(username, password);
+    }
+
     public static StoreRequestDTO createStoreRequest(String name, String city, String street) {
         StoreRequestDTO request = new StoreRequestDTO();
         request.setName(name);
