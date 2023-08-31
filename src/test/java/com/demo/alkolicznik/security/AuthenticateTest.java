@@ -11,11 +11,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_BODY;
+import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_OK_CODE;
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getUserRoleLowerCase;
 import static com.demo.alkolicznik.utils.JsonUtils.createAuthRequest;
@@ -29,9 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles({"main", "test-controller", "no-vaadin"})
 @TestMethodOrder(MethodOrderer.Random.class)
 public class AuthenticateTest {
-
-    private static final HttpStatusCode TEST_ENDPOINT_OK_CODE = HttpStatus.I_AM_A_TEAPOT;
-    private static String TEST_ENDPOINT_BODY = "Access granted, ";
 
     private List<User> users;
 
