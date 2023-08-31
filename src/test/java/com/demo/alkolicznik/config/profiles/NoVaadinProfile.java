@@ -1,21 +1,14 @@
 package com.demo.alkolicznik.config.profiles;
 
 import com.demo.alkolicznik.security.config.SecurityVaadinConfig;
-import com.vaadin.flow.spring.SpringBootAutoConfiguration;
-import com.vaadin.flow.spring.SpringSecurityAutoConfiguration;
-import com.vaadin.flow.spring.VaadinScopesConfig;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@EnableAutoConfiguration(exclude = {
-        VaadinScopesConfig.class,
-        SpringBootAutoConfiguration.class,
-        SpringSecurityAutoConfiguration.class,
-})
 @Profile("no-vaadin")
+@PropertySource("classpath:profiles/no-vaadin.properties")
 public class NoVaadinProfile {
 
     @MockBean
