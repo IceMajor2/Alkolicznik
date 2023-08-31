@@ -68,13 +68,33 @@ public class AuthenticateTest {
             "kacprox07, haslo",
             "jacek, Cr1($dkao2,1-s;a"
     })
-    @DisplayName("POST: '/api/auth/authenticate'")
+    @DisplayName("POST: '/api/auth/authenticate' wrong password")
     public void shouldReturn404OnWrongPassword(String username, String password) {
         // given
         AuthRequestDTO credentials = createAuthRequest(username, password);
         // when
         var response = postRequest("/api/auth/authenticate", credentials);
+        // then
+        assertIsError(response.getBody(),
+                HttpStatus.NOT_FOUND,
+                "Could not log in: wrong credentials",
+                "/api/auth/authenticate"
+        );
+    }
 
+    @ParameterizedTest
+    @CsvSource({
+            "krzyzak, bork!tomasz_nn!$63;mal",
+            "xXx_dragon69, w44Rior1!!+_pap",
+            "kris_PL, b33R!MyL0ve:)91!"
+    })
+    @DisplayName("POST: '/api/auth/authenticate' wrong credentials")
+    public void shouldReturn404OnWrongCredentials(String username, String password) {
+        // given
+        AuthRequestDTO credentials = createAuthRequest(username, password);
+        // when
+        var response = postRequest("/api/auth/authenticate", credentials);
+        // then
         assertIsError(response.getBody(),
                 HttpStatus.NOT_FOUND,
                 "Could not log in: wrong credentials",
