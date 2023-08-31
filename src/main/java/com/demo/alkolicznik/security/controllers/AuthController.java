@@ -3,6 +3,7 @@ package com.demo.alkolicznik.security.controllers;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
+import com.demo.alkolicznik.dto.security.SignupResponseDTO;
 import com.demo.alkolicznik.security.services.AuthService;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,9 +25,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponseDTO> signup
+    public ResponseEntity<SignupResponseDTO> signup
             (@RequestBody @Valid SignupRequestDTO request) {
-        AuthResponseDTO response = authService.register(request);
+        SignupResponseDTO response = authService.register(request);
         return ResponseEntity.created(ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .build()

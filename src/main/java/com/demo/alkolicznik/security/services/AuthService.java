@@ -3,10 +3,12 @@ package com.demo.alkolicznik.security.services;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
+import com.demo.alkolicznik.dto.security.SignupResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
+import com.demo.alkolicznik.utils.ModelDtoConverter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +28,7 @@ public class AuthService {
 
     private final AuthenticationManager authManager;
 
-    public AuthResponseDTO register(SignupRequestDTO request) {
+    public SignupResponseDTO register(SignupRequestDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException();
         }
@@ -35,9 +37,9 @@ public class AuthService {
         user.setPassword(passwordEncoder
                 .encode(request.getPassword()));
         assignRoles(user);
-        userRepository.save(user);
+        User saved = userRepository.save(user);
         String jwt = jwtService.generateToken(user);
-        return new AuthResponseDTO(jwt);
+        return ModelDtoConverter.convertToResponse(saved, jwt);
     }
 
     private void assignRoles(User user) {

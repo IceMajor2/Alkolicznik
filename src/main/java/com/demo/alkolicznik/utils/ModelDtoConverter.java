@@ -6,12 +6,14 @@ import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.security.SignupResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
 
@@ -122,5 +124,14 @@ public class ModelDtoConverter {
 		storeRequest.setCity(store.getCity());
 		storeRequest.setStreet(store.getStreet());
 		return storeRequest;
+	}
+
+	public static SignupResponseDTO convertToResponse(User user, String token) {
+		SignupResponseDTO response = new SignupResponseDTO();
+		response.setId(user.getId());
+		response.setRole(user.getRole().name());
+		response.setUsername(user.getUsername());
+		response.setToken(token);
+		return response;
 	}
 }
