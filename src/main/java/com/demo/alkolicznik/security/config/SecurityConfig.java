@@ -3,7 +3,7 @@ package com.demo.alkolicznik.security.config;
 import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-@ConditionalOnMissingBean(type = "com.demo.alkolicznik.config.NoSecurityConfig")
+@ConditionalOnProperty(prefix = "security", value = "config.enabled", havingValue = "true", matchIfMissing = true)
 public class SecurityConfig {
 
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
