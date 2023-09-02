@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@Primary
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = false)
 @Profile("no-security")

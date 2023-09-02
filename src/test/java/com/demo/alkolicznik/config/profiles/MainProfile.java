@@ -25,6 +25,12 @@ public class MainProfile {
 
     private static JdbcTemplate jdbcTemplate;
 
+    @Bean
+    @Primary
+    public String imageKitPath2() {
+        return "/test";
+    }
+
     @Bean("jdbcTemplate")
     @DependsOn("dataSource")
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
@@ -65,12 +71,6 @@ public class MainProfile {
         String sql = "SELECT * FROM users";
         List<User> users = DatabaseTableConverters.convertToUserList(sql);
         return users;
-    }
-
-    @Bean("imageKitPath")
-    @Primary
-    public String imageKitPath2() {
-        return "/test";
     }
 
     @Bean("dataSource")

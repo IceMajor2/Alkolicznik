@@ -66,6 +66,11 @@ public class ImageProfile {
         this.testUtils = testUtils;
     }
 
+    @Autowired
+    public void setImageKitPath(String imageKitPath) {
+        ImageProfile.imageKitPath = imageKitPath;
+    }
+
     @Bean("beerImages")
     @DependsOn("beers")
     @ConditionalOnProperty(prefix = "database.table.image", name = "enabled", havingValue = "true")
@@ -90,11 +95,6 @@ public class ImageProfile {
         updateStoreImageRemoteId(storeImages);
         updateUrlsWithUpdatedAt(storeImages, "store_image", "id");
         return storeImages;
-    }
-
-    @Autowired
-    public void setImageKitPath(String imageKitPath) {
-        ImageProfile.imageKitPath = imageKitPath;
     }
 
     @PostConstruct
@@ -144,7 +144,6 @@ public class ImageProfile {
     private void sendImages(String srcPath, String remotePath) throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException, IOException, IllegalAccessException, InstantiationException {
         GetFileListRequest getFileListRequest = new GetFileListRequest();
         getFileListRequest.setPath(remotePath);
-
         Map<String, String> baseFiles = this.imageKit.getFileList(getFileListRequest)
                 .getResults()
                 .stream()
