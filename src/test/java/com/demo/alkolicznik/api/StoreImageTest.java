@@ -438,12 +438,10 @@ public class StoreImageTest {
         @TestMethodOrder(MethodOrderer.Random.class)
         @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
         class PostRequests {
-            //
-            private List<Store> stores;
 
+            private List<Store> stores;
             private List<StoreImage> storeImages;
 
-            //
             @Autowired
             public PostRequests(List<Store> stores, List<StoreImage> storeImages) {
                 this.stores = stores;
@@ -574,71 +572,71 @@ public class StoreImageTest {
                 assertThat(actualImage.getStoreImage().getRemoteId()).isEqualTo(expected.getRemoteId());
                 assertThat(actualImage.getStoreImage().getImageUrl()).isEqualTo(expected.getImageUrl());
             }
+        }
 
-            @Nested
-            @TestMethodOrder(MethodOrderer.Random.class)
-            @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-            class DeleteRequests {
+        @Nested
+        @TestMethodOrder(MethodOrderer.Random.class)
+        @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+        class DeleteRequests {
 
-                private List<Store> stores;
+            private List<Store> stores;
 
-                @Autowired
-                public DeleteRequests(List<Store> stores) {
-                    this.stores = stores;
-                }
+            @Autowired
+            public DeleteRequests(List<Store> stores) {
+                this.stores = stores;
+            }
 
-                @ParameterizedTest
-                @ValueSource(longs = {1, 8})
-                @DisplayName("DELETE: '/api/store/{store_id}'")
-                @DirtiesContext
-                public void deletingOneOfMultipleStoresShouldNotDeleteImageTest(Long storeId) {
-                    Store store = getStore(storeId.longValue(), stores);
-                    // when
-                    var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
-                    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                    var getResponse = getRequestAuth("admin", "admin", "/api/store");
-                    List<String> actualURLs =
-                            toModelList(getResponse.getBody(), StoreResponseDTO.class)
-                                    .stream()
-                                    .filter(storeResponse ->
-                                            storeResponse.getName().equals(store.getName()))
-                                    .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
-                                    .toList();
-                    BufferedImage actualComp = getBufferedImageFromWeb(actualURLs.get(0));
-                    // then
-                    String expectedURL = store.getImage().get().getImageUrl();
-                    BufferedImage expectedComp = getBufferedImageFromWeb(expectedURL);
-                    assertThat(actualURLs).containsOnly(expectedURL);
-                    BufferedImageAssert.assertThat(actualComp).isEqualTo(expectedComp);
-                }
+            @ParameterizedTest
+            @ValueSource(longs = {1, 8})
+            @DisplayName("DELETE: '/api/store/{store_id}'")
+            @DirtiesContext
+            public void deletingOneOfMultipleStoresShouldNotDeleteImageTest(Long storeId) {
+                Store store = getStore(storeId.longValue(), stores);
+                // when
+                var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
+                assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                var getResponse = getRequestAuth("admin", "admin", "/api/store");
+                List<String> actualURLs =
+                        toModelList(getResponse.getBody(), StoreResponseDTO.class)
+                                .stream()
+                                .filter(storeResponse ->
+                                        storeResponse.getName().equals(store.getName()))
+                                .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
+                                .toList();
+                BufferedImage actualComp = getBufferedImageFromWeb(actualURLs.get(0));
+                // then
+                String expectedURL = store.getImage().get().getImageUrl();
+                BufferedImage expectedComp = getBufferedImageFromWeb(expectedURL);
+                assertThat(actualURLs).containsOnly(expectedURL);
+                BufferedImageAssert.assertThat(actualComp).isEqualTo(expectedComp);
+            }
 
-                @ParameterizedTest
-                @ValueSource(longs = {4, 5})
-                @DisplayName("DELETE: '/api/store/{store_id}' last-entity-standing")
-                @DirtiesContext
-                public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) throws InterruptedException {
-                    Store store = getStore(storeId.longValue(), stores);
-                    // when
-                    var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
-                    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                    var getResponse = getRequestAuth("admin", "admin", "/api/store");
-                    List<String> actualURLs =
-                            toModelList(getResponse.getBody(), StoreResponseDTO.class)
-                                    .stream()
-                                    .filter(storeResponse ->
-                                            storeResponse.getName().equals(store.getName()))
-                                    .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
-                                    .toList();
-                    // then
-                    Thread.sleep(2000);
-                    assertThat(actualURLs)
-                            .withFailMessage("Store was supposed to be deleted")
-                            .isEmpty();
-                    String urlExpectedToNotExist = store.getImage().get().getImageUrl();
-                    assertThat(getBufferedImageFromWeb(urlExpectedToNotExist))
-                            .withFailMessage("Image was not deleted remotely")
-                            .isNull();
-                }
+            @ParameterizedTest
+            @ValueSource(longs = {4, 5})
+            @DisplayName("DELETE: '/api/store/{store_id}' last-entity-standing")
+            @DirtiesContext
+            public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) throws InterruptedException {
+                Store store = getStore(storeId.longValue(), stores);
+                // when
+                var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
+                assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                var getResponse = getRequestAuth("admin", "admin", "/api/store");
+                List<String> actualURLs =
+                        toModelList(getResponse.getBody(), StoreResponseDTO.class)
+                                .stream()
+                                .filter(storeResponse ->
+                                        storeResponse.getName().equals(store.getName()))
+                                .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
+                                .toList();
+                // then
+                Thread.sleep(2000);
+                assertThat(actualURLs)
+                        .withFailMessage("Store was supposed to be deleted")
+                        .isEmpty();
+                String urlExpectedToNotExist = store.getImage().get().getImageUrl();
+                assertThat(getBufferedImageFromWeb(urlExpectedToNotExist))
+                        .withFailMessage("Image was not deleted remotely")
+                        .isNull();
             }
         }
     }
