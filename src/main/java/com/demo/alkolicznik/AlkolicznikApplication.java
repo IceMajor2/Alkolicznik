@@ -21,7 +21,7 @@ public class AlkolicznikApplication implements AppShellConfigurator {
         SpringApplication.run(AlkolicznikApplication.class, args);
     }
 
-    @Bean
+    @Bean("imageKitPath")
     public String imageKitPath() {
         return "/main";
     }
