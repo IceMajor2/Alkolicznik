@@ -23,7 +23,8 @@ import java.util.Set;
 public class StoreImage extends ImageModel implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "storeImgIdSeq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "store_generator")
+    @SequenceGenerator(name = "store_generator", sequenceName = "storeImgIdSeq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
