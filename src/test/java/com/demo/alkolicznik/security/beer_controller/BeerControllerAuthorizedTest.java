@@ -1,114 +1,124 @@
 package com.demo.alkolicznik.security.beer_controller;
 
-import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.demo.alkolicznik.dto.security.AuthRequestDTO;
+import com.demo.alkolicznik.security.services.AuthService;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
+import java.util.stream.Stream;
+
+import static com.demo.alkolicznik.utils.TestUtils.createTokenCookie;
+import static com.demo.alkolicznik.utils.requests.JWTRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.Random.class)
 @ActiveProfiles({"main", "no-vaadin"})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BeerControllerAuthorizedTest {
 
+    private static AuthService authService;
+
+    private static final BeerRequestDTO VALID_POST_REQUEST = new BeerRequestDTO("Lomza", "Pelne", 0.33);
+    private static final BeerUpdateDTO VALID_PATCH_REQUEST = new BeerUpdateDTO(null, "", 0.5);
+    private static final BeerRequestDTO VALID_DELETE_REQUEST = new BeerRequestDTO("Ksiazece", "Zlote pszeniczne", null);
+    private static String accountantToken;
+    private static String adminToken;
+
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        BeerControllerAuthorizedTest.authService = authService;
+    }
+
+    @BeforeEach
+    void setup() {
+        accountantToken = authService.authenticate
+                        (new AuthRequestDTO("accountant", "accountant"))
+                .getToken();
+        adminToken = authService.authenticate
+                        (new AuthRequestDTO("admin", "admin"))
+                .getToken();
+    }
+
+    private static Stream<Arguments> adminTokens() {
+        return Stream.of(
+                Arguments.of(accountantToken),
+                Arguments.of(adminToken)
+        );
+    }
+
+    @Test
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    void loadContext() {
+        // This "test" is only for loading the context, so that
+        // the method sources may be used successfully
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = {"accountant", "admin"})
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted GET endpoints")
-    public void authorizedRestrictedEndpointsTest(String credentials) {
+    public void authorizedRestrictedEndpointsTest(String adminToken) {
         String endpoint = "/api/beer";
-        var response = getRequestAuth(credentials, credentials, endpoint);
+        var response = getRequestJWT(endpoint, createTokenCookie(adminToken));
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "accountant, Lomza, Jasne, 0.33",
-            "admin, Manufaktura Piwna, Piwo na miodzie gryczanym, null"
-    }, nullValues = "null")
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted POST endpoints")
     @DirtiesContext
-    public void authorizedRestrictedPostEndpointsTest(String credentials,
-                                                      String brand, String type, Double volume) {
+    public void authorizedRestrictedPostEndpointsTest(String adminToken) {
         String endpoint = "/api/beer";
-        BeerRequestDTO request = createBeerRequest(brand, type, volume);
-
-        var response = postRequestAuth(credentials, credentials, endpoint, request);
+        var response = postRequestJWT(endpoint, createTokenCookie(adminToken), VALID_POST_REQUEST);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "admin, 3, Manufaktura Piwna, Piwo na miodzie gryczanym, null",
-            "accountant, 5, Tyskie, IPA, 0.33"
-    }, nullValues = "null")
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted PUT endpoints")
     @DirtiesContext
-    public void authorizedRestrictedPutEndpointsTest(String credentials, Long beerId,
-                                                     String brand, String type, Double volume) {
-        String endpoint = "/api/beer/" + beerId;
-        BeerRequestDTO request = createBeerRequest(brand, type, volume);
-
-        var response = putRequestAuth(credentials, credentials, endpoint, request);
+    public void authorizedRestrictedPutEndpointsTest(String adminToken) {
+        String endpoint = "/api/beer/" + 1;
+        var response = putRequestJWT(endpoint, createTokenCookie(adminToken), VALID_POST_REQUEST);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "admin, 2, Miloslaw, null, 0.33",
-            "accountant, 1, null, Porter, null"
-    }, nullValues = "null")
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted PATCH requests")
     @DirtiesContext
-    public void authorizedRestrictedPatchRequestsTest(String credentials, Long beerId,
-                                                      String brand, String type, Double volume) {
-        String endpoint = "/api/beer/" + beerId;
-        BeerUpdateDTO request = createBeerUpdateRequest(brand, type, volume);
-
-        var response = patchRequestAuth(credentials, credentials, endpoint, request);
+    public void authorizedRestrictedPatchRequestsTest(String adminToken) {
+        String endpoint = "/api/beer/" + 3;
+        var response = patchRequestJWT(endpoint, createTokenCookie(adminToken), VALID_PATCH_REQUEST);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "admin, Ksiazece, Zlote pszeniczne, null",
-            "accountant, Zubr, null, 0.5"
-    }, nullValues = "null")
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted DELETE by object requests")
     @DirtiesContext
-    public void authorizedRestrictedDeleteByObjectRequestsTest(String credentials,
-                                                               String brand, String type, Double volume) {
-        // given
+    public void authorizedRestrictedDeleteByObjectRequestsTest(String adminToken) {
         String endpoint = "/api/beer";
-        BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
-
-        // when
-        var response = deleteRequestAuth(credentials, credentials, endpoint, request);
+        var response = deleteRequestJWT(endpoint, createTokenCookie(adminToken), VALID_DELETE_REQUEST);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "admin, 7",
-            "accountant, 4"
-    })
+    @MethodSource("adminTokens")
     @DisplayName("[ACC/ADMIN]: restricted DELETE by id requests")
     @DirtiesContext
-    public void authorizedRestrictedDeleteByIdRequestsTest(String credentials, Long beerId) {
-        // when
-        String endpoint = "/api/beer/" + beerId;
-        var response = deleteRequestAuth(credentials, credentials, endpoint);
+    public void authorizedRestrictedDeleteByIdRequestsTest(String adminToken) {
+        String endpoint = "/api/beer/" + 6;
+        var response = deleteRequestJWT(endpoint, createTokenCookie(adminToken));
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 }
