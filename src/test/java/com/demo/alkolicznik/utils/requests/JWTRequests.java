@@ -24,6 +24,31 @@ public class JWTRequests {
                 .exchange(endpoint, HttpMethod.GET, new HttpEntity<>(getCookieHeader(cookie)), String.class);
     }
 
+    public static <T> ResponseEntity<String> postRequestJWT(String endpoint, Cookie cookie, Object object) {
+        return testRestTemplate
+                .exchange(endpoint, HttpMethod.POST, new HttpEntity<>(object, getCookieHeader(cookie)), String.class);
+    }
+
+    public static <T> ResponseEntity<String> putRequestJWT(String endpoint, Cookie cookie, Object object) {
+        return testRestTemplate
+                .exchange(endpoint, HttpMethod.PUT, new HttpEntity<>(object, getCookieHeader(cookie)), String.class);
+    }
+
+    public static <T> ResponseEntity<String> patchRequestJWT(String endpoint, Cookie cookie, Object object) {
+        return testRestTemplate
+                .exchange(endpoint, HttpMethod.PATCH, new HttpEntity<>(object, getCookieHeader(cookie)), String.class);
+    }
+
+    public static <T> ResponseEntity<String> deleteRequestJWT(String endpoint, Cookie cookie, Object object) {
+        return testRestTemplate
+                .exchange(endpoint, HttpMethod.DELETE, new HttpEntity<>(object, getCookieHeader(cookie)), String.class);
+    }
+
+    public static <T> ResponseEntity<String> deleteRequestJWT(String endpoint, Cookie cookie) {
+        return testRestTemplate
+                .exchange(endpoint, HttpMethod.DELETE, new HttpEntity<>(getCookieHeader(cookie)), String.class);
+    }
+
     private static HttpHeaders getCookieHeader(Cookie cookie) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", "token=" + cookie.getValue());
