@@ -4,7 +4,6 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
-import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.Utils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.html.Image;
@@ -39,12 +38,10 @@ public class GuiUtils {
         }
     }
 
-    public static int[] getNewDimensions(StoreImage storeImage) {
-        BufferedImage image = Utils.getBufferedImageFromWeb(storeImage.getImageUrl());
+    public static int[] dimensionsForStoreImage(String imageSrcUrl) {
+        BufferedImage image = Utils.getBufferedImageFromWeb(imageSrcUrl);
         int height = image.getHeight();
         int width = image.getWidth();
-        if (height * 3.5 < width) throw new RuntimeException("Image is too wide");
-
         if (height <= 80) return new int[]{height, width};
 
         double resizeBy = height / 80.0;

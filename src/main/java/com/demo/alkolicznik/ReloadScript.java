@@ -138,7 +138,9 @@ public class ReloadScript implements CommandLineRunner {
 
         for (var remoteFile : externalFiles) {
             storeImageRepository.findByImageUrl(remoteFile.getUrl()).ifPresent(storeImage -> {
-                int[] dimensions = GuiUtils.getNewDimensions(storeImage);
+                // the addition of updatedAt key-value pair prevents from fetching
+                // different image version from ImageKit API
+                int[] dimensions = GuiUtils.dimensionsForStoreImage(storeImage.getImageUrl() + "?updatedAt=1");
                 String mappedUrl = imageKitRepository
                         .scaleTransformation(remoteFile.getFileId(), dimensions[0], dimensions[1]);
                 storeImage.setImageUrl(mappedUrl);

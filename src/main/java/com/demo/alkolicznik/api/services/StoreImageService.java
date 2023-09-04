@@ -7,6 +7,7 @@ import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.image.ImageProportionsInvalidException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.models.Store;
@@ -78,9 +79,10 @@ public class StoreImageService {
         StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
                 createFilename(storeName, getExtensionFromPath(imagePath)), StoreImage.class);
         storeImage.setStoreName(storeName);
-        // set StoreImage's width and height that will be used
-        // to resize image using ImageKit's transformations
-        int[] newImageDimensions = GuiUtils.getNewDimensions(storeImage);
+
+        // the addition of updatedAt key-value pair prevents from fetching
+        // different image version from ImageKit API
+        int[] newImageDimensions = GuiUtils.dimensionsForStoreImage(storeImage.getImageUrl() + "?updatedAt=1");
         String transformedUrl = imageKitRepository.scaleTransformation
                 (storeImage.getRemoteId(), newImageDimensions[0], newImageDimensions[1]);
         storeImage.setImageUrl(transformedUrl);
@@ -115,10 +117,18 @@ public class StoreImageService {
         return storeImageRepository.findByStoreName(name);
     }
 
-    private void fileCheck(File file) {
+    private BufferedImage fileCheck(File file) {
         if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
         BufferedImage image = getBufferedImageFromLocal(file.getAbsolutePath());
         if (image == null) throw new FileIsNotImageException();
+        sizeCheck(image);
+        return image;
+    }
+
+    private void sizeCheck(BufferedImage image) {
+        int height = image.getHeight();
+        int width = image.getWidth();
+        if (height * 3.5 < width) throw new ImageProportionsInvalidException("Image is too wide");
     }
 
     private String createFilename(String storeName, String extension) {
