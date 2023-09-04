@@ -60,7 +60,7 @@ public class StoreController {
 	}
 
 	@GetMapping
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
 	public List<StoreResponseDTO> getAll() {
 		return storeService.getStores();
@@ -147,7 +147,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content)
 	})
 	@DeleteMapping("/{store_id}")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
 	public StoreDeleteDTO deleteByParam(@PathVariable("store_id") Long storeId) {
 		return storeService.delete(storeId);

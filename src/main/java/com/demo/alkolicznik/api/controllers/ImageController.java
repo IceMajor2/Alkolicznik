@@ -1,29 +1,20 @@
 package com.demo.alkolicznik.api.controllers;
 
-import java.net.URI;
-import java.util.List;
-
 import com.demo.alkolicznik.api.services.BeerImageService;
 import com.demo.alkolicznik.api.services.StoreImageService;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -40,7 +31,7 @@ public class ImageController {
 	}
 
 	@GetMapping("/beer/image")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	public List<ImageResponseDTO> getAllBeerImages() {
 		return beerImageService.getAll();
 	}
@@ -61,7 +52,7 @@ public class ImageController {
 	}
 
 	@DeleteMapping("/beer/{beer_id}/image")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	public ImageDeleteDTO deleteBeerImage(@PathVariable("beer_id") Long beerId) {
 		return beerImageService.delete(beerId);
 	}
@@ -72,7 +63,7 @@ public class ImageController {
 	}
 
 	@GetMapping("/store/image")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	public List<ImageResponseDTO> getAllStoreImages() {
 		return storeImageService.getAll();
 	}
@@ -109,7 +100,7 @@ public class ImageController {
 	}
 
 	@DeleteMapping("/store/image")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	public ImageDeleteDTO deleteStoreImage(@RequestParam("name") String storeName) {
 		storeName = storeName.replace("%20", " ");
 		return storeImageService.delete(storeName);

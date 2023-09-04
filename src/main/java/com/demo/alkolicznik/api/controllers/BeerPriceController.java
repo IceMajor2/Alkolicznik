@@ -1,8 +1,5 @@
 package com.demo.alkolicznik.api.controllers;
 
-import java.net.URI;
-import java.util.List;
-
 import com.demo.alkolicznik.api.services.BeerPriceService;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
@@ -15,20 +12,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -65,7 +56,7 @@ public class BeerPriceController {
 	}
 
 	@GetMapping("/beer-price")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
 	public List<BeerPriceResponseDTO> getAll() {
 		return beerPriceService.getAll();
@@ -148,7 +139,7 @@ public class BeerPriceController {
 	}
 
 	@PostMapping(value = "/store/{store_id}/beer-price", params = { "beer_id", "beer_price" })
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	@SecurityRequirement(name = "Basic Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByParam(
 			@PathVariable("store_id") Long storeId,
@@ -191,7 +182,7 @@ public class BeerPriceController {
 	}
 
 	@DeleteMapping("/beer-price")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ACCOUNTANT')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
 	@Operation(summary = "Delete price",
 			description = "In case of you not selling a beer not anymore, "
 					+ "delete it from our application. Customers will be glad!")
