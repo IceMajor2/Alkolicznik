@@ -64,12 +64,17 @@ public class WelcomeView extends VerticalLayout {
         H1 header = new H1("Alkolicznik");
         Button beers = new Button("Beers", click -> UI.getCurrent().navigate("beer"));
         Button stores = new Button("Stores", click -> UI.getCurrent().navigate("store"));
-        Button button = new Button("Prices", click -> UI.getCurrent().navigate("beer-price"));
+        Button prices = new Button("Prices", click -> UI.getCurrent().navigate("beer-price"));
+        Button images = null;
+        if (AuthenticatedUser.hasAccountantRole())
+            images = new Button("Upload image", click -> UI.getCurrent().navigate("image"));
 
         components.add(header);
         components.add(beers);
         components.add(stores);
-        components.add(button);
+        components.add(prices);
+        if(images != null)
+            components.add(images);
         return components;
     }
 }
