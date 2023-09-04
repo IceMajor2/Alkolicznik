@@ -15,19 +15,20 @@ public class AuthenticatedUser {
 
 	public static boolean isUser() {
 		User user = getLoggedUserFromContext();
+		if(user == null) return false;
 		return user.isUser();
 	}
 
 	public static boolean hasAccountantRole() {
 		User user = getLoggedUserFromContext();
+		if(user == null) return false;
 		return user.hasAccountantRole();
 	}
 
 	private static User getLoggedUserFromContext() {
-		try {
-			return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		} catch(NullPointerException e) {
+		if(!isAuthenticated()) {
 			return null;
 		}
+		return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 }
