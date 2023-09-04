@@ -42,17 +42,14 @@ public class MainLayout extends AppLayout {
         RouterLink storeView = new RouterLink("Stores", StoreView.class);
         RouterLink pricesView = new RouterLink("Prices", BeerPriceView.class);
         RouterLink imagesView = null;
-        if(AuthenticatedUser.hasAccountantRole())
+        if (AuthenticatedUser.hasAccountantRole())
             imagesView = new RouterLink("Images", ImageView.class);
         beerView.setHighlightCondition(HighlightConditions.sameLocation());
 
-        addToDrawer(new VerticalLayout(
-                homeView,
-                beerView,
-                storeView,
-                pricesView
-        ));
-        if(imagesView != null) addToDrawer(imagesView);
+        VerticalLayout drawerLayout = new VerticalLayout();
+        drawerLayout.add(homeView, beerView, storeView, pricesView);
+        if (imagesView != null) drawerLayout.add(imagesView);
+        addToDrawer(drawerLayout);
     }
 
     private Button getAuthButton() {
