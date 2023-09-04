@@ -10,7 +10,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 @Route(value = "image", layout = MainLayout.class)
 @PageTitle("Upload image | Alkolicznik")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "ACCOUNTANT"})
 public class ImageView extends VerticalLayout {
 
     public ImageView() {
