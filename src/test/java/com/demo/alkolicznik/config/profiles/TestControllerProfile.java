@@ -27,7 +27,7 @@ public class TestControllerProfile {
     }
 
     @GetMapping("/user")
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> user() {
         return ResponseEntity
                 .status(TEST_ENDPOINT_OK_CODE)
@@ -35,7 +35,7 @@ public class TestControllerProfile {
     }
 
     @GetMapping("/accountant")
-    @PreAuthorize("hasAuthority('ACCOUNTANT')")
+    @PreAuthorize("hasRole('ACCOUNTANT')")
     public ResponseEntity<String> accountant() {
         return ResponseEntity
                 .status(TEST_ENDPOINT_OK_CODE)
@@ -43,7 +43,7 @@ public class TestControllerProfile {
     }
 
     @GetMapping("/admin")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> admin() {
         return ResponseEntity
                 .status(TEST_ENDPOINT_OK_CODE)
