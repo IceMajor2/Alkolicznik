@@ -4,7 +4,9 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreNameDTO;
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,8 +36,7 @@ public class ImageView extends VerticalLayout {
     private FileBuffer fileBuffer;
     private ComboBox<BeerResponseDTO> beerBox;
     private ComboBox<StoreNameDTO> storeBox;
-
-    // TODO: handle exceptions and radio button group change
+    
     public ImageView() {
         this.radioGroup = getRadioButtonGroup();
         add(radioGroup);
@@ -61,8 +62,12 @@ public class ImageView extends VerticalLayout {
                 if (store != null) {
                     String path = fileBuffer.getFileData().getFile().getAbsolutePath();
                     Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-                    RequestUtils.request(HttpMethod.POST, "/api/store/image", Map.of("name", store.getStoreName()),
-                            new ImageRequestDTO(path), authCookie, ImageResponseDTO.class);
+                    try {
+                        RequestUtils.request(HttpMethod.POST, "/api/store/image", Map.of("name", store.getStoreName()),
+                                new ImageRequestDTO(path), authCookie, ImageResponseDTO.class);
+                    } catch (ApiException e) {
+                        GuiUtils.showError(e.getMessage());
+                    }
                 }
             });
         });
@@ -75,8 +80,12 @@ public class ImageView extends VerticalLayout {
                 if (beer != null) {
                     String path = fileBuffer.getFileData().getFile().getAbsolutePath();
                     Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-                    RequestUtils.request(HttpMethod.POST, "/api/beer/" + beer.getId() + "/image",
-                            new ImageRequestDTO(path), authCookie, BeerResponseDTO.class);
+                    try {
+                        RequestUtils.request(HttpMethod.POST, "/api/beer/" + beer.getId() + "/image",
+                                new ImageRequestDTO(path), authCookie, BeerResponseDTO.class);
+                    } catch (ApiException e) {
+                        GuiUtils.showError(e.getMessage());
+                    }
                 }
             });
         });
