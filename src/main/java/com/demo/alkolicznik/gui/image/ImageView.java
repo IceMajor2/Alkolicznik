@@ -11,9 +11,11 @@ import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.router.PageTitle;
@@ -31,6 +33,8 @@ import java.util.Map;
 @RolesAllowed({"ADMIN", "ACCOUNTANT"})
 public class ImageView extends VerticalLayout {
 
+    private VerticalLayout uploadLayout;
+    private TabSheet tabSheet;
     private RadioButtonGroup<String> radioGroup;
     private Upload singleUpload;
     private FileBuffer fileBuffer;
@@ -38,8 +42,16 @@ public class ImageView extends VerticalLayout {
     private ComboBox<StoreNameDTO> storeBox;
     
     public ImageView() {
+        this.tabSheet = new TabSheet();
+        tabSheet.add("Upload", getUploadImageComponentFamily());
+        tabSheet.add("Delete", new H1("TODO"));
+        add(tabSheet);
+    }
+
+    private VerticalLayout getUploadImageComponentFamily() {
+        this.uploadLayout = new VerticalLayout();
         this.radioGroup = getRadioButtonGroup();
-        add(radioGroup);
+        uploadLayout.add(radioGroup);
 
         radioGroup.addValueChangeListener(event -> {
             String selection = radioGroup.getOptionalValue().orElse(null);
@@ -53,6 +65,7 @@ public class ImageView extends VerticalLayout {
                 waitForStoreImage();
             }
         });
+        return uploadLayout;
     }
 
     private void waitForStoreImage() {
@@ -109,7 +122,7 @@ public class ImageView extends VerticalLayout {
         this.singleUpload = new Upload(fileBuffer);
         singleUpload.setDropAllowed(true);
         singleUpload.setAutoUpload(false);
-        add(singleUpload);
+        uploadLayout.add(singleUpload);
     }
 
     private void displayItemList(String selection) {
@@ -125,7 +138,7 @@ public class ImageView extends VerticalLayout {
                     authCookie, new TypeReference<>() {
                     });
             beerBox.setItems(beers);
-            add(beerBox);
+            uploadLayout.add(beerBox);
         } else if ("Store".equals(selection)) {
             this.storeBox = new ComboBox<>(selection);
             storeBox.setAllowCustomValue(false);
@@ -136,17 +149,17 @@ public class ImageView extends VerticalLayout {
                     authCookie, new TypeReference<>() {
                     });
             storeBox.setItems(stores);
-            add(storeBox);
+            uploadLayout.add(storeBox);
         }
     }
 
     private void resetIfValueChanged(String selection) {
         if (beerBox != null && beerBox.isAttached() && !"Beer".equals(selection)) {
-            remove(beerBox);
-            remove(singleUpload);
+            uploadLayout.remove(beerBox);
+            uploadLayout.remove(singleUpload);
         } else if (storeBox != null && storeBox.isAttached() && !"Store".equals(selection)) {
-            remove(storeBox);
-            remove(singleUpload);
+            uploadLayout.remove(storeBox);
+            uploadLayout.remove(singleUpload);
         }
     }
 
