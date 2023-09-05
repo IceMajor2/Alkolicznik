@@ -1,10 +1,7 @@
 package com.demo.alkolicznik.api.controllers;
 
 import com.demo.alkolicznik.api.services.StoreService;
-import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.store.StoreRequestDTO;
-import com.demo.alkolicznik.dto.store.StoreResponseDTO;
-import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -64,6 +61,12 @@ public class StoreController {
 	@SecurityRequirement(name = "Basic Authentication")
 	public List<StoreResponseDTO> getAll() {
 		return storeService.getStores();
+	}
+
+	@GetMapping(params = "brand_only")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+	public List<StoreNameDTO> getAllBrands(@RequestParam("brand_only") Object brandOnly) {
+		return storeService.getAllBrands();
 	}
 
 	@Operation(summary = "Add new store",

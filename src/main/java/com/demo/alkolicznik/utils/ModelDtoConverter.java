@@ -7,6 +7,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreNameDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
@@ -52,6 +53,12 @@ public class ModelDtoConverter {
 			beer.setVolume(beerRequestDTO.getVolume());
 		}
 		return beer;
+	}
+
+	public static List<StoreNameDTO> stringListToStoreNameListKeepOrder(Collection<String> storeNames) {
+		return storeNames.stream()
+				.map(StoreNameDTO::new)
+				.toList();
 	}
 
 	public static Store convertToModelNoImage(StoreRequestDTO storeRequestDTO) {

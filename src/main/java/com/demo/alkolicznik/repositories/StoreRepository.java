@@ -1,15 +1,14 @@
 package com.demo.alkolicznik.repositories;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.models.Store;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface StoreRepository extends CrudRepository<Store, Long> {
 
@@ -32,6 +31,9 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices "
 			+ "WHERE s.name = ?1 AND s.city = ?2 AND s.street = ?3")
 	Optional<Store> findByNameAndCityAndStreet(String name, String city, String street);
+
+	@Query("SELECT DISTINCT(s.name) FROM Store s")
+	List<String> findDistinctNames();
 
 	long countByName(String name);
 

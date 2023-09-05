@@ -1,12 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
-import java.util.List;
-import java.util.Optional;
-
-import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.store.StoreRequestDTO;
-import com.demo.alkolicznik.dto.store.StoreResponseDTO;
-import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.*;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
@@ -17,10 +11,13 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.ModelDtoConverter;
 import lombok.AllArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 import static com.demo.alkolicznik.utils.ModelDtoConverter.storeListToDtoList;
+import static com.demo.alkolicznik.utils.ModelDtoConverter.stringListToStoreNameListKeepOrder;
 
 @Service
 @AllArgsConstructor
@@ -45,6 +42,10 @@ public class StoreService {
 		return new StoreResponseDTO(storeRepository.findById(storeId).orElseThrow(() ->
 				new StoreNotFoundException(storeId))
 		);
+	}
+
+	public List<StoreNameDTO> getAllBrands() {
+		return stringListToStoreNameListKeepOrder(storeRepository.findDistinctNames());
 	}
 
 	public StoreResponseDTO add(StoreRequestDTO requestDTO) {
