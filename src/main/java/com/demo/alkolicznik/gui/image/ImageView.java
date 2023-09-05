@@ -2,7 +2,8 @@ package com.demo.alkolicznik.gui.image;
 
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.store.StoreResponseDTO;
+import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreNameDTO;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
@@ -21,6 +22,7 @@ import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpMethod;
 
 import java.util.List;
+import java.util.Map;
 
 @Route(value = "image", layout = MainLayout.class)
 @PageTitle("Upload image | Alkolicznik")
@@ -31,8 +33,9 @@ public class ImageView extends VerticalLayout {
     private Upload singleUpload;
     private FileBuffer fileBuffer;
     private ComboBox<BeerResponseDTO> beerBox;
-    private ComboBox<StoreResponseDTO> storeBox;
+    private ComboBox<StoreNameDTO> storeBox;
 
+    // TODO: handle exceptions and radio button group change
     public ImageView() {
         this.radioGroup = getRadioButtonGroup();
         add(radioGroup);
@@ -45,9 +48,23 @@ public class ImageView extends VerticalLayout {
                 waitForBeerImage();
             } else if (isStoreBoxDisplayed()) {
                 displayUpload();
-                // waitForStoreImage();
+                waitForStoreImage();
             }
             resetIfValueChanged(selection);
+        });
+    }
+
+    private void waitForStoreImage() {
+        storeBox.addValueChangeListener(storeSelect -> {
+            StoreNameDTO store = storeSelect.getValue();
+            singleUpload.addSucceededListener(upload -> {
+                if (store != null) {
+                    String path = fileBuffer.getFileData().getFile().getAbsolutePath();
+                    Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+                    RequestUtils.request(HttpMethod.POST, "/api/store/image", Map.of("name", store.getStoreName()),
+                            new ImageRequestDTO(path), authCookie, ImageResponseDTO.class);
+                }
+            });
         });
     }
 
@@ -95,19 +112,22 @@ public class ImageView extends VerticalLayout {
                     beer.getId(), beer.getFullName(), beer.getVolume()));
             beerBox.setWidth("20em");
 
-            List<BeerResponseDTO> beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie,
-                    new TypeReference<>() {
+            List<BeerResponseDTO> beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
+                    authCookie, new TypeReference<>() {
                     });
             beerBox.setItems(beers);
             add(beerBox);
         } else if ("Store".equals(selection)) {
-            // TODO: new endpoint that provides a unique list of store names
-//            this.storeBox = new ComboBox<>(selection);
-//            List<StoreResponseDTO> stores = RequestUtils.request(HttpMethod.GET, "/api/store", authCookie,
-//                    new TypeReference<>() {});
-//            storeBox.setItems(stores);
-//            storeBox.setAllowCustomValue(false);
-//            storeBox.setItemLabelGenerator(store -> String.format("[%d] %s"));
+            this.storeBox = new ComboBox<>(selection);
+            storeBox.setAllowCustomValue(false);
+            storeBox.setItemLabelGenerator(StoreNameDTO::getStoreName);
+            storeBox.setWidth("20em");
+
+            List<StoreNameDTO> stores = RequestUtils.request(HttpMethod.GET, "/api/store?brand_only",
+                    authCookie, new TypeReference<>() {
+                    });
+            storeBox.setItems(stores);
+            add(storeBox);
         }
     }
 
