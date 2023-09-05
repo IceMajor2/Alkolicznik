@@ -42,6 +42,7 @@ public class ImageView extends VerticalLayout {
 
         radioGroup.addValueChangeListener(event -> {
             String selection = radioGroup.getOptionalValue().orElse(null);
+            resetIfValueChanged(selection);
             displayItemList(selection);
             if (isBeerBoxDisplayed()) {
                 displayUpload();
@@ -50,7 +51,6 @@ public class ImageView extends VerticalLayout {
                 displayUpload();
                 waitForStoreImage();
             }
-            resetIfValueChanged(selection);
         });
     }
 
@@ -132,15 +132,11 @@ public class ImageView extends VerticalLayout {
     }
 
     private void resetIfValueChanged(String selection) {
-        boolean uploadToRemove = false;
         if (beerBox != null && beerBox.isAttached() && !"Beer".equals(selection)) {
             remove(beerBox);
-            if (isUploadDisplayed()) uploadToRemove = true;
+            remove(singleUpload);
         } else if (storeBox != null && storeBox.isAttached() && !"Store".equals(selection)) {
             remove(storeBox);
-            if (isUploadDisplayed()) uploadToRemove = true;
-        }
-        if (uploadToRemove) {
             remove(singleUpload);
         }
     }
