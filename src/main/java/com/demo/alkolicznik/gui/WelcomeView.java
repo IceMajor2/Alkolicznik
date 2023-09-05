@@ -67,7 +67,7 @@ public class WelcomeView extends VerticalLayout {
         Button prices = new Button("Prices", click -> UI.getCurrent().navigate("beer-price"));
         Button images = null;
         if (AuthenticatedUser.hasAccountantRole())
-            images = new Button("Upload image", click -> UI.getCurrent().navigate("image"));
+            images = new Button("Images", click -> UI.getCurrent().navigate("image"));
 
         components.add(header);
         components.add(beers);
