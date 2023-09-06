@@ -7,7 +7,6 @@ import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.security.AuthenticatedUser;
-import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -90,7 +89,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
     @Override
     protected BeerRequestDTO convertToRequest(BeerResponseDTO beerResponse) {
-        return ModelDtoConverter.convertToRequest(beerResponse);
+        return new BeerRequestDTO(beerResponse);
     }
 
     @Override
@@ -160,8 +159,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             return;
         }
         Long beerToUpdateId = selection.get().getId();
-        BeerUpdateDTO requestBody = ModelDtoConverter
-                .convertToUpdate(event.getBeer());
+        BeerUpdateDTO requestBody = new BeerUpdateDTO(event.getBeer());
         try {
             Cookie cookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,

@@ -2,7 +2,7 @@ package com.demo.alkolicznik.gui.image;
 
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreNameDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
@@ -57,7 +57,7 @@ public class UploadImageView extends VerticalLayout {
                     Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
                     try {
                         RequestUtils.request(HttpMethod.POST, "/api/store/image", Map.of("name", store.getStoreName()),
-                                new ImageRequestDTO(path), authCookie, ImageResponseDTO.class);
+                                new ImageRequestDTO(path), authCookie, StoreImageResponseDTO.class);
                     } catch (ApiException e) {
                         GuiUtils.showError(e.getMessage());
                     }

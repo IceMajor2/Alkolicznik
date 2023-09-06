@@ -10,7 +10,6 @@ import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.security.AuthenticatedUser;
-import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -127,7 +126,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             return;
         }
         Long storeToUpdateId = selection.get().getId();
-        StoreUpdateDTO newItem = ModelDtoConverter.convertToUpdate(event.getStore());
+        StoreUpdateDTO newItem = new StoreUpdateDTO(event.getStore());
         try {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.PATCH, "/api/store/" + storeToUpdateId,
@@ -166,6 +165,6 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
     @Override
     protected StoreRequestDTO convertToRequest(StoreResponseDTO store) {
-        return ModelDtoConverter.convertToRequest(store);
+        return new StoreRequestDTO(store);
     }
 }

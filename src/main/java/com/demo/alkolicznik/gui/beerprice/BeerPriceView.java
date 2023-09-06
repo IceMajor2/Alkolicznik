@@ -11,7 +11,6 @@ import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.security.AuthenticatedUser;
-import com.demo.alkolicznik.utils.ModelDtoConverter;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -89,7 +88,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
 
     @Override
     protected BeerPriceParamRequestDTO convertToRequest(BeerPriceResponseDTO priceResponse) {
-        return ModelDtoConverter.convertToRequest(priceResponse);
+        return new BeerPriceParamRequestDTO(priceResponse);
     }
 
     @Override

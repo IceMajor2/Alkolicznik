@@ -1,8 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
@@ -23,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.demo.alkolicznik.utils.ModelDtoConverter.storeImageListToDtoList;
 import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 import static com.demo.alkolicznik.utils.Utils.getExtensionFromPath;
 
@@ -37,36 +35,36 @@ public class StoreImageService {
 
     private ImageKitRepository imageKitRepository;
 
-    public ImageResponseDTO get(Long storeId) {
+    public StoreImageResponseDTO get(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreNotFoundException(storeId));
         StoreImage image = store.getImage()
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-        return new ImageResponseDTO(image);
+        return new StoreImageResponseDTO(image);
     }
 
-    public ImageResponseDTO get(String storeName) {
+    public StoreImageResponseDTO get(String storeName) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
         StoreImage image = storeImageRepository.findByStoreName(storeName)
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-        return new ImageResponseDTO(image);
+        return new StoreImageResponseDTO(image);
     }
 
-    public List<ImageResponseDTO> getAll() {
-        return storeImageListToDtoList(storeImageRepository.findAll());
+    public List<StoreImageResponseDTO> getAll() {
+        return StoreImageResponseDTO.asList(storeImageRepository.findAll());
     }
 
-    public ImageResponseDTO add(Store store, String imagePath) {
+    public StoreImageResponseDTO add(Store store, String imagePath) {
         StoreImage added = this.add(store.getName(), imagePath);
         store.setImage(added);
-        return new ImageResponseDTO(added);
+        return new StoreImageResponseDTO(added);
     }
 
-    public ImageResponseDTO add(String storeName, ImageRequestDTO request) {
+    public StoreImageResponseDTO add(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
-        return new ImageResponseDTO(
+        return new StoreImageResponseDTO(
                 this.add(storeName, request.getImagePath()));
     }
 
@@ -90,7 +88,7 @@ public class StoreImageService {
         return storeImageRepository.save(storeImage);
     }
 
-    public ImageResponseDTO update(String storeName, ImageRequestDTO request) {
+    public StoreImageResponseDTO update(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
         StoreImage image = storeImageRepository.findByStoreName(storeName)
@@ -99,18 +97,17 @@ public class StoreImageService {
         return this.add(storeName, request);
     }
 
-    public ImageDeleteDTO delete(String storeName) {
+    public void delete(String storeName) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
         StoreImage image = storeImageRepository.findByStoreName(storeName)
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-        return this.delete(image);
+        this.delete(image);
     }
 
-    public ImageDeleteDTO delete(StoreImage image) {
+    public void delete(StoreImage image) {
         imageKitRepository.delete(image);
         storeImageRepository.delete(image);
-        return new ImageDeleteDTO(image);
     }
 
     public Optional<StoreImage> findByStoreName(String name) {

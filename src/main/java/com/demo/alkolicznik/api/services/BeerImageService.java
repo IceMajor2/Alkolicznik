@@ -1,9 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
-import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
-import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
 import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
@@ -15,7 +13,6 @@ import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
-import com.vaadin.flow.component.html.Image;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
-import static com.demo.alkolicznik.utils.ModelDtoConverter.beerImageListToDtoList;
-import static com.demo.alkolicznik.utils.Utils.*;
+import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
+import static com.demo.alkolicznik.utils.Utils.getExtensionFromPath;
 
 @Service
 @AllArgsConstructor
@@ -36,19 +33,19 @@ public class BeerImageService {
 
     private ImageKitRepository imageKitRepository;
 
-    public ImageResponseDTO get(Long beerId) {
+    public BeerImageResponseDTO get(Long beerId) {
         Beer beer = beerRepository.findById(beerId)
                 .orElseThrow(() -> new BeerNotFoundException(beerId));
         BeerImage image = beer.getImage()
                 .orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-        return new ImageResponseDTO(image);
+        return new BeerImageResponseDTO(image);
     }
 
-    public List<ImageResponseDTO> getAll() {
-        return beerImageListToDtoList(beerImageRepository.findAll());
+    public List<BeerImageResponseDTO> getAll() {
+        return BeerImageResponseDTO.asList(beerImageRepository.findAll());
     }
 
-    public BeerResponseDTO add(Long beerId, ImageRequestDTO request) {
+    public BeerImageResponseDTO add(Long beerId, ImageRequestDTO request) {
         String imagePath = request.getImagePath();
         File file = new File(imagePath);
         fileCheck(file);
@@ -65,33 +62,23 @@ public class BeerImageService {
                 (beerImage.getRemoteId(), "get_beer");
         beerImage.setImageUrl(transformedUrl);
         beerImage.setImageComponent();
-        beerImageRepository.save(beerImage);
-        return new BeerResponseDTO(beer);
+        BeerImage saved = beerImageRepository.save(beerImage);
+        return new BeerImageResponseDTO(saved);
     }
 
-    public ImageDeleteDTO delete(BeerImage image) {
-        ImageDeleteDTO response = new ImageDeleteDTO(image.getBeer());
+    public void delete(BeerImage image) {
         imageKitRepository.delete(image);
         image.getBeer().setImage(null);
         image.setBeer(null);
         beerImageRepository.deleteById(image.getId());
-        return response;
     }
 
-    public ImageDeleteDTO delete(Long beerId) {
+    public void delete(Long beerId) {
         Beer beer = beerRepository.findById(beerId)
                 .orElseThrow(() -> new BeerNotFoundException(beerId));
         BeerImage image = beer.getImage()
                 .orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-        return this.delete(image);
-    }
-
-    public Image getComponent(Beer beer) {
-        BeerImage image = beer.getImage()
-                .orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
-        Image component = image.getImageComponent();
-        beerImageRepository.save(image);
-        return component;
+        this.delete(image);
     }
 
     private void fileCheck(File file) {

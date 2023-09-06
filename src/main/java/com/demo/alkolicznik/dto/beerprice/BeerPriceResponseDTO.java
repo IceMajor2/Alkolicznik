@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
+import java.util.Collection;
+import java.util.List;
+
 @JsonPropertyOrder({"beer", "price", "store"})
 @NoArgsConstructor
 @Getter
@@ -23,6 +26,12 @@ public class BeerPriceResponseDTO {
         this.store = new StoreResponseDTO(beerPrice.getStore());
         this.beer = new BeerResponseDTO(beerPrice.getBeer());
         this.price = beerPrice.getPrice().toString();
+    }
+
+    public static List<BeerPriceResponseDTO> asList(Collection<BeerPrice> beerPrices) {
+        return beerPrices.stream()
+                .map(BeerPriceResponseDTO::new)
+                .toList();
     }
 
     @JsonIgnore

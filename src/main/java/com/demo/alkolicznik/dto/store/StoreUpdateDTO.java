@@ -1,13 +1,13 @@
 package com.demo.alkolicznik.dto.store;
 
-import java.util.Objects;
-
 import com.demo.alkolicznik.dto.UpdateModel;
 import com.demo.alkolicznik.exceptions.annotations.NotBlankIfExists;
 import com.demo.alkolicznik.models.Store;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
@@ -22,6 +22,12 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
 
     @NotBlankIfExists(message = "Street was not specified")
     private String street;
+
+    public StoreUpdateDTO(StoreRequestDTO store) {
+        this.name = store.getName();
+        this.city = store.getCity();
+        this.street = store.getStreet();
+    }
 
     public boolean propertiesMissing() {
         return name == null && city == null && street == null;
@@ -47,12 +53,4 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
         }
         return false;
     }
-
-	public static StoreUpdateDTO convertFromRequest(StoreRequestDTO requestDTO) {
-		StoreUpdateDTO updateDTO = new StoreUpdateDTO();
-		updateDTO.setName(requestDTO.getName());
-		updateDTO.setCity(requestDTO.getCity());
-		updateDTO.setStreet(requestDTO.getStreet());
-		return updateDTO;
-	}
 }

@@ -1,16 +1,14 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.Collection;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,16 +29,20 @@ public class BeerResponseDTO {
 	private Double volume;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private ImageResponseDTO image;
+	private BeerImageResponseDTO image;
 
 	public BeerResponseDTO(Beer beer) {
 		this.id = beer.getId();
 		this.brand = beer.getBrand();
 		this.type = beer.getType();
 		this.volume = beer.getVolume();
-		if (beer.getImage().isPresent()) {
-			this.image = new ImageResponseDTO(beer.getImage().get());
-		}
+		beer.getImage().ifPresent(beerImage -> this.image = new BeerImageResponseDTO(beerImage));
+	}
+
+	public static List<BeerResponseDTO> asList(Collection<Beer> beers) {
+		return beers.stream()
+				.map(BeerResponseDTO::new)
+				.toList();
 	}
 
 	@JsonIgnore

@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,4 +17,10 @@ public class StoreNameDTO {
 
     @JsonProperty("name")
     private String storeName;
+
+    public static List<StoreNameDTO> asList(Collection<String> storeNames) {
+        return storeNames.stream()
+                .map(StoreNameDTO::new)
+                .toList();
+    }
 }

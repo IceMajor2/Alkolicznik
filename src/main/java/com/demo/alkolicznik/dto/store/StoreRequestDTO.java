@@ -1,10 +1,14 @@
 package com.demo.alkolicznik.dto.store;
 
+import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.image.StoreImage;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Optional;
 
 @NoArgsConstructor
 @Getter
@@ -20,4 +24,19 @@ public class StoreRequestDTO {
 
     @NotBlank(message = "Street was not specified")
     private String street;
+
+    public StoreRequestDTO(StoreResponseDTO store) {
+        this.name = store.getName();
+        this.city = store.getCity();
+        this.street = store.getStreet();
+    }
+
+    public static Store toModel(StoreRequestDTO requestDTO, Optional<StoreImage> optImage) {
+        Store store = new Store();
+        store.setName(requestDTO.getName());
+        store.setCity(requestDTO.getCity());
+        store.setStreet(requestDTO.getStreet());
+        optImage.ifPresent(storeImage -> store.setImage(storeImage));
+        return store;
+    }
 }

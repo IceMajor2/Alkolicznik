@@ -11,7 +11,6 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
-import com.demo.alkolicznik.utils.ModelDtoConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,15 +47,15 @@ public class BeerService {
                             .toList()
             );
         }
-        return ModelDtoConverter.beerListToDtoList(beersInCity);
+        return BeerResponseDTO.asList(beersInCity);
     }
 
     public List<BeerResponseDTO> getBeers() {
-        return ModelDtoConverter.beerListToDtoList(beerRepository.findAllByOrderByIdAsc());
+        return BeerResponseDTO.asList(beerRepository.findAllByOrderByIdAsc());
     }
 
     public BeerResponseDTO add(BeerRequestDTO requestDTO) {
-        Beer beer = ModelDtoConverter.convertToModelNoImage(requestDTO);
+        Beer beer = BeerRequestDTO.toModel(requestDTO);
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
         }
@@ -65,7 +64,7 @@ public class BeerService {
 
     public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
         Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
-        Beer newBeer = ModelDtoConverter.convertToModelNoImage(requestDTO);
+        Beer newBeer = BeerRequestDTO.toModel(requestDTO);
         Beer overwritten = updateFieldsOnPut(toOverwrite, newBeer);
         if (beerRepository.exists(overwritten)) throw new BeerAlreadyExistsException();
         // for each PUT request all the previous

@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.dto.beer;
 
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,39 +11,32 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@JsonPropertyOrder({ "id", "name", "volume", "image", "status" })
+@JsonPropertyOrder({"id", "name", "volume", "image", "status"})
 @EqualsAndHashCode
 @ToString
 public class BeerDeleteResponseDTO {
 
-	private Long id;
+    private Long id;
 
-	@JsonProperty("name")
-	private String fullName;
+    @JsonProperty("name")
+    private String fullName;
 
-	private Double volume;
+    private Double volume;
 
-	private String status = "Beer was deleted successfully!";
+    private String status = "Beer was deleted successfully!";
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private ImageResponseDTO image;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BeerImageResponseDTO image;
 
-	public BeerDeleteResponseDTO(Beer beer) {
-		this.id = beer.getId();
-		this.fullName = beer.getFullName();
-		this.volume = beer.getVolume();
-		if (beer.getImage().isPresent()) {
-			this.image = new ImageResponseDTO(beer.getImage().get());
-		}
-	}
+    public BeerDeleteResponseDTO(Beer beer) {
+        this.id = beer.getId();
+        this.fullName = beer.getFullName();
+        this.volume = beer.getVolume();
+        beer.getImage().ifPresent(beerImage -> this.image = new BeerImageResponseDTO(beerImage));
+    }
 
-	public BeerDeleteResponseDTO(Beer beer, String status) {
-		this.id = beer.getId();
-		this.fullName = beer.getFullName();
-		this.volume = beer.getVolume();
-		this.status = status;
-		if (beer.getImage().isPresent()) {
-			this.image = new ImageResponseDTO(beer.getImage().get());
-		}
-	}
+    public BeerDeleteResponseDTO(Beer beer, String status) {
+        this(beer);
+        this.status = status;
+    }
 }

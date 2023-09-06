@@ -8,9 +8,7 @@ import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
-import com.demo.alkolicznik.utils.ModelDtoConverter;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +37,7 @@ public class AuthService {
         assignRoles(user);
         User saved = userRepository.save(user);
         String jwt = jwtService.generateToken(user);
-        return ModelDtoConverter.convertToResponse(saved, jwt);
+        return new SignupResponseDTO(saved, jwt);
     }
 
     private void assignRoles(User user) {

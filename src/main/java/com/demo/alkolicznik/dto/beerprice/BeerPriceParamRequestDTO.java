@@ -19,7 +19,13 @@ public class BeerPriceParamRequestDTO {
     @Positive(message = "Price must be a positive number")
     private Double price;
 
-	public Long getLongStoreId() {
+    public BeerPriceParamRequestDTO(BeerPriceResponseDTO priceResponse) {
+        this.storeId = priceResponse.getStore().getId().doubleValue();
+        this.beerId = priceResponse.getBeer().getId().doubleValue();
+        this.price = priceResponse.getAmountOnly();
+    }
+
+    public Long getLongStoreId() {
 		return this.storeId.longValue();
 	}
 

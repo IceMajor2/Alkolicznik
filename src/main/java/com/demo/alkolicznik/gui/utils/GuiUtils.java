@@ -1,7 +1,8 @@
 package com.demo.alkolicznik.gui.utils;
 
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.utils.Utils;
@@ -21,8 +22,8 @@ public class GuiUtils {
     public static Image getVaadinImage(StoreResponseDTO store) {
         try {
             var response = RequestUtils.request(HttpMethod.GET, "/api/store/" +
-                    store.getId() + "/image", ImageResponseDTO.class);
-            return new Image(response.getStoreImage().getImageUrl(), "Store image");
+                    store.getId() + "/image", StoreImageResponseDTO.class);
+            return new Image(response.getUrl(), "Store image");
         } catch (ApiException e) {
             return null;
         }
@@ -31,8 +32,8 @@ public class GuiUtils {
     public static Image getVaadinImage(BeerResponseDTO beer) {
         try {
             var response = RequestUtils.request(HttpMethod.GET, "/api/beer/" +
-                    beer.getId() + "/image", ImageResponseDTO.class);
-            return new Image(response.getBeerImage().getImageUrl(), "Beer image");
+                    beer.getId() + "/image", BeerImageResponseDTO.class);
+            return new Image(response.getUrl(), "Beer image");
         } catch (ApiException e) {
             return null;
         }
