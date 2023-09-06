@@ -1,9 +1,6 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
-import com.demo.alkolicznik.dto.store.StoreRequestDTO;
-import com.demo.alkolicznik.dto.store.StoreResponseDTO;
-import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
+import com.demo.alkolicznik.dto.store.*;
 import com.demo.alkolicznik.models.Store;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,6 +118,26 @@ public class StoreTest {
             String actualJson = getResponse.getBody();
             List<StoreResponseDTO> actual = toModelList(actualJson, StoreResponseDTO.class);
 
+            assertThat(actual).containsExactlyElementsOf(expected);
+        }
+
+        @Test
+        @DisplayName("GET: '/api/store?brand_only'")
+        public void getAllBrandsTest() {
+            // when
+            var getResponse = getRequestAuth("admin", "admin", "/api/store?brand_only");
+            assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            // then
+            List<String> expected = stores.stream()
+                    .map(Store::getName)
+                    .distinct()
+                    .sorted()
+                    .toList();
+            List<String> actual = toModelList(getResponse.getBody(), StoreNameDTO.class)
+                    .stream()
+                    .map(StoreNameDTO::getStoreName)
+                    .toList();
             assertThat(actual).containsExactlyElementsOf(expected);
         }
     }
