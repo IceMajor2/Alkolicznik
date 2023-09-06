@@ -2,8 +2,10 @@ package com.demo.alkolicznik.dto.security;
 
 import com.demo.alkolicznik.models.User;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SignupResponseDTO {
 
     private Long id;
