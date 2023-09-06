@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api;
 
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.models.Store;
@@ -25,12 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.FindingUtils.getStore;
+import static com.demo.alkolicznik.utils.FindingUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.FindingUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
-import static com.demo.alkolicznik.utils.TestUtils.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
@@ -64,10 +65,10 @@ public class StoreImageTest {
                 // when
                 var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
                 String actualJson = getResponse.getBody();
-                ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
+                StoreImageResponseDTO actual = toModel(actualJson, StoreImageResponseDTO.class);
 
                 // then
-                ImageResponseDTO expected = createImageResponse(image);
+                StoreImageResponseDTO expected = createImageResponse(image);
                 String expectedJson = toJsonString(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
                 assertThat(actual).isEqualTo(expected);
@@ -108,11 +109,11 @@ public class StoreImageTest {
                 // when
                 var getResponse = getRequestAuth("admin", "admin", "/api/store/image");
                 assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                List<ImageResponseDTO> actual = toModelList(getResponse.getBody(),
-                        ImageResponseDTO.class);
+                List<StoreImageResponseDTO> actual = toModelList(getResponse.getBody(),
+                        StoreImageResponseDTO.class);
                 // then
-                List<ImageResponseDTO> expected = storeImages.stream()
-                        .map(ImageResponseDTO::new)
+                List<StoreImageResponseDTO> expected = storeImages.stream()
+                        .map(StoreImageResponseDTO::new)
                         .toList();
                 assertThat(actual).containsExactlyElementsOf(expected);
             }
@@ -189,11 +190,11 @@ public class StoreImageTest {
                         ("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
                 assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
                 var getResponse = getRequest("/api/store/image", Map.of("name", storeName));
-                ImageResponseDTO actualResponse = toModel
-                        (getResponse.getBody(), ImageResponseDTO.class);
+                StoreImageResponseDTO actualResponse = toModel
+                        (getResponse.getBody(), StoreImageResponseDTO.class);
                 // then
                 BufferedImage expected = getBufferedImageFromLocal(pathToNewImg);
-                String noTransformationURL = removeTransformationFromURL(actualResponse.getStoreImage().getImageUrl());
+                String noTransformationURL = removeTransformationFromURL(actualResponse.getUrl());
                 BufferedImage actual = getBufferedImageFromWeb(noTransformationURL);
                 // NOTE: ImageKit compresses images if their quality is too high,
                 // thus increasing the chance of a false negative. Here, I'm comparing
@@ -270,10 +271,10 @@ public class StoreImageTest {
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
                         Map.of("name", storeName));
                 assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                ImageResponseDTO actual = toModel(putResponse.getBody(), ImageResponseDTO.class);
+                StoreImageResponseDTO actual = toModel(putResponse.getBody(), StoreImageResponseDTO.class);
                 // then
-                BufferedImage actualComponent = getBufferedImageFromWeb(actual.getStoreImage().getImageUrl());
-                assertThat(actual.getStoreImage().getImageUrl())
+                BufferedImage actualComponent = getBufferedImageFromWeb(actual.getUrl());
+                assertThat(actual.getUrl())
                         .withFailMessage("Image was not uploaded to remote")
                         .isNotEqualTo(prevImg.getImageUrl());
                 BufferedImageAssert.assertThat(actualComponent)
@@ -410,10 +411,10 @@ public class StoreImageTest {
                 // when
                 var getResponse = getRequest("/api/store/" + storeId + "/image");
                 String actualJson = getResponse.getBody();
-                ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
+                StoreImageResponseDTO actual = toModel(actualJson, StoreImageResponseDTO.class);
 
                 // then
-                ImageResponseDTO expected = createImageResponse(img);
+                StoreImageResponseDTO expected = createImageResponse(img);
                 String expectedJson = toJsonString(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
                 assertThat(actual).isEqualTo(expected);
@@ -470,7 +471,7 @@ public class StoreImageTest {
                 assertThat(actualResponse.getImage())
                         .withFailMessage("The image was not found in the response")
                         .isNotNull();
-                BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImage().getStoreImage().getImageUrl());
+                BufferedImage actual = getBufferedImageFromWeb(actualResponse.getImage().getUrl());
                 BufferedImageAssert.assertThat(actual).isEqualTo(expected);
             }
 
@@ -565,12 +566,12 @@ public class StoreImageTest {
                 assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
                 String actualJson = putResponse.getBody();
                 StoreResponseDTO actual = toModel(actualJson, StoreResponseDTO.class);
-                ImageResponseDTO actualImage = actual.getImage();
+                StoreImageResponseDTO actualImage = actual.getImage();
                 // then
                 StoreImage expected = getStoreImage(name, storeImages);
                 assertThat(actualImage).isNotNull();
-                assertThat(actualImage.getStoreImage().getRemoteId()).isEqualTo(expected.getRemoteId());
-                assertThat(actualImage.getStoreImage().getImageUrl()).isEqualTo(expected.getImageUrl());
+                assertThat(actualImage.getRemoteId()).isEqualTo(expected.getRemoteId());
+                assertThat(actualImage.getUrl()).isEqualTo(expected.getImageUrl());
             }
         }
 
@@ -601,7 +602,7 @@ public class StoreImageTest {
                                 .stream()
                                 .filter(storeResponse ->
                                         storeResponse.getName().equals(store.getName()))
-                                .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
+                                .map(storeResponse -> storeResponse.getImage().getUrl())
                                 .toList();
                 BufferedImage actualComp = getBufferedImageFromWeb(actualURLs.get(0));
                 // then
@@ -626,7 +627,7 @@ public class StoreImageTest {
                                 .stream()
                                 .filter(storeResponse ->
                                         storeResponse.getName().equals(store.getName()))
-                                .map(storeResponse -> storeResponse.getImage().getStoreImage().getImageUrl())
+                                .map(storeResponse -> storeResponse.getImage().getUrl())
                                 .toList();
                 // then
                 Thread.sleep(2000);

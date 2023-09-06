@@ -6,9 +6,9 @@ import com.demo.alkolicznik.dto.beer.*;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
-import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreDeleteDTO;
@@ -16,10 +16,8 @@ import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Beer;
-import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.BeerImage;
-import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,12 +48,8 @@ public class JsonUtils {
         return request;
     }
 
-    public static StoreRequestDTO createStoreRequest(Store store) {
-        return createStoreRequest(store.getName(), store.getCity(), store.getStreet());
-    }
-
     public static StoreResponseDTO createStoreResponse(Integer id, String name,
-                                                       String city, String street, ImageResponseDTO imageDTO) {
+                                                       String city, String street, StoreImageResponseDTO imageDTO) {
         StoreResponseDTO store = new StoreResponseDTO();
         store.setId(id.longValue());
         store.setName(name);
@@ -75,7 +69,7 @@ public class JsonUtils {
                 store.getCity(), store.getStreet(), createImageResponse(store.getImage().orElse(null)));
     }
 
-    public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, ImageResponseDTO imageDTO) {
+    public static BeerResponseDTO createBeerResponse(long id, String brand, String type, Double volume, BeerImageResponseDTO imageDTO) {
         BeerResponseDTO response = new BeerResponseDTO();
         response.setId(id);
         response.setBrand(brand);
@@ -96,35 +90,32 @@ public class JsonUtils {
         );
     }
 
-    public static BeerResponseDTO createBeerResponse(Beer beer, ImageResponseDTO image) {
-        return createBeerResponse(beer.getId(), beer.getBrand(), beer.getType(), beer.getVolume(),
-                image);
-    }
-
     public static ImageRequestDTO createImageRequest(String srcPath) {
         ImageRequestDTO request = new ImageRequestDTO();
         request.setImagePath(srcPath);
         return request;
     }
 
-    public static ImageResponseDTO createImageResponse(String filename, ImageResponseDTO actual, Class<? extends ImageModel> imgClass) {
-        return createImageResponse(filename, null, actual, imgClass);
+    public static StoreImageResponseDTO createImageResponse(String filename, String storeName, BeerImageResponseDTO actual) {
+        StoreImageResponseDTO response = new StoreImageResponseDTO();
+        response.setStoreName(storeName);
+        response.setUrl(StoreImageTest.IMG_TRANSFORMED_URL + filename
+                + "?updatedAt=" + fetchEpochsInUpdatedAt(actual.getUrl()));
+//        response.setRemoteId(actual.getRemoteId());
+        return response;
     }
 
-    public static ImageResponseDTO createImageResponse(String filename, String storeName, ImageResponseDTO actual, Class<? extends ImageModel> imgClass) {
-        ImageResponseDTO response = new ImageResponseDTO();
-        if (imgClass.equals(StoreImage.class)) {
-            response.getStoreImage().setImageUrl
-                    (StoreImageTest.IMG_TRANSFORMED_URL + filename + "?updatedAt=" +
-                            fetchEpochsInUpdatedAt(actual.getStoreImage().getImageUrl()));
-            if (response.getStoreImage().getRemoteId() != null)
-                response.getStoreImage().setRemoteId(actual.getStoreImage().getRemoteId());
-            response.getStoreImage().setStoreName(storeName);
-        } else if (imgClass.equals(BeerImage.class)) {
-            response.getBeerImage().setImageUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
-            if (response.getBeerImage().getRemoteId() != null)
-                response.getBeerImage().setRemoteId(actual.getBeerImage().getRemoteId());
-        }
+    public static BeerImageResponseDTO createBeerImageResponse(String filename, String remoteId) {
+        BeerImageResponseDTO response = new BeerImageResponseDTO();
+        response.setUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
+        response.setRemoteId(remoteId);
+        return response;
+    }
+
+    public static StoreImageResponseDTO createStoreImageResponse(String filename, String remoteId) {
+        StoreImageResponseDTO response = new StoreImageResponseDTO();
+        response.setUrl(StoreImageTest.IMG_TRANSFORMED_URL + filename);
+        response.setRemoteId(remoteId);
         return response;
     }
 
@@ -132,21 +123,16 @@ public class JsonUtils {
         return url.substring(url.lastIndexOf('=') + 1);
     }
 
-    public static ImageResponseDTO createImageResponse(String filename, String remoteId, Class<? extends ImageModel> imgClass) {
-        ImageResponseDTO response = new ImageResponseDTO();
-        if (imgClass.equals(BeerImage.class)) {
-            response.getBeerImage().setImageUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
-            response.getBeerImage().setRemoteId(remoteId);
-        } else if (imgClass.equals(StoreImage.class)) {
-            response.getStoreImage().setImageUrl(StoreImageTest.IMG_TRANSFORMED_URL + filename);
-            response.getStoreImage().setRemoteId(remoteId);
+    public static StoreImageResponseDTO createImageResponse(StoreImage storeImage) {
+        if (storeImage != null) {
+            return new StoreImageResponseDTO(storeImage);
         }
-        return response;
+        return null;
     }
 
-    public static ImageResponseDTO createImageResponse(ImageModel image) {
-        if (image != null) {
-            return new ImageResponseDTO(image);
+    public static BeerImageResponseDTO createImageResponse(BeerImage beerImage) {
+        if (beerImage != null) {
+            return new BeerImageResponseDTO(beerImage);
         }
         return null;
     }
@@ -159,22 +145,12 @@ public class JsonUtils {
         return request;
     }
 
-    public static BeerRequestDTO createBeerRequest(Beer beer) {
-        BeerRequestDTO request =
-                createBeerRequest(beer.getBrand(), beer.getType(), beer.getVolume());
-        return request;
-    }
-
     public static BeerDeleteRequestDTO createBeerDeleteRequest(String brand, String type, Double volume) {
         BeerDeleteRequestDTO request = new BeerDeleteRequestDTO();
         request.setBrand(brand);
         request.setType(type);
         request.setVolume(volume);
         return request;
-    }
-
-    public static BeerDeleteRequestDTO createBeerDeleteRequest(Beer beer) {
-        return createBeerDeleteRequest(beer.getBrand(), beer.getType(), beer.getVolume());
     }
 
     public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
@@ -187,12 +163,6 @@ public class JsonUtils {
         return request;
     }
 
-    public static BeerPriceRequestDTO createBeerPriceRequest(BeerPrice beerPrice) {
-        return createBeerPriceRequest(beerPrice.getBeer().getFullName(),
-                beerPrice.getBeer().getVolume(),
-                beerPrice.getPrice().getNumber().doubleValueExact());
-    }
-
     public static BeerPriceResponseDTO createBeerPriceResponse(BeerResponseDTO beerResponseDTO,
                                                                StoreResponseDTO storeResponseDTO, String price) {
         BeerPriceResponseDTO response = new BeerPriceResponseDTO();
@@ -200,12 +170,6 @@ public class JsonUtils {
         response.setStore(storeResponseDTO);
         response.setPrice(price);
         return response;
-    }
-
-    public static BeerPriceResponseDTO createBeerPriceResponse(Beer beer, Store store, String price) {
-        BeerResponseDTO beerDTO = createBeerResponse(beer);
-        StoreResponseDTO storeDTO = createStoreResponse(store);
-        return createBeerPriceResponse(beerDTO, storeDTO, price);
     }
 
     public static BeerUpdateDTO createBeerUpdateRequest(String brand, String type, Double volume) {
@@ -242,26 +206,6 @@ public class JsonUtils {
         response.setPrice(price);
         response.setStatus(status);
         return response;
-    }
-
-    public static BeerPriceDeleteDTO createBeerPriceDeleteResponse(Beer beer, Store store, String price, String status) {
-        BeerResponseDTO beerResponseDTO = createBeerResponse(beer);
-        StoreResponseDTO storeResponseDTO = createStoreResponse(store);
-        return createBeerPriceDeleteResponse(beerResponseDTO, storeResponseDTO, price, status);
-    }
-
-    public static SignupRequestDTO createUserRequest(String username, String password) {
-        SignupRequestDTO signupRequestDTO = new SignupRequestDTO();
-        signupRequestDTO.setUsername(username);
-        signupRequestDTO.setPassword(password);
-        return signupRequestDTO;
-    }
-
-    public static ImageDeleteDTO createImageDeleteResponse(Beer beer, String message) {
-        ImageDeleteDTO deleteDTO = new ImageDeleteDTO();
-        deleteDTO.setBeer(createBeerResponse(beer));
-        deleteDTO.setMessage(message);
-        return deleteDTO;
     }
 
     public static <T> List<T> toModelList(String json, Class<T> clazz) {

@@ -4,9 +4,9 @@ import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
-import com.demo.alkolicznik.dto.image.ImageDeleteDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.ImageResponseDTO;
+import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
@@ -66,10 +66,10 @@ public class BeerImageTest {
                 // when
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
                 String actualJson = getResponse.getBody();
-                ImageResponseDTO actual = toModel(actualJson, ImageResponseDTO.class);
+                StoreImageResponseDTO actual = toModel(actualJson, StoreImageResponseDTO.class);
 
                 // then
-                ImageResponseDTO expected = createImageResponse(img);
+                BeerImageResponseDTO expected = createImageResponse(img);
                 String expectedJson = toJsonString(expected);
                 assertThat(actualJson).isEqualTo(expectedJson);
                 assertThat(actual).isEqualTo(expected);
@@ -109,11 +109,11 @@ public class BeerImageTest {
                 // when
                 var getResponse = getRequestAuth("admin", "admin", "/api/beer/image");
                 assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                List<ImageResponseDTO> actual = toModelList(getResponse.getBody(),
-                        ImageResponseDTO.class);
+                List<BeerImageResponseDTO> actual = toModelList(getResponse.getBody(),
+                        BeerImageResponseDTO.class);
                 // then
-                List<ImageResponseDTO> expected = beerImages.stream()
-                        .map(ImageResponseDTO::new)
+                List<BeerImageResponseDTO> expected = beerImages.stream()
+                        .map(BeerImageResponseDTO::new)
                         .toList();
                 assertThat(actual).containsExactlyElementsOf(expected);
             }
@@ -144,7 +144,7 @@ public class BeerImageTest {
                 assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
                 BeerResponseDTO actual = toModel(postResponse.getBody(), BeerResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
-                        (actual.getImage().getBeerImage().getImageUrl());
+                        (actual.getImage().getUrl());
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
                 assertThat(actualImg)
@@ -275,26 +275,19 @@ public class BeerImageTest {
             @DisplayName("DELETE: '/api/beer/{beer_id}/image'")
             @DirtiesContext
             public void whenDeletingBeerImage_thenReturnOKTest(Long beerId) {
-                // given
-                Beer beer = getBeer(beerId.longValue(), beers);
                 // when
                 var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId + "/image");
                 assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
                 String actualJson = deleteResponse.getBody();
-                ImageDeleteDTO actual = toModel(actualJson, ImageDeleteDTO.class);
 
+                // then
+                String expectedJson = "{\"message\":\"Beer image was deleted successfully!\"}";
+                assertThat(actualJson).isEqualTo(expectedJson);
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
                 assertIsError(getResponse.getBody(),
                         HttpStatus.NOT_FOUND,
                         "Unable to find image for this beer",
                         "/api/beer/" + beerId + "/image");
-
-                // then
-                ImageDeleteDTO expected = createImageDeleteResponse(beer,
-                        "Image was deleted successfully!");
-                String expectedJson = toJsonString(expected);
-                assertThat(actual).isEqualTo(expected);
-                assertThat(actualJson).isEqualTo(expectedJson);
             }
 
             @ParameterizedTest
@@ -413,10 +406,10 @@ public class BeerImageTest {
                 assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
-                ImageResponseDTO actual = toModel(getResponse.getBody(), ImageResponseDTO.class);
+                BeerImageResponseDTO actual = toModel(getResponse.getBody(), BeerImageResponseDTO.class);
 
                 // then
-                ImageResponseDTO expected = createImageResponse(beer.getImage().get());
+                BeerImageResponseDTO expected = createImageResponse(beer.getImage().get());
                 assertThat(actual).isEqualTo(expected);
             }
 
@@ -437,10 +430,10 @@ public class BeerImageTest {
                 assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
-                ImageResponseDTO actual = toModel(getResponse.getBody(), ImageResponseDTO.class);
+                BeerImageResponseDTO actual = toModel(getResponse.getBody(), BeerImageResponseDTO.class);
 
                 // then
-                ImageResponseDTO expected = createImageResponse(beer.getImage().get());
+                BeerImageResponseDTO expected = createImageResponse(beer.getImage().get());
                 assertThat(actual).isEqualTo(expected);
             }
         }
