@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
@@ -32,6 +33,7 @@ import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
@@ -144,6 +146,9 @@ public class BeerImageTest {
                 BeerImageResponseDTO actual = toModel(postResponse.getBody(), BeerImageResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
                         (actual.getUrl());
+                await().atMost(3000, TimeUnit.MILLISECONDS)
+                        .pollInterval(500, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(urlNoTransformation) != null);
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
                 assertThat(actualImg)
@@ -342,7 +347,10 @@ public class BeerImageTest {
                         HttpStatus.NOT_FOUND,
                         "Unable to find image for this beer",
                         "/api/beer/" + beerId + "/image");
-                Thread.sleep(2000);
+
+                await().atMost(6, TimeUnit.SECONDS)
+                        .with().pollInterval(1000, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(previous_urlToDelete) == null);
                 BufferedImage expectedRemoved = getBufferedImageFromWeb(previous_urlToDelete);
                 assertThat(expectedRemoved)
                         .withFailMessage("Image was expected to be deleted from remote")

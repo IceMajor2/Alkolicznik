@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getStore;
@@ -32,6 +33,7 @@ import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
@@ -194,8 +196,8 @@ public class StoreImageTest {
                         (getResponse.getBody(), StoreImageResponseDTO.class);
                 // then
                 BufferedImage expected = getBufferedImageFromLocal(pathToNewImg);
-                String noTransformationURL = removeTransformationFromURL(actualResponse.getUrl());
-                BufferedImage actual = getBufferedImageFromWeb(noTransformationURL);
+                String urlNoTransformation = removeTransformationFromURL(actualResponse.getUrl());
+                BufferedImage actual = getBufferedImageFromWeb(urlNoTransformation);
                 // NOTE: ImageKit compresses images if their quality is too high,
                 // thus increasing the chance of a false negative. Here, I'm comparing
                 // just the dimensions of the images. It is also flawed as it
@@ -352,7 +354,9 @@ public class StoreImageTest {
                         "Unable to find image for this store",
                         "/api/store/image");
                 // waiting for ImageKit
-                Thread.sleep(2000);
+                await().atMost(3000, TimeUnit.MILLISECONDS)
+                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(notExpectedURL) == null);
                 assertThat(getBufferedImageFromWeb(notExpectedURL))
                         .withFailMessage("Image was not deleted remotely")
                         .isNull();
@@ -545,7 +549,9 @@ public class StoreImageTest {
                         .isEqualTo(0);
                 // asserting that ImageIO.read returns null
                 // which would mean the image is not found remotely
-                Thread.sleep(2000);
+                await().atMost(3000, TimeUnit.MILLISECONDS)
+                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(initialUrl) == null);
                 assertThat(getBufferedImageFromWeb(initialUrl))
                         .withFailMessage("Image was supposed to be deleted from remote")
                         .isNull();
@@ -630,11 +636,13 @@ public class StoreImageTest {
                                 .map(storeResponse -> storeResponse.getImage().getUrl())
                                 .toList();
                 // then
-                Thread.sleep(2000);
                 assertThat(actualURLs)
                         .withFailMessage("Store was supposed to be deleted")
                         .isEmpty();
                 String urlExpectedToNotExist = store.getImage().get().getImageUrl();
+                await().atMost(3000, TimeUnit.MILLISECONDS)
+                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(urlExpectedToNotExist) == null);
                 assertThat(getBufferedImageFromWeb(urlExpectedToNotExist))
                         .withFailMessage("Image was not deleted remotely")
                         .isNull();
