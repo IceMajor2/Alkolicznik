@@ -549,8 +549,8 @@ public class StoreImageTest {
                         .isEqualTo(0);
                 // asserting that ImageIO.read returns null
                 // which would mean the image is not found remotely
-                await().atMost(3000, TimeUnit.MILLISECONDS)
-                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+                await().atMost(4000, TimeUnit.MILLISECONDS)
+                        .pollInterval(2000, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(initialUrl) == null);
                 assertThat(getBufferedImageFromWeb(initialUrl))
                         .withFailMessage("Image was supposed to be deleted from remote")
