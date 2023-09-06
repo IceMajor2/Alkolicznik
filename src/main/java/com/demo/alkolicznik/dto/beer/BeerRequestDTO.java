@@ -32,8 +32,16 @@ public class BeerRequestDTO {
     public static Beer toModel(BeerRequestDTO request) {
         Beer beer = new Beer();
         beer.setBrand(request.getBrand());
-        beer.setType(request.getType());
-        beer.setVolume(request.getVolume());
+        if (request.getType() != null && request.getType().isBlank()) {
+            beer.setType(null);
+        } else {
+            beer.setType(request.getType());
+        }
+        if (request.getVolume() == null) {
+            beer.setVolume(0.5);
+        } else {
+            beer.setVolume(request.getVolume());
+        }
         return beer;
     }
 
