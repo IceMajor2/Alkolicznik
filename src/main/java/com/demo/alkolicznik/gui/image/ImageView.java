@@ -14,14 +14,14 @@ public class ImageView extends VerticalLayout {
 
     private TabSheet tabSheet;
     private UploadImageView uploadTab;
-    // private DeleteImageView deleteTab;
+    private DeleteImageView deleteTab;
 
     public ImageView() {
         this.uploadTab = new UploadImageView();
-        // this.deleteImageView = new DeleteImageView();
+        this.deleteTab = new DeleteImageView();
         this.tabSheet = new TabSheet();
         tabSheet.add("Upload", uploadTab);
-        // tabSheet.add("Delete", deleteImageView);
+        tabSheet.add("Delete", deleteTab);
         add(tabSheet);
     }
 }
