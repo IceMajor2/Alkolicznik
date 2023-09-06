@@ -28,10 +28,10 @@ public class LoginView extends VerticalLayout {
     private Button login;
 
     public LoginView() {
+        // TODO: fool around with Vaadin's LoginForm class and modify its click listener
         this.username = new TextField("Username");
         this.password = new PasswordField("Password");
         this.login = new Button("Login", loginEvent());
-
         add(username, password, login);
     }
 
