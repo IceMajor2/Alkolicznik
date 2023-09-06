@@ -2,7 +2,6 @@ package com.demo.alkolicznik.gui.beerprice;
 
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
-import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
@@ -158,7 +157,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.POST, "/api/store/" + request.getLongStoreId()
                     + "/beer-price", Map.of("beer_id", request.getLongBeerId(), "beer_price",
-                    request.getPrice()), authCookie, BeerPriceRequestDTO.class);
+                    request.getPrice()), authCookie, BeerPriceResponseDTO.class);
         } catch (ApiException e) {
             GuiUtils.showError(e.getMessage());
             return;
