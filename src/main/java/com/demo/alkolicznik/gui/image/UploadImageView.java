@@ -5,50 +5,46 @@ import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreNameDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
+import com.demo.alkolicznik.gui.templates.ImageTabTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpMethod;
 
-import java.util.List;
 import java.util.Map;
 
-public class UploadImageView extends VerticalLayout {
+public class UploadImageView extends ImageTabTemplate {
 
-    private RadioButtonGroup<String> radioGroup;
     private Upload singleUpload;
     private FileBuffer fileBuffer;
-    private ComboBox<BeerResponseDTO> beerBox;
-    private ComboBox<StoreNameDTO> storeBox;
 
     public UploadImageView() {
-        this.radioGroup = getRadioButtonGroup();
-        add(radioGroup);
-
-        radioGroup.addValueChangeListener(event -> {
-            String selection = radioGroup.getOptionalValue().orElse(null);
-            resetIfValueChanged(selection);
-            displayItemList(selection);
-            if (isBeerBoxDisplayed()) {
-                displayUpload();
-                waitForBeerImage();
-            } else if (isStoreBoxDisplayed()) {
-                displayUpload();
-                waitForStoreImage();
-            }
-        });
+        super();
+        radioGroup.setLabel("Add image for:");
     }
 
-    private void waitForStoreImage() {
+    @Override
+    protected void radioGroupListener(AbstractField.ComponentValueChangeEvent<RadioButtonGroup<String>, String> event) {
+        String selection = radioGroup.getOptionalValue().orElse(null);
+        resetIfValueChanged(selection);
+        displayItemList(selection);
+        if (isBeerBoxDisplayed()) {
+            displayUpload();
+            waitForBeerImageRequest();
+        } else if (isStoreBoxDisplayed()) {
+            displayUpload();
+            waitForStoreImageRequest();
+        }
+    }
+
+    @Override
+    protected void waitForStoreImageRequest() {
         storeBox.addValueChangeListener(storeSelect -> {
             StoreNameDTO store = storeSelect.getValue();
             singleUpload.addSucceededListener(upload -> {
@@ -66,7 +62,8 @@ public class UploadImageView extends VerticalLayout {
         });
     }
 
-    private void waitForBeerImage() {
+    @Override
+    protected void waitForBeerImageRequest() {
         beerBox.addValueChangeListener(beerSelect -> {
             BeerResponseDTO beer = beerSelect.getValue();
             singleUpload.addSucceededListener(upload -> {
@@ -93,61 +90,18 @@ public class UploadImageView extends VerticalLayout {
         add(singleUpload);
     }
 
-    private void displayItemList(String selection) {
-        Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-        if ("Beer".equals(selection)) {
-            this.beerBox = new ComboBox<>(selection);
-            beerBox.setAllowCustomValue(false);
-            beerBox.setItemLabelGenerator(beer -> String.format("[%d] %s %.2f l", // [1] Example Beer 0,50 l
-                    beer.getId(), beer.getFullName(), beer.getVolume()));
-            beerBox.setWidth("20em");
-
-            List<BeerResponseDTO> beers = RequestUtils.request(HttpMethod.GET, "/api/beer",
-                    authCookie, new TypeReference<>() {
-                    });
-            beerBox.setItems(beers);
-            add(beerBox);
-        } else if ("Store".equals(selection)) {
-            this.storeBox = new ComboBox<>(selection);
-            storeBox.setAllowCustomValue(false);
-            storeBox.setItemLabelGenerator(StoreNameDTO::getStoreName);
-            storeBox.setWidth("20em");
-
-            List<StoreNameDTO> stores = RequestUtils.request(HttpMethod.GET, "/api/store?brand_only",
-                    authCookie, new TypeReference<>() {
-                    });
-            storeBox.setItems(stores);
-            add(storeBox);
-        }
-    }
-
-    private void resetIfValueChanged(String selection) {
-        if (beerBox != null && beerBox.isAttached() && !"Beer".equals(selection)) {
+    @Override
+    protected void resetIfValueChanged(String selection) {
+        if (isBeerBoxDisplayed() && !"Beer".equals(selection)) {
             remove(beerBox);
             remove(singleUpload);
-        } else if (storeBox != null && storeBox.isAttached() && !"Store".equals(selection)) {
+        } else if (isStoreBoxDisplayed() && !"Store".equals(selection)) {
             remove(storeBox);
             remove(singleUpload);
         }
     }
 
-    private RadioButtonGroup<String> getRadioButtonGroup() {
-        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-        radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-        radioGroup.setLabel("Add image for:");
-        radioGroup.setItems("Beer", "Store");
-        return radioGroup;
-    }
-
     private boolean isUploadDisplayed() {
         return singleUpload != null && singleUpload.isAttached();
-    }
-
-    private boolean isBeerBoxDisplayed() {
-        return beerBox != null && beerBox.isAttached();
-    }
-
-    private boolean isStoreBoxDisplayed() {
-        return storeBox != null && storeBox.isAttached();
     }
 }
