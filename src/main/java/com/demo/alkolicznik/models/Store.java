@@ -1,31 +1,17 @@
 package com.demo.alkolicznik.models;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.money.Monetary;
-import javax.money.MonetaryAmount;
-
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
+import java.util.*;
 
 @Table(name = "store")
 @Entity(name = "Store")
@@ -37,7 +23,8 @@ import lombok.ToString;
 public class Store {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "store_generator")
+	@SequenceGenerator(name = "store_generator", sequenceName = "store_seq", allocationSize = 1)
 	private Long id;
 
 	private String name;

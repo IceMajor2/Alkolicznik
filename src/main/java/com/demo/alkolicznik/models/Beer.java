@@ -22,8 +22,8 @@ import java.util.*;
 public class Beer implements Cloneable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "beer_generator")
+    @SequenceGenerator(name = "beer_generator", sequenceName = "beer_seq", allocationSize = 1)
     private Long id;
 
     private String brand;
