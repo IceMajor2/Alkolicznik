@@ -6,7 +6,6 @@ import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
@@ -66,7 +65,7 @@ public class BeerImageTest {
                 // when
                 var getResponse = getRequest("/api/beer/" + beerId + "/image");
                 String actualJson = getResponse.getBody();
-                StoreImageResponseDTO actual = toModel(actualJson, StoreImageResponseDTO.class);
+                BeerImageResponseDTO actual = toModel(actualJson, BeerImageResponseDTO.class);
 
                 // then
                 BeerImageResponseDTO expected = createImageResponse(img);
@@ -142,9 +141,9 @@ public class BeerImageTest {
                 var postResponse = postRequestAuth("admin", "admin",
                         "/api/beer/" + beerId + "/image", request);
                 assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-                BeerResponseDTO actual = toModel(postResponse.getBody(), BeerResponseDTO.class);
+                BeerImageResponseDTO actual = toModel(postResponse.getBody(), BeerImageResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
-                        (actual.getImage().getUrl());
+                        (actual.getUrl());
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
                 assertThat(actualImg)
