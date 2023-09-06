@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.gui.LoginView;
+import com.demo.alkolicznik.gui.auth.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import org.springframework.context.annotation.Configuration;
