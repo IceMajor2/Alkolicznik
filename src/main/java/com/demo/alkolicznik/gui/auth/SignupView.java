@@ -1,12 +1,22 @@
 package com.demo.alkolicznik.gui.auth;
 
+import com.demo.alkolicznik.dto.security.SignupRequestDTO;
+import com.demo.alkolicznik.dto.security.SignupResponseDTO;
+import com.demo.alkolicznik.exceptions.ApiException;
+import com.demo.alkolicznik.gui.utils.GuiUtils;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import com.demo.alkolicznik.utils.request.RequestUtils;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.springframework.http.HttpMethod;
 
 
 @PageTitle("Sign up | Alkolicznik")
@@ -23,6 +33,8 @@ public class SignupView extends VerticalLayout {
         toolbar = getToolbar();
 
         signupForm = new SignupForm();
+        signupForm.getSubmit().addClickListener(signupEvent());
+
         signupWrapper = getSignupFormWrapped();
 
         add(toolbar, signupWrapper);
@@ -47,5 +59,21 @@ public class SignupView extends VerticalLayout {
         Button home = new Button("Home", event -> UI.getCurrent().navigate("/"));
         horizontalLayout.add(home);
         return horizontalLayout;
+    }
+
+    private ComponentEventListener<ClickEvent<Button>> signupEvent() {
+        return event -> {
+            try {
+                SignupRequestDTO request = new SignupRequestDTO(signupForm.getUsername(), signupForm.getPassword());
+                SignupResponseDTO response = RequestUtils.request(HttpMethod.POST, "/api/auth/signup",
+                        request, SignupResponseDTO.class);
+                VaadinService.getCurrentResponse()
+                        .addCookie(CookieUtils.createTokenCookie(response.getToken()));
+                UI.getCurrent().getPage().setLocation("/");
+                GuiUtils.notify("You have been registered! Welcome.");
+            } catch (ApiException e) {
+                signupForm.setError(e.getMessage());
+            }
+        };
     }
 }
