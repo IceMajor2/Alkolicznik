@@ -18,6 +18,8 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.http.HttpMethod;
 
+import java.util.Objects;
+
 
 @PageTitle("Sign up | Alkolicznik")
 @Route(value = "signup")
@@ -63,6 +65,10 @@ public class SignupView extends VerticalLayout {
 
     private ComponentEventListener<ClickEvent<Button>> signupEvent() {
         return event -> {
+            if(!Objects.equals(signupForm.getPassword(), signupForm.getConfirmPassword())) {
+                signupForm.setError("Passwords do not match");
+                return;
+            }
             try {
                 SignupRequestDTO request = new SignupRequestDTO(signupForm.getUsername(), signupForm.getPassword());
                 SignupResponseDTO response = RequestUtils.request(HttpMethod.POST, "/api/auth/signup",

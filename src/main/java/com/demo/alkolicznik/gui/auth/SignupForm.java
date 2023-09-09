@@ -78,4 +78,8 @@ public class SignupForm extends FormLayout {
     public void setError(String errorMessage) {
         errorMessageField.setText(errorMessage);
     }
+
+    public String getConfirmPassword() {
+        return confirmPassword.getValue();
+    }
 }
