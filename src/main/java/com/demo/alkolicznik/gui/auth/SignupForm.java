@@ -72,4 +72,8 @@ public class SignupForm extends FormLayout {
     public String getUsername() {
         return username.getValue();
     }
+
+    public void setError(String errorMessage) {
+        errorMessageField.setText(errorMessage);
+    }
 }
