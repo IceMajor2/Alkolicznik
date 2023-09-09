@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.gui.auth;
 
 import com.vaadin.flow.component.HasValueAndElement;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -36,6 +37,7 @@ public class SignupForm extends FormLayout {
 
         submit = new Button("Create account");
         submit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        submit.addClickShortcut(Key.ENTER);
 
         add(title, username, password, confirmPassword, errorMessageField, submit);
 
