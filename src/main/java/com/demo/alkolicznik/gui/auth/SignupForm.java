@@ -8,13 +8,9 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 
 import java.util.stream.Stream;
 
-@PageTitle("Sign up | Alkolicznik")
-@Route(value = "signup")
 public class SignupForm extends FormLayout {
 
     private H3 title;
