@@ -99,7 +99,6 @@ public class DatabaseTableConverters {
      * @param stores the stores bean
      */
     // O(n**2)
-    // TODO: Remove outer loop and see what happens
     public static List<StoreImage> convertToStoreImageList(String sql, List<Store> stores) {
         List<StoreImage> storeImages = jdbcTemplate.query(sql, RowMappers.STORE_IMAGE);
         for (Store store : stores) {
