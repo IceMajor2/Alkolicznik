@@ -15,50 +15,63 @@ import java.util.Arrays;
 @Component
 public class CookieUtils {
 
-	private static String ipAddress;
+    private static String IP_ADDRESS;
+    private static String SCHEMA;
 
-	@Autowired
-	public void setIpAddress(String ipAddress) {
-		CookieUtils.ipAddress = ipAddress;
-	}
+    @Autowired
+    public void setIpAddress(String ipAddress) {
+        CookieUtils.IP_ADDRESS = ipAddress;
+    }
 
-	public static Cookie createTokenCookie(String token) {
-		Cookie cookie = new Cookie("token", token);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setDomain("");
-		return cookie;
-	}
+    @Autowired
+    public void setSchema(String schema) {
+        CookieUtils.SCHEMA = schema;
+    }
 
-	private static BasicClientCookie createApacheTokenCookie(String token) {
-		BasicClientCookie cookie = new BasicClientCookie("token", token);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setDomain(ipAddress);
-		return cookie;
-	}
+    public static Cookie createTokenCookie(String token) {
+        Cookie cookie = new Cookie("token", token);
+        cookie.setHttpOnly(true);
+        if ("https".equals(SCHEMA))
+            cookie.setSecure(true);
+        else if ("http".equals(SCHEMA))
+            cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setDomain("");
+        return cookie;
+    }
 
-	public static Cookie getAuthCookie(VaadinRequest currentRequest) {
-		return Arrays.stream(currentRequest.getCookies())
-				.filter(cookie ->
-						CookieAuthenticationFilter.JWT_COOKIE_NAME.equals(cookie.getName()))
-				.findFirst()
-				.orElse(null);
-	}
+    private static BasicClientCookie createApacheTokenCookie(String token) {
+        BasicClientCookie cookie = new BasicClientCookie("token", token);
+        cookie.setHttpOnly(true);
+        if ("https".equals(SCHEMA)) {
+            cookie.setSecure(true);
+        } else if ("http".equals(SCHEMA)) {
+            cookie.setSecure(false);
+        }
+        cookie.setPath("/");
+        cookie.setDomain(IP_ADDRESS);
+        return cookie;
+    }
 
-	protected static HttpContext getHttpContextWith(Cookie cookie) {
-		BasicCookieStore cookieStore = createCookieStoreWith(cookie);
-		HttpContext localContext = HttpClientContext.create();
-		localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-		return localContext;
-	}
+    public static Cookie getAuthCookie(VaadinRequest currentRequest) {
+        return Arrays.stream(currentRequest.getCookies())
+                .filter(cookie ->
+                        CookieAuthenticationFilter.JWT_COOKIE_NAME.equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
+    }
 
-	public static BasicCookieStore createCookieStoreWith(Cookie cookie) {
-		BasicCookieStore cookieStore = new BasicCookieStore();
-		BasicClientCookie clientCookie = CookieUtils.createApacheTokenCookie(cookie.getValue());
-		cookieStore.addCookie(clientCookie);
-		return cookieStore;
-	}
+    protected static HttpContext getHttpContextWith(Cookie cookie) {
+        BasicCookieStore cookieStore = createCookieStoreWith(cookie);
+        HttpContext localContext = HttpClientContext.create();
+        localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
+        return localContext;
+    }
+
+    public static BasicCookieStore createCookieStoreWith(Cookie cookie) {
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        BasicClientCookie clientCookie = CookieUtils.createApacheTokenCookie(cookie.getValue());
+        cookieStore.addCookie(clientCookie);
+        return cookieStore;
+    }
 }
