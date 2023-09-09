@@ -3,7 +3,6 @@ package com.demo.alkolicznik.gui.auth;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
-import com.demo.alkolicznik.gui.WelcomeView;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -47,7 +46,7 @@ public class LoginView extends VerticalLayout {
                         AuthResponseDTO.class);
                 VaadinService.getCurrentResponse()
                         .addCookie(CookieUtils.createTokenCookie(response.getToken()));
-                UI.getCurrent().navigate(WelcomeView.class);
+                UI.getCurrent().getPage().setLocation("/");
             } catch (ApiException e) {
                 loginForm.setError(true);
             }
