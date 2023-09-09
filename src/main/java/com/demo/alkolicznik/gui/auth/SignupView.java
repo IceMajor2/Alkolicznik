@@ -3,7 +3,6 @@ package com.demo.alkolicznik.gui.auth;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.security.SignupResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
-import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.ClickEvent;
@@ -65,7 +64,7 @@ public class SignupView extends VerticalLayout {
 
     private ComponentEventListener<ClickEvent<Button>> signupEvent() {
         return event -> {
-            if(!Objects.equals(signupForm.getPassword(), signupForm.getConfirmPassword())) {
+            if (!Objects.equals(signupForm.getPassword(), signupForm.getConfirmPassword())) {
                 signupForm.setError("Passwords do not match");
                 return;
             }
@@ -76,7 +75,6 @@ public class SignupView extends VerticalLayout {
                 VaadinService.getCurrentResponse()
                         .addCookie(CookieUtils.createTokenCookie(response.getToken()));
                 UI.getCurrent().getPage().setLocation("/");
-                GuiUtils.notify("You have been registered! Welcome.");
             } catch (ApiException e) {
                 signupForm.setError(e.getMessage());
             }
