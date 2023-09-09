@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.utils;
 
+import org.apache.commons.io.FilenameUtils;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -8,8 +10,23 @@ import java.net.URL;
 
 public class Utils {
 
-    public static String getExtensionFromPath(String path) {
-        return path.substring(path.lastIndexOf('.') + 1);
+    public static String createStoreFilename(String storeName, String fullPath) {
+        String polishedStoreName = replaceWhitespaces(storeName).toLowerCase();
+        return appendExtensionIfExists(polishedStoreName, fullPath);
+    }
+
+    public static String createBeerFilename(String beerName, Double volume, String fullPath) {
+        String polishedBeerName = replaceWhitespaces(beerName).toLowerCase() + '-' + volume;
+        return appendExtensionIfExists(polishedBeerName, fullPath);
+    }
+
+    private static String appendExtensionIfExists(String filename, String fullPath) {
+        String extension = FilenameUtils.getExtension(FilenameUtils.getName(fullPath));
+        return extension.isEmpty() ? filename : filename + '.' + extension;
+    }
+
+    private static String replaceWhitespaces(String s) {
+        return s.replace(' ', '-');
     }
 
     public static BufferedImage getBufferedImageFromWeb(String url) {
