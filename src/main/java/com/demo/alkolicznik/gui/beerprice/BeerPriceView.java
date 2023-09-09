@@ -129,7 +129,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
                             request.getLongStoreId(), "beer_id", request.getLongBeerId()),
                     authCookie, BeerPriceDeleteDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -144,7 +144,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
                     request.getLongStoreId(), "beer_id", request.getLongBeerId(), "price",
                     request.getPrice()), authCookie, BeerPriceResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -159,7 +159,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
                     + "/beer-price", Map.of("beer_id", request.getLongBeerId(), "beer_price",
                     request.getPrice()), authCookie, BeerPriceResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();

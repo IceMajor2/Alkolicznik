@@ -60,4 +60,16 @@ public class SignupForm extends FormLayout {
     private void setRequiredIndicatorVisible(HasValueAndElement<?, ?>... components) {
         Stream.of(components).forEach(comp -> comp.setRequiredIndicatorVisible(true));
     }
+
+    public Button getSubmit() {
+        return submit;
+    }
+
+    public String getPassword() {
+        return password.getValue();
+    }
+
+    public String getUsername() {
+        return username.getValue();
+    }
 }

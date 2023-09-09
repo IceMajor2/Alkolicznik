@@ -55,7 +55,7 @@ public class UploadImageView extends ImageTabTemplate {
                         RequestUtils.request(HttpMethod.POST, "/api/store/image", Map.of("name", store.getStoreName()),
                                 new ImageRequestDTO(path), authCookie, StoreImageResponseDTO.class);
                     } catch (ApiException e) {
-                        GuiUtils.showError(e.getMessage());
+                        GuiUtils.notify(e.getMessage());
                     }
                 }
             });
@@ -74,7 +74,7 @@ public class UploadImageView extends ImageTabTemplate {
                         RequestUtils.request(HttpMethod.POST, "/api/beer/" + beer.getId() + "/image",
                                 new ImageRequestDTO(path), authCookie, BeerResponseDTO.class);
                     } catch (ApiException e) {
-                        GuiUtils.showError(e.getMessage());
+                        GuiUtils.notify(e.getMessage());
                     }
                 }
             });

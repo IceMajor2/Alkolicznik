@@ -131,7 +131,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             RequestUtils.request(HttpMethod.DELETE, "/api/beer", deleteRequest, authCookie,
                     BeerDeleteResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -145,7 +145,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             RequestUtils.request(HttpMethod.POST, "/api/beer", requestBody, authCookie,
                     BeerResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -155,7 +155,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
     private void updateBeer(BeerForm.UpdateEvent event) {
         Optional<BeerResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
         if (selection.isEmpty()) {
-            GuiUtils.showError("First select the beer to update from the grid");
+            GuiUtils.notify("First select the beer to update from the grid");
             return;
         }
         Long beerToUpdateId = selection.get().getId();
@@ -165,7 +165,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             RequestUtils.request(HttpMethod.PATCH, "/api/beer/" + beerToUpdateId,
                     requestBody, cookie, BeerResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();

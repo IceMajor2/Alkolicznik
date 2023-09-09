@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 
 public class GuiUtils {
 
-    public static void showError(String message) {
+    public static void notify(String message) {
         Notification.show(message, 4000, Notification.Position.BOTTOM_END);
     }
 

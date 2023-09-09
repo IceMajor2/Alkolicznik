@@ -122,7 +122,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
     private void updateStore(StoreForm.UpdateEvent event) {
         Optional<StoreResponseDTO> selection = grid.getSelectionModel().getFirstSelectedItem();
         if (selection.isEmpty()) {
-            GuiUtils.showError("You did not select a store to update");
+            GuiUtils.notify("You did not select a store to update");
             return;
         }
         Long storeToUpdateId = selection.get().getId();
@@ -132,7 +132,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             RequestUtils.request(HttpMethod.PATCH, "/api/store/" + storeToUpdateId,
                     newItem, authCookie, StoreResponseDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -144,7 +144,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.DELETE, "/api/store", event.getStore(), authCookie, StoreDeleteDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();
@@ -156,7 +156,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.POST, "/api/store", event.getStore(), authCookie, StoreDeleteDTO.class);
         } catch (ApiException e) {
-            GuiUtils.showError(e.getMessage());
+            GuiUtils.notify(e.getMessage());
             return;
         }
         updateList();

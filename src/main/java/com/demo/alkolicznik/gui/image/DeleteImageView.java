@@ -63,7 +63,7 @@ public class DeleteImageView extends ImageTabTemplate {
                         RequestUtils.request(HttpMethod.DELETE, "/api/store/image",
                                 Map.of("name", store.getStoreName()), authCookie, String.class);
                     } catch (ApiException e) {
-                        GuiUtils.showError(e.getMessage());
+                        GuiUtils.notify(e.getMessage());
                     }
                 }
             });
@@ -81,7 +81,7 @@ public class DeleteImageView extends ImageTabTemplate {
                         RequestUtils.request(HttpMethod.DELETE, "/api/beer/" + beer.getId() + "/image",
                                 authCookie, String.class);
                     } catch (ApiException e) {
-                        GuiUtils.showError(e.getMessage());
+                        GuiUtils.notify(e.getMessage());
                     }
                 }
             });
