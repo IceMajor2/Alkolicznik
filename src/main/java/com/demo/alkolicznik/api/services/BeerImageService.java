@@ -20,8 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
+import static com.demo.alkolicznik.utils.Utils.createBeerFilename;
 import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
-import static com.demo.alkolicznik.utils.Utils.getExtensionFromPath;
 
 @Service
 @AllArgsConstructor
@@ -55,7 +55,7 @@ public class BeerImageService {
             throw new ImageAlreadyExistsException(BeerImage.class);
 
         BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, "/beer",
-                createFilename(beer, getExtensionFromPath(imagePath)), BeerImage.class);
+                createBeerFilename(beer.getFullName(), beer.getVolume(), imagePath), BeerImage.class);
         beer.setImage(beerImage);
         beerImage.setBeer(beer);
         String transformedUrl = imageKitRepository.namedTransformation
@@ -105,16 +105,5 @@ public class BeerImageService {
             return true;
         }
         return false;
-    }
-
-    private String createFilename(Beer beer, String extension) {
-        StringBuilder stringBuilder = new StringBuilder("");
-        stringBuilder
-                .append(beer.getFullName().toLowerCase().replace(' ', '-'))
-                .append('-')
-                .append(beer.getVolume())
-                .append('.')
-                .append(extension);
-        return stringBuilder.toString();
     }
 }

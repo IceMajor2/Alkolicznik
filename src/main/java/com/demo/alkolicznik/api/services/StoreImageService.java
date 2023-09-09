@@ -22,8 +22,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
-import static com.demo.alkolicznik.utils.Utils.getExtensionFromPath;
+import static com.demo.alkolicznik.utils.Utils.*;
 
 @Service
 @AllArgsConstructor
@@ -75,8 +74,9 @@ public class StoreImageService {
 
         if (storeImageRepository.existsByStoreName(storeName))
             throw new ImageAlreadyExistsException(StoreImage.class);
+
         StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
-                createFilename(storeName, getExtensionFromPath(imagePath)), StoreImage.class);
+                createStoreFilename(storeName, imagePath), StoreImage.class);
         storeImage.setStoreName(storeName);
 
         // the addition of updatedAt key-value pair prevents from fetching
@@ -127,14 +127,5 @@ public class StoreImageService {
         int height = image.getHeight();
         int width = image.getWidth();
         if (height * 3.5 < width) throw new ImageProportionsInvalidException("Image is too wide");
-    }
-
-    private String createFilename(String storeName, String extension) {
-        StringBuilder stringBuilder = new StringBuilder("");
-        stringBuilder
-                .append(storeName.toLowerCase().replace(' ', '-'))
-                .append('.')
-                .append(extension);
-        return stringBuilder.toString();
     }
 }
