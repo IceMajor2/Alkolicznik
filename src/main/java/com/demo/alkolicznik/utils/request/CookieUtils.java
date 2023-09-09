@@ -7,10 +7,20 @@ import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+@Component
 public class CookieUtils {
+
+	private static String ipAddress;
+
+	@Autowired
+	public void setIpAddress(String ipAddress) {
+		CookieUtils.ipAddress = ipAddress;
+	}
 
 	public static Cookie createTokenCookie(String token) {
 		Cookie cookie = new Cookie("token", token);
@@ -26,8 +36,7 @@ public class CookieUtils {
 		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
 		cookie.setPath("/");
-		// TODO: property
-		cookie.setDomain("127.0.0.1");
+		cookie.setDomain(ipAddress);
 		return cookie;
 	}
 

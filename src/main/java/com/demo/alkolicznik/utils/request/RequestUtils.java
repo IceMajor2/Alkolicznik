@@ -26,12 +26,19 @@ import java.util.Map;
 @Component
 public class RequestUtils {
 
-    // TODO: autowire this
-    private static final String BASE_URL = "https://127.0.0.1:8433";
-
+    private static String BASE_URL;
     private static ObjectMapper mapper;
-
     private static CloseableHttpClient httpClient;
+
+    @Autowired
+    public void setBaseUrl(String baseUrl) {
+        RequestUtils.BASE_URL = baseUrl;
+    }
+
+    @Autowired
+    public void setHttpClient(CloseableHttpClient httpClient) {
+        RequestUtils.httpClient = httpClient;
+    }
 
     @Bean
     public ObjectMapper objectMapper() {
@@ -40,11 +47,6 @@ public class RequestUtils {
         mapper.findAndRegisterModules();
         RequestUtils.mapper = mapper;
         return mapper;
-    }
-
-    @Autowired
-    public void setHttpClient(CloseableHttpClient httpClient) {
-        RequestUtils.httpClient = httpClient;
     }
 
     public static <T> T request(HttpMethod method, String endpoint,
