@@ -154,7 +154,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
     private void createStore(StoreForm.CreateEvent event) {
         try {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
-            RequestUtils.request(HttpMethod.POST, "/api/store", event.getStore(), authCookie, StoreDeleteDTO.class);
+            RequestUtils.request(HttpMethod.POST, "/api/store", event.getStore(), authCookie, StoreResponseDTO.class);
         } catch (ApiException e) {
             GuiUtils.notify(e.getMessage());
             return;
