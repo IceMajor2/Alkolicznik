@@ -1,12 +1,5 @@
 package com.demo.alkolicznik.security.config;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.SSLContext;
-
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -31,11 +24,16 @@ import org.apache.hc.core5.util.TimeValue;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableScheduling
@@ -138,6 +136,7 @@ public class HttpClientConfig {
 
 	@Bean
 	public Registry<ConnectionSocketFactory> socketFactoryRegistry() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+		// TODO: add my self-signed certificate to the trust store and nothing else
 		final TrustStrategy trustStrategy = (cert, authType) -> true;
 		final SSLContext sslContext = SSLContexts.custom()
 				.loadTrustMaterial(null, trustStrategy)
