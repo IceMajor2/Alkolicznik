@@ -6,14 +6,15 @@ import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnMissingBean(type = "org.springframework.boot.test.mock.mockito.MockitoPostProcessor")
+@ConditionalOnProperty(prefix = "server.ssl", name = "enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
-// TODO: rename class and organize it better
 public class RedirectConfig {
 
     private final static String SECURITY_USER_CONSTRAINT = "CONFIDENTIAL";
