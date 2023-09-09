@@ -31,8 +31,9 @@ public class WelcomeView extends VerticalLayout {
         hl.setWidthFull();
         hl.setJustifyContentMode(JustifyContentMode.END);
 
-        Button button = getAuthButton();
-        hl.add(button);
+        Button logInOut = getLogInOutButton();
+        Button signup = getSignupButton();
+        hl.add(signup, logInOut);
         return hl;
     }
 
@@ -46,7 +47,13 @@ public class WelcomeView extends VerticalLayout {
         return vl;
     }
 
-    private Button getAuthButton() {
+    private Button getSignupButton() {
+        Button signup = new Button("Sign up", event -> UI.getCurrent().navigate("signup"));
+        if (AuthenticatedUser.isAuthenticated()) signup.setVisible(false);
+        return signup;
+    }
+
+    private Button getLogInOutButton() {
         Button authButton;
         if (AuthenticatedUser.isAuthenticated()) {
             authButton = new Button("Sign out");
@@ -73,7 +80,7 @@ public class WelcomeView extends VerticalLayout {
         components.add(beers);
         components.add(stores);
         components.add(prices);
-        if(images != null)
+        if (images != null)
             components.add(images);
         return components;
     }
