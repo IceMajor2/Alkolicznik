@@ -66,8 +66,7 @@ public class StoreImageService {
         return new StoreImageResponseDTO(
                 this.add(storeName, request.getImagePath()));
     }
-
-    // TODO: fix extension extraction when there's no extension
+    
     private StoreImage add(String storeName, String imagePath) {
         File file = new File(imagePath);
         fileCheck(file);
