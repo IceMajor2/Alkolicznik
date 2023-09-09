@@ -2,16 +2,15 @@ package com.demo.alkolicznik.gui.auth;
 
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.WelcomeView;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.login.AbstractLogin;
+import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
@@ -21,29 +20,37 @@ import org.springframework.http.HttpMethod;
 @Route(value = "login")
 public class LoginView extends VerticalLayout {
 
-    private TextField username;
-
-    private PasswordField password;
-
-    private Button login;
+    private LoginForm loginForm;
 
     public LoginView() {
-        // TODO: fool around with Vaadin's LoginForm class and modify its click listener
-        this.username = new TextField("Username");
-        this.password = new PasswordField("Password");
-        this.login = new Button("Login", loginEvent());
-        add(username, password, login);
+        setSizeFull();
+        setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
+
+        this.loginForm = configureLoginForm();
+        add(loginForm);
     }
 
-    private ComponentEventListener<ClickEvent<Button>> loginEvent() {
+    private LoginForm configureLoginForm() {
+        LoginForm loginForm = new LoginForm();
+        loginForm.addLoginListener(loginEvent());
+        loginForm.setForgotPasswordButtonVisible(false);
+        return loginForm;
+    }
+
+    private ComponentEventListener<AbstractLogin.LoginEvent> loginEvent() {
         return event -> {
-            AuthResponseDTO response = RequestUtils.request(HttpMethod.POST,
-                    "/api/auth/authenticate",
-                    new AuthRequestDTO(username.getValue(), password.getValue()),
-                    AuthResponseDTO.class);
-            VaadinService.getCurrentResponse()
-                    .addCookie(CookieUtils.createTokenCookie(response.getToken()));
-            UI.getCurrent().navigate(WelcomeView.class);
+            try {
+                AuthResponseDTO response = RequestUtils.request(HttpMethod.POST,
+                        "/api/auth/authenticate",
+                        new AuthRequestDTO(event.getUsername(), event.getPassword()),
+                        AuthResponseDTO.class);
+                VaadinService.getCurrentResponse()
+                        .addCookie(CookieUtils.createTokenCookie(response.getToken()));
+                UI.getCurrent().navigate(WelcomeView.class);
+            } catch (ApiException e) {
+                loginForm.setError(true);
+            }
         };
     }
 }
