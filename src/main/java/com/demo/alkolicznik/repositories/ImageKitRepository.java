@@ -135,7 +135,7 @@ public class ImageKitRepository {
         String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
         try {
             imageKit.setConfig(new Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
+                    Files.readAllLines(Paths.get("secure" + File.separator + "imagekit_private_key.txt")).get(0),
                     endpoint));
         } catch (IOException e) {
             throw new RuntimeException("Could not read secured file");
