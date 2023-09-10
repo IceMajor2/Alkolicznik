@@ -13,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Component
 @RequiredArgsConstructor
 public class SecurityBeans {
@@ -42,5 +47,14 @@ public class SecurityBeans {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(13);
+    }
+
+    @Bean
+    public String jwtKey() {
+        try {
+            return Files.readAllLines(Paths.get("secure" + File.separator + "jwt_key.txt")).get(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
