@@ -1,5 +1,7 @@
 package com.demo.alkolicznik.exceptions;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +52,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         String path = getPath(request);
         ApiException error = new ApiException(HttpStatus.NOT_FOUND, message, path);
         return ResponseEntity.status(404).body(error);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ApiException> handleExpiredJwtException(ExpiredJwtException e, WebRequest request) {
+        String message = "Please log in again, your token has expired";
+        String path = getPath(request);
+        ApiException error = new ApiException(HttpStatus.UNAUTHORIZED, message, path);
+        return ResponseEntity.status(401).body(error);
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ApiException> handleSignatureException(SignatureException e, WebRequest request) {
+        String message = "The provided authentication info is manipulated or comes from other source.";
+        String path = getPath(request);
+        ApiException error = new ApiException(HttpStatus.BAD_REQUEST, message, path);
+        return ResponseEntity.status(400).body(error);
     }
 
     private String getPath(WebRequest request) {
