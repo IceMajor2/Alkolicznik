@@ -3,7 +3,6 @@ package com.demo.alkolicznik.exceptions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -53,12 +53,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<ApiException> handleSignatureException(SignatureException e, WebRequest request) {
-        String message = "The provided authentication info is manipulated or comes from other source.";
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiException> handleBadCredentialsException(BadCredentialsException e, WebRequest request) {
+        String message = "Could not log in: wrong credentials";
         String path = getPath(request);
-        ApiException error = new ApiException(HttpStatus.BAD_REQUEST, message, path);
-        return ResponseEntity.status(400).body(error);
+        ApiException error = new ApiException(HttpStatus.NOT_FOUND, message, path);
+        return ResponseEntity.status(404).body(error);
     }
 
     private String getPath(WebRequest request) {
