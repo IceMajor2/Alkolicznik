@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.stream.Stream;
 
 import static com.demo.alkolicznik.utils.TestUtils.createTokenCookie;
-import static com.demo.alkolicznik.utils.requests.JWTRequests.*;
+import static com.demo.alkolicznik.utils.requests.JwtRequests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

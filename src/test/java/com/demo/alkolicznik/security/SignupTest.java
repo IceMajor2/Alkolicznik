@@ -17,7 +17,7 @@ import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_EN
 import static com.demo.alkolicznik.utils.JsonUtils.createSignupRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.TestUtils.createTokenCookie;
-import static com.demo.alkolicznik.utils.requests.JWTRequests.getRequestJWT;
+import static com.demo.alkolicznik.utils.requests.JwtRequests.getRequestJWT;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JWTRequests {
+public class JwtRequests {
 
     private static TestRestTemplate testRestTemplate;
 
     @Autowired
     public void setTestRestTemplate(TestRestTemplate testRestTemplate) {
-        JWTRequests.testRestTemplate = testRestTemplate;
+        JwtRequests.testRestTemplate = testRestTemplate;
     }
 
     public static <T> ResponseEntity<String> getRequestJWT(String endpoint, Cookie cookie) {
