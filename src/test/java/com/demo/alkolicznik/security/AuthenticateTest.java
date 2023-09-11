@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AuthenticateTest {
 
     private List<User> users;
+    private static final long TOKEN_VALIDITY_TIME = JwtService.FOUR_HOURS_IN_MS / 1000 / 60 / 60;
 
     @Autowired
     public AuthenticateTest(List<User> users) {
@@ -127,15 +128,17 @@ public class AuthenticateTest {
     }
 
     @Test
-    public void shouldReturnCustomExceptionOnTokenExpired() {
+    public void shouldReturn401OnTokenExpired() {
         // given
-        long expirationTimeInHrs = JwtService.FOUR_HOURS_IN_MS / 1000 / 60 / 60;
         Date issuedAt = Timestamp.valueOf(LocalDateTime.now().minusHours(4));
-        Date expiration = Timestamp.valueOf(LocalDateTime.now().minusHours(4 - expirationTimeInHrs));
+        Date expiration = Timestamp.valueOf(LocalDateTime.now().minusHours(4 - TOKEN_VALIDITY_TIME));
         String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration);
         // when
         var response = getRequestJWT("/api/beer", createTokenCookie(jwtToken));
         // then
-        assertIsError(response.getBody(), HttpStatus.UNAUTHORIZED, "Please log in again", "/api/beer");
+        assertIsError(response.getBody(),
+                HttpStatus.UNAUTHORIZED,
+                "Please log in again",
+                "/api/beer");
     }
 }

@@ -97,13 +97,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             try {
                 filterChain.doFilter(request, response);
             } catch (ExpiredJwtException e) {
-                String message = "Please log in again";
-                String path = request.getServletPath();
-                ApiException error = new ApiException(HttpStatus.UNAUTHORIZED, message, path);
-
-                response.setStatus(error.getStatus());
-                response.getWriter().write(convertObjectToJson(error));
+                handleExpiredJwtException(request, response);
             }
+        }
+
+        private void handleExpiredJwtException(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            String message = "Please log in again";
+            String path = request.getServletPath();
+            ApiException error = new ApiException(HttpStatus.UNAUTHORIZED, message, path);
+
+            response.setStatus(error.getStatus());
+            response.getWriter().write(convertObjectToJson(error));
         }
 
         private String convertObjectToJson(Object object) throws JsonProcessingException {
