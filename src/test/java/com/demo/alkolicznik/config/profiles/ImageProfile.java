@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.File;
@@ -41,23 +42,18 @@ import static com.demo.alkolicznik.utils.TestUtils.getRawPathToClassPathResource
 public class ImageProfile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageProfile.class);
-
     // TODO: replace with method
     private static final List<String> BEER_IMAGES = List.of(
             "tyskie-gronie-0.65.png", "zubr-0.5.png",
             "komes-porter-malinowy-0.33.jpg", "miloslaw-biale-0.5.jpg"
     );
-
     private static final List<String> STORE_IMAGES = List.of(
             "carrefour.png", "lubi.jpg", "abc.png"
     );
 
     private static String imageKitPath;
-
     private ImageKit imageKit;
-
     private JdbcTemplate jdbcTemplate;
-
     private TestUtils testUtils;
 
     @Autowired
@@ -67,8 +63,8 @@ public class ImageProfile {
     }
 
     @Autowired
-    public void setImageKitPath(String imageKitPath) {
-        ImageProfile.imageKitPath = imageKitPath;
+    public void setImageKitPath(Environment env) {
+        ImageProfile.imageKitPath = env.getProperty("imageKit.path");
     }
 
     @Bean("beerImages")
@@ -171,7 +167,7 @@ public class ImageProfile {
         String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
         try {
             this.imageKit.setConfig(new io.imagekit.sdk.config.Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "api_key.txt")).get(0),
+                    Files.readAllLines(Paths.get("secure" + File.separator + "imagekit_private_key.txt")).get(0),
                     endpoint));
         } catch (IOException e) {
             throw new RuntimeException("Could not read secured file");
