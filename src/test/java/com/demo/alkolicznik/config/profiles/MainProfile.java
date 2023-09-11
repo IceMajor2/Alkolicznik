@@ -25,12 +25,6 @@ public class MainProfile {
 
     private static JdbcTemplate jdbcTemplate;
 
-    @Bean
-    @Primary
-    public String imageKitPath2() {
-        return "/test";
-    }
-
     @Bean("jdbcTemplate")
     @DependsOn("dataSource")
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
