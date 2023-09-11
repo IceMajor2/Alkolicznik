@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.gui.image;
 
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
+import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreNameDTO;
@@ -72,7 +73,7 @@ public class UploadImageView extends ImageTabTemplate {
                     Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
                     try {
                         RequestUtils.request(HttpMethod.POST, "/api/beer/" + beer.getId() + "/image",
-                                new ImageRequestDTO(path), authCookie, BeerResponseDTO.class);
+                                new ImageRequestDTO(path), authCookie, BeerImageResponseDTO.class);
                     } catch (ApiException e) {
                         GuiUtils.notify(e.getMessage());
                     }
