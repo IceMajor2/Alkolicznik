@@ -3,8 +3,11 @@ package com.demo.alkolicznik.security;
 import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.models.User;
+import com.demo.alkolicznik.security.services.JwtService;
+import com.demo.alkolicznik.utils.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,6 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_BODY;
@@ -22,7 +28,7 @@ import static com.demo.alkolicznik.utils.FindingUtils.getUserRoleLowerCase;
 import static com.demo.alkolicznik.utils.JsonUtils.createAuthRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;
 import static com.demo.alkolicznik.utils.TestUtils.createTokenCookie;
-import static com.demo.alkolicznik.utils.requests.JWTRequests.getRequestJWT;
+import static com.demo.alkolicznik.utils.requests.JwtRequests.getRequestJWT;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.postRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -118,5 +124,18 @@ public class AuthenticateTest {
                 "You did not specify a password",
                 "/api/auth/authenticate"
         );
+    }
+
+    @Test
+    public void shouldReturnCustomExceptionOnTokenExpired() {
+        // given
+        long expirationTimeInHrs = JwtService.FOUR_HOURS_IN_MS / 1000 / 60 / 60;
+        Date issuedAt = Timestamp.valueOf(LocalDateTime.now().minusHours(4));
+        Date expiration = Timestamp.valueOf(LocalDateTime.now().minusHours(4 - expirationTimeInHrs));
+        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration);
+        // when
+        var response = getRequestJWT("/api/beer", createTokenCookie(jwtToken));
+        // then
+        assertIsError(response.getBody(), HttpStatus.UNAUTHORIZED, "Please log in again", "/api/beer");
     }
 }
