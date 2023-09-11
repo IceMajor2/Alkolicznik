@@ -12,7 +12,8 @@ import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.GetFileListRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Component;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,16 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Repository
 public class ImageKitRepository {
 
     private ImageKit imageKit;
-
     private String imageKitPath;
 
-    public ImageKitRepository(String imageKitPath) {
+    public ImageKitRepository(Environment env) {
         this.imageKit = ImageKit.getInstance();
-        this.imageKitPath = imageKitPath;
+        this.imageKitPath = env.getProperty("imageKit.path");
         setConfig();
     }
 

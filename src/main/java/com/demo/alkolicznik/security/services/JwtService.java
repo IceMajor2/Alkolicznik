@@ -5,7 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,15 @@ import java.util.Objects;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
+@PropertySource("classpath:jwt.properties")
 public class JwtService {
 
     private final String jwtKey;
     public static final int FOUR_HOURS_IN_MS = 1000 * 60 * 60 * 4; // 4 hours
+
+    public JwtService(Environment env) {
+        this.jwtKey = env.getProperty("jwt.key");
+    }
 
     public String extractUsername(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
