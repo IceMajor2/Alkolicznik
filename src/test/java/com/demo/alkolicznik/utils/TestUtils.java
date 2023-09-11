@@ -41,10 +41,8 @@ public class TestUtils {
     }
 
     public static BufferedImage getBufferedImageFromWeb(String url) {
-        BufferedImage image = null;
         try {
-            image = ImageIO.read(new URL(url));
-            return image;
+            return ImageIO.read(new URL(url));
         } catch (IOException e) {
             return null;
         }
@@ -52,8 +50,7 @@ public class TestUtils {
 
     public static BufferedImage getBufferedImageFromLocal(String path) {
         try {
-            BufferedImage image = ImageIO.read(new File(path));
-            return image;
+            return ImageIO.read(new File(path));
         } catch (IOException e) {
             return null;
         }
