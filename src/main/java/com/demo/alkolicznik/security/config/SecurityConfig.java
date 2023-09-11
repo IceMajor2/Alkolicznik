@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
+import com.demo.alkolicznik.exceptions.CustomExceptionHandler;
 import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,11 +27,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
     private final CookieAuthenticationFilter cookieAuthenticationFilter;
-
+    private final CustomExceptionHandler.ExceptionHandlerFilter exceptionHandlerFilter;
     private final AuthenticationProvider authenticationProvider;
 
     private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
@@ -69,6 +69,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManager -> sessionManager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+                .addFilterBefore(exceptionHandlerFilter, CorsFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cookieAuthenticationFilter, JwtAuthenticationFilter.class);
         return http.build();
