@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui;
 
+import com.demo.alkolicznik.gui.auth.LogoutButton;
 import com.demo.alkolicznik.gui.beer.BeerView;
 import com.demo.alkolicznik.gui.beerprice.BeerPriceView;
 import com.demo.alkolicznik.gui.image.ImageView;
@@ -56,7 +57,7 @@ public class MainLayout extends AppLayout {
     private Button getAuthButton() {
         Button authButton;
         if (AuthenticatedUser.isAuthenticated()) {
-            authButton = new Button("Sign out");
+            authButton = new LogoutButton();
         } else {
             authButton = new Button("Log in", click ->
                     UI.getCurrent().navigate("login"));

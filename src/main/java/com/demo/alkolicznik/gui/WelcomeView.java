@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui;
 
+import com.demo.alkolicznik.gui.auth.LogoutButton;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -56,7 +57,7 @@ public class WelcomeView extends VerticalLayout {
     private Button getLogInOutButton() {
         Button authButton;
         if (AuthenticatedUser.isAuthenticated()) {
-            authButton = new Button("Sign out");
+            authButton = new LogoutButton();
         } else {
             authButton = new Button("Log in", click ->
                     UI.getCurrent().navigate("login"));
