@@ -6,6 +6,7 @@ import com.demo.alkolicznik.gui.image.ImageView;
 import com.demo.alkolicznik.gui.store.StoreView;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -31,7 +32,7 @@ public class MainLayout extends AppLayout {
 
         header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         header.expand(logo);
-        header.setWidthFull();
+        header.setWidth(99, Unit.PERCENTAGE);
 
         addToNavbar(header);
     }
