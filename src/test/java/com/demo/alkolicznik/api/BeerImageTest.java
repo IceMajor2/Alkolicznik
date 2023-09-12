@@ -24,6 +24,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_MS;
+import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_UNTIL_MS;
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeerImage;
@@ -146,8 +148,8 @@ public class BeerImageTest {
                 BeerImageResponseDTO actual = toModel(postResponse.getBody(), BeerImageResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
                         (actual.getUrl());
-                await().atMost(3000, TimeUnit.MILLISECONDS)
-                        .pollInterval(500, TimeUnit.MILLISECONDS)
+                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
+                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(urlNoTransformation) != null);
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
@@ -348,8 +350,8 @@ public class BeerImageTest {
                         "Unable to find image for this beer",
                         "/api/beer/" + beerId + "/image");
 
-                await().atMost(6, TimeUnit.SECONDS)
-                        .with().pollInterval(1000, TimeUnit.MILLISECONDS)
+                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
+                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(previous_urlToDelete) == null);
                 BufferedImage expectedRemoved = getBufferedImageFromWeb(previous_urlToDelete);
                 assertThat(expectedRemoved)

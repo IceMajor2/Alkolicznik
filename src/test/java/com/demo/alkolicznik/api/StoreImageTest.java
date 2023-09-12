@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_MS;
+import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_UNTIL_MS;
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getStore;
 import static com.demo.alkolicznik.utils.FindingUtils.getStoreImage;
@@ -353,9 +355,9 @@ public class StoreImageTest {
                         HttpStatus.NOT_FOUND,
                         "Unable to find image for this store",
                         "/api/store/image");
-                // waiting for ImageKit
-                await().atMost(3000, TimeUnit.MILLISECONDS)
-                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+
+                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
+                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(notExpectedURL) == null);
                 assertThat(getBufferedImageFromWeb(notExpectedURL))
                         .withFailMessage("Image was not deleted remotely")
@@ -549,8 +551,8 @@ public class StoreImageTest {
                         .isEqualTo(0);
                 // asserting that ImageIO.read returns null
                 // which would mean the image is not found remotely
-                await().atMost(4000, TimeUnit.MILLISECONDS)
-                        .pollInterval(2000, TimeUnit.MILLISECONDS)
+                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
+                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(initialUrl) == null);
                 assertThat(getBufferedImageFromWeb(initialUrl))
                         .withFailMessage("Image was supposed to be deleted from remote")
@@ -640,8 +642,8 @@ public class StoreImageTest {
                         .withFailMessage("Store was supposed to be deleted")
                         .isEmpty();
                 String urlExpectedToNotExist = store.getImage().get().getImageUrl();
-                await().atMost(3000, TimeUnit.MILLISECONDS)
-                        .pollInterval(1500, TimeUnit.MILLISECONDS)
+                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
+                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(urlExpectedToNotExist) == null);
                 assertThat(getBufferedImageFromWeb(urlExpectedToNotExist))
                         .withFailMessage("Image was not deleted remotely")
