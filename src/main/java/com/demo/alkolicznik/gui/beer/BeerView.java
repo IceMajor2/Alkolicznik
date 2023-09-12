@@ -16,6 +16,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -28,16 +29,14 @@ import java.util.Optional;
 @PermitAll
 public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
-    private static final String DEFAULT_CITY = "Olsztyn";
-
     private static final TypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
             new TypeReference<List<BeerResponseDTO>>() {
             };
 
     private BeerForm wizard;
 
-    public BeerView() {
-        super("Beers");
+    public BeerView(Environment env) {
+        super("Beers", env);
 
         setSizeFull();
         add(
@@ -115,7 +114,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie, BEERS_DTO_REF);
             this.grid.setItems(beers);
-            updateDisplayText("entire Poland");
+            updateDisplayText("entire " + COUNTRY);
         } else {
             updateList(DEFAULT_CITY);
             updateDisplayText(DEFAULT_CITY);

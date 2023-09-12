@@ -19,6 +19,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -31,13 +32,12 @@ import java.util.Map;
 public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPriceResponseDTO> {
 
     private static final TypeReference<List<BeerPriceResponseDTO>> PRICES_DTO_REF =
-            new TypeReference<List<BeerPriceResponseDTO>>() {
-            };
+            new TypeReference<>() {};
 
     private BeerPriceForm wizard;
 
-    public BeerPriceView() {
-        super("Prices");
+    public BeerPriceView(Environment env) {
+        super("Prices", env);
 
         setSizeFull();
         add(
@@ -114,10 +114,10 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             List<BeerPriceResponseDTO> prices = RequestUtils.request(HttpMethod.GET,
                     "/api/beer-price", authCookie, PRICES_DTO_REF);
             this.grid.setItems(prices);
-            updateDisplayText("entire Poland");
+            updateDisplayText("entire " + COUNTRY);
         } else {
-            updateList("Olsztyn");
-            updateDisplayText("Olsztyn");
+            updateList(DEFAULT_CITY);
+            updateDisplayText(DEFAULT_CITY);
         }
     }
 

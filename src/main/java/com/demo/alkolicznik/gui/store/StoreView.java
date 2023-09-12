@@ -19,6 +19,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -32,13 +33,12 @@ import java.util.Optional;
 public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
     private static final TypeReference<List<StoreResponseDTO>> STORES_DTO_REF =
-            new TypeReference<List<StoreResponseDTO>>() {
-            };
+            new TypeReference<>() {};
 
     private StoreForm wizard;
 
-    public StoreView() {
-        super("Stores");
+    public StoreView(Environment env) {
+        super("Stores", env);
 
         setSizeFull();
         add(
@@ -58,10 +58,10 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             List<StoreResponseDTO> stores = RequestUtils.request(HttpMethod.GET,
                     "/api/store", authCookie, STORES_DTO_REF);
             this.grid.setItems(stores);
-            updateDisplayText("entire Poland");
+            updateDisplayText("entire " + COUNTRY);
         } else {
-            updateList("Olsztyn");
-            updateDisplayText("Olsztyn");
+            updateList(DEFAULT_CITY);
+            updateDisplayText(DEFAULT_CITY);
         }
     }
 

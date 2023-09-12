@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import org.springframework.core.env.Environment;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
@@ -18,9 +19,13 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     protected FormTemplate<REQUEST> wizard;
 
     protected String textModel;
+    protected static String DEFAULT_CITY;
+    protected static String COUNTRY;
 
-    public ViewTemplate(String textModel) {
+    public ViewTemplate(String textModel, Environment env) {
         this.textModel = textModel;
+        ViewTemplate.DEFAULT_CITY = env.getProperty("default.city");
+        ViewTemplate.COUNTRY = env.getProperty("country");
     }
 
     protected Component getSearchText() {
@@ -93,9 +98,9 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
     protected void updateDisplayText() {
         if (AuthenticatedUser.isUser()) {
-            updateDisplayText("Olsztyn");
+            updateDisplayText(DEFAULT_CITY);
         } else {
-            updateDisplayText("entire Poland");
+            updateDisplayText("entire " + COUNTRY);
         }
     }
 
