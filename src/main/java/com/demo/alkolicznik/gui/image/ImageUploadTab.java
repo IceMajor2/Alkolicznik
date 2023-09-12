@@ -20,7 +20,6 @@ import org.springframework.http.HttpMethod;
 
 import java.util.Map;
 
-// TODO: rename to 'ImageUploadTab'
 public class ImageUploadTab extends ImageTabTemplate {
 
     private Upload singleUpload;

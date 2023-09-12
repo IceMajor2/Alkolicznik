@@ -18,7 +18,6 @@ import org.springframework.http.HttpMethod;
 
 import java.util.Map;
 
-// TODO: rename to 'ImageDeleteTab'
 public class ImageDeleteTab extends ImageTabTemplate {
 
     private Button delete;
