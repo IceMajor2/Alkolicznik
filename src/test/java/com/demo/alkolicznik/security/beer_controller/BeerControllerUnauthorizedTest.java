@@ -25,7 +25,7 @@ import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
 public class BeerControllerUnauthorizedTest {
 
     @Test
-    @DisplayName("[ANON]: restricted GET endpoints")
+    @DisplayName("[ANON]: restricted GET '/api/beer'")
     public void anonRestrictedGetEndpointsTest() {
         String endpoint = "/api/beer";
         var response = getRequest(endpoint);
@@ -42,7 +42,7 @@ public class BeerControllerUnauthorizedTest {
             "Ksiazece, IPA, null",
             "'', null, -1.0"
     }, nullValues = "null")
-    @DisplayName("[ANON]: restricted POST endpoints")
+    @DisplayName("[ANON]: restricted POST '/api/beer'")
     public void anonRestrictedPostEndpointsTest(String brand, String type, Double volume) {
         // given
         String endpoint = "/api/beer";
@@ -63,7 +63,7 @@ public class BeerControllerUnauthorizedTest {
             "9218, null, IPA, 0",
             "3, null, null, null"
     }, nullValues = "null")
-    @DisplayName("[ANON]: restricted PUT endpoints")
+    @DisplayName("[ANON]: restricted PUT '/api/beer/{beer_id}'")
     public void anonRestrictedPutEndpointsTest(Long beerId, String brand,
                                                String type, Double volume) {
         // given
@@ -86,7 +86,7 @@ public class BeerControllerUnauthorizedTest {
             "-5, Namyslow, null, -0.5",
             "3, null, null, null"
     }, nullValues = "null")
-    @DisplayName("[ANON]: restricted PATCH requests")
+    @DisplayName("[ANON]: restricted PATCH '/api/beer/{beer_id}'")
     public void anonRestrictedPatchRequestsTest(Long beerId, String brand,
                                                 String type, Double volume) {
         // given
@@ -110,7 +110,7 @@ public class BeerControllerUnauthorizedTest {
             "null, Biale, 0",
             "null, null, null"
     }, nullValues = "null")
-    @DisplayName("[ANON]: restricted DELETE by object requests")
+    @DisplayName("[ANON]: restricted DELETE '/api/beer'")
     public void anonRestrictedDeleteByObjectRequestsTest(String brand, String type,
                                                          Double volume) {
         // given
@@ -130,7 +130,7 @@ public class BeerControllerUnauthorizedTest {
 
     @ParameterizedTest
     @ValueSource(longs = {3, -5})
-    @DisplayName("[ANON]: restricted DELETE by id requests")
+    @DisplayName("[ANON]: restricted DELETE '/api/beer/{beer_id}'")
     public void anonRestrictedDeleteByIdRequestsTest(Long beerId) {
         String endpoint = "/api/beer/" + beerId;
         // when

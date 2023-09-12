@@ -65,7 +65,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted GET endpoints")
+    @DisplayName("[ACC/ADMIN]: restricted GET '/api/beer'")
     public void authorizedRestrictedEndpointsTest(String adminToken) {
         String endpoint = "/api/beer";
         var response = getRequestJWT(endpoint, createTokenCookie(adminToken));
@@ -74,7 +74,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted POST endpoints")
+    @DisplayName("[ACC/ADMIN]: restricted POST '/api/beer'")
     @DirtiesContext
     public void authorizedRestrictedPostEndpointsTest(String adminToken) {
         String endpoint = "/api/beer";
@@ -84,7 +84,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted PUT endpoints")
+    @DisplayName("[ACC/ADMIN]: restricted PUT '/api/beer/{beer_id}'")
     @DirtiesContext
     public void authorizedRestrictedPutEndpointsTest(String adminToken) {
         String endpoint = "/api/beer/" + 1;
@@ -94,7 +94,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted PATCH requests")
+    @DisplayName("[ACC/ADMIN]: restricted PATCH '/api/beer/{beer_id}'")
     @DirtiesContext
     public void authorizedRestrictedPatchRequestsTest(String adminToken) {
         String endpoint = "/api/beer/" + 3;
@@ -104,7 +104,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted DELETE by object requests")
+    @DisplayName("[ACC/ADMIN]: restricted DELETE '/api/beer'")
     @DirtiesContext
     public void authorizedRestrictedDeleteByObjectRequestsTest(String adminToken) {
         String endpoint = "/api/beer";
@@ -114,7 +114,7 @@ public class BeerControllerAuthorizedTest {
 
     @ParameterizedTest
     @MethodSource("adminTokens")
-    @DisplayName("[ACC/ADMIN]: restricted DELETE by id requests")
+    @DisplayName("[ACC/ADMIN]: restricted DELETE '/api/beer/{beer_id}'")
     @DirtiesContext
     public void authorizedRestrictedDeleteByIdRequestsTest(String adminToken) {
         String endpoint = "/api/beer/" + 6;
