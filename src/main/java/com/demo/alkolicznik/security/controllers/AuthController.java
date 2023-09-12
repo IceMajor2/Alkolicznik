@@ -1,16 +1,14 @@
 package com.demo.alkolicznik.security.controllers;
 
-import com.demo.alkolicznik.dto.security.AuthRequestDTO;
-import com.demo.alkolicznik.dto.security.AuthResponseDTO;
-import com.demo.alkolicznik.dto.security.SignupRequestDTO;
-import com.demo.alkolicznik.dto.security.SignupResponseDTO;
+import com.demo.alkolicznik.dto.security.*;
 import com.demo.alkolicznik.security.services.AuthService;
 import com.demo.alkolicznik.utils.request.CookieUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +39,12 @@ public class AuthController {
         AuthResponseDTO tokenDTO = authService.authenticate(request);
         response.addCookie(CookieUtils.createTokenCookie(tokenDTO.getToken()));
         return tokenDTO;
+    }
+
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AuthLogoutDTO> logout(HttpServletRequest request, HttpServletResponse response) {
+        response.addCookie(CookieUtils.createExpiredTokenCookie(request));
+        return ResponseEntity.ok(new AuthLogoutDTO());
     }
 }
