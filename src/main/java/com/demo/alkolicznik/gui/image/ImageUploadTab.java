@@ -20,12 +20,13 @@ import org.springframework.http.HttpMethod;
 
 import java.util.Map;
 
-public class UploadImageView extends ImageTabTemplate {
+// TODO: rename to 'ImageUploadTab'
+public class ImageUploadTab extends ImageTabTemplate {
 
     private Upload singleUpload;
     private FileBuffer fileBuffer;
 
-    public UploadImageView() {
+    public ImageUploadTab() {
         super();
         radioGroup.setLabel("Add image for:");
     }

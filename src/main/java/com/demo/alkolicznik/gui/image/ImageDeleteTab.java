@@ -18,11 +18,12 @@ import org.springframework.http.HttpMethod;
 
 import java.util.Map;
 
-public class DeleteImageView extends ImageTabTemplate {
+// TODO: rename to 'ImageDeleteTab'
+public class ImageDeleteTab extends ImageTabTemplate {
 
     private Button delete;
 
-    public DeleteImageView() {
+    public ImageDeleteTab() {
         super();
         radioGroup.setLabel("Delete image of:");
     }

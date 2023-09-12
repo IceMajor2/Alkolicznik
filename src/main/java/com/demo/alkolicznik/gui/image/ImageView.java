@@ -13,12 +13,12 @@ import jakarta.annotation.security.RolesAllowed;
 public class ImageView extends VerticalLayout {
 
     private TabSheet tabSheet;
-    private UploadImageView uploadTab;
-    private DeleteImageView deleteTab;
+    private ImageUploadTab uploadTab;
+    private ImageDeleteTab deleteTab;
 
     public ImageView() {
-        this.uploadTab = new UploadImageView();
-        this.deleteTab = new DeleteImageView();
+        this.uploadTab = new ImageUploadTab();
+        this.deleteTab = new ImageDeleteTab();
         this.tabSheet = new TabSheet();
         tabSheet.add("Upload", uploadTab);
         tabSheet.add("Delete", deleteTab);
