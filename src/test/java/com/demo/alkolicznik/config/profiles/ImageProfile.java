@@ -51,15 +51,21 @@ public class ImageProfile {
             "carrefour.png", "lubi.jpg", "abc.png"
     );
 
-    private static String imageKitPath;
     private ImageKit imageKit;
     private JdbcTemplate jdbcTemplate;
     private TestUtils testUtils;
 
+    // properties
+    private static String imageKitPath;
+    public static int POLL_INTERVALS_MS;
+    public static int POLL_INTERVALS_UNTIL_MS;
+
     @Autowired
-    public ImageProfile(TestUtils testUtils, JdbcTemplate jdbcTemplate) {
+    public ImageProfile(TestUtils testUtils, JdbcTemplate jdbcTemplate, Environment env) {
         this.jdbcTemplate = jdbcTemplate;
         this.testUtils = testUtils;
+        ImageProfile.POLL_INTERVALS_MS = env.getProperty("imageKit.repeat-calls-in-ms", Integer.class);
+        ImageProfile.POLL_INTERVALS_UNTIL_MS = POLL_INTERVALS_MS * 2;
     }
 
     @Autowired
