@@ -3,6 +3,7 @@ package com.demo.alkolicznik.gui.beer;
 import com.demo.alkolicznik.dto.beer.*;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.config.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
@@ -16,7 +17,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -30,13 +30,12 @@ import java.util.Optional;
 public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
     private static final TypeReference<List<BeerResponseDTO>> BEERS_DTO_REF =
-            new TypeReference<List<BeerResponseDTO>>() {
-            };
+            new TypeReference<>() {};
 
     private BeerForm wizard;
 
-    public BeerView(Environment env) {
-        super("Beers", env);
+    public BeerView(ConfigProperties configProperties) {
+        super("Beers", configProperties);
 
         setSizeFull();
         add(

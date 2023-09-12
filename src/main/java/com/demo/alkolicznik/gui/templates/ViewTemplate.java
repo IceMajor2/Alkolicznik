@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.gui.templates;
 
+import com.demo.alkolicznik.gui.config.ConfigProperties;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -9,7 +10,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.springframework.core.env.Environment;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
@@ -22,10 +22,10 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     protected static String DEFAULT_CITY;
     protected static String COUNTRY;
 
-    public ViewTemplate(String textModel, Environment env) {
+    public ViewTemplate(String textModel, ConfigProperties configProperties) {
         this.textModel = textModel;
-        ViewTemplate.DEFAULT_CITY = env.getProperty("default.city");
-        ViewTemplate.COUNTRY = env.getProperty("country");
+        ViewTemplate.DEFAULT_CITY = configProperties.getDefaultCity();
+        ViewTemplate.COUNTRY = configProperties.getCountry();
     }
 
     protected Component getSearchText() {

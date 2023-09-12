@@ -6,6 +6,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.config.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
@@ -19,7 +20,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -36,8 +36,8 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
 
     private BeerPriceForm wizard;
 
-    public BeerPriceView(Environment env) {
-        super("Prices", env);
+    public BeerPriceView(ConfigProperties configProperties) {
+        super("Prices", configProperties);
 
         setSizeFull();
         add(

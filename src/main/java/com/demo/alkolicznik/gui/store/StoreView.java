@@ -6,6 +6,7 @@ import com.demo.alkolicznik.dto.store.StoreResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.config.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;
@@ -19,7 +20,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
@@ -37,8 +37,8 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
 
     private StoreForm wizard;
 
-    public StoreView(Environment env) {
-        super("Stores", env);
+    public StoreView(ConfigProperties configProperties) {
+        super("Stores", configProperties);
 
         setSizeFull();
         add(
