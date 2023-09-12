@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.beer_controller;
+package com.demo.alkolicznik.security.controllers.beer_controller;
 
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
