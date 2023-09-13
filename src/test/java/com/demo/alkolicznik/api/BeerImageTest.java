@@ -24,9 +24,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_MS;
-import static com.demo.alkolicznik.config.profiles.ImageProfile.POLL_INTERVALS_UNTIL_MS;
 import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.FileUtils.*;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeerImage;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
@@ -43,6 +42,12 @@ import static org.awaitility.Awaitility.await;
 public class BeerImageTest {
 
     public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/alkolicznik/tr:n-get_beer/test/beer/";
+
+    @Autowired
+    private int pollIntervals;
+
+    @Autowired
+    private int pollIntervalsUntil;
 
     @Nested
     @TestClassOrder(ClassOrderer.Random.class)
@@ -148,8 +153,8 @@ public class BeerImageTest {
                 BeerImageResponseDTO actual = toModel(postResponse.getBody(), BeerImageResponseDTO.class);
                 String urlNoTransformation = removeTransformationFromURL
                         (actual.getUrl());
-                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
-                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
+                await().atMost(pollIntervalsUntil, TimeUnit.MILLISECONDS)
+                        .pollInterval(pollIntervals, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(urlNoTransformation) != null);
                 BufferedImage actualImg = getBufferedImageFromWeb(urlNoTransformation);
                 // then
@@ -350,8 +355,8 @@ public class BeerImageTest {
                         "Unable to find image for this beer",
                         "/api/beer/" + beerId + "/image");
 
-                await().atMost(POLL_INTERVALS_UNTIL_MS, TimeUnit.MILLISECONDS)
-                        .pollInterval(POLL_INTERVALS_MS, TimeUnit.MILLISECONDS)
+                await().atMost(pollIntervalsUntil, TimeUnit.MILLISECONDS)
+                        .pollInterval(pollIntervals, TimeUnit.MILLISECONDS)
                         .until(() -> getBufferedImageFromWeb(previous_urlToDelete) == null);
                 BufferedImage expectedRemoved = getBufferedImageFromWeb(previous_urlToDelete);
                 assertThat(expectedRemoved)
