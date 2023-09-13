@@ -1,10 +1,10 @@
 package com.demo.alkolicznik.utils.matchers;
 
-import java.awt.image.BufferedImage;
-
-import com.demo.alkolicznik.utils.TestUtils;
+import com.demo.alkolicznik.utils.FileUtils;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+
+import java.awt.image.BufferedImage;
 
 public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, BufferedImage> {
 
@@ -18,7 +18,7 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 
 	public BufferedImageAssert hasSameDimensionsAs(BufferedImage expected) {
 		isNotNull();
-		Assertions.assertThat(TestUtils.dimensionsSame(actual, expected))
+		Assertions.assertThat(FileUtils.dimensionsSame(actual, expected))
 				.as("Comparing only dimensions of the image")
 				.isTrue();
 		return this;
@@ -26,7 +26,7 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 
 	public BufferedImageAssert hasDifferentDimensionsAs(BufferedImage compare) {
 		isNotNull();
-		Assertions.assertThat(TestUtils.dimensionsSame(actual, compare))
+		Assertions.assertThat(FileUtils.dimensionsSame(actual, compare))
 				.as("Comparing only dimensions of the image")
 				.isFalse();
 		return this;
@@ -34,7 +34,7 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 
 	public BufferedImageAssert isEqualTo(BufferedImage expected) {
 		isNotNull();
-		Assertions.assertThat(TestUtils.imageEquals(actual, expected))
+		Assertions.assertThat(FileUtils.imageEquals(actual, expected))
 				.as("expecting images to be equal")
 				.isTrue();
 		return this;
@@ -42,7 +42,7 @@ public class BufferedImageAssert extends AbstractAssert<BufferedImageAssert, Buf
 
 	public BufferedImageAssert isNotEqualTo(BufferedImage compare) {
 		isNotNull();
-		Assertions.assertThat(TestUtils.imageEquals(actual, compare))
+		Assertions.assertThat(FileUtils.imageEquals(actual, compare))
 				.as("expecting images not to be equal")
 				.isFalse();
 		return this;
