@@ -11,6 +11,7 @@ import com.demo.alkolicznik.gui.utils.GuiUtils;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.FileBuffer;
@@ -23,6 +24,8 @@ import java.util.Map;
 public class ImageUploadTab extends ImageTabTemplate {
 
     private Upload singleUpload;
+    private Text info;
+    //  private com.vaadin. info;
     private FileBuffer fileBuffer;
 
     public ImageUploadTab() {
@@ -36,9 +39,11 @@ public class ImageUploadTab extends ImageTabTemplate {
         resetIfValueChanged(selection);
         displayItemList(selection);
         if (isBeerBoxDisplayed()) {
+            displayInfo("Proportions must be close to 3:7");
             displayUpload();
             waitForBeerImageRequest();
         } else if (isStoreBoxDisplayed()) {
+            displayInfo("Proportions must not be bigger than 7:2");
             displayUpload();
             waitForStoreImageRequest();
         }
@@ -82,6 +87,11 @@ public class ImageUploadTab extends ImageTabTemplate {
         });
     }
 
+    private void displayInfo(String info) {
+        this.info = new Text(info);
+        add(this.info);
+    }
+
     private void displayUpload() {
         if (isUploadDisplayed()) return;
         this.fileBuffer = new FileBuffer();
@@ -94,9 +104,11 @@ public class ImageUploadTab extends ImageTabTemplate {
     @Override
     protected void resetIfValueChanged(String selection) {
         if (isBeerBoxDisplayed() && !"Beer".equals(selection)) {
+            remove(info);
             remove(beerBox);
             remove(singleUpload);
         } else if (isStoreBoxDisplayed() && !"Store".equals(selection)) {
+            remove(info);
             remove(storeBox);
             remove(singleUpload);
         }
