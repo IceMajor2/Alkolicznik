@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

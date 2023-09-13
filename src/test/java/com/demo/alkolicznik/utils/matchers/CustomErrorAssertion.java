@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.utils;
+package com.demo.alkolicznik.utils.matchers;
 
+import com.demo.alkolicznik.utils.JsonUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;

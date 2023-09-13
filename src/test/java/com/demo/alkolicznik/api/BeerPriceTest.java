@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.*;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;

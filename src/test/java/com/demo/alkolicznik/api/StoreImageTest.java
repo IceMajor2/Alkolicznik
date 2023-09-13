@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FileUtils.*;
 import static com.demo.alkolicznik.utils.FindingUtils.getStore;
 import static com.demo.alkolicznik.utils.FindingUtils.getStoreImage;

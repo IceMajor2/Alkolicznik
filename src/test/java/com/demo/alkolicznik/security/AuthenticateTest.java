@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_BODY;
 import static com.demo.alkolicznik.config.profiles.TestControllerProfile.TEST_ENDPOINT_OK_CODE;
-import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FindingUtils.getUserRoleLowerCase;
 import static com.demo.alkolicznik.utils.JsonUtils.createAuthRequest;
 import static com.demo.alkolicznik.utils.JsonUtils.toModel;

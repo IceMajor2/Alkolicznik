@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.demo.alkolicznik.utils.CustomErrorAssertion.assertIsError;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeer;
 import static com.demo.alkolicznik.utils.FindingUtils.getBeersInCity;
