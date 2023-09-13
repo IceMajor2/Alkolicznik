@@ -25,7 +25,6 @@ public class ImageUploadTab extends ImageTabTemplate {
 
     private Upload singleUpload;
     private Text info;
-    //  private com.vaadin. info;
     private FileBuffer fileBuffer;
 
     public ImageUploadTab() {
