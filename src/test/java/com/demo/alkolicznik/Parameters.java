@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.utils;
+package com.demo.alkolicznik;
 
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
