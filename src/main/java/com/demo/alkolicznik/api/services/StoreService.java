@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.api.services;
 
+import com.demo.alkolicznik.dto.city.CityDTO;
 import com.demo.alkolicznik.dto.store.*;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
@@ -100,6 +101,10 @@ public class StoreService {
                 .orElseThrow(() -> new StoreNotFoundException
                         (store.getName(), store.getCity(), store.getStreet()));
         return this.delete(toDelete.getId());
+    }
+
+    public List<CityDTO> getAllCities() {
+        return CityDTO.asList(storeRepository.findDistinctCities());
     }
 
     private Store checkForPatchConditions(Long storeId, StoreUpdateDTO updateDTO) {

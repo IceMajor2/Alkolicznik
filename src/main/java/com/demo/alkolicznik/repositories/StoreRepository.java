@@ -35,6 +35,9 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
 	@Query("SELECT DISTINCT(s.name) FROM Store s")
 	List<String> findDistinctNames();
 
+	@Query("SELECT DISTINCT(s.city) FROM Store s")
+	List<String> findDistinctCities();
+
 	long countByName(String name);
 
 	default Optional<Store> findByStoreRequest(StoreRequestDTO storeRequestDTO) {
