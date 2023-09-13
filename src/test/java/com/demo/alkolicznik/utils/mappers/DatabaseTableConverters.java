@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.demo.alkolicznik.config.profiles.ImageProfile.extractFilenameFromUrl;
-import static com.demo.alkolicznik.config.profiles.ImageProfile.getRemoteId;
+import static com.demo.alkolicznik.utils.TestUtils.extractFilenameFromUrl;
+import static com.demo.alkolicznik.utils.requests.ImageKitRequests.getRemoteId;
 
 @Component
 public class DatabaseTableConverters {
@@ -189,5 +189,5 @@ enum ResultSetExtractors implements ResultSetExtractor {
             beerImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url), BeerImage.class));
             return beerImage;
         }
-    }
+    };
 }
