@@ -32,7 +32,7 @@ public class StoreControllerUnauthorizedTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.demo.alkolicznik.utils.Parameters#validAndInvalidStorePostRequests")
+    @MethodSource("com.demo.alkolicznik.Parameters#validAndInvalidStorePostRequests")
     @DisplayName("[ANON]: restricted POST '/api/beer'")
     public void anonRestrictedPostEndpointTest(StoreRequestDTO request) {
         var response = postRequest(STORE_ENDPOINT, request);
@@ -41,7 +41,7 @@ public class StoreControllerUnauthorizedTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.demo.alkolicznik.utils.Parameters#validAndInvalidStorePutRequests")
+    @MethodSource("com.demo.alkolicznik.Parameters#validAndInvalidStorePutRequests")
     @DisplayName("[ANON]: restricted PUT '/api/beer/{beer_id}'")
     public void anonRestirctedPutEndpointTest(Long beerId, StoreRequestDTO request) {
         var response = putRequest(STORE_ENDPOINT + '/' + beerId, request);
@@ -50,7 +50,7 @@ public class StoreControllerUnauthorizedTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.demo.alkolicznik.utils.Parameters#validAndInvalidStorePatchRequests")
+    @MethodSource("com.demo.alkolicznik.Parameters#validAndInvalidStorePatchRequests")
     @DisplayName("[ANON]: restricted PATCH '/api/beer/{beer_id}'")
     public void anonRestrictedPatchEndpointTest(Long beerId, StoreUpdateDTO request) {
         var response = putRequest(STORE_ENDPOINT + '/' + beerId, request);
@@ -59,7 +59,7 @@ public class StoreControllerUnauthorizedTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.demo.alkolicznik.utils.Parameters#validAndInvalidStoreDeleteRequests")
+    @MethodSource("com.demo.alkolicznik.Parameters#validAndInvalidStoreDeleteRequests")
     @DisplayName("[ANON]: restricted DELETE '/api/beer'")
     public void anonRestrictedDeleteEndpointTest(StoreRequestDTO request) {
         var response = deleteRequest(STORE_ENDPOINT, request);
