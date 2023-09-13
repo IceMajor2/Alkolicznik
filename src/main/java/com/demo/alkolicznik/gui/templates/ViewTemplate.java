@@ -1,19 +1,30 @@
 package com.demo.alkolicznik.gui.templates;
 
+import com.demo.alkolicznik.dto.city.CityDTO;
 import com.demo.alkolicznik.gui.config.ConfigProperties;
 import com.demo.alkolicznik.security.AuthenticatedUser;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import com.demo.alkolicznik.utils.request.RequestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.server.VaadinRequest;
+import jakarta.servlet.http.Cookie;
+import org.springframework.http.HttpMethod;
+
+import java.util.List;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
-    protected TextField filterCity;
+    private static final TypeReference<List<CityDTO>> CITIES_DTO_REF =
+            new TypeReference<>() {};
+
+    protected ComboBox<CityDTO> cityBox;
     protected H2 displayText;
     protected Grid<RESPONSE> grid;
     protected FormTemplate<REQUEST> wizard;
@@ -34,16 +45,10 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
     }
 
     protected Component getToolbar(REQUEST emptyRequest) {
-        filterCity = new TextField();
-        filterCity.setPlaceholder("Enter a city...");
-        filterCity.setClearButtonVisible(true);
-        filterCity.setValueChangeMode(ValueChangeMode.LAZY);
-        filterCity.addValueChangeListener(event -> {
-            updateList(filterCity.getValue());
-        });
+        cityBox = getCityBox();
 
         if (AuthenticatedUser.isUser()) {
-            return new HorizontalLayout(filterCity);
+            return new HorizontalLayout(cityBox);
         }
 
         Button editorButton = new Button("Open editor");
@@ -51,7 +56,28 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
             grid.asSingleSelect().clear();
             openEditor(emptyRequest);
         });
-        return new HorizontalLayout(filterCity, editorButton);
+        return new HorizontalLayout(cityBox, editorButton);
+    }
+
+    protected ComboBox<CityDTO> getCityBox() {
+        ComboBox<CityDTO> cityBox = new ComboBox<>();
+        cityBox.setAllowCustomValue(false);
+        cityBox.setPlaceholder("Choose a city...");
+        cityBox.setClearButtonVisible(true);
+        cityBox.setWidth("20em");
+        cityBox.setItemLabelGenerator(CityDTO::getCity);
+        cityBox.addValueChangeListener(event -> {
+            if(cityBox.getValue() == null) updateList();
+            else updateList(cityBox.getValue().getCity());
+        });
+        setCityBoxItems(cityBox);
+        return cityBox;
+    }
+
+    protected void setCityBoxItems(ComboBox<CityDTO> cityBox) {
+        Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
+        List<CityDTO> cities = RequestUtils.request(HttpMethod.GET, "/api/city", authCookie, new TypeReference<>() {});
+        cityBox.setItems(cities);
     }
 
     protected Component getContent() {
