@@ -257,7 +257,7 @@ public class JsonUtils {
         }
     }
 
-    protected static JSONObject getJsonObject(String json) {
+    public static JSONObject getJsonObject(String json) {
         try {
             JSONObject jsonObject = new JSONObject(json);
             return jsonObject;
