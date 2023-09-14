@@ -11,20 +11,21 @@ import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BeerService {
 
-    private BeerRepository beerRepository;
-
-    private StoreRepository storeRepository;
-
-    private BeerImageService imageService;
+    private final BeerRepository beerRepository;
+    private final StoreRepository storeRepository;
+    private final BeerImageService imageService;
 
     public BeerResponseDTO get(Long beerId) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
@@ -54,6 +55,7 @@ public class BeerService {
         return BeerResponseDTO.asList(beerRepository.findAllByOrderByIdAsc());
     }
 
+    @Transactional(readOnly = false)
     public BeerResponseDTO add(BeerRequestDTO requestDTO) {
         Beer beer = BeerRequestDTO.toModel(requestDTO);
         if (beerRepository.exists(beer)) {
@@ -62,6 +64,7 @@ public class BeerService {
         return new BeerResponseDTO(beerRepository.save(beer));
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
         Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
         Beer newBeer = BeerRequestDTO.toModel(requestDTO);
@@ -77,6 +80,7 @@ public class BeerService {
         return new BeerResponseDTO(beerRepository.save(toOverwrite));
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
         Beer beer = checkForPatchConditions(beerId, updateDTO);
         Beer original = (Beer) beer.clone();
@@ -95,6 +99,7 @@ public class BeerService {
         return new BeerResponseDTO(beerRepository.save(beer));
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerDeleteResponseDTO delete(Long beerId) {
         Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
                 new BeerNotFoundException(beerId));
@@ -103,6 +108,7 @@ public class BeerService {
         return new BeerDeleteResponseDTO(toDelete);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
         Beer toDelete = beerRepository.findByFullnameAndVolume(request.getFullName(), request.getVolume())
                 .orElseThrow(() -> new BeerNotFoundException(request.getFullName(), request.getVolume()));
