@@ -39,7 +39,7 @@ public class Beer implements Cloneable {
     private BeerImage image;
 
     @OneToMany(mappedBy = "beer",
-            cascade = {CascadeType.MERGE},
+            cascade = {CascadeType.PERSIST},
             orphanRemoval = true,
             fetch = FetchType.LAZY)
     @JsonIgnore
