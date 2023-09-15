@@ -13,20 +13,19 @@ import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class BeerService {
 
     private final BeerRepository beerRepository;
     private final StoreRepository storeRepository;
     private final BeerImageService imageService;
 
+    @Transactional(readOnly = true)
     public BeerResponseDTO get(Long beerId) {
         Beer beer = beerRepository.findById(beerId).orElseThrow(
                 () -> new BeerNotFoundException(beerId)
@@ -34,6 +33,7 @@ public class BeerService {
         return new BeerResponseDTO(beer);
     }
 
+    @Transactional(readOnly = true)
     public List<BeerResponseDTO> getBeers(String city) {
         if (!storeRepository.existsByCity(city)) {
             throw new NoSuchCityException(city);
@@ -51,6 +51,7 @@ public class BeerService {
         return BeerResponseDTO.asList(beersInCity);
     }
 
+    @Transactional(readOnly = true)
     public List<BeerResponseDTO> getBeers() {
         return BeerResponseDTO.asList(beerRepository.findAllByOrderByIdAsc());
     }
@@ -64,79 +65,52 @@ public class BeerService {
         return new BeerResponseDTO(beerRepository.save(beer));
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
+        // CONDITIONS: start
         Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
-        Beer newBeer = BeerRequestDTO.toModel(requestDTO);
-        Beer overwritten = updateFieldsOnPut(toOverwrite, newBeer);
+        Beer overwritten = BeerRequestDTO.toOverwrittenModel(requestDTO, toOverwrite);
         if (beerRepository.exists(overwritten)) throw new BeerAlreadyExistsException();
-        // for each PUT request all the previous
-        // beer prices for this beer MUST be deleted
-        toOverwrite.deleteAllPrices();
-        // for each PUT request the previous image MUST be deleted
-        if (toOverwrite.getImage().isPresent()) {
-            imageService.delete(toOverwrite.getImage().get());
-        }
-        return new BeerResponseDTO(beerRepository.save(toOverwrite));
+        // CONDITIONS: end
+        overwritten.deleteAllPrices();
+        toOverwrite.getImage().ifPresent(beerImage -> {
+            imageService.delete(beerImage);
+            overwritten.setImage(null);
+        });
+        return new BeerResponseDTO(beerRepository.save(overwritten));
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
     public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
-        Beer beer = checkForPatchConditions(beerId, updateDTO);
-        Beer original = (Beer) beer.clone();
-        updateFieldsOnPatch(beer, updateDTO);
-
-        if (beerRepository.exists(beer))
+        // CONDITIONS: start
+        Beer toUpdate = checkForPatchConditions(beerId, updateDTO);
+        Beer updated = BeerUpdateDTO.toModel(updateDTO, toUpdate);
+        if (beerRepository.exists(updated))
             throw new BeerAlreadyExistsException();
-        // deleting prices on conditions
-        if (this.pricesToDelete(updateDTO)) {
-            beer.deleteAllPrices();
+        // CONDITIONS: end
+        if (this.pricesToDelete(updateDTO))
+            updated.deleteAllPrices();
+        if (this.imageToDelete(toUpdate, updateDTO)) {
+            imageService.delete(toUpdate.getImage().get());
+            updated.setImage(null);
         }
-        // deleting image on conditions
-        if (this.imageToDelete(original, updateDTO)) {
-            imageService.delete(beer.getImage().get());
-        }
-        return new BeerResponseDTO(beerRepository.save(beer));
+
+        return new BeerResponseDTO(beerRepository.save(updated));
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
+    @Transactional(readOnly = false)
     public BeerDeleteResponseDTO delete(Long beerId) {
         Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
                 new BeerNotFoundException(beerId));
         beerRepository.delete(toDelete);
-        if (toDelete.getImage().isPresent()) imageService.delete(toDelete.getImage().get());
+        if (toDelete.getImage().isPresent())
+            imageService.delete(toDelete.getImage().get());
         return new BeerDeleteResponseDTO(toDelete);
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
+    @Transactional(readOnly = false)
     public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
         Beer toDelete = beerRepository.findByFullnameAndVolume(request.getFullName(), request.getVolume())
                 .orElseThrow(() -> new BeerNotFoundException(request.getFullName(), request.getVolume()));
         return this.delete(toDelete.getId());
-    }
-
-    private void updateFieldsOnPatch(Beer toUpdate, BeerUpdateDTO updateDTO) {
-        String updatedBrand = updateDTO.getBrand();
-        String updatedType = updateDTO.getType();
-        Double updatedVolume = updateDTO.getVolume();
-
-        if (updatedBrand != null) {
-            toUpdate.setBrand(updatedBrand);
-        }
-        if (updatedType != null) {
-            if (updatedType.isBlank()) toUpdate.setType(null);
-            else toUpdate.setType(updatedType);
-        }
-        if (updatedVolume != null) {
-            toUpdate.setVolume(updatedVolume);
-        }
-    }
-
-    private Beer updateFieldsOnPut(Beer toOverwrite, Beer newBeer) {
-        toOverwrite.setBrand(newBeer.getBrand());
-        toOverwrite.setType(newBeer.getType());
-        toOverwrite.setVolume(newBeer.getVolume());
-        return toOverwrite;
     }
 
     private Beer checkForUpdateConditions(Long beerId, BeerUpdateDTO updateDTO) {
