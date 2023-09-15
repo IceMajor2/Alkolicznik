@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @Setter
 public class StoreUpdateDTO implements UpdateModel<Store> {
-    
+
     @NotBlankIfExists(message = "Name was not specified")
     private String name;
 
@@ -44,15 +44,29 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
         String upName = this.getName();
         String upCity = this.getCity();
         String upStreet = this.getStreet();
-        if(upName != null && !Objects.equals(currName, upName)) {
+        if (upName != null && !Objects.equals(currName, upName)) {
             return true;
         }
-        if(upCity != null && !Objects.equals(currCity, upCity)) {
+        if (upCity != null && !Objects.equals(currCity, upCity)) {
             return true;
         }
-        if(upStreet != null && !Objects.equals(currStreet, upStreet)) {
+        if (upStreet != null && !Objects.equals(currStreet, upStreet)) {
             return true;
         }
         return false;
+    }
+
+    // TODO: write logic
+    public static Store toModel(StoreUpdateDTO updateDTO, Store original) {
+        Store model = (Store) original.clone();
+
+        String updatedName = updateDTO.getName();
+        String updatedCity = updateDTO.getCity();
+        String updatedStreet = updateDTO.getStreet();
+        if (updatedName != null) model.setName(updatedName);
+        if (updatedCity != null) model.setCity(updatedCity);
+        if (updatedStreet != null) model.setStreet(updatedStreet);
+
+        return model;
     }
 }
