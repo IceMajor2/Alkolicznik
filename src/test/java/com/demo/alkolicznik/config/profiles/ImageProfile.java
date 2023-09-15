@@ -99,7 +99,9 @@ public class ImageProfile {
 
     @Bean("pollIntervalsUntil")
     public int pollIntervalsUntil(Environment env, int pollIntervals) {
-        return env.getProperty("imageKit.repeat-calls-tries", Integer.class) * pollIntervals;
+        int tries = env.getProperty("imageKit.repeat-calls-tries", Integer.class);
+        if(tries != 1) return tries * pollIntervals;
+        return pollIntervals + 1;
     }
 
     @PostConstruct
