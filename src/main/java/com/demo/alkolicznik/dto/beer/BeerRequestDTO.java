@@ -45,6 +45,15 @@ public class BeerRequestDTO {
         return beer;
     }
 
+    public static Beer toOverwrittenModel(BeerRequestDTO request, Beer toOverwrite) {
+        Beer toOverwriteClone = (Beer) toOverwrite.clone();
+        Beer partiallyOverwritten = toModel(request);
+        toOverwriteClone.setBrand(partiallyOverwritten.getBrand());
+        toOverwriteClone.setType(partiallyOverwritten.getType());
+        toOverwriteClone.setVolume(partiallyOverwritten.getVolume());
+        return toOverwriteClone;
+    }
+
     @JsonIgnore
     public String getFullName() {
         StringBuilder sb = new StringBuilder(this.brand);

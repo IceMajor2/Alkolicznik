@@ -73,4 +73,23 @@ public class BeerUpdateDTO implements UpdateModel<Beer> {
 		}
 		return sb.toString();
 	}
+
+	public static Beer toModel(BeerUpdateDTO updateDTO, Beer toUpdate) {
+		Beer updated = (Beer) toUpdate.clone();
+		String updatedBrand = updateDTO.getBrand();
+		String updatedType = updateDTO.getType();
+		Double updatedVolume = updateDTO.getVolume();
+
+		if (updatedBrand != null) {
+			updated.setBrand(updatedBrand);
+		}
+		if (updatedType != null) {
+			if (updatedType.isBlank()) updated.setType(null);
+			else updated.setType(updatedType);
+		}
+		if (updatedVolume != null) {
+			updated.setVolume(updatedVolume);
+		}
+		return updated;
+	}
 }
