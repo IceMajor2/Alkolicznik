@@ -4,6 +4,7 @@ import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
 import com.demo.alkolicznik.dto.store.StoreRequestDTO;
 import com.demo.alkolicznik.dto.store.StoreResponseDTO;
+import com.demo.alkolicznik.dto.store.StoreUpdateDTO;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.matchers.BufferedImageAssert;
@@ -33,6 +34,7 @@ import static com.demo.alkolicznik.utils.JsonUtils.*;
 import static com.demo.alkolicznik.utils.TestUtils.*;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
+import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -528,7 +530,7 @@ public class StoreImageTest {
                     "5, Primo, Olsztyn, ul. Okulickiego 15",
                     "4, Dwojka, Gdansk, al. Hallera 121"
             })
-            @DisplayName("PUT: '/api/store' single store with image replacement with new brand removes image")
+            @DisplayName("PUT: '/api/store' single store with image replacement and new brand removes image")
             @DirtiesContext
             public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
                     (Long storeId, String name, String city, String street) {
@@ -585,6 +587,100 @@ public class StoreImageTest {
                 assertThat(actualImage).isNotNull();
                 assertThat(actualImage.getRemoteId()).isEqualTo(expected.getRemoteId());
                 assertThat(actualImage.getUrl()).isEqualTo(expected.getImageUrl());
+            }
+        }
+
+        @Nested
+        @TestMethodOrder(MethodOrderer.Random.class)
+        @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+        class PatchRequests {
+
+            private List<Store> stores;
+            private JdbcTemplate jdbcTemplate;
+
+            @Autowired
+            public PatchRequests(List<Store> stores, DataSource dataSource) {
+                this.stores = stores;
+                this.jdbcTemplate = new JdbcTemplate(dataSource);
+            }
+
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "5, Carrefour, null, null",
+                    "4, Milek, Olsztyn, null"
+            }, nullValues = "null")
+            @DisplayName("PATCH: '/api/store/{store_id}' updating unique store name removes image")
+            @DirtiesContext
+            public void shouldRemoveImageOnUpdatingUniqueStoreName(Long storeId, String name, String city, String street) {
+                // given
+                Store beforeUpdate = getStore(storeId, stores);
+                String initialUrl = beforeUpdate.getImage().get().getImageUrl();
+                StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+                // when
+                var patchResponse = patchRequest("/api/store/" + storeId, request);
+                assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                var getResponse = getRequest("/api/store/image", Map.of("name", beforeUpdate.getName()));
+                Integer count = jdbcTemplate.queryForObject
+                        ("SELECT count(*) FROM store_image WHERE store_name = ?",
+                                Integer.class, beforeUpdate.getName());
+                // then
+                assertIsError(getResponse.getBody(),
+                        HttpStatus.NOT_FOUND,
+                        "Unable to find store of '%s' name".formatted(beforeUpdate.getName()),
+                        "/api/store/image");
+                assertThat(count)
+                        .withFailMessage("'%s' was found in 'store_image' table".formatted(beforeUpdate.getName()))
+                        .isEqualTo(0);
+                await().atMost(pollIntervalsUntil, TimeUnit.MILLISECONDS)
+                        .pollInterval(pollIntervals, TimeUnit.MILLISECONDS)
+                        .until(() -> getBufferedImageFromWeb(initialUrl) == null);
+                assertThat(getBufferedImageFromWeb(initialUrl))
+                        .withFailMessage("Image was supposed to be deleted from remote")
+                        .isNull();
+            }
+
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "2, Lubi, Braniewo, ul. Dworcowa 21",
+                    "9, Carrefour, Katowice, null"
+            }, nullValues = "null")
+            @DisplayName("PATCH: '/api/store/{store_id}' updating store name attaches image")
+            @DirtiesContext
+            public void shouldAttachImageIfUpdatingToExistingBrandWithImage(Long storeId, String name, String city, String street) {
+                // given
+                StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+                // when
+                var patchResponse = patchRequest("/api/store/" + storeId, request);
+                assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                StoreResponseDTO actual = toModel(patchResponse.getBody(), StoreResponseDTO.class);
+                // then
+                assertThat(actual.getImage())
+                        .withFailMessage("Image was supposed to exist")
+                        .isNotNull();
+            }
+
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "5, null, null, ul. Dworcowa 101",
+                    "8, Carrefour, Gdansk, al. Hallera 12"
+            }, nullValues = "null")
+            @DisplayName("PATCH: '/api/store/{store_id}' not updating name does not change image")
+            @DirtiesContext
+            public void shouldNotInterfereWithImageIfNameWasNotChanged(Long storeId, String name, String city, String street) {
+                // given
+                StoreUpdateDTO request = createStoreUpdateRequest(name, city, street);
+                BufferedImage initialImage = getBufferedImageFromWeb(getStoreImage(storeId, stores).getImageUrl());
+                // when
+                var patchResponse = patchRequest("/api/store/" + storeId, request);
+                assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                StoreResponseDTO actual = toModel(patchResponse.getBody(), StoreResponseDTO.class);
+                BufferedImage actualImage = getBufferedImageFromWeb(actual.getImage().getUrl());
+                // then
+                assertThat(actualImage)
+                        .withFailMessage("Image was removed")
+                        .isNotNull();
+                BufferedImageAssert.assertThat(actualImage)
+                        .isEqualTo(initialImage);
             }
         }
 
