@@ -29,14 +29,6 @@ public class StoreRequestDTO {
         this.street = store.getStreet();
     }
 
-    public static Store toModel(StoreRequestDTO requestDTO, Store original) {
-        Store model = (Store) original.clone();
-        model.setName(requestDTO.getName());
-        model.setCity(requestDTO.getCity());
-        model.setStreet(requestDTO.getStreet());
-        return model;
-    }
-
     public static Store toModel(StoreRequestDTO requestDTO, Optional<StoreImage> optImage) {
         Store store = new Store();
         store.setName(requestDTO.getName());
