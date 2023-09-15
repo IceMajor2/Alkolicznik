@@ -56,7 +56,6 @@ public class StoreUpdateDTO implements UpdateModel<Store> {
         return false;
     }
 
-    // TODO: write logic
     public static Store toModel(StoreUpdateDTO updateDTO, Store original) {
         Store model = (Store) original.clone();
 
