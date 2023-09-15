@@ -20,7 +20,7 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
-public class Store {
+public class Store implements Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "store_generator")
@@ -70,6 +70,15 @@ public class Store {
 		return Objects.equals(name, store.getName()) &&
 				Objects.equals(city, store.getCity()) &&
 				Objects.equals(street, store.getStreet());
+	}
+
+	@Override
+	public Object clone() {
+		try {
+			return (Store) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void saveBeer(Beer beer, double price) {
