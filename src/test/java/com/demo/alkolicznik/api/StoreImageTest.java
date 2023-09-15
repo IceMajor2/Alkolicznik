@@ -347,7 +347,7 @@ public class StoreImageTest {
             @ValueSource(strings = {"ABC", "Carrefour", "Lubi"})
             @DisplayName("DELETE: '/api/store/image?name='")
             @DirtiesContext
-            public void successfulDeletionTest(String storeName) throws InterruptedException {
+            public void successfulDeletionTest(String storeName) {
                 StoreImage notExpected = getStoreImage(storeName, storeImages);
                 String notExpectedURL = notExpected.getImageUrl();
                 // when
@@ -531,7 +531,7 @@ public class StoreImageTest {
             @DisplayName("PUT: '/api/store' single store with image replacement with new brand removes image")
             @DirtiesContext
             public void replacingSingleEntityOfStoreWithImageShouldDeleteImageTest
-                    (Long storeId, String name, String city, String street) throws InterruptedException {
+                    (Long storeId, String name, String city, String street) {
                 Store store = getStore(storeId, stores);
                 String initialUrl = store.getImage().get().getImageUrl();
                 // given
@@ -629,7 +629,7 @@ public class StoreImageTest {
             @ValueSource(longs = {4, 5})
             @DisplayName("DELETE: '/api/store/{store_id}' last-entity-standing")
             @DirtiesContext
-            public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) throws InterruptedException {
+            public void deletingLastEntityStandingShouldRemoveImageTest(Long storeId) {
                 Store store = getStore(storeId.longValue(), stores);
                 // when
                 var deleteResponse = deleteRequestAuth("admin", "admin", "/api/store/" + storeId);
