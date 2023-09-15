@@ -150,7 +150,7 @@ public class StoreService {
         overwritten.setPrices(toOverwrite.getPrices());
         return overwritten;
     }
-    
+
     private void attachImageIfExists(Store updated) {
         imageService.findByStoreName(updated.getName()).ifPresent
                 (updated::setImage);
