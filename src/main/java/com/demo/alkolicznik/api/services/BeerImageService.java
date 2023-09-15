@@ -13,8 +13,9 @@ import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,15 +25,14 @@ import static com.demo.alkolicznik.utils.Utils.createBeerFilename;
 import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BeerImageService {
 
-    private BeerRepository beerRepository;
+    private final BeerRepository beerRepository;
+    private final BeerImageRepository beerImageRepository;
+    private final ImageKitRepository imageKitRepository;
 
-    private BeerImageRepository beerImageRepository;
-
-    private ImageKitRepository imageKitRepository;
-
+    @Transactional(readOnly = true)
     public BeerImageResponseDTO get(Long beerId) {
         Beer beer = beerRepository.findById(beerId)
                 .orElseThrow(() -> new BeerNotFoundException(beerId));
@@ -41,10 +41,12 @@ public class BeerImageService {
         return new BeerImageResponseDTO(image);
     }
 
+    @Transactional(readOnly = true)
     public List<BeerImageResponseDTO> getAll() {
         return BeerImageResponseDTO.asList(beerImageRepository.findAll());
     }
 
+    @Transactional
     public BeerImageResponseDTO add(Long beerId, ImageRequestDTO request) {
         String imagePath = request.getImagePath();
         File file = new File(imagePath);
@@ -66,6 +68,7 @@ public class BeerImageService {
         return new BeerImageResponseDTO(saved);
     }
 
+    @Transactional
     public void delete(BeerImage image) {
         imageKitRepository.delete(image);
         image.getBeer().setImage(null);
@@ -73,6 +76,7 @@ public class BeerImageService {
         beerImageRepository.deleteById(image.getId());
     }
 
+    @Transactional
     public void delete(Long beerId) {
         Beer beer = beerRepository.findById(beerId)
                 .orElseThrow(() -> new BeerNotFoundException(beerId));

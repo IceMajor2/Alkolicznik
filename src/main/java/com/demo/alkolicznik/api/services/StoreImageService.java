@@ -14,26 +14,27 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.demo.alkolicznik.utils.Utils.*;
+import static com.demo.alkolicznik.utils.Utils.createStoreFilename;
+import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StoreImageService {
 
-    private StoreRepository storeRepository;
+    private final StoreRepository storeRepository;
+    private final StoreImageRepository storeImageRepository;
+    private final ImageKitRepository imageKitRepository;
 
-    private StoreImageRepository storeImageRepository;
-
-    private ImageKitRepository imageKitRepository;
-
+    @Transactional(readOnly = true)
     public StoreImageResponseDTO get(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreNotFoundException(storeId));
@@ -42,6 +43,7 @@ public class StoreImageService {
         return new StoreImageResponseDTO(image);
     }
 
+    @Transactional(readOnly = true)
     public StoreImageResponseDTO get(String storeName) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
@@ -50,23 +52,27 @@ public class StoreImageService {
         return new StoreImageResponseDTO(image);
     }
 
+    @Transactional(readOnly = true)
     public List<StoreImageResponseDTO> getAll() {
         return StoreImageResponseDTO.asList(storeImageRepository.findAll());
     }
 
+    @Transactional
     public StoreImageResponseDTO add(Store store, String imagePath) {
         StoreImage added = this.add(store.getName(), imagePath);
         store.setImage(added);
         return new StoreImageResponseDTO(added);
     }
 
+    @Transactional
     public StoreImageResponseDTO add(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
         return new StoreImageResponseDTO(
                 this.add(storeName, request.getImagePath()));
     }
-    
+
+    @Transactional
     private StoreImage add(String storeName, String imagePath) {
         File file = new File(imagePath);
         fileCheck(file);
@@ -88,6 +94,7 @@ public class StoreImageService {
         return storeImageRepository.save(storeImage);
     }
 
+    @Transactional
     public StoreImageResponseDTO update(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
@@ -97,6 +104,7 @@ public class StoreImageService {
         return this.add(storeName, request);
     }
 
+    @Transactional
     public void delete(String storeName) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
@@ -105,11 +113,13 @@ public class StoreImageService {
         this.delete(image);
     }
 
+    @Transactional
     public void delete(StoreImage image) {
         imageKitRepository.delete(image);
         storeImageRepository.delete(image);
     }
 
+    @Transactional(readOnly = true)
     public Optional<StoreImage> findByStoreName(String name) {
         return storeImageRepository.findByStoreName(name);
     }
