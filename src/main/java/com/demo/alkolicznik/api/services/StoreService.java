@@ -12,7 +12,6 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -80,7 +79,7 @@ public class StoreService {
         return new StoreResponseDTO(storeRepository.save(overwritten));
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
+    @Transactional(readOnly = false)
     public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
         // CONDITIONS: start
         Store store = checkForPatchConditions(storeId, updateDTO);
@@ -90,9 +89,9 @@ public class StoreService {
         }
         // CONDITIONS: end
         updated.deleteAllPrices();
-
         if (isPreviousImageToDelete(store, updated))
             imageService.delete(store.getImage().get());
+        attachImageIfExists(updated);
         return new StoreResponseDTO(storeRepository.save(updated));
     }
 
@@ -150,5 +149,10 @@ public class StoreService {
         overwritten.setId(toOverwrite.getId());
         overwritten.setPrices(toOverwrite.getPrices());
         return overwritten;
+    }
+    
+    private void attachImageIfExists(Store updated) {
+        imageService.findByStoreName(updated.getName()).ifPresent
+                (updated::setImage);
     }
 }
