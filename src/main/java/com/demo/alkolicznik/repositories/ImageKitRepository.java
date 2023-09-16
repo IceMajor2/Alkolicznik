@@ -3,13 +3,12 @@ package com.demo.alkolicznik.repositories;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.Utils;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.exceptions.NotFoundException;
-import io.imagekit.sdk.models.BaseFile;
 import io.imagekit.sdk.models.DeleteFolderRequest;
 import io.imagekit.sdk.models.FileCreateRequest;
-import io.imagekit.sdk.models.GetFileListRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.PropertySource;
@@ -48,13 +47,10 @@ public class ImageKitRepository {
         Result result = upload(srcPath, remotePath, filename);
         String fileId = result.getFileId();
         // get link
-        if (imgClass.equals(StoreImage.class)) {
-            var baseOptions = getBaseOptionsForMapping(fileId);
+        if (Utils.isStoreImage(imgClass))
             return new StoreImage(result.getUrl(), fileId);
-        } else if (imgClass.equals(BeerImage.class)) {
-            var baseOptions = getBaseOptionsForMapping(fileId);
+        else if (Utils.isBeerImage(imgClass))
             return new BeerImage(result.getUrl(), fileId);
-        }
         return null;
     }
 
@@ -82,13 +78,13 @@ public class ImageKitRepository {
     }
 
     @SneakyThrows
-    public static long getUpdatedAt(String fileId) {
+    public long getUpdatedAt(String fileId) {
         Result result = ImageKit.getInstance().getFileDetail(fileId);
         return result.getUpdatedAt().toInstant().getEpochSecond();
     }
 
     @SneakyThrows
-    public static String getFilePath(String fileId) {
+    public String getFilePath(String fileId) {
         Result result = ImageKit.getInstance().getFileDetail(fileId);
         return result.getFilePath();
     }
@@ -111,15 +107,7 @@ public class ImageKitRepository {
     }
 
     @SneakyThrows
-    public List<BaseFile> findAllIn(String path) {
-        GetFileListRequest getFileListRequest = new GetFileListRequest();
-        getFileListRequest.setPath(imageKitPath + path);
-        return imageKit.getFileList(getFileListRequest).getResults();
-    }
-
-    @SneakyThrows
     public void delete(ImageModel image) {
-        System.out.println(image.getRemoteId());
         imageKit.deleteFile(image.getRemoteId());
     }
 
@@ -128,11 +116,6 @@ public class ImageKitRepository {
         DeleteFolderRequest deleteFolderRequest = new DeleteFolderRequest();
         deleteFolderRequest.setFolderPath(imageKitPath + path);
         imageKit.deleteFolder(deleteFolderRequest);
-    }
-
-    @SneakyThrows
-    public Result getFileDetails(String fileId) {
-        return imageKit.getFileDetail(fileId);
     }
 
     private void setConfig(String endpoint, String publicKey, String privateKey) {
