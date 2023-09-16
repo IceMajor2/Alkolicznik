@@ -21,22 +21,22 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static com.demo.alkolicznik.utils.requests.ImageKitRequests.*;
 
 @Configuration
 @Profile("image")
-@PropertySource("classpath:profiles/image.properties")
+@PropertySources({ // order is meaningful: first is the main .properties loaded, then test's overrides duplicates
+        @PropertySource("classpath:imageKit.properties"),
+        @PropertySource("classpath:profiles/image.properties")})
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class ImageProfile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageProfile.class);
 
+    private Environment env;
     private JdbcTemplate jdbcTemplate;
     private FileUtils fileUtils;
 
@@ -50,22 +50,17 @@ public class ImageProfile {
     private Resource beerImageDir;
 
     @Autowired
-    public ImageProfile(FileUtils fileUtils, JdbcTemplate jdbcTemplate) {
+    public ImageProfile(FileUtils fileUtils, JdbcTemplate jdbcTemplate, Environment env) {
         this.jdbcTemplate = jdbcTemplate;
         this.fileUtils = fileUtils;
+        this.env = env;
     }
 
     private void setImageKit() {
-        ImageKit imageKit = ImageKit.getInstance();
-        String endpoint = "https://ik.imagekit.io/alkolicznik";
-        String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
-        try {
-            imageKit.setConfig(new io.imagekit.sdk.config.Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "imagekit_private_key.txt")).get(0),
-                    endpoint));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read file");
-        }
+        String publicKey = env.getProperty("imageKit.public-key");
+        String privateKey = env.getProperty("imageKit.private-key");
+        String endpoint = env.getProperty("imageKit.endpoint");
+        ImageKit.getInstance().setConfig(new io.imagekit.sdk.config.Configuration(publicKey, privateKey, endpoint));
     }
 
     @Bean("beerImages")
@@ -100,7 +95,7 @@ public class ImageProfile {
     @Bean("pollIntervalsUntil")
     public int pollIntervalsUntil(Environment env, int pollIntervals) {
         int tries = env.getProperty("imageKit.repeat-calls-tries", Integer.class);
-        if(tries != 1) return tries * pollIntervals;
+        if (tries != 1) return tries * pollIntervals;
         return pollIntervals + 1;
     }
 
