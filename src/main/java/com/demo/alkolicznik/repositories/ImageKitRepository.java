@@ -12,11 +12,10 @@ import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.GetFileListRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
+@PropertySource("classpath:imageKit.properties")
 public class ImageKitRepository {
 
     private ImageKit imageKit;
@@ -32,7 +32,11 @@ public class ImageKitRepository {
     public ImageKitRepository(Environment env) {
         this.imageKit = ImageKit.getInstance();
         this.imageKitPath = env.getProperty("imageKit.path");
-        setConfig();
+
+        String endpoint = env.getProperty("imageKit.endpoint");
+        String publicKey = env.getProperty("imageKit.public-key");
+        String privateKey = env.getProperty("imageKit.private-key");
+        setConfig(endpoint, publicKey, privateKey);
     }
 
     /**
@@ -115,6 +119,7 @@ public class ImageKitRepository {
 
     @SneakyThrows
     public void delete(ImageModel image) {
+        System.out.println(image.getRemoteId());
         imageKit.deleteFile(image.getRemoteId());
     }
 
@@ -130,15 +135,7 @@ public class ImageKitRepository {
         return imageKit.getFileDetail(fileId);
     }
 
-    private void setConfig() {
-        String endpoint = "https://ik.imagekit.io/alkolicznik";
-        String publicKey = "public_9bnA9mQhgiGpder50E8rqIB98uM=";
-        try {
-            imageKit.setConfig(new Configuration(publicKey,
-                    Files.readAllLines(Paths.get("secure" + File.separator + "imagekit_private_key.txt")).get(0),
-                    endpoint));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read secured file");
-        }
+    private void setConfig(String endpoint, String publicKey, String privateKey) {
+        imageKit.setConfig(new Configuration(publicKey, privateKey, endpoint));
     }
 }
