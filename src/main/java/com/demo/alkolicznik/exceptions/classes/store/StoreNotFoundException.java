@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class StoreNotFoundException extends RuntimeException {
-    
+
     public StoreNotFoundException(Long id) {
         super("Unable to find store of '%d' id".formatted(id));
     }
@@ -14,7 +14,12 @@ public class StoreNotFoundException extends RuntimeException {
         super("Unable to find '%s' located in '%s, %s'".formatted(name, city, street));
     }
 
-	public StoreNotFoundException(String name) {
-		super("Unable to find store of '%s' name".formatted(name));
-	}
+    public StoreNotFoundException(String name) {
+        this(name, false);
+    }
+
+    public StoreNotFoundException(String name, boolean rawName) {
+        super(rawName ? "Unable to find store of name similar to '%s'".formatted(name)
+                : "Unable to find store of '%s' name".formatted(name));
+    }
 }
