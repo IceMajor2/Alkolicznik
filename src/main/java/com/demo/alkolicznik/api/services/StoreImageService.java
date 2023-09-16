@@ -15,6 +15,7 @@ import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,7 +82,7 @@ public class StoreImageService {
             throw new ImageAlreadyExistsException(StoreImage.class);
 
         StoreImage storeImage = (StoreImage) imageKitRepository.save(imagePath, "/store",
-                createStoreFilename(storeName, imagePath), StoreImage.class);
+                createStoreFilename(storeName, FilenameUtils.getExtension(file.getName())), StoreImage.class);
         storeImage.setStoreName(storeName);
 
         // the addition of updatedAt key-value pair prevents from fetching

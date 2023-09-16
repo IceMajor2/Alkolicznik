@@ -14,6 +14,7 @@ import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +58,7 @@ public class BeerImageService {
             throw new ImageAlreadyExistsException(BeerImage.class);
 
         BeerImage beerImage = (BeerImage) imageKitRepository.save(imagePath, "/beer",
-                createBeerFilename(beer.getFullName(), beer.getVolume(), imagePath), BeerImage.class);
+                createBeerFilename(beer.getFullName(), beer.getVolume(), FilenameUtils.getExtension(file.getName())), BeerImage.class);
         beer.setImage(beerImage);
         beerImage.setBeer(beer);
         String transformedUrl = imageKitRepository.namedTransformation
