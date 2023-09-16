@@ -4,6 +4,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+# src/main/resources/imageKit.properties <-- is "git update-index --assume-unchanged FILE_NAME"
 
 ### STS ###
 .apt_generated
