@@ -17,7 +17,6 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.Utils;
 import io.imagekit.sdk.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Launching this class reloads database both from
@@ -102,8 +102,7 @@ public class ReloadScript implements CommandLineRunner {
         }
     }
 
-    @SneakyThrows
-    private <T extends ImageModel> void sendAll(String srcPath, Class<T> imgClass) {
+    private <T extends ImageModel> void sendAll(String srcPath, Class<T> imgClass) throws IOException {
         File[] imageDirectory = new File(new ClassPathResource(srcPath).getURI().getRawPath()).listFiles();
         for (File image : imageDirectory) {
             String absolutePath = image.getAbsolutePath();
