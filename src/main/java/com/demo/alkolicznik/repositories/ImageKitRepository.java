@@ -36,9 +36,10 @@ public class ImageKitRepository {
     }
 
     private void validate(Environment env) {
-        if (imageKitPath == null || imageKitPath.isBlank())
-            throw new IllegalStateException("Property 'imageKit.path' can not be set to '/'. " +
-                    "Files need to be placed in subdirectory'");
+        if (imageKitPath == null)
+            throw new IllegalStateException("Property 'imageKit.path' is required but was missing");
+        if (imageKitPath.isBlank())
+            throw new IllegalStateException("Property 'imageKit.path' can not be set to root directory.");
 
         String endpoint = "https://ik.imagekit.io/%s".formatted(env.getProperty("imageKit.id"));
         String publicKey = env.getProperty("imageKit.public-key");
