@@ -31,14 +31,22 @@ public class ImageKitRepository {
 
     public ImageKitRepository(Environment env) {
         this.imageKitPath = env.getProperty("imageKit.path");
-        authenticate(env);
+        validate(env);
         log.info("Successful authentication of ImageKit account");
     }
 
-    private void authenticate(Environment env) {
+    private void validate(Environment env) {
+        if (imageKitPath == null || imageKitPath.isBlank())
+            throw new IllegalStateException("Property 'imageKit.path' can not be set to '/'. " +
+                    "Files need to be placed in subdirectory'");
+
         String endpoint = "https://ik.imagekit.io/%s".formatted(env.getProperty("imageKit.id"));
         String publicKey = env.getProperty("imageKit.public-key");
         String privateKey = env.getProperty("imageKit.private-key");
+        authenticate(endpoint, publicKey, privateKey);
+    }
+
+    private void authenticate(String endpoint, String publicKey, String privateKey) {
         setConfig(endpoint, publicKey, privateKey);
         stopIfAuthenticationFailed();
     }
