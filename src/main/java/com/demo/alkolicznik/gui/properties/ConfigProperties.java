@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.gui.config;
+package com.demo.alkolicznik.gui.properties;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
