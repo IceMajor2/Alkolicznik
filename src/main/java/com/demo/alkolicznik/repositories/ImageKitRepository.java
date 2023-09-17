@@ -6,7 +6,9 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.utils.Utils;
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
+import io.imagekit.sdk.exceptions.ForbiddenException;
 import io.imagekit.sdk.exceptions.NotFoundException;
+import io.imagekit.sdk.exceptions.UnauthorizedException;
 import io.imagekit.sdk.models.DeleteFolderRequest;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
@@ -25,21 +27,33 @@ import java.util.*;
 @Slf4j
 public class ImageKitRepository {
 
-    private ImageKit imageKit;
     private String imageKitPath;
 
     public ImageKitRepository(Environment env) {
-        this.imageKit = ImageKit.getInstance();
         this.imageKitPath = env.getProperty("imageKit.path");
+        authenticate(env);
+        log.info("Successful authentication of ImageKit account");
+    }
 
-        String endpoint = env.getProperty("imageKit.endpoint");
+    private void authenticate(Environment env) {
+        String endpoint = "https://ik.imagekit.io/%s".formatted(env.getProperty("imageKit.id"));
         String publicKey = env.getProperty("imageKit.public-key");
         String privateKey = env.getProperty("imageKit.private-key");
         setConfig(endpoint, publicKey, privateKey);
+        stopIfAuthenticationFailed();
+    }
+
+    private void stopIfAuthenticationFailed() {
+        try {
+            ImageKit.getInstance().getFileDetail("some_id");
+        } catch (ForbiddenException | UnauthorizedException e) {
+            log.error("Authentication failed: check your credentials in 'imageKit.properties'");
+            throw new RuntimeException(e);
+        } catch (Exception e) {}
     }
 
     private void setConfig(String endpoint, String publicKey, String privateKey) {
-        imageKit.setConfig(new Configuration(publicKey, privateKey, endpoint));
+        ImageKit.getInstance().setConfig(new Configuration(publicKey, privateKey, endpoint));
     }
 
     /**
@@ -73,19 +87,19 @@ public class ImageKitRepository {
         fileCreateRequest.setUseUniqueFileName(false);
         // set folder into which image will be uploaded
         fileCreateRequest.setFolder(imageKitPath + remotePath);
-        return this.imageKit.upload(fileCreateRequest);
+        return ImageKit.getInstance().upload(fileCreateRequest);
     }
 
     @SneakyThrows
     public void delete(ImageModel image) {
-        imageKit.deleteFile(image.getRemoteId());
+        ImageKit.getInstance().deleteFile(image.getRemoteId());
     }
 
     @SneakyThrows
     public void deleteFolder(String path) throws NotFoundException {
         DeleteFolderRequest deleteFolderRequest = new DeleteFolderRequest();
         deleteFolderRequest.setFolderPath(imageKitPath + path);
-        imageKit.deleteFolder(deleteFolderRequest);
+        ImageKit.getInstance().deleteFolder(deleteFolderRequest);
     }
 
     public static final class URLBuilder {
