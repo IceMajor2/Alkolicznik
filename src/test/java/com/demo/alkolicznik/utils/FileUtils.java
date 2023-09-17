@@ -7,12 +7,14 @@ import org.springframework.stereotype.Component;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 @Component
 public class FileUtils {
@@ -23,6 +25,7 @@ public class FileUtils {
     public void setResourceLoader(ResourceLoader resourceLoader) {
         FileUtils.resourceLoader = resourceLoader;
     }
+
     public static BufferedImage getBufferedImageFromWeb(String url) {
         try {
             return ImageIO.read(new URL(url));
@@ -57,6 +60,16 @@ public class FileUtils {
 
     public static boolean dimensionsSame(BufferedImage imgA, BufferedImage imgB) {
         return imgA.getWidth() == imgB.getWidth() && imgA.getHeight() == imgB.getHeight();
+    }
+
+    public static Properties readPropertiesFile(String path) {
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(path));
+            return properties;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public static String getRawPathToClassPathResource(String resource) {
