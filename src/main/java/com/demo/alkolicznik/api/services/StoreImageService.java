@@ -15,6 +15,7 @@ import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreImageRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StoreImageService {
 
     private final StoreRepository storeRepository;
@@ -88,8 +90,7 @@ public class StoreImageService {
         // the addition of updatedAt key-value pair prevents from fetching
         // different image version from ImageKit API
         int[] newImageDimensions = GuiUtils.dimensionsForStoreImage(storeImage.getImageUrl() + "?updatedAt=1");
-        String transformedUrl = imageKitRepository.scaleTransformation
-                (storeImage.getRemoteId(), newImageDimensions[0], newImageDimensions[1]);
+        String transformedUrl = getURL(storeImage.getRemoteId(), newImageDimensions[0], newImageDimensions[1]);
         storeImage.setImageUrl(transformedUrl);
         storeImage.setImageComponent();
         return storeImageRepository.save(storeImage);
@@ -123,6 +124,15 @@ public class StoreImageService {
     @Transactional(readOnly = true)
     public Optional<StoreImage> findByStoreName(String name) {
         return storeImageRepository.findByStoreName(name);
+    }
+
+    private String getURL(String fileId, int height, int width) {
+        return new ImageKitRepository.URLBuilder()
+                .defaultPath(fileId)
+                .scaledTransformation(height, width)
+                .cForce()
+                .updatedAt(imageKitRepository.getUpdatedAt(fileId))
+                .build();
     }
 
     private BufferedImage fileCheck(File file) {
