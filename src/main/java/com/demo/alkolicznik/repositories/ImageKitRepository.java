@@ -11,18 +11,18 @@ import io.imagekit.sdk.models.DeleteFolderRequest;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @PropertySource("classpath:imageKit.properties")
+@Slf4j
 public class ImageKitRepository {
 
     private ImageKit imageKit;
@@ -36,6 +36,10 @@ public class ImageKitRepository {
         String publicKey = env.getProperty("imageKit.public-key");
         String privateKey = env.getProperty("imageKit.private-key");
         setConfig(endpoint, publicKey, privateKey);
+    }
+
+    private void setConfig(String endpoint, String publicKey, String privateKey) {
+        imageKit.setConfig(new Configuration(publicKey, privateKey, endpoint));
     }
 
     /**
@@ -54,39 +58,10 @@ public class ImageKitRepository {
         return null;
     }
 
-    public String scaleTransformation(String fileId, int height, int width) {
-        Map<String, Object> options = getBaseOptionsForMapping(fileId);
-        options.put("transformation", List.of(Map.of("height", String.valueOf(height),
-                "width", String.valueOf(width))));
-        return this.mapUrl(options);
-    }
-
-    public String namedTransformation(String fileId, String namedTransformation) {
-        Map<String, Object> options = getBaseOptionsForMapping(fileId);
-        options.put("transformation", List.of(Map.of("named", namedTransformation)));
-        return this.mapUrl(options);
-    }
-
-    private Map<String, Object> getBaseOptionsForMapping(String fileId) {
-        String remotePath = getFilePath(fileId);
-        long updatedAt = getUpdatedAt(fileId);
-
-        Map<String, Object> baseOptions = new HashMap<>();
-        baseOptions.put("path", remotePath);
-        baseOptions.put("queryParameters", Map.of("updatedAt", String.valueOf(updatedAt)));
-        return baseOptions;
-    }
-
     @SneakyThrows
     public long getUpdatedAt(String fileId) {
         Result result = ImageKit.getInstance().getFileDetail(fileId);
         return result.getUpdatedAt().toInstant().getEpochSecond();
-    }
-
-    @SneakyThrows
-    public String getFilePath(String fileId) {
-        Result result = ImageKit.getInstance().getFileDetail(fileId);
-        return result.getFilePath();
     }
 
     @SneakyThrows
@@ -102,11 +77,6 @@ public class ImageKitRepository {
     }
 
     @SneakyThrows
-    private String mapUrl(Map<String, Object> options) {
-        return imageKit.getUrl(options);
-    }
-
-    @SneakyThrows
     public void delete(ImageModel image) {
         imageKit.deleteFile(image.getRemoteId());
     }
@@ -118,7 +88,73 @@ public class ImageKitRepository {
         imageKit.deleteFolder(deleteFolderRequest);
     }
 
-    private void setConfig(String endpoint, String publicKey, String privateKey) {
-        imageKit.setConfig(new Configuration(publicKey, privateKey, endpoint));
+    public static final class URLBuilder {
+
+        private Map<String, Object> options = new HashMap<>();
+        private static final String TRANSFORMATION_KEY = "transformation";
+        private static final String PATH_KEY = "path";
+        private static final String QUERY_PARAMS_KEY = "queryParameters";
+
+        @SneakyThrows
+        public URLBuilder defaultPath(String fileId) {
+            String path = ImageKit.getInstance().getFileDetail(fileId).getFilePath();
+            options.put(PATH_KEY, path);
+            return this;
+        }
+
+        public URLBuilder updatedAt(long updatedAt) {
+            options.put(QUERY_PARAMS_KEY, Map.of("updatedAt", String.valueOf(updatedAt)));
+            return this;
+        }
+
+        public URLBuilder namedTransformation(String namedTransformation) {
+            Map<String, String> currentTransformations = getTransformations();
+            currentTransformations.put("named", namedTransformation);
+            options.put(TRANSFORMATION_KEY, List.of(currentTransformations));
+            return this;
+        }
+
+        public URLBuilder scaledTransformation(int height, int width) {
+            Map<String, String> currentTransformations = getTransformations();
+            currentTransformations.putAll(
+                    Map.of("height", String.valueOf(height),
+                            "width", String.valueOf(width)));
+            options.put(TRANSFORMATION_KEY, List.of(currentTransformations));
+            return this;
+        }
+
+        public URLBuilder cForce() {
+            Map<String, String> currentTransformations = getTransformations();
+            currentTransformations.put("c", "force");
+            options.put(TRANSFORMATION_KEY, List.of(currentTransformations));
+            return this;
+        }
+
+        public String build() {
+            if (!options.containsKey(PATH_KEY)) {
+                throw new IllegalStateException("Path must be specified");
+            }
+            if (!containsUpdatedAt()) {
+                log.warn("Building image URL with 'updatedAt' parameter absent. " +
+                        "It is very likely it may cause synchronization issues in the future");
+            }
+            return ImageKit.getInstance().getUrl(options);
+        }
+
+        private boolean containsUpdatedAt() {
+            Map<String, String> queryParams = getQueryParams();
+            return queryParams.containsKey("updatedAt");
+        }
+
+        private Map<String, String> getQueryParams() {
+            return (Map<String, String>) options.getOrDefault(QUERY_PARAMS_KEY, Collections.EMPTY_MAP);
+        }
+
+        private Map<String, String> getTransformations() {
+            List<Map<String, String>> chainedTransformations =
+                    (List<Map<String, String>>) options
+                            .getOrDefault(TRANSFORMATION_KEY, new ArrayList<Map<String, String>>());
+            return chainedTransformations.isEmpty() ? new HashMap<>() : chainedTransformations.get(0);
+        }
     }
 }
