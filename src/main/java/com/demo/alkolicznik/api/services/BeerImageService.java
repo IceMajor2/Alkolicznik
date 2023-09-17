@@ -29,6 +29,8 @@ import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 @RequiredArgsConstructor
 public class BeerImageService {
 
+    private static final String NAMED_TRANSFORMATION = "get_beer";
+
     private final BeerRepository beerRepository;
     private final BeerImageRepository beerImageRepository;
     private final ImageKitRepository imageKitRepository;
@@ -61,12 +63,11 @@ public class BeerImageService {
                 createBeerFilename(beer.getFullName(), beer.getVolume(), FilenameUtils.getExtension(file.getName())), BeerImage.class);
         beer.setImage(beerImage);
         beerImage.setBeer(beer);
-        String transformedUrl = imageKitRepository.namedTransformation
-                (beerImage.getRemoteId(), "get_beer");
+
+        String transformedUrl = this.getURL(beerImage.getRemoteId());
         beerImage.setImageUrl(transformedUrl);
         beerImage.setImageComponent();
-        BeerImage saved = beerImageRepository.save(beerImage);
-        return new BeerImageResponseDTO(saved);
+        return new BeerImageResponseDTO(beerImageRepository.save(beerImage));
     }
 
     @Transactional
@@ -84,6 +85,14 @@ public class BeerImageService {
         BeerImage image = beer.getImage()
                 .orElseThrow(() -> new ImageNotFoundException(BeerImage.class));
         this.delete(image);
+    }
+
+    private String getURL(String fileId) {
+        return new ImageKitRepository.URLBuilder()
+                .defaultPath(fileId)
+                .namedTransformation(NAMED_TRANSFORMATION)
+                .updatedAt(imageKitRepository.getUpdatedAt(fileId))
+                .build();
     }
 
     private void fileCheck(File file) {
