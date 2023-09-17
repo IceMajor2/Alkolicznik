@@ -95,6 +95,12 @@ public class ImageKitRepository {
         private static final String PATH_KEY = "path";
         private static final String QUERY_PARAMS_KEY = "queryParameters";
 
+        private URLBuilder() {}
+
+        public static URLBuilder builder() {
+            return new URLBuilder();
+        }
+
         @SneakyThrows
         public URLBuilder defaultPath(String fileId) {
             String path = ImageKit.getInstance().getFileDetail(fileId).getFilePath();
