@@ -88,7 +88,7 @@ public class BeerImageService {
     }
 
     private String getURL(String fileId) {
-        return new ImageKitRepository.URLBuilder()
+        return ImageKitRepository.URLBuilder.builder()
                 .defaultPath(fileId)
                 .namedTransformation(NAMED_TRANSFORMATION)
                 .updatedAt(imageKitRepository.getUpdatedAt(fileId))

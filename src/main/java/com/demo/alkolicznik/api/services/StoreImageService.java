@@ -127,7 +127,7 @@ public class StoreImageService {
     }
 
     private String getURL(String fileId, int height, int width) {
-        return new ImageKitRepository.URLBuilder()
+        return ImageKitRepository.URLBuilder.builder()
                 .defaultPath(fileId)
                 .scaledTransformation(height, width)
                 .cForce()
