@@ -6,7 +6,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
-import com.demo.alkolicznik.gui.config.ConfigProperties;
+import com.demo.alkolicznik.gui.properties.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
 import com.demo.alkolicznik.gui.templates.ViewTemplate;
 import com.demo.alkolicznik.gui.utils.GuiUtils;

@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.config.profiles;
 
-import com.demo.alkolicznik.gui.config.ConfigProperties;
+import com.demo.alkolicznik.gui.properties.ConfigProperties;
 import com.demo.alkolicznik.security.config.SecurityVaadinConfig;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;

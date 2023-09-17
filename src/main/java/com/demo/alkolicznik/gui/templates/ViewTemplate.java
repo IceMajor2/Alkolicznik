@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.gui.templates;
 
 import com.demo.alkolicznik.dto.city.CityDTO;
-import com.demo.alkolicznik.gui.config.ConfigProperties;
+import com.demo.alkolicznik.gui.properties.ConfigProperties;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
