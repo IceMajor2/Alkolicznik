@@ -5,9 +5,12 @@ import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import com.demo.alkolicznik.utils.request.RequestUtils;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.login.AbstractLogin;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -16,6 +19,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.http.HttpMethod;
 
 @PageTitle("Login | Alkolicznik")
@@ -25,6 +30,7 @@ public class LoginView extends VerticalLayout {
 
     private VerticalLayout loginWrapper;
     private LoginForm loginForm;
+    private Component accountsList;
 
     private HorizontalLayout toolbar;
 
@@ -33,10 +39,13 @@ public class LoginView extends VerticalLayout {
 
         loginForm = configureLoginForm();
         loginWrapper = getLoginFormWrapped();
+        accountsList = getAccountInfoPanel();
 
-        add(toolbar, loginWrapper);
+        super.setAlignItems(Alignment.CENTER);
+
+        add(toolbar, loginWrapper, accountsList);
     }
-    
+
     private VerticalLayout getLoginFormWrapped() {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -77,5 +86,22 @@ public class LoginView extends VerticalLayout {
                 loginForm.setError(true);
             }
         };
+    }
+
+    private Component getAccountInfoPanel() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setAlignItems(Alignment.CENTER);
+
+        H3 header = new H3("Example accounts");
+
+        String adminCode = "<p style=\"font-size:12px\"><b>[ROLE_ADMIN]</b>: <i>admin</i> : <i>admin</i></p>";
+        String accountantCode = "<p style=\"font-size:12px\"><b>[ROLE_ACCOUNTANT]</b>: <i>user1</i> : <i>abcdef</i></p>";
+        String userCode = "<p style=\"font-size:12px\"><b>[ROLE_USER]</b>: <i>user</i> : <i>user</i></p>";
+
+        Html admin = new Html(Jsoup.clean(adminCode, Safelist.basic()));
+        Html accountant = new Html(Jsoup.clean(accountantCode, Safelist.basic()));
+        Html user = new Html(Jsoup.clean(userCode, Safelist.basic()));
+        layout.add(header, admin, accountant, user);
+        return layout;
     }
 }
