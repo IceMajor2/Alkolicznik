@@ -136,8 +136,7 @@ public class HttpClientConfig {
 
 	@Bean
 	public Registry<ConnectionSocketFactory> socketFactoryRegistry() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		// TODO: add my self-signed certificate to the trust store and nothing else
-		final TrustStrategy trustStrategy = (cert, authType) -> true;
+		final TrustStrategy trustStrategy = new TrustSelfSignedStrategy();
 		final SSLContext sslContext = SSLContexts.custom()
 				.loadTrustMaterial(null, trustStrategy)
 				.build();
