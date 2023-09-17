@@ -23,6 +23,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 import static com.demo.alkolicznik.utils.requests.ImageKitRequests.*;
 
@@ -54,13 +56,33 @@ public class ImageProfile {
         this.jdbcTemplate = jdbcTemplate;
         this.fileUtils = fileUtils;
         this.env = env;
+        setImageKit();
     }
 
     private void setImageKit() {
+        checkRemotePathCollision();
         String publicKey = env.getProperty("imageKit.public-key");
         String privateKey = env.getProperty("imageKit.private-key");
-        String endpoint = env.getProperty("imageKit.endpoint");
+        String endpoint = "https://ik.imagekit.io/%s".formatted(env.getProperty("imageKit.id"));
         ImageKit.getInstance().setConfig(new io.imagekit.sdk.config.Configuration(publicKey, privateKey, endpoint));
+    }
+
+    private void checkRemotePathCollision() {
+        final String property = "imageKit.path";
+        String mainPath = FileUtils.getRawPathToClassPathResource("imageKit.properties");
+        String testPath = FileUtils.getRawPathToClassPathResource("profiles/image.properties");
+        Properties mainImageKit = FileUtils.readPropertiesFile(mainPath);
+        Properties testImageKit = FileUtils.readPropertiesFile(testPath);
+        String mainImageKitPath = mainImageKit.getProperty(property);
+        String testImageKitPath = testImageKit.getProperty(property);
+
+        if (mainImageKitPath == null || mainImageKitPath.isBlank())
+            throw new IllegalStateException("Property '%s' was missing from '%s'".formatted(property, mainPath));
+        if (testImageKitPath == null || testImageKitPath.isBlank())
+            throw new IllegalStateException("Property '%s' was missing from '%s'".formatted(property, testPath));
+        if (Objects.equals(mainImageKitPath, testImageKitPath))
+            throw new IllegalStateException("Property '%s' has the same value in production ('%s') and tests ('%s'). " +
+                    "Please, make sure they differ".formatted(property, mainPath, testPath));
     }
 
     @Bean("beerImages")
@@ -104,8 +126,6 @@ public class ImageProfile {
         String remoteBeerImgPath = imageKitPath + "/beer";
         String remoteStoreImgPath = imageKitPath + "/store";
         LOGGER.info("Reloading ImageKit's directory...");
-        setImageKit();
-
         LOGGER.info("Deleting unwanted images from '%s' directory...".formatted(remoteBeerImgPath));
         List<String> beerImgFilenames = FileUtils.convertToFilenamesList(beerImageDir.getFile().listFiles());
         deleteFilesIn(remoteBeerImgPath, false, beerImgFilenames);
