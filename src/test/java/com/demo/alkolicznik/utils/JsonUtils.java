@@ -1,7 +1,5 @@
 package com.demo.alkolicznik.utils;
 
-import com.demo.alkolicznik.api.BeerImageTest;
-import com.demo.alkolicznik.api.StoreImageTest;
 import com.demo.alkolicznik.dto.beer.*;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
@@ -94,33 +92,6 @@ public class JsonUtils {
         ImageRequestDTO request = new ImageRequestDTO();
         request.setImagePath(srcPath);
         return request;
-    }
-
-    public static StoreImageResponseDTO createImageResponse(String filename, String storeName, BeerImageResponseDTO actual) {
-        StoreImageResponseDTO response = new StoreImageResponseDTO();
-        response.setStoreName(storeName);
-        response.setUrl(StoreImageTest.IMG_TRANSFORMED_URL + filename
-                + "?updatedAt=" + fetchEpochsInUpdatedAt(actual.getUrl()));
-//        response.setRemoteId(actual.getRemoteId());
-        return response;
-    }
-
-    public static BeerImageResponseDTO createBeerImageResponse(String filename, String remoteId) {
-        BeerImageResponseDTO response = new BeerImageResponseDTO();
-        response.setUrl(BeerImageTest.IMG_TRANSFORMED_URL + filename);
-        response.setRemoteId(remoteId);
-        return response;
-    }
-
-    public static StoreImageResponseDTO createStoreImageResponse(String filename, String remoteId) {
-        StoreImageResponseDTO response = new StoreImageResponseDTO();
-        response.setUrl(StoreImageTest.IMG_TRANSFORMED_URL + filename);
-        response.setRemoteId(remoteId);
-        return response;
-    }
-
-    private static String fetchEpochsInUpdatedAt(String url) {
-        return url.substring(url.lastIndexOf('=') + 1);
     }
 
     public static StoreImageResponseDTO createImageResponse(StoreImage storeImage) {
