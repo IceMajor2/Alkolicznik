@@ -29,7 +29,8 @@ import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 @RequiredArgsConstructor
 public class BeerImageService {
 
-    private static final String NAMED_TRANSFORMATION = "get_beer";
+    private static final int HEIGHT = 140;
+    private static final int WIDTH = 45;
 
     private final BeerRepository beerRepository;
     private final BeerImageRepository beerImageRepository;
@@ -90,7 +91,8 @@ public class BeerImageService {
     private String getURL(String fileId) {
         return ImageKitRepository.URLBuilder.builder()
                 .defaultPath(fileId)
-                .namedTransformation(NAMED_TRANSFORMATION)
+                .scaledTransformation(HEIGHT, WIDTH)
+                .cForce()
                 .updatedAt(imageKitRepository.getUpdatedAt(fileId))
                 .build();
     }
