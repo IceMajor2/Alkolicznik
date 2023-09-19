@@ -31,8 +31,4 @@ public class TestUtils {
         }
         return sb.deleteCharAt(sb.length() - 1).toString();
     }
-
-    public static String extractFilenameFromUrl(String url) {
-        return url.substring(url.lastIndexOf('/') + 1);
-    }
 }
