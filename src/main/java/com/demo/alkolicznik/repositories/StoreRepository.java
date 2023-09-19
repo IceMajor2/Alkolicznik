@@ -27,7 +27,7 @@ public interface StoreRepository extends CrudRepository<Store, Long> {
             + "WHERE s.name = ?1 AND s.city = ?2 AND s.street = ?3")
     Optional<Store> findByNameAndCityAndStreet(String name, String city, String street);
 
-    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE LOWER(s.name) = lower(?1)")
+    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.prices WHERE LOWER(s.name) = LOWER(?1)")
     List<Store> findByNameIgnoreCase(String name);
 
     @Query("SELECT DISTINCT(s.name) FROM Store s")
