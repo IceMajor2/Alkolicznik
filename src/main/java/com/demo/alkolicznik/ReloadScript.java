@@ -111,16 +111,17 @@ public class ReloadScript implements CommandLineRunner {
             try {
                 model = getAssociatedModel(srcFilename, imgClass);
             } catch (BeerNotFoundException e) {
-                LOGGER.warn("Beer image ('{}/{}') was not loaded. Failed to determine beer ID from filename: " +
-                                "ID needs to be specified as first characters in the filename",
+                LOGGER.warn("Beer image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine beer ID " +
+                                "from filename: ID needs to be specified as first characters in the filename\n" +
+                                "2) There is no beer of specified id",
                         RELATIVE_TO_BEER, srcFilename);
             } catch (BeerAlreadyExistsException e) {
                 LOGGER.warn("You have duplicated IDs in '{}'. Image '{}' was not initialized",
                         RELATIVE_TO_BEER, srcFilename);
             } catch (StoreNotFoundException e) {
-                LOGGER.warn("Store image ('{}/{}') was not loaded. Failed to determine store name from filename: " +
-                                "filename should only consist of exact store name (case insensitive). " +
-                                "Moreover, store should be included in database",
+                LOGGER.warn("Store image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine store name " +
+                                "from filename: filename should only consist of exact store name (case insensitive)\n" +
+                                "2) There is no store of specified name",
                         RELATIVE_TO_STORE, srcFilename);
             }
             if (model != null)
