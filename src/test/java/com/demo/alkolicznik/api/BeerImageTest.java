@@ -41,8 +41,6 @@ import static org.awaitility.Awaitility.await;
 @TestClassOrder(ClassOrderer.Random.class)
 public class BeerImageTest {
 
-    public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/alkolicznik/tr:n-get_beer/test/beer/";
-
     @Autowired
     private int pollIntervals;
 
@@ -143,9 +141,9 @@ public class BeerImageTest {
             public void addBeerImageTest(Long beerId, String imageFile) {
                 // given
                 BufferedImage toUpload = getBufferedImageFromLocal
-                        (getRawPathToImage("beer/" + imageFile));
+                        (getRawPathToImage("beer_not_added/" + imageFile));
                 ImageRequestDTO request = createImageRequest
-                        (getRawPathToImage("beer/" + imageFile));
+                        (getRawPathToImage("beer_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth("admin", "admin",
                         "/api/beer/" + beerId + "/image", request);
@@ -175,7 +173,7 @@ public class BeerImageTest {
             public void addBeerImage_imageAlreadyExistsTest(Long beerId, String imageFile) {
                 // given
                 ImageRequestDTO request = createImageRequest
-                        (getRawPathToImage("beer/" + imageFile));
+                        (getRawPathToImage("beer_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth("admin", "admin",
                         "/api/beer/" + beerId + "/image", request);
@@ -216,7 +214,7 @@ public class BeerImageTest {
             public void addBeerImage_givenInvalidProportionsTest(Long beerId, String imageFile) {
                 // given
                 ImageRequestDTO request = createImageRequest
-                        (getRawPathToImage("beer/" + imageFile));
+                        (getRawPathToImage("beer_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth("admin", "admin",
                         "/api/beer/" + beerId + "/image", request);
@@ -257,7 +255,7 @@ public class BeerImageTest {
             public void addBeerImage_beerNotFoundTest(Long beerId, String imageFile) {
                 // given
                 ImageRequestDTO request = createImageRequest
-                        (getRawPathToImage("beer/" + imageFile));
+                        (getRawPathToImage("beer_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth("admin", "admin",
                         "/api/beer/" + beerId + "/image", request);
