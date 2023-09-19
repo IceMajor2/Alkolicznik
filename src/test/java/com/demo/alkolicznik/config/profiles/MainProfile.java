@@ -7,7 +7,6 @@ import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.utils.mappers.DatabaseTableConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,24 +67,7 @@ public class MainProfile {
     }
 
     @Bean("dataSource")
-    @ConditionalOnProperty(prefix = "database.table.image", name = "enabled", havingValue = "true")
-    public DataSource dataSource2() {
-        LOGGER.info("Loading data source with images included...");
-        return
-                (new EmbeddedDatabaseBuilder())
-                        .addScript("classpath:data_sql/schema.sql")
-                        .addScript("classpath:data_sql/beer-data.sql")
-                        .addScript("classpath:data_sql/store-data.sql")
-                        .addScript("classpath:data_sql/beer-price-data.sql")
-                        .addScript("classpath:data_sql/user-data.sql")
-                        .addScript("classpath:data_sql/image-data.sql")
-                        .build();
-    }
-
-    @Bean("dataSource")
-    @ConditionalOnMissingBean(DataSource.class)
     public DataSource dataSource() {
-        LOGGER.info("Loading data source with images excluded...");
         return
                 (new EmbeddedDatabaseBuilder())
                         .addScript("classpath:data_sql/schema.sql")
