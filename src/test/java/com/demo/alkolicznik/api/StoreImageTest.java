@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.FileUtils.*;
 import static com.demo.alkolicznik.utils.FindingUtils.getStore;
 import static com.demo.alkolicznik.utils.FindingUtils.getStoreImage;
 import static com.demo.alkolicznik.utils.JsonUtils.*;
-import static com.demo.alkolicznik.utils.TestUtils.*;
+import static com.demo.alkolicznik.utils.TestUtils.removeTransformationFromURL;
+import static com.demo.alkolicznik.utils.matchers.CustomErrorAssertion.assertIsError;
 import static com.demo.alkolicznik.utils.requests.BasicAuthRequests.*;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.getRequest;
 import static com.demo.alkolicznik.utils.requests.SimpleRequests.patchRequest;
@@ -42,8 +42,6 @@ import static org.awaitility.Awaitility.await;
 @ActiveProfiles({"main", "image", "no-security", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class StoreImageTest {
-
-    public static final String IMG_TRANSFORMED_URL = "https://ik.imagekit.io/alkolicznik/test/store/";
 
     @Autowired
     private int pollIntervals;
@@ -154,7 +152,7 @@ public class StoreImageTest {
             @DisplayName("POST: '/api/store/image?name=' [STORE_NOT_FOUND]")
             public void doNotAddImageIfStoreOfNameIsNotFoundTest(String storeName, String imageFile) {
                 // given
-                ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+                ImageRequestDTO request = createImageRequest(getRawPathToImage("store_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth
                         ("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
@@ -174,7 +172,7 @@ public class StoreImageTest {
             @DisplayName("POST: '/api/store/image?name=' [IMAGE_ALREADY_EXISTS]")
             public void shouldReturn409WhenStoreAlreadyHasImageTest(String storeName, String imageFile) {
                 // given
-                ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imageFile));
+                ImageRequestDTO request = createImageRequest(getRawPathToImage("store_not_added/" + imageFile));
                 // when
                 var postResponse = postRequestAuth
                         ("admin", "admin", "/api/store/image", request, Map.of("name", storeName));
@@ -194,7 +192,7 @@ public class StoreImageTest {
             @DirtiesContext
             public void uploadedFileShouldMatchRemoteTest(String storeName, String imageFile) {
                 // given
-                String pathToNewImg = getRawPathToImage("store/" + imageFile);
+                String pathToNewImg = getRawPathToImage("store_not_added/" + imageFile);
                 ImageRequestDTO request = createImageRequest(pathToNewImg);
                 // when
                 var postResponse = postRequestAuth
@@ -241,7 +239,7 @@ public class StoreImageTest {
             @DisplayName("POST: '/api/store/image?name=' [FILE_NOT_FOUND]")
             public void addStoreImage_givenFileNotFoundTest(String storeName, String imageFile) {
                 // given
-                String pathToImg = getRawPathToImage("store\\" + imageFile);
+                String pathToImg = getRawPathToImage("store_not_added\\" + imageFile);
                 ImageRequestDTO request = createImageRequest(pathToImg);
                 // when
                 var postResponse = postRequestAuth("admin", "admin",
@@ -277,7 +275,7 @@ public class StoreImageTest {
                 StoreImage prevImg = getStoreImage(storeName, storeImages);
                 BufferedImage prevImgComponent = getBufferedImageFromWeb(prevImg.getImageUrl());
                 // given
-                ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+                ImageRequestDTO request = createImageRequest(getRawPathToImage("store_not_added/" + imgFile));
                 // when
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
                         Map.of("name", storeName));
@@ -302,7 +300,7 @@ public class StoreImageTest {
             @DisplayName("PUT: '/api/store/image?name=' [STORE_NOT_FOUND]")
             public void shouldReturn404WhenStoreIsNotFoundTest(String storeName, String imgFile) {
                 // given
-                ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+                ImageRequestDTO request = createImageRequest(getRawPathToImage("store_not_added/" + imgFile));
                 // when
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
                         Map.of("name", storeName));
@@ -321,7 +319,7 @@ public class StoreImageTest {
             @DisplayName("PUT: '/api/store/image?name=' [IMAGE_NOT_FOUND]")
             public void shouldReturn404WhenImageIsNotFoundTest(String storeName, String imgFile) {
                 // given
-                ImageRequestDTO request = createImageRequest(getRawPathToImage("store/" + imgFile));
+                ImageRequestDTO request = createImageRequest(getRawPathToImage("store_not_added/" + imgFile));
                 // when
                 var putResponse = putRequestAuth("admin", "admin", "/api/store/image", request,
                         Map.of("name", storeName));
