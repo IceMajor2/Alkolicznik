@@ -1,25 +1,17 @@
 package com.demo.alkolicznik.utils.mappers;
 
-import com.demo.alkolicznik.models.*;
+import com.demo.alkolicznik.models.Beer;
+import com.demo.alkolicznik.models.BeerPrice;
+import com.demo.alkolicznik.models.Store;
+import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import javax.money.Monetary;
-import javax.money.MonetaryAmount;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-
-import static com.demo.alkolicznik.utils.TestUtils.extractFilenameFromUrl;
-import static com.demo.alkolicznik.utils.requests.ImageKitRequests.getRemoteId;
 
 @Component
 public class DatabaseTableConverters {
@@ -115,79 +107,3 @@ public class DatabaseTableConverters {
     }
 }
 
-enum RowMappers implements RowMapper {
-
-    BEER {
-        @Override
-        public Beer mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Beer beer = new Beer();
-            beer.setId(rs.getLong("id"));
-            beer.setBrand(rs.getString("brand"));
-            beer.setType(rs.getString("type"));
-            beer.setVolume(rs.getDouble("volume"));
-            return beer;
-        }
-    }, STORE {
-        @Override
-        public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Store store = new Store();
-            store.setId(rs.getLong("id"));
-            store.setName(rs.getString("name"));
-            store.setCity(rs.getString("city"));
-            store.setStreet(rs.getString("street"));
-            return store;
-        }
-    }, USER {
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setUsername(rs.getString("username"));
-            user.setPassword(rs.getString("password"));
-            user.setRole(Roles.valueOf(rs.getString("role")));
-            return user;
-        }
-    }, STORE_IMAGE {
-        @Override
-        public StoreImage mapRow(ResultSet rs, int rowNum) throws SQLException {
-            String url = rs.getString("url");
-            StoreImage storeImage = new StoreImage();
-            storeImage.setImageUrl(url);
-            storeImage.setStoreName(rs.getString("store_name"));
-            storeImage.setStores(new HashSet<>());
-            storeImage.setId(rs.getLong("id"));
-            storeImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url), StoreImage.class));
-            return storeImage;
-        }
-    }
-}
-
-enum ResultSetExtractors implements ResultSetExtractor {
-    BEER_PRICE {
-        @Override
-        public BeerPrice extractData(ResultSet rs) throws SQLException, DataAccessException {
-            if (!rs.next()) {
-                return null;
-            }
-            BeerPrice beerPrice = new BeerPrice();
-            MonetaryAmount price = Monetary.getDefaultAmountFactory()
-                    .setCurrency(rs.getString("price_currency"))
-                    .setNumber(rs.getBigDecimal("price_amount")).create();
-            beerPrice.setPrice(price);
-            return beerPrice;
-        }
-    }, BEER_IMAGE {
-        @Override
-        public BeerImage extractData(ResultSet rs) throws SQLException, DataAccessException {
-            if (!rs.next()) {
-                return null;
-            }
-            String url = rs.getString("url");
-            BeerImage beerImage = new BeerImage();
-            beerImage.setImageUrl(url);
-            beerImage.setId(rs.getLong("beer_id"));
-            beerImage.setRemoteId(getRemoteId(extractFilenameFromUrl(url), BeerImage.class));
-            return beerImage;
-        }
-    };
-}
