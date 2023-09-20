@@ -3,10 +3,7 @@ package com.demo.alkolicznik.models.image;
 import com.demo.alkolicznik.models.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import java.io.Serializable;
@@ -17,9 +14,8 @@ import java.util.Set;
 @Entity(name = "StoreImage")
 @Table(name = "store_image")
 @NoArgsConstructor
-@Getter
-@Setter
 @ToString(callSuper = true)
+@Data
 public class StoreImage extends ImageModel implements Serializable {
 
     @Id
