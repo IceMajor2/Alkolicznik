@@ -28,6 +28,7 @@ public class BeerResponseDTO {
 
 	private Double volume;
 
+	@ToString.Exclude
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private BeerImageResponseDTO image;
 
