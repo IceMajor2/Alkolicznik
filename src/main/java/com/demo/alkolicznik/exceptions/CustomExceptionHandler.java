@@ -1,7 +1,5 @@
 package com.demo.alkolicznik.exceptions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static com.demo.alkolicznik.utils.Utils.convertObjectToJson;
 
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
@@ -108,14 +108,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
             response.setStatus(error.getStatus());
             response.getWriter().write(convertObjectToJson(error));
-        }
-
-        private String convertObjectToJson(Object object) throws JsonProcessingException {
-            if (object == null) {
-                return null;
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(object);
         }
     }
 }
