@@ -5,20 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.*;
 
 @Entity(name = "Beer")
 @Table(name = "beer")
-@JsonPropertyOrder({"id", "brand", "type", "volume"})
+@JsonPropertyOrder({"id", "brand", "type", "volume", "image"})
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class Beer implements Cloneable {
 
     @Id
