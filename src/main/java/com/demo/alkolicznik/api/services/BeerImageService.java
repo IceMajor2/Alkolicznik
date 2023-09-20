@@ -14,6 +14,7 @@ import com.demo.alkolicznik.repositories.BeerImageRepository;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import static com.demo.alkolicznik.utils.Utils.getBufferedImageFromLocal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BeerImageService {
 
     private static final int HEIGHT = 140;
@@ -68,15 +70,18 @@ public class BeerImageService {
         String transformedUrl = this.getURL(beerImage.getRemoteId());
         beerImage.setImageUrl(transformedUrl);
         beerImage.setImageComponent();
-        return new BeerImageResponseDTO(beerImageRepository.save(beerImage));
+        BeerImageResponseDTO saved = new BeerImageResponseDTO(beerImageRepository.save(beerImage));
+        log.info("Added: [{}]", saved);
+        return saved;
     }
 
     @Transactional
-    public void delete(BeerImage image) {
+    public BeerImageResponseDTO delete(BeerImage image) {
         imageKitRepository.delete(image);
-        image.getBeer().setImage(null);
-        image.setBeer(null);
         beerImageRepository.deleteById(image.getId());
+        BeerImageResponseDTO deleted = new BeerImageResponseDTO(image);
+        log.info("Deleted: [{}]", deleted);
+        return deleted;
     }
 
     @Transactional
