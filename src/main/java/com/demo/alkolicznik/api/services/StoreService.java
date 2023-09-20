@@ -11,6 +11,7 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StoreService {
 
     private final StoreRepository storeRepository;
@@ -60,7 +62,9 @@ public class StoreService {
         Optional<StoreImage> optImage = imageService.findByStoreName(requestDTO.getName());
         Store store = StoreRequestDTO.toModel(requestDTO, optImage);
         if (storeRepository.exists(store)) throw new StoreAlreadyExistsException();
-        return new StoreResponseDTO(storeRepository.save(store));
+        StoreResponseDTO saved = new StoreResponseDTO(storeRepository.save(store));
+        log.info("Added: [{}]", saved);
+        return saved;
     }
 
     @Transactional(readOnly = false)
@@ -76,23 +80,29 @@ public class StoreService {
 
         if (isPreviousImageToDelete(toOverwrite, overwritten))
             imageService.delete(toOverwrite.getImage().get());
-        return new StoreResponseDTO(storeRepository.save(overwritten));
+        StoreResponseDTO previous = new StoreResponseDTO(toOverwrite);
+        StoreResponseDTO saved = new StoreResponseDTO(storeRepository.save(overwritten));
+        log.info("Replacing: [{}] with: [{}]", previous, saved);
+        return saved;
     }
 
     @Transactional(readOnly = false)
     public StoreResponseDTO update(Long storeId, StoreUpdateDTO updateDTO) {
         // CONDITIONS: start
-        Store store = checkForPatchConditions(storeId, updateDTO);
-        Store updated = StoreUpdateDTO.toModel(updateDTO, store);
+        Store toUpdate = checkForPatchConditions(storeId, updateDTO);
+        Store updated = StoreUpdateDTO.toModel(updateDTO, toUpdate);
         if (storeRepository.exists(updated)) {
             throw new StoreAlreadyExistsException();
         }
         // CONDITIONS: end
         updated.deleteAllPrices();
-        if (isPreviousImageToDelete(store, updated))
-            imageService.delete(store.getImage().get());
+        if (isPreviousImageToDelete(toUpdate, updated))
+            imageService.delete(toUpdate.getImage().get());
         attachImageIfExists(updated);
-        return new StoreResponseDTO(storeRepository.save(updated));
+        StoreResponseDTO previous = new StoreResponseDTO(toUpdate);
+        StoreResponseDTO saved = new StoreResponseDTO(storeRepository.save(updated));
+        log.info("Updating: [{}] to: [{}]", previous, saved);
+        return saved;
     }
 
     @Transactional(readOnly = false)
@@ -105,7 +115,9 @@ public class StoreService {
             toDelete.getImage().ifPresent(storeImage -> imageService.delete(storeImage.getStoreName()));
 
         storeRepository.delete(toDelete);
-        return new StoreDeleteDTO(toDelete);
+        StoreDeleteDTO deleted = new StoreDeleteDTO(toDelete);
+        log.info("Deleted: [{}]", deleted);
+        return deleted;
     }
 
     @Transactional(readOnly = false)
