@@ -102,7 +102,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             } catch (ExpiredJwtException e) {
                 handleExpiredJwtException(request, response);
             } catch (SignatureException e) {
-                handleSignatureException(request, response);
+                handleSignatureException(request, response, e);
             }
         }
 
@@ -115,14 +115,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             }
         }
 
-        private void handleSignatureException(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        private void handleSignatureException(HttpServletRequest request, HttpServletResponse response, SignatureException e) throws IOException {
             Cookie invalidAuth = CookieUtils.createExpiredTokenCookie(request);
             response.addCookie(invalidAuth);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             if (!isCallToAPI(request)) {
                 response.sendRedirect("/");
             }
-            log.warn("Suspicious JWT authentication request with invalid signature");
+            log.warn("Suspicious JWT authentication request with invalid signature: %s".formatted(e.getMessage()));
         }
 
         private boolean isCallToAPI(HttpServletRequest request) {
