@@ -26,11 +26,20 @@ public class JwtUtils {
                 .setSubject(username)
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiration)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(jwtKey), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private static Key getSigningKey() {
+    public static String generateToken(String username, Date issuedAt, Date expiration, String signatureKey) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiration)
+                .signWith(getSigningKey(signatureKey), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    private static Key getSigningKey(String jwtKey) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
