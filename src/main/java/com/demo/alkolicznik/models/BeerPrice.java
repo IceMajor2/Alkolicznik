@@ -1,32 +1,20 @@
 package com.demo.alkolicznik.models;
 
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CompositeType;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.hypersistence.utils.hibernate.type.money.MonetaryAmountType;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CompositeType;
+import java.util.Objects;
 
 @Entity(name = "BeerPrice")
 @Table(name = "beer_price")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class BeerPrice {
 
 	@EmbeddedId
@@ -85,14 +73,7 @@ public class BeerPrice {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder("");
-		sb.append(beer.getFullName()).append(" | ").append(store.getName()).append(" | ").append(price);
-		return sb.toString();
-	}
-
-	@Override
-	protected BeerPrice clone() {
+	public BeerPrice clone() {
 		return new BeerPrice(this.id, this.store, this.beer, this.price);
 	}
 }
