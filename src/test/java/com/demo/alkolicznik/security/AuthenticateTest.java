@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -145,6 +146,19 @@ public class AuthenticateTest {
         Date issuedAt = Timestamp.valueOf(LocalDateTime.now());
         Date expiration = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_VALIDITY_TIME));
         String signatureKey = "9077c7341b76f19476f9e3c21618af56720d2bce858ccabcf130061230476f53";
+        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
+        // when
+        var response = getRequestJWT("/api/store", createTokenCookie(jwtToken));
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"010aa7a9a1b9ec11e389b6fd5c744dbf", "a3d87c4861b8e212"})
+    public void shouldReturn401OnTooShortJwtSignature(String signatureKey) {
+        // given
+        Date issuedAt = Timestamp.valueOf(LocalDateTime.now());
+        Date expiration = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_VALIDITY_TIME));
         String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
         // when
         var response = getRequestJWT("/api/store", createTokenCookie(jwtToken));
