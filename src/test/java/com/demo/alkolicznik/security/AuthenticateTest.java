@@ -133,9 +133,9 @@ public class AuthenticateTest {
         // given
         Date issuedAt = Timestamp.valueOf(LocalDateTime.now().minusHours(4));
         Date expiration = Timestamp.valueOf(LocalDateTime.now().minusHours(4 - TOKEN_VALIDITY_TIME));
-        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration);
+        String jwt = JwtUtils.generateToken("user", issuedAt, expiration);
         // when
-        var response = getRequestJWT("/api/beer", createTokenCookie(jwtToken));
+        var response = getRequestJWT("/api/beer", createTokenCookie(jwt));
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -146,22 +146,20 @@ public class AuthenticateTest {
         Date issuedAt = Timestamp.valueOf(LocalDateTime.now());
         Date expiration = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_VALIDITY_TIME));
         String signatureKey = "9077c7341b76f19476f9e3c21618af56720d2bce858ccabcf130061230476f53";
-        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
+        String jwt = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
         // when
-        var response = getRequestJWT("/api/store", createTokenCookie(jwtToken));
+        var response = getRequestJWT("/api/store", createTokenCookie(jwt));
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"010aa7a9a1b9ec11e389b6fd5c744dbf", "a3d87c4861b8e212"})
-    public void shouldReturn401OnTooShortJwtSignature(String signatureKey) {
-        // given
-        Date issuedAt = Timestamp.valueOf(LocalDateTime.now());
-        Date expiration = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_VALIDITY_TIME));
-        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
+    @ValueSource(strings =
+            {"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNjk1MjEyNDQ1LCJleHAiOjE2OTUyMjY4NDV9.SHbyAdADHk9u8fFaUTh6bMNv5IeF0RBIJkoDMOdCS-g",
+                    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNjk1MjEyNDQ1LCJleHAiOjE2OTUyMjY4NDV9.kgIkIZG4kZ9zKiID_FwFn6N-PeQc6AxD5VNGqf57-Lk"})
+    public void shouldReturn401OnTooShortJwtSignature(String jwtWithWeakSignature) {
         // when
-        var response = getRequestJWT("/api/store", createTokenCookie(jwtToken));
+        var response = getRequestJWT("/api/store", createTokenCookie(jwtWithWeakSignature));
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
