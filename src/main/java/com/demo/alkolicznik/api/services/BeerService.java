@@ -65,7 +65,7 @@ public class BeerService {
             throw new BeerAlreadyExistsException();
         }
         BeerResponseDTO saved = new BeerResponseDTO(beerRepository.save(beer));
-        log.info("Beer added: [{}]", saved);
+        log.info("Added: [{}]", saved);
         return saved;
     }
 
