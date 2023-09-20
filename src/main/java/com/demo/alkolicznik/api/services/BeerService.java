@@ -12,6 +12,7 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BeerService {
 
     private final BeerRepository beerRepository;
@@ -62,7 +64,9 @@ public class BeerService {
         if (beerRepository.exists(beer)) {
             throw new BeerAlreadyExistsException();
         }
-        return new BeerResponseDTO(beerRepository.save(beer));
+        BeerResponseDTO saved = new BeerResponseDTO(beerRepository.save(beer));
+        log.info("Beer added: [{}]", saved);
+        return saved;
     }
 
     public BeerResponseDTO replace(Long beerId, BeerRequestDTO requestDTO) {
@@ -76,7 +80,10 @@ public class BeerService {
             imageService.delete(beerImage);
             overwritten.setImage(null);
         });
-        return new BeerResponseDTO(beerRepository.save(overwritten));
+        BeerResponseDTO previous = new BeerResponseDTO(toOverwrite);
+        BeerResponseDTO saved = new BeerResponseDTO(beerRepository.save(overwritten));
+        log.info("Replacing: [{}] with: [{}]", previous, saved);
+        return saved;
     }
 
     public BeerResponseDTO update(Long beerId, BeerUpdateDTO updateDTO) {
@@ -92,8 +99,10 @@ public class BeerService {
             imageService.delete(toUpdate.getImage().get());
             updated.setImage(null);
         }
-
-        return new BeerResponseDTO(beerRepository.save(updated));
+        BeerResponseDTO previous = new BeerResponseDTO(toUpdate);
+        BeerResponseDTO saved = new BeerResponseDTO(beerRepository.save(updated));
+        log.info("Updating: [{}] to: [{}]", previous, saved);
+        return saved;
     }
 
     @Transactional(readOnly = false)
@@ -103,14 +112,17 @@ public class BeerService {
         beerRepository.delete(toDelete);
         if (toDelete.getImage().isPresent())
             imageService.delete(toDelete.getImage().get());
-        return new BeerDeleteResponseDTO(toDelete);
+        BeerDeleteResponseDTO deleted = new BeerDeleteResponseDTO(toDelete);
+        log.info("Deleted: [{}]", deleted);
+        return deleted;
     }
 
     @Transactional(readOnly = false)
     public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
         Beer toDelete = beerRepository.findByFullnameAndVolume(request.getFullName(), request.getVolume())
                 .orElseThrow(() -> new BeerNotFoundException(request.getFullName(), request.getVolume()));
-        return this.delete(toDelete.getId());
+        BeerDeleteResponseDTO deleted = this.delete(toDelete.getId());
+        return deleted;
     }
 
     private Beer checkForUpdateConditions(Long beerId, BeerUpdateDTO updateDTO) {
