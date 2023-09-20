@@ -5,8 +5,7 @@ import lombok.*;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CityDTO {

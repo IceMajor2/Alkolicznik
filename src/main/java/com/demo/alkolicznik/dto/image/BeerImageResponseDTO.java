@@ -10,11 +10,9 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
 @EqualsAndHashCode
 @JsonPropertyOrder({"beer_name", "remote_id", "url"})
+@Data
 public class BeerImageResponseDTO {
 
     @JsonProperty("beer_name")
