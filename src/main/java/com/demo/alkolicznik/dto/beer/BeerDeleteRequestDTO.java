@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @JsonPropertyOrder({"brand", "type", "volume"})
 @EqualsAndHashCode
+@NoArgsConstructor
 @Data
 public class BeerDeleteRequestDTO {
 
