@@ -4,7 +4,7 @@ import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.security.SignupResponseDTO;
-import com.demo.alkolicznik.exceptions.classes.UserAlreadyExistsException;
+import com.demo.alkolicznik.exceptions.classes.user.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;

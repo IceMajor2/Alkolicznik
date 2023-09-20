@@ -1,10 +1,12 @@
-package com.demo.alkolicznik.exceptions;
+package com.demo.alkolicznik.exceptions.config;
 
 import com.demo.alkolicznik.exceptions.classes.*;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.PriceIsSameException;
+import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;

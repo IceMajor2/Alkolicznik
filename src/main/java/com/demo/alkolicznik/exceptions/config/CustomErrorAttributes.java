@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.exceptions;
+package com.demo.alkolicznik.exceptions.config;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;

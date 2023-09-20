@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.exceptions.CustomResponseStatusExceptionResolver;
+import com.demo.alkolicznik.exceptions.config.CustomResponseStatusExceptionResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;

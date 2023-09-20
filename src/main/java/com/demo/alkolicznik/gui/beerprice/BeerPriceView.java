@@ -4,7 +4,7 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.properties.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;

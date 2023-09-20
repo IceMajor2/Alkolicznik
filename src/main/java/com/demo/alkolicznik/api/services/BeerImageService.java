@@ -2,8 +2,8 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
-import com.demo.alkolicznik.exceptions.classes.FileIsNotImageException;
-import com.demo.alkolicznik.exceptions.classes.FileNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.file.FileIsNotImageException;
+import com.demo.alkolicznik.exceptions.classes.file.FileNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.image.ImageNotFoundException;

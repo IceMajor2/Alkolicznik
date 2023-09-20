@@ -2,7 +2,7 @@ package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.city.CityDTO;
 import com.demo.alkolicznik.dto.store.*;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreAlreadyExistsException;

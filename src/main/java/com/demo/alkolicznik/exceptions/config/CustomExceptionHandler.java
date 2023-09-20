@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.exceptions;
+package com.demo.alkolicznik.exceptions.config;
 
+import com.demo.alkolicznik.exceptions.ApiException;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;

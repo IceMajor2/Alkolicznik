@@ -1,7 +1,7 @@
 package com.demo.alkolicznik.api.services;
 
 import com.demo.alkolicznik.dto.beer.*;
-import com.demo.alkolicznik.exceptions.classes.NoSuchCityException;
+import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.ObjectsAreEqualException;
 import com.demo.alkolicznik.exceptions.classes.PropertiesMissingException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
