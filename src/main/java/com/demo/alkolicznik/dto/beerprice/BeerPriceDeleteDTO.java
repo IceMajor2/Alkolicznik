@@ -8,21 +8,20 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @JsonPropertyOrder({"beer", "price", "store", "status"})
 @EqualsAndHashCode
-@ToString
+@Data
 public class BeerPriceDeleteDTO {
 
     private StoreResponseDTO store;
     private BeerResponseDTO beer;
     private String price;
+    @ToString.Exclude
     private String status = "Beer price was deleted successfully!";
 
     public BeerPriceDeleteDTO(BeerPrice beerPrice) {
         this.store = new StoreResponseDTO(beerPrice.getStore());
         this.beer = new BeerResponseDTO(beerPrice.getBeer());
-		this.price = beerPrice.getPrice().toString();
+        this.price = beerPrice.getPrice().toString();
     }
 }

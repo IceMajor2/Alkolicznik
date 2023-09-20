@@ -12,10 +12,8 @@ import java.util.List;
 
 @JsonPropertyOrder({"beer", "price", "store"})
 @NoArgsConstructor
-@Getter
-@Setter
 @EqualsAndHashCode
-@ToString
+@Data
 public class BeerPriceResponseDTO {
 
     private BeerResponseDTO beer;

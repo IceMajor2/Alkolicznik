@@ -2,13 +2,11 @@ package com.demo.alkolicznik.dto.beerprice;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class BeerPriceParamRequestDTO {
 
     @NotNull(message = "Store id was not specified")
@@ -26,10 +24,10 @@ public class BeerPriceParamRequestDTO {
     }
 
     public Long getLongStoreId() {
-		return this.storeId.longValue();
-	}
+        return this.storeId.longValue();
+    }
 
-	public Long getLongBeerId() {
-		return this.beerId.longValue();
-	}
+    public Long getLongBeerId() {
+        return this.beerId.longValue();
+    }
 }
