@@ -12,46 +12,44 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
 @EqualsAndHashCode
-@JsonPropertyOrder({ "id", "brand", "type", "volume", "image" })
+@JsonPropertyOrder({"id", "brand", "type", "volume", "image"})
+@Data
 public class BeerResponseDTO {
 
-	private Long id;
+    private Long id;
 
-	private String brand;
+    private String brand;
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String type;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String type;
 
-	private Double volume;
+    private Double volume;
 
-	@ToString.Exclude
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private BeerImageResponseDTO image;
+    @ToString.Exclude
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BeerImageResponseDTO image;
 
-	public BeerResponseDTO(Beer beer) {
-		this.id = beer.getId();
-		this.brand = beer.getBrand();
-		this.type = beer.getType();
-		this.volume = beer.getVolume();
-		beer.getImage().ifPresent(beerImage -> this.image = new BeerImageResponseDTO(beerImage));
-	}
+    public BeerResponseDTO(Beer beer) {
+        this.id = beer.getId();
+        this.brand = beer.getBrand();
+        this.type = beer.getType();
+        this.volume = beer.getVolume();
+        beer.getImage().ifPresent(beerImage -> this.image = new BeerImageResponseDTO(beerImage));
+    }
 
-	public static List<BeerResponseDTO> asList(Collection<Beer> beers) {
-		return beers.stream()
-				.map(BeerResponseDTO::new)
-				.toList();
-	}
+    public static List<BeerResponseDTO> asList(Collection<Beer> beers) {
+        return beers.stream()
+                .map(BeerResponseDTO::new)
+                .toList();
+    }
 
-	@JsonIgnore
-	public String getFullName() {
-		StringBuilder sb = new StringBuilder(this.brand);
-		if (this.type != null) {
-			sb.append(" ").append(this.type);
-		}
-		return sb.toString();
-	}
+    @JsonIgnore
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder(this.brand);
+        if (this.type != null) {
+            sb.append(" ").append(this.type);
+        }
+        return sb.toString();
+    }
 }

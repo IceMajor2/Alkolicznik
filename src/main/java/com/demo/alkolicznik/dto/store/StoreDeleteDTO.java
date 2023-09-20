@@ -1,25 +1,19 @@
 package com.demo.alkolicznik.dto.store;
 
 import com.demo.alkolicznik.models.Store;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@AllArgsConstructor
 @EqualsAndHashCode
-@ToString
+@Data
 public class StoreDeleteDTO {
 
     private Long id;
     private String name;
     private String city;
     private String street;
+    @ToString.Exclude
     private String status = "Store was deleted successfully!";
 
     public StoreDeleteDTO(Store store) {

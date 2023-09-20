@@ -11,10 +11,8 @@ import java.util.List;
 
 @JsonPropertyOrder({"id", "name", "city", "street", "image"})
 @NoArgsConstructor
-@Getter
-@Setter
 @EqualsAndHashCode
-@ToString
+@Data
 public class StoreResponseDTO {
 
     private Long id;
@@ -22,6 +20,7 @@ public class StoreResponseDTO {
     private String city;
     private String street;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @ToString.Exclude
     private StoreImageResponseDTO image;
 
     public StoreResponseDTO(Store store) {

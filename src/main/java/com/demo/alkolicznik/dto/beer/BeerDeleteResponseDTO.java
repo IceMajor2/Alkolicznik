@@ -9,11 +9,9 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @JsonPropertyOrder({"id", "name", "volume", "image", "status"})
 @EqualsAndHashCode
-@ToString
+@Data
 public class BeerDeleteResponseDTO {
 
     private Long id;
@@ -23,9 +21,11 @@ public class BeerDeleteResponseDTO {
 
     private Double volume;
 
+    @ToString.Exclude
     private String status = "Beer was deleted successfully!";
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @ToString.Exclude
     private BeerImageResponseDTO image;
 
     public BeerDeleteResponseDTO(Beer beer) {

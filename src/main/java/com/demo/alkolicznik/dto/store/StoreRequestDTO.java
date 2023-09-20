@@ -9,9 +9,7 @@ import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class StoreRequestDTO {
 
     @NotBlank(message = "Name was not specified")

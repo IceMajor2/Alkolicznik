@@ -9,10 +9,8 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 @JsonPropertyOrder({"brand", "type", "volume"})
+@Data
 public class BeerRequestDTO {
 
     @NotBlank(message = "Brand was not specified")
