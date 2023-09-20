@@ -2,6 +2,7 @@ package com.demo.alkolicznik.exceptions;
 
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -90,6 +92,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Component
+    @Slf4j
     public static class ExceptionHandlerFilter extends OncePerRequestFilter {
 
         @Override
@@ -98,13 +101,32 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 filterChain.doFilter(request, response);
             } catch (ExpiredJwtException e) {
                 handleExpiredJwtException(request, response);
+            } catch (SignatureException e) {
+                handleSignatureException(request, response);
             }
         }
 
         private void handleExpiredJwtException(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            Cookie expiredAuth = CookieUtils.createExpiredTokenCookie(request);
-            response.addCookie(expiredAuth);
+            Cookie removeCookie = CookieUtils.createExpiredTokenCookie(request);
+            response.addCookie(removeCookie);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            if (!isCallToAPI(request)) {
+                response.sendRedirect("/");
+            }
+        }
+
+        private void handleSignatureException(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            Cookie invalidAuth = CookieUtils.createExpiredTokenCookie(request);
+            response.addCookie(invalidAuth);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            if (!isCallToAPI(request)) {
+                response.sendRedirect("/");
+            }
+            log.warn("Suspicious JWT authentication request with invalid signature");
+        }
+
+        private boolean isCallToAPI(HttpServletRequest request) {
+            return request.getServletPath().contains("/api");
         }
     }
 }
