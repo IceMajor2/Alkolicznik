@@ -125,7 +125,7 @@ public class ReloadScript implements CommandLineRunner {
                         RELATIVE_TO_STORE, srcFilename);
             }
             if (model != null)
-                LOGGER.info("Image was successfully sent: {}", addImage(model, absolutePath));
+                addImage(model, absolutePath);
         }
     }
 
