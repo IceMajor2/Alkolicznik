@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.config;
+package com.demo.alkolicznik.exceptions.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

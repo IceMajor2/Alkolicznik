@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.config;
+package com.demo.alkolicznik.security.config.client;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.Context;

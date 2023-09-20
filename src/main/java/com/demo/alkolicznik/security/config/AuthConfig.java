@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class SecurityBeans {
+public class AuthConfig {
 
     private final UserRepository userRepository;
 

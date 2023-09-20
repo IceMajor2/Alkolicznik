@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.security.config;
+package com.demo.alkolicznik.security.config.client;
 
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.ConnectionConfig;

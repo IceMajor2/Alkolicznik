@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Component
-public class ServerInfoBeans {
+public class ServerInfo {
 
     @Bean
     public String baseUrl(String schema, String ipAddress, int serverPort) {

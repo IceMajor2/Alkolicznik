@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.security.config;
 
 import com.demo.alkolicznik.exceptions.config.CustomExceptionHandler;
+import com.demo.alkolicznik.exceptions.config.RestAuthenticationEntryPoint;
 import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
