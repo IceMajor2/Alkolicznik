@@ -64,15 +64,19 @@ public class StoreImageService {
     public StoreImageResponseDTO add(Store store, String imagePath) {
         StoreImage added = this.add(store.getName(), imagePath);
         store.setImage(added);
-        return new StoreImageResponseDTO(added);
+        StoreImageResponseDTO saved = new StoreImageResponseDTO(added);
+        log.info("Added: [{}]", saved);
+        return saved;
     }
 
     @Transactional
     public StoreImageResponseDTO add(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
-        return new StoreImageResponseDTO(
+        StoreImageResponseDTO saved = new StoreImageResponseDTO(
                 this.add(storeName, request.getImagePath()));
+        log.info("Added: [{}]", saved);
+        return saved;
     }
 
     @Transactional
@@ -116,9 +120,12 @@ public class StoreImageService {
     }
 
     @Transactional
-    public void delete(StoreImage image) {
+    public StoreImageResponseDTO delete(StoreImage image) {
         imageKitRepository.delete(image);
         storeImageRepository.delete(image);
+        StoreImageResponseDTO deleted = new StoreImageResponseDTO(image);
+        log.info("Deleted: [{}]", deleted);
+        return deleted;
     }
 
     @Transactional(readOnly = true)
