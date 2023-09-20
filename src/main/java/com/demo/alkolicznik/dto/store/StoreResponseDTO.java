@@ -36,4 +36,8 @@ public class StoreResponseDTO {
                 .map(StoreResponseDTO::new)
                 .toList();
     }
+
+    public String prettyString() {
+        return String.format("%s (%s, %s)".formatted(this.name, this.city, this.street));
+    }
 }
