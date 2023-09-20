@@ -1,8 +1,10 @@
 package com.demo.alkolicznik.exceptions;
 
+import com.demo.alkolicznik.utils.request.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
@@ -27,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import static com.demo.alkolicznik.utils.Utils.convertObjectToJson;
 
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
@@ -102,12 +102,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         private void handleExpiredJwtException(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            String message = "Please log in again";
-            String path = request.getServletPath();
-            ApiException error = new ApiException(HttpStatus.UNAUTHORIZED, message, path);
-
-            response.setStatus(error.getStatus());
-            response.getWriter().write(convertObjectToJson(error));
+            Cookie expiredAuth = CookieUtils.createExpiredTokenCookie(request);
+            response.addCookie(expiredAuth);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }
