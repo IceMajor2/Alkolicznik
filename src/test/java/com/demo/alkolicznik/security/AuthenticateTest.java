@@ -138,4 +138,17 @@ public class AuthenticateTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
+
+    @Test
+    public void shouldReturn401OnInvalidJwtSignature() {
+        // given
+        Date issuedAt = Timestamp.valueOf(LocalDateTime.now());
+        Date expiration = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_VALIDITY_TIME));
+        String signatureKey = "9077c7341b76f19476f9e3c21618af56720d2bce858ccabcf130061230476f53";
+        String jwtToken = JwtUtils.generateToken("user", issuedAt, expiration, signatureKey);
+        // when
+        var response = getRequestJWT("/api/store", createTokenCookie(jwtToken));
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 }
