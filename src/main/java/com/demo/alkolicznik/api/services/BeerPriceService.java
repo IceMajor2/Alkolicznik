@@ -16,19 +16,17 @@ import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.Monetary;
-import javax.money.MonetaryAmount;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BeerPriceService {
 
     private final StoreRepository storeRepository;
@@ -120,9 +118,11 @@ public class BeerPriceService {
         double price = beerPriceRequestDTO.getPrice();
         store.saveBeer(beer, price);
         storeRepository.save(store);
-        return new BeerPriceResponseDTO(store.findBeer(beer.getId()).get());
+        BeerPriceResponseDTO saved = new BeerPriceResponseDTO(store.findBeer(beer.getId()).get());
+        log.info("Added: [{}]", saved);
+        return saved;
     }
-    
+
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
     public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, Double price) {
         throwIfNotFoundAll(storeId, beerId);
@@ -135,24 +135,27 @@ public class BeerPriceService {
 
         store.saveBeer(beer, price);
         storeRepository.save(store);
-        return new BeerPriceResponseDTO(store.findBeer(beerId).get());
+        BeerPriceResponseDTO saved = new BeerPriceResponseDTO(store.findBeer(beerId).get());
+        log.info("Added: [{}]", saved);
+        return saved;
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public BeerPriceResponseDTO update(Long storeId, Long beerId, Double price) {
         throwIfNotFoundAll(storeId, beerId);
         Store store = storeRepository.findById(storeId).get();
-        BeerPrice beerPrice = store.findBeer(beerId).orElseThrow(() ->
+        BeerPrice toUpdate = store.findBeer(beerId).orElseThrow(() ->
                 new BeerPriceNotFoundException());
-        if (beerPrice.getAmountOnly().equals(price)) {
-            throw new PriceIsSameException(beerPrice.getPrice().toString());
+        BeerPrice updated = toUpdatedModel(toUpdate, price);
+        if (Objects.equals(toUpdate.getAmountOnly(), updated.getAmountOnly())) {
+            throw new PriceIsSameException(toUpdate.getPrice().toString());
         }
-        MonetaryAmount updatedPrice = Monetary.getDefaultAmountFactory()
-                .setCurrency("PLN").setNumber(price).create();
-        beerPrice.setPrice(updatedPrice);
-
         storeRepository.save(store);
-        return new BeerPriceResponseDTO(beerPrice);
+        BeerPriceResponseDTO saved = new BeerPriceResponseDTO(updated);
+        log.info("Updating price of [{}] in [{}] from: [{}] to: [{}]",
+                saved.getBeer().getFullName(), saved.getStore().prettyString(),
+                toUpdate.getPrice(), updated.getPrice());
+        return saved;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
@@ -166,7 +169,10 @@ public class BeerPriceService {
         BeerPrice deleted = store.deleteBeer(beer);
         beerRepository.save(beer);
         storeRepository.save(store);
-        return new BeerPriceDeleteDTO(deleted);
+        BeerPriceDeleteDTO deletedDTO = new BeerPriceDeleteDTO(deleted);
+        log.info("Deleted [{} of {}] from [{}]",
+                deletedDTO.getBeer().getFullName(), deletedDTO.getPrice(), deletedDTO.getStore().prettyString());
+        return deletedDTO;
     }
 
     private Comparator comparatorByBeerIdPriceAndStoreId() {
@@ -220,5 +226,14 @@ public class BeerPriceService {
         if (!storeRepository.existsById(storeId) && !beerRepository.existsById(beerId)) {
             throw new EntitiesNotFoundException(beerId, storeId);
         }
+    }
+
+    private BeerPrice toUpdatedModel(BeerPrice toUpdate, Double withPrice) {
+        BeerPrice updated = toUpdate.clone();
+        updated.setPrice(Monetary.getDefaultAmountFactory()
+                .setCurrency("PLN")
+                .setNumber(withPrice)
+                .create());
+        return updated;
     }
 }
