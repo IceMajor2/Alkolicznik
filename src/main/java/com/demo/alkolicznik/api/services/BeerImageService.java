@@ -77,9 +77,11 @@ public class BeerImageService {
 
     @Transactional
     public BeerImageResponseDTO delete(BeerImage image) {
-        imageKitRepository.delete(image);
-        beerImageRepository.deleteById(image.getId());
         BeerImageResponseDTO deleted = new BeerImageResponseDTO(image);
+        imageKitRepository.delete(image);
+        image.getBeer().setImage(null);
+        image.setBeer(null);
+        beerImageRepository.deleteById(image.getId());
         log.info("Deleted: [{}]", deleted);
         return deleted;
     }

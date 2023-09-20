@@ -150,11 +150,13 @@ public class BeerPriceService {
         if (Objects.equals(toUpdate.getAmountOnly(), updated.getAmountOnly())) {
             throw new PriceIsSameException(toUpdate.getPrice().toString());
         }
+        String previousPrice = toUpdate.getPrice().toString();
+        toUpdate.setPrice(updated.getPrice());
         storeRepository.save(store);
         BeerPriceResponseDTO saved = new BeerPriceResponseDTO(updated);
         log.info("Updating price of [{}] in [{}] from: [{}] to: [{}]",
                 saved.getBeer().getFullName(), saved.getStore().prettyString(),
-                toUpdate.getPrice(), updated.getPrice());
+                previousPrice, updated.getPrice());
         return saved;
     }
 
