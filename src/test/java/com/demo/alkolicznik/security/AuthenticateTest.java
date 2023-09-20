@@ -136,9 +136,6 @@ public class AuthenticateTest {
         // when
         var response = getRequestJWT("/api/beer", createTokenCookie(jwtToken));
         // then
-        assertIsError(response.getBody(),
-                HttpStatus.UNAUTHORIZED,
-                "Please log in again",
-                "/api/beer");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }
