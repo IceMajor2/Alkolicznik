@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -94,7 +93,8 @@ public class BeerController {
 
     @Operation(
             summary = "Add new beer",
-            description = "If you found some beer missing, then by all means add it!" +
+            description = "If you found some beer missing, then by all means add it!<br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
                     "<br><b>CONSTRAINTS:</b><br>" +
                     "&bull; brand must be specified (type may be empty though)<br>" +
                     "&bull; volume must be a positive number<br>" +
@@ -154,6 +154,7 @@ public class BeerController {
             summary = "Replace beer",
             description = "Here you can replace an already existing beer with new one. " +
                     "Features? You can keep the <i>id</i>! How cool is that?<br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
                     "<b>WARNING:</b> every price & image associated " +
                     "with the previous beer will be deleted!" +
                     "<br><b>CONSTRAINTS:</b><br>" +
@@ -208,6 +209,7 @@ public class BeerController {
             summary = "Update beer",
             description = "If you are interested in updating just one or two individual " +
                     "pieces of an item, you've come to the right place.<br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
                     "<b>TIP:</b> to remove beer's type, put an empty string as a value of \"type\" key (see example).<br>" +
                     "<b>WARNING:</b> If you update anything else than volume, " +
                     "then all associated prices & an image will be deleted." +
@@ -311,18 +313,54 @@ public class BeerController {
         return beerService.delete(beerId);
     }
 
-    @Operation(summary = "Delete beer by JSON string",
-            description = "The beer is nowhere to be found anymore and - even worse - you can't get its ID?<br>"
-                    + "Not a problem! Try to describe it just as you'd create it de novo.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "beer successfully deleted", content = @Content),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content)
-    })
+    @Operation(
+            summary = "Delete beer by JSON string",
+            description = "The beer should have been deleted years ago and now - even worse - you can't get its ID?<br>"
+                    + "Not a problem! Try to describe it just as you'd create it de novo.<br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Deleting a beer w/o type & volume",
+                                            description = "This will delete a beer <b>Blackfort</b> of <b>0.5</b> volume",
+                                            value = "{\"brand\":\"Blackfort\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Deleting a beer with beer, type & volume specified",
+                                            value = "{\"brand\":\"Godfather\",\"type\":\"Lager\",\"volume\":0.33}"
+                                    )
+                            }
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Beer successfully deleted",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = BeerDeleteResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Beer not found",
+                            content = @Content
+                    ),
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @DeleteMapping
-    @SecurityRequirement(name = "JWT Authentication")
     public BeerDeleteResponseDTO delete(@RequestBody @Valid BeerDeleteRequestDTO requestDTO) {
         return beerService.delete(requestDTO);
     }
