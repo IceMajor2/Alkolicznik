@@ -58,7 +58,7 @@ public class StoreController {
 
 	@GetMapping
 	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public List<StoreResponseDTO> getAll() {
 		return storeService.getStores();
 	}
@@ -80,7 +80,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
 	})
 	@PostMapping
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public ResponseEntity<StoreResponseDTO> add(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
 		StoreResponseDTO saved = storeService.add(storeRequestDTO);
 		URI location = ServletUriComponentsBuilder
@@ -109,7 +109,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
 	})
 	@PutMapping("/{store_id}")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public StoreResponseDTO replace(@PathVariable("store_id") Long storeId,
 			@RequestBody @Valid StoreRequestDTO requestDTO) {
 		return storeService.replace(storeId, requestDTO);
@@ -132,7 +132,7 @@ public class StoreController {
 			@ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
 	})
 	@PatchMapping("/{store_id}")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public StoreResponseDTO update(@PathVariable("store_id") Long storeId,
 			@RequestBody @Valid StoreUpdateDTO updateDTO) {
 		return storeService.update(storeId, updateDTO);
@@ -151,7 +151,7 @@ public class StoreController {
 	})
 	@DeleteMapping("/{store_id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public StoreDeleteDTO deleteByParam(@PathVariable("store_id") Long storeId) {
 		return storeService.delete(storeId);
 	}

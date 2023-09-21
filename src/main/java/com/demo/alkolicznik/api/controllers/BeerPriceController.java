@@ -57,7 +57,7 @@ public class BeerPriceController {
 
 	@GetMapping("/beer-price")
 	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public List<BeerPriceResponseDTO> getAll() {
 		return beerPriceService.getAll();
 	}
@@ -123,7 +123,7 @@ public class BeerPriceController {
 			@ApiResponse(responseCode = "404 (4)", description = "both store and beer not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "price already exists", content = @Content)
 	})
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByObject(
 			@PathVariable("store_id") Long storeId,
 			@RequestBody @Valid BeerPriceRequestDTO beerPriceRequestDTO) {
@@ -140,7 +140,7 @@ public class BeerPriceController {
 
 	@PostMapping(value = "/store/{store_id}/beer-price", params = { "beer_id", "beer_price" })
 	@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public ResponseEntity<BeerPriceResponseDTO> addByParam(
 			@PathVariable("store_id") Long storeId,
 			@RequestParam(value = "beer_id", required = false) Long beerId,
@@ -174,7 +174,7 @@ public class BeerPriceController {
 			@ApiResponse(responseCode = "404 (5)", description = "both store and beer not found", content = @Content),
 			@ApiResponse(responseCode = "409", description = "price already exists", content = @Content)
 	})
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public BeerPriceResponseDTO update(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId,
 			@RequestParam("price") @Positive(message = "Price must be a positive number") Double price) {
@@ -195,7 +195,7 @@ public class BeerPriceController {
 			@ApiResponse(responseCode = "404 (4)", description = "store not found", content = @Content),
 			@ApiResponse(responseCode = "404 (5)", description = "both store and beer not found", content = @Content)
 	})
-	@SecurityRequirement(name = "Basic Authentication")
+	@SecurityRequirement(name = "JWT Authentication")
 	public BeerPriceDeleteDTO delete(@RequestParam("store_id") Long storeId,
 			@RequestParam("beer_id") Long beerId) {
 		return beerPriceService.delete(storeId, beerId);
