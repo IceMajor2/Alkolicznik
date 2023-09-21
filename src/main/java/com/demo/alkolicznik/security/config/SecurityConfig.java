@@ -51,7 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(swaggerEndpoints()).permitAll()
                         // secured endpoints that request a valid body
-                        // needs to be specified below
+                        // need to be specified below
+                        // so that 404 is returned for unauthorized/unauthenticated user
                         .requestMatchers(HttpMethod.POST, "/api/beer").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.PUT, "/api/beer/*").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.DELETE, "/api/beer").hasAnyRole(ACCOUNTANT_AUTHORITIES)
@@ -67,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/beer/image/*").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.DELETE, "/api/store").hasAnyRole(ACCOUNTANT_AUTHORITIES)
+                     //   .requestMatchers("/api/**").denyAll()
                         .anyRequest().permitAll())
                 .sessionManagement(sessionManager -> sessionManager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
