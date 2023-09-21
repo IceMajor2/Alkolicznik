@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -98,6 +99,13 @@ public class BeerController {
                     "&bull; brand must be specified (type may be empty though)<br>" +
                     "&bull; volume must be a positive number<br>" +
                     "&bull; beer must not have been already created",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    value = "{\"brand\":\"Heineken\",\"type\":\"Silver\",\"volume\":0.5}"
+                            )
+                    )
+            ),
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -142,22 +150,55 @@ public class BeerController {
                 .body(savedDTO);
     }
 
-    @Operation(summary = "Replace beer",
-            description = "Here you can replace an already existing beer with new one. "
-                    + "Features? You can keep the id! How cool is that?<br>"
-                    + "<b>WARNING:</b> every price associated with the previous beer "
-                    + "will be deleted!")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "beer successfully replaced"),
-            @ApiResponse(responseCode = "200 (2)", description = "replacement is the same as original entity - nothing happens", content = @Content),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
-            @ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
-    })
+    @Operation(
+            summary = "Replace beer",
+            description = "Here you can replace an already existing beer with new one. " +
+                    "Features? You can keep the <i>id</i>! How cool is that?<br>" +
+                    "<b>WARNING:</b> every price & image associated " +
+                    "with the previous beer will be deleted!" +
+                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "&bull; same constraints apply as with the case of usual beer addition",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    value = "{\"brand\":\"Carlsberg\",\"type\":\"Pilsner\",\"volume\":0.33}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "&bull; Beer successfully replaced<br>" +
+                                    "&bull; Replacement is the same as original entity: nothing changes",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = BeerResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Beer not found",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Such beer already exists",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @PutMapping("/{beer_id}")
-    @SecurityRequirement(name = "JWT Authentication")
     public BeerResponseDTO replace(@PathVariable("beer_id") Long beerId,
                                    @RequestBody @Valid BeerRequestDTO requestDTO) {
         return beerService.replace(beerId, requestDTO);

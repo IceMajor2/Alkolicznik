@@ -38,8 +38,8 @@ public class AuthController {
             summary = "Register an account",
             description = "Create account for this application." +
                     "<br><b>CONSTRAINTS:</b><br>" +
-                    "- password must be at least 12 characters long<br>" +
-                    "- username must not exist in database",
+                    "&bull; password must be at least 12 characters long<br>" +
+                    "&bull; username must not exist in database",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
                             examples = @ExampleObject(
