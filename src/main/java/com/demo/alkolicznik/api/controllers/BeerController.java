@@ -3,12 +3,16 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.beer.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,29 +33,54 @@ public class BeerController {
     }
 
     @GetMapping("/{beer_id}")
-    @Operation(summary = "Get beer details",
-            description = "Include id of beer you would like to see details of.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "beer details retrieved"),
-            @ApiResponse(responseCode = "404", description = "beer not found", content = @Content)
-    })
+    @Operation(
+            summary = "Get beer object",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Beer details retrieved",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = BeerResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Beer not found",
+                            content = @Content
+                    )
+            }
+    )
     public BeerResponseDTO get(@PathVariable("beer_id") Long id) {
         return beerService.get(id);
     }
 
     @GetMapping(params = "city")
-    @Operation(summary = "Get a list of currently tracked beers",
+    @Operation(
+            summary = "Get a list of all beers",
             description = "Average user is only enabled to get an array of beers from a "
-                    + "desired city. Accountants may retrieve all beers from database.<br>"
-                    + "<b>Options available</b>:<br>"
-                    + "<i>/api/beer</i> - lists every beer in database: secured<br>"
-                    + "<i>/api/beer?city=</i> - lists every beer sold in a city")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "beer list retrieved"),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "city not found", content = @Content)
-    })
+                    + "desired city. Accountant-roles may retrieve all beers from database."
+                    + "<br><b>Options available</b>:<br>"
+                    + "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant-roles only</i><br>"
+                    + "&bull; <b>/api/beer?city=${some_city}</b> - lists every in a given city",
+            parameters = @Parameter(
+                    name = "city",
+                    in = ParameterIn.PATH,
+                    required = false
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Beer list retrieved"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; City not found ",
+                            content = @Content
+                    ),
+            }
+    )
     public List<BeerResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
         return beerService.getBeers(city);
     }
