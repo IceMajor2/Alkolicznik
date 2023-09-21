@@ -248,7 +248,7 @@ public class BeerController {
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(
-                                            implementation = BeerUpdateDTO.class
+                                            implementation = BeerResponseDTO.class
                                     )
                             )
                     ),
@@ -280,18 +280,33 @@ public class BeerController {
         return beerService.update(beerId, updateDTO);
     }
 
-    @Operation(summary = "Delete beer by id",
-            description = "Was this beer a limited edition? Is it nowhere to be acquired anymore?<br>"
-                    + "Say no more! Just give me an ID...")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "beer successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content)
-    })
+    @Operation(
+            summary = "Delete beer by id",
+            description = "Please remove a beer that is nowhere to be seen anymore in order not to confuse customers...",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Beer successfully deleted",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = BeerDeleteResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Beer not found",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @DeleteMapping("/{beer_id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    @SecurityRequirement(name = "JWT Authentication")
     public BeerDeleteResponseDTO delete(@PathVariable("beer_id") Long beerId) {
         return beerService.delete(beerId);
     }
