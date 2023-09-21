@@ -204,25 +204,77 @@ public class BeerController {
         return beerService.replace(beerId, requestDTO);
     }
 
-    @Operation(summary = "Update beer",
-            description = "If you are interested in updating just one or two - or even more - individual "
-                    + "fields, you've come to the right place.<br>"
-                    + "<b>WARNING #1:</b> If you update brand and/or type, the beer will be removed "
-                    + "from each store it has been previously linked to.<br>"
-                    + "<b>WARNING #2:</b> If you update anything else than beer volume, then "
-                    + "beer image will be deleted.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "beer successfully updated"),
-            @ApiResponse(responseCode = "200", description = "replacement is the same as original entity - nothing happens", content = @Content),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "400 (2)", description = "there was not one single property to update specified", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "beer not found", content = @Content),
-            @ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
-    })
+    @Operation(
+            summary = "Update beer",
+            description = "If you are interested in updating just one or two individual " +
+                    "pieces of an item, you've come to the right place.<br>" +
+                    "<b>TIP:</b> to remove beer's type, put an empty string as a value of \"type\" key (see example).<br>" +
+                    "<b>WARNING:</b> If you update anything else than volume, " +
+                    "then all associated prices & an image will be deleted." +
+                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "&bull; brand, if specified in the request body, must not be empty<br>" +
+                    "&bull; volume must be a positive number",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Updating brand & type",
+                                            value = "{\"brand\":\"Corona\",\"type\":\"Extra\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Updating brand & removing type",
+                                            value = "{\"brand\":\"Budweiser\",\"type\":\"\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Updating volume",
+                                            value = "{\"volume\":0.33}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Updating brand, type & volume",
+                                            value = "{\"brand\":\"Kingfisher\",\"type\":\"Strong\",\"volume\":0.6}"
+                                    )
+                            }
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Replacement is the same as original entity: nothing changes",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Beer successfully updated",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = BeerUpdateDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "&bull; Validation failed<br>" +
+                                    "&bull; Request body was empty",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Beer not found<br>" +
+                                    "&bull; Unauthorized (dummy response)",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Such beer already exists",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @PatchMapping("/{beer_id}")
-    @SecurityRequirement(name = "JWT Authentication")
     public BeerResponseDTO update(@PathVariable("beer_id") Long beerId,
                                   @RequestBody @Valid BeerUpdateDTO updateDTO) {
         return beerService.update(beerId, updateDTO);
