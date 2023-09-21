@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -14,13 +15,21 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                         email = "icemajorr2@gmail.com"
                 ),
                 description = "API documentation for Alkolicznik",
-                title = "Alkolicznik Web API",
-                version = "1.0 alpha"
-        )
+                title = "Alkolicznik API",
+                version = "1.0"
+        ),
+        tags = {
+                @Tag(name = "Account"),
+                @Tag(name = "Beer"),
+                @Tag(name = "Store"),
+                @Tag(name = "Beer Price"),
+                @Tag(name = "Image"),
+                @Tag(name = "City")
+        }
 )
 @SecurityScheme(
         name = "JWT Authentication",
-        description = "Paste token below or just use <b>/api/auth/authenticate</b> endpoint and do not bother anymore!",
+        description = "Paste token below or use <b>/api/auth/authenticate</b> endpoint (which also sets a cookie)",
         scheme = "bearer",
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
