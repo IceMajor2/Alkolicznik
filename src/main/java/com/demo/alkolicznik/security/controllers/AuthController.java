@@ -123,6 +123,21 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(
+            summary = "Log out",
+            description = "Take care... and come back soon!",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "You have been logged out",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE
+                    ),
+                    headers = @Header(
+                            name = "Set-Cookie",
+                            description = "removes (if present) cookie with JWT"
+                    )
+            )
+    )
     public ResponseEntity<AuthLogoutDTO> logout(@AuthenticationPrincipal User user,
                                                 HttpServletRequest request, HttpServletResponse response) {
         Cookie expiredAuthCookie = authService.getLogoutCookie(user, request);
