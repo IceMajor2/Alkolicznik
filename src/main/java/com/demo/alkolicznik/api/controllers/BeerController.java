@@ -59,9 +59,9 @@ public class BeerController {
     @Operation(
             summary = "Get a list of all beers",
             description = "Average user is only enabled to get an array of beers from a "
-                    + "desired city. Accountant-roles may retrieve all beers from database."
+                    + "desired city. Accountant roles may retrieve all beers from database."
                     + "<br><b>Options available</b>:<br>"
-                    + "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant-roles only</i><br>"
+                    + "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant roles only</i><br>"
                     + "&bull; <b>/api/beer?city=${some_city}</b> - lists every in a given city",
             parameters = @Parameter(
                     name = "city",
@@ -87,22 +87,49 @@ public class BeerController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    @SecurityRequirement(name = "JWT Authentication")
     public List<BeerResponseDTO> getAll() {
         return beerService.getBeers();
     }
 
-    @Operation(summary = "Add new beer",
-            description = "If you found a beer missing, feel free to addBeerImage it!")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "beer successfully created"),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "409", description = "such beer already exists", content = @Content)
-    })
+    @Operation(
+            summary = "Add new beer",
+            description = "If you found some beer missing, then by all means add it!" +
+                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "&bull; brand must be specified (type may be empty though)<br>" +
+                    "&bull; volume must be a positive number<br>" +
+                    "&bull; beer must not have been already created",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Beer successfully created",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = BeerResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Unauthorized (dummy response)",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Such beer already exists",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @PostMapping
-    @SecurityRequirement(name = "JWT Authentication")
     public ResponseEntity<BeerResponseDTO> add(@RequestBody @Valid BeerRequestDTO beerRequestDTO) {
         BeerResponseDTO savedDTO = beerService.add(beerRequestDTO);
         URI location = ServletUriComponentsBuilder
