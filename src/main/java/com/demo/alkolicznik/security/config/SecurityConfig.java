@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(swaggerEndpoints()).permitAll()
                         // secured endpoints that request a valid body
                         // needs to be specified below
                         .requestMatchers(HttpMethod.POST, "/api/beer").hasAnyRole(ACCOUNTANT_AUTHORITIES)
@@ -74,5 +75,19 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cookieAuthenticationFilter, JwtAuthenticationFilter.class);
         return http.build();
+    }
+
+    private String[] swaggerEndpoints() {
+        return new String[]{"/api/v1/auth",
+                "/v2/api-docs",
+                "/v3/api-docs",
+                "/v3/api-docs/**",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/configuration/ui",
+                "/configuration/security",
+                "/swagger-ui/**",
+                "/webjars/**",
+                "/swagger-ui.html"};
     }
 }
