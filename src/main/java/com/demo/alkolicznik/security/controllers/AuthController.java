@@ -4,6 +4,7 @@ import com.demo.alkolicznik.dto.security.*;
 import com.demo.alkolicznik.security.services.AuthService;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,8 +34,7 @@ public class AuthController {
     @PostMapping("/signup")
     @Operation(
             summary = "Register an account",
-            description =
-                    "Create account for this application." +
+            description = "Create account for this application." +
                     "<br><b>CONSTRAINTS:</b><br>" +
                     "- password must be at least 12 characters long<br>" +
                     "- username must not exist in database",
@@ -48,7 +48,7 @@ public class AuthController {
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "account was registered",
+                            description = "Account was registered",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = SignupResponseDTO.class)
@@ -56,12 +56,12 @@ public class AuthController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "validation failed",
+                            description = "Validation failed",
                             content = @Content
                     ),
                     @ApiResponse(
                             responseCode = "409",
-                            description = "username is taken",
+                            description = "Username is taken",
                             content = @Content
                     )
             }
@@ -77,6 +77,43 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
+    @Operation(
+            summary = "Log in",
+            description = "This is a necessary step in order to access all the goods of <b>Alkolicznik&trade;</b>.<br>" +
+                    "<b>NOTE:</b> successful authentication automatically sets cookie with token " +
+                    "so you don't need to log in on each request.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    value = "{\"username\":\"your_username\",\"password\":\"your_password\"}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "You have logged in",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = AuthRequestDTO.class)
+                            ),
+                            headers = @Header(
+                                    name = "Set-Cookie",
+                                    description = "sets cookie with JWT"
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Invalid credentials",
+                            content = @Content
+                    )
+            }
+    )
     public AuthResponseDTO authenticate(@RequestBody @Valid AuthRequestDTO request,
                                         HttpServletResponse response) {
         AuthResponseDTO tokenDTO = authService.authenticate(request);
