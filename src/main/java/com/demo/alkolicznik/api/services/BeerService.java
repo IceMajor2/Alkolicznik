@@ -93,11 +93,14 @@ public class BeerService {
         if (beerRepository.exists(updated))
             throw new BeerAlreadyExistsException();
         // CONDITIONS: end
-        if (this.pricesToDelete(updateDTO))
+        if (this.pricesToDelete(toUpdate, updateDTO)) {
+            // updating 'BRAND' or 'TYPE' should make all prices be deleted
             updated.deleteAllPrices();
-        if (this.imageToDelete(toUpdate, updateDTO)) {
-            imageService.delete(toUpdate.getImage().get());
-            updated.setImage(null);
+            // same logic applies to image removal, but it additionally needs to exist first
+            if(toUpdate.getImage().isPresent()) {
+                imageService.delete(toUpdate.getImage().get());
+                updated.setImage(null);
+            }
         }
         BeerResponseDTO previous = new BeerResponseDTO(toUpdate);
         BeerResponseDTO saved = new BeerResponseDTO(beerRepository.save(updated));
@@ -146,21 +149,8 @@ public class BeerService {
         return checkForUpdateConditions(beerId, new BeerUpdateDTO(requestDTO));
     }
 
-    /**
-     * If updated field is ONLY volume, then do not delete image
-     */
-    private boolean imageToDelete(Beer beforeUpdate, BeerUpdateDTO updateDTO) {
-        if (beforeUpdate.getImage().isEmpty()) return false;
-        if (updateDTO.getBrand() != null && !Objects.equals(beforeUpdate.getBrand(), updateDTO.getBrand())) {
-            return true;
-        }
-        if (updateDTO.getType() != null && !Objects.equals(beforeUpdate.getType(), updateDTO.getType())) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean pricesToDelete(BeerUpdateDTO updateDTO) {
-        return updateDTO.getBrand() != null || updateDTO.getType() != null;
+    private boolean pricesToDelete(Beer beforeUpdate, BeerUpdateDTO updateDTO) {
+        return (updateDTO.getBrand() != null && !Objects.equals(beforeUpdate.getBrand(), updateDTO.getBrand()))
+                || updateDTO.getType() != null && !Objects.equals(beforeUpdate.getType(), updateDTO.getType());
     }
 }
