@@ -96,7 +96,7 @@ public class AuthController {
                             description = "You have logged in",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = AuthRequestDTO.class)
+                                    schema = @Schema(implementation = AuthResponseDTO.class)
                             ),
                             headers = @Header(
                                     name = "Set-Cookie",
