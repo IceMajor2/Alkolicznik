@@ -4,10 +4,14 @@ import com.demo.alkolicznik.dto.security.AuthRequestDTO;
 import com.demo.alkolicznik.dto.security.AuthResponseDTO;
 import com.demo.alkolicznik.dto.security.SignupRequestDTO;
 import com.demo.alkolicznik.dto.security.SignupResponseDTO;
+import com.demo.alkolicznik.exceptions.classes.user.NoLoggedInUserException;
 import com.demo.alkolicznik.exceptions.classes.user.UserAlreadyExistsException;
 import com.demo.alkolicznik.models.Roles;
 import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.repositories.UserRepository;
+import com.demo.alkolicznik.utils.request.CookieUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,5 +59,12 @@ public class AuthService {
         User user = userRepository.findByUsername(request.getUsername()).get();
         String jwt = jwtService.generateToken(user);
         return new AuthResponseDTO(jwt);
+    }
+
+    public Cookie getLogoutCookie(User user, HttpServletRequest request) {
+        if(user == null) {
+            throw new NoLoggedInUserException();
+        }
+        return CookieUtils.createExpiredTokenCookie(request);
     }
 }

@@ -1,6 +1,7 @@
 package com.demo.alkolicznik.security.controllers;
 
 import com.demo.alkolicznik.dto.security.*;
+import com.demo.alkolicznik.models.User;
 import com.demo.alkolicznik.security.services.AuthService;
 import com.demo.alkolicznik.utils.request.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,13 +11,14 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,8 +68,7 @@ public class AuthController {
                     )
             }
     )
-    public ResponseEntity<SignupResponseDTO> signup
-            (@RequestBody @Valid SignupRequestDTO request) {
+    public ResponseEntity<SignupResponseDTO> signup(@RequestBody @Valid SignupRequestDTO request) {
         SignupResponseDTO response = authService.register(request);
         return ResponseEntity.created(ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -122,9 +123,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<AuthLogoutDTO> logout(HttpServletRequest request, HttpServletResponse response) {
-        response.addCookie(CookieUtils.createExpiredTokenCookie(request));
+    public ResponseEntity<AuthLogoutDTO> logout(@AuthenticationPrincipal User user,
+                                                HttpServletRequest request, HttpServletResponse response) {
+        Cookie expiredAuthCookie = authService.getLogoutCookie(user, request);
+        response.addCookie(expiredAuthCookie);
         return ResponseEntity.ok(new AuthLogoutDTO());
     }
 }
