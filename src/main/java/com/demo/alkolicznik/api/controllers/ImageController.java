@@ -5,6 +5,7 @@ import com.demo.alkolicznik.api.services.StoreImageService;
 import com.demo.alkolicznik.dto.image.BeerImageResponseDTO;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.dto.image.StoreImageResponseDTO;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
+@Tag(name = "Image")
 public class ImageController {
 
     private StoreImageService storeImageService;

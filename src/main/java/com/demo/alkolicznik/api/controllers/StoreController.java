@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/store")
-@Tag(name = "Store Controller")
+@Tag(name = "Store")
 public class StoreController {
 
 	private StoreService storeService;

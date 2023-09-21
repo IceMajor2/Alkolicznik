@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @Validated
-@Tag(name = "Beer Price Controller")
+@Tag(name = "Beer Price")
 public class BeerPriceController {
 
 	private BeerPriceService beerPriceService;

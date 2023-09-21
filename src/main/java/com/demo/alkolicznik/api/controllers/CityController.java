@@ -13,8 +13,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/city")
-@Tag(name = "City Controller")
 @RequiredArgsConstructor
+@Tag(name = "City")
 public class CityController {
 
     private final StoreService storeService;

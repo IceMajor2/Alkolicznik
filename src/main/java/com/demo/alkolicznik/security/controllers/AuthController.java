@@ -3,6 +3,7 @@ package com.demo.alkolicznik.security.controllers;
 import com.demo.alkolicznik.dto.security.*;
 import com.demo.alkolicznik.security.services.AuthService;
 import com.demo.alkolicznik.utils.request.CookieUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Account")
 public class AuthController {
 
     private final AuthService authService;
