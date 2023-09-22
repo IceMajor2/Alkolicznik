@@ -6,12 +6,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +37,13 @@ public class StoreController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Store details retrieved"
+                            description = "Store details retrieved",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = StoreResponseDTO.class
+                                    )
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "404",
@@ -100,18 +109,51 @@ public class StoreController {
         return storeService.getAllBrands();
     }
 
-    @Operation(summary = "Add new store",
+    @Operation(
+            summary = "Add new store",
             description = "Hey, if you just opened up a new store, "
-                    + "do not hesitate to tell us so!")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "store successfully created"),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
-    })
+                    + "do not hesitate to tell us so!" +
+                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "&bull; name, street and city must not be left empty",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    value = "{\"name\":\"Carrefour\",\"city\":\"Paris\",\"street\":\"79 Rue de Seine\"}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Store successfully created",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = StoreResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Unauthorized (dummy response)",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Such store already exists",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @PostMapping
-    @SecurityRequirement(name = "JWT Authentication")
     public ResponseEntity<StoreResponseDTO> add(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
         StoreResponseDTO saved = storeService.add(storeRequestDTO);
         URI location = ServletUriComponentsBuilder
