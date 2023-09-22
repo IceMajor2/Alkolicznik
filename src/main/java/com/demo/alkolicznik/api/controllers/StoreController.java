@@ -288,12 +288,11 @@ public class StoreController {
             summary = "Delete store by id",
             description = "You've just gone bankrupt... again, haven't you?" +
                     " Well, what a shame...<br> But please, " +
-                    "do remember to delete it from <b>Alkolicznik</b>" + '\u2122' + "... " +
-                    "Thanks!",
+                    "do remember to delete it from <b>Alkolicznik&trade;</b>... Thanks!",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "store successfully deleted",
+                            description = "Store successfully deleted",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(
