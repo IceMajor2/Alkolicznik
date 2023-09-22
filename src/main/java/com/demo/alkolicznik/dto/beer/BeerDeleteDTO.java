@@ -12,7 +12,7 @@ import lombok.*;
 @JsonPropertyOrder({"id", "name", "volume", "image", "status"})
 @EqualsAndHashCode
 @Data
-public class BeerDeleteResponseDTO {
+public class BeerDeleteDTO {
 
     private Long id;
 
@@ -25,17 +25,16 @@ public class BeerDeleteResponseDTO {
     private String status = "Beer was deleted successfully!";
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @ToString.Exclude
     private BeerImageResponseDTO image;
 
-    public BeerDeleteResponseDTO(Beer beer) {
+    public BeerDeleteDTO(Beer beer) {
         this.id = beer.getId();
         this.fullName = beer.getFullName();
         this.volume = beer.getVolume();
         beer.getImage().ifPresent(beerImage -> this.image = new BeerImageResponseDTO(beerImage));
     }
 
-    public BeerDeleteResponseDTO(Beer beer, String status) {
+    public BeerDeleteDTO(Beer beer, String status) {
         this(beer);
         this.status = status;
     }
