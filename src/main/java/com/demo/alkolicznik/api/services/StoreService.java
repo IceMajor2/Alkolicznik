@@ -109,13 +109,17 @@ public class StoreService {
     public StoreDeleteDTO delete(Long storeId) {
         Store toDelete = storeRepository.findById(storeId).orElseThrow(() ->
                 new StoreNotFoundException(storeId));
+        return this.delete(toDelete);
+    }
 
-        toDelete.deleteAllPrices();
-        if (storeRepository.isNameUnique(toDelete.getName()))
-            toDelete.getImage().ifPresent(storeImage -> imageService.delete(storeImage.getStoreName()));
+    @Transactional(readOnly = false)
+    private StoreDeleteDTO delete(Store store) {
+        store.deleteAllPrices();
+        if (storeRepository.isNameUnique(store.getName()))
+            store.getImage().ifPresent(storeImage -> imageService.delete(storeImage.getStoreName()));
 
-        storeRepository.delete(toDelete);
-        StoreDeleteDTO deleted = new StoreDeleteDTO(toDelete);
+        storeRepository.delete(store);
+        StoreDeleteDTO deleted = new StoreDeleteDTO(store);
         log.info("Deleted: [{}]", deleted);
         return deleted;
     }
@@ -125,7 +129,7 @@ public class StoreService {
         Store toDelete = storeRepository.find(StoreRequestDTO.toModel(store, Optional.empty()))
                 .orElseThrow(() -> new StoreNotFoundException
                         (store.getName(), store.getCity(), store.getStreet()));
-        return this.delete(toDelete.getId());
+        return this.delete(toDelete);
     }
 
     private boolean isPreviousImageToDelete(Store prevStore, Store newStore) {
