@@ -122,12 +122,12 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
 
     private void deleteBeer(BeerForm.DeleteEvent event) {
         var request = event.getBeer();
-        var deleteRequest = new BeerDeleteRequestDTO(request.getBrand(),
+        var deleteRequest = new BeerRequestDTO(request.getBrand(),
                 request.getType(), request.getVolume());
         try {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             RequestUtils.request(HttpMethod.DELETE, "/api/beer", deleteRequest, authCookie,
-                    BeerDeleteResponseDTO.class);
+                    BeerDeleteDTO.class);
         } catch (ApiException e) {
             GuiUtils.notify(e.getMessage());
             return;
