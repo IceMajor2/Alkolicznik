@@ -33,11 +33,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/signup")
     @Operation(
             summary = "Register an account",
             description = "Create account for this application." +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; password must be at least 12 characters long<br>" +
                     "&bull; username must not exist in database",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -68,6 +67,7 @@ public class AuthController {
                     )
             }
     )
+    @PostMapping("/signup")
     public ResponseEntity<SignupResponseDTO> signup(@RequestBody @Valid SignupRequestDTO request) {
         SignupResponseDTO response = authService.register(request);
         return ResponseEntity.created(ServletUriComponentsBuilder
@@ -77,10 +77,9 @@ public class AuthController {
         ).body(response);
     }
 
-    @PostMapping("/authenticate")
     @Operation(
             summary = "Log in",
-            description = "This is a necessary step in order to access all the goods of <b>Alkolicznik&trade;</b>.<br>" +
+            description = "This is a necessary step in order to access all the goods of <b>Alkolicznik&trade;</b>.<br><br>" +
                     "<b>NOTE:</b> successful authentication automatically sets cookie with token " +
                     "so you don't need to log in on each request.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -115,6 +114,7 @@ public class AuthController {
                     )
             }
     )
+    @PostMapping("/authenticate")
     public AuthResponseDTO authenticate(@RequestBody @Valid AuthRequestDTO request,
                                         HttpServletResponse response) {
         AuthResponseDTO tokenDTO = authService.authenticate(request);
@@ -122,7 +122,6 @@ public class AuthController {
         return tokenDTO;
     }
 
-    @PostMapping("/logout")
     @Operation(
             summary = "Log out",
             description = "Take care... and come back soon!",
@@ -138,6 +137,7 @@ public class AuthController {
                     )
             )
     )
+    @PostMapping("/logout")
     public ResponseEntity<AuthLogoutDTO> logout(@AuthenticationPrincipal User user,
                                                 HttpServletRequest request, HttpServletResponse response) {
         Cookie expiredAuthCookie = authService.getLogoutCookie(user, request);

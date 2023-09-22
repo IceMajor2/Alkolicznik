@@ -57,14 +57,12 @@ public class StoreController {
 
     @Operation(
             summary = "Get a list of stores",
-            description = "Average user is only enabled to get an array of stores from a " +
-                    "desired city. Accountants may retrieve all stores from database " +
-                    "as well as query only for list of store brands " +
-                    "(with <b>brand_only</b> parameter as flag)." +
-                    "<br><b>Options available:</b><br>" +
-                    "&bull; <b>/api/store</b> - lists all stores in database: <i>for accountant roles only</i><br>" +
-                    "&bull; <b>/api/store?brand_only</b> - lists all store brands in database: <i>for accountant roles only</i><br>" +
-                    "&bull; <b>/api/store?city=${some_city}</b> - lists every entity in a given city",
+            description = "<u>EVERYONE:</u> List every store in a given city: " +
+                    "<b>/api/store?city={some_city}</b><br><br>" +
+                    "<u>ACCOUNTANTS:</u> List all store brands in database: " +
+                    "<b>/api/store?brand_only</b> (value is not taken into account)<br><br>" +
+                    "<u>ACCOUNTANTS:</u> List all stores in the database: " +
+                    "<b>/api/store</b>",
             parameters = {
                     @Parameter(
                             name = "city",
@@ -112,7 +110,7 @@ public class StoreController {
             summary = "Add new store",
             description = "Hey, if you just opened up a new store, "
                     + "do not hesitate to tell us so!" +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; name, street and city must not be left empty",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -168,11 +166,11 @@ public class StoreController {
     @Operation(
             summary = "Replace store",
             description = "Replace a store that, for example, you might have seen " +
-                    "closed and replaced by a new one... and keep the <i>id</i>!<br>" +
+                    "closed and replaced by a new one... and keep the <i>id</i>!<br><br>" +
                     "<b>WARNING:</b> every price associated with the previous store " +
                     "will be deleted! Plus, the image may also be deleted if you replaced " +
                     "the last appearance of store brand." +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; same constraints apply as with the case of usual store addition",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -223,12 +221,12 @@ public class StoreController {
     @Operation(
             summary = "Update store",
             description = "If you made a typo in - for instance - street number, then you are " +
-                    "welcome to fix it here without creating an entirely new object.<br>" +
+                    "welcome to fix it here without creating an entirely new object.<br><br>" +
                     "<b>WARNING:</b> No matter what field you replace, " +
                     "all of the store prices will, of course, be deleted! " +
                     "Plus, the image may also be deleted if you replaced " +
                     "the last appearance of store brand." +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; brand, city and street, if specified in the request body, must not be empty<br>",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -324,7 +322,6 @@ public class StoreController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
                             examples = @ExampleObject(
-                                    name = "Deleting store",
                                     value = "{\"name\":\"Kaufland\",\"city\":\"Berlin\",\"street\":\"Storkower Str. 139\"}"
                             )
                     )

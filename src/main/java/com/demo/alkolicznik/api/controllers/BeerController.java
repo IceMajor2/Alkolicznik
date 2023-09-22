@@ -52,12 +52,11 @@ public class BeerController {
     }
 
     @Operation(
-            summary = "Get a list of all beers",
-            description = "Average user is only enabled to get an array of beers from a " +
-                    "desired city. Accountants may retrieve all beers from database." +
-                    "<br><b>Options available:</b><br>" +
-                    "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant roles only</i><br>" +
-                    "&bull; <b>/api/beer?city=${some_city}</b> - lists every entity in a given city",
+            summary = "Get a list of beers",
+            description = "<u>EVERYONE:</u> List every beer in a given city: " +
+                    "<b>/api/beer?city={some_city}</b><br><br>" +
+                    "<u>ACCOUNTANTS:</u> List every beer in the database: " +
+                    "<b>/api/beer</b>",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -84,17 +83,25 @@ public class BeerController {
 
     @Operation(
             summary = "Add new beer",
-            description = "If you found some beer missing, then by all means add it!<br>" +
-                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+            description = "If you found some beer missing, then by all means add it!<br><br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default." +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; brand must be specified (type may be empty though)<br>" +
                     "&bull; volume must be a positive number<br>" +
                     "&bull; beer must not have been already created",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
-                            examples = @ExampleObject(
-                                    value = "{\"brand\":\"Heineken\",\"type\":\"Silver\",\"volume\":0.5}"
-                            )
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Creating beer with brand, type & volume",
+                                            value = "{\"brand\":\"Heineken\",\"type\":\"Silver\",\"volume\":0.6}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Creating beer with brand",
+                                            description = "This will create a beer of brand <b>Estrella Damm</b> without a type and with volume <b>0.5</b>",
+                                            value = "{\"brand\":\"Estrella Damm\"}"
+                                    )
+                            }
                     )
             ),
             responses = {
@@ -143,12 +150,12 @@ public class BeerController {
 
     @Operation(
             summary = "Replace beer",
-            description = "Here you can replace an already existing beer with new one. " +
-                    "Features? You can keep the <i>id</i>! How cool is that?<br>" +
-                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
+            description = "Here you can replace an already existing beer with a new one. " +
+                    "Features? You can keep the <i>id</i>! How cool is that?<br><br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default.<br>" +
                     "<b>WARNING:</b> every price & image associated " +
                     "with the previous beer will be deleted!" +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; same constraints apply as with the case of usual beer addition",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -199,12 +206,12 @@ public class BeerController {
     @Operation(
             summary = "Update beer",
             description = "If you are interested in updating just one or two individual " +
-                    "pieces of an item, you've come to the right place.<br>" +
-                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default" +
-                    "<b>TIP:</b> to remove beer's type, put an empty string as a value of \"type\" key (see example).<br>" +
+                    "pieces of an item, you've come to the right place.<br><br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default.<br>" +
+                    "<b>NOTE #2:</b> to remove beer's type, put an empty string as a value of <b>type</b> key (see example).<br>" +
                     "<b>WARNING:</b> If you update anything else than volume, " +
                     "then all associated prices & an image will be deleted." +
-                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; brand, if specified in the request body, must not be empty<br>" +
                     "&bull; volume must be a positive number",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -232,7 +239,7 @@ public class BeerController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "&bull; Beer successfully updated" +
+                            description = "&bull; Beer successfully updated<br>" +
                                     "&bull; Replacement is the same as original entity: nothing changes",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -279,7 +286,7 @@ public class BeerController {
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(
-                                            implementation = BeerDeleteResponseDTO.class
+                                            implementation = BeerDeleteDTO.class
                                     )
                             )
                     ),
@@ -296,15 +303,15 @@ public class BeerController {
     )
     @DeleteMapping("/{beer_id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    public BeerDeleteResponseDTO delete(@PathVariable("beer_id") Long beerId) {
+    public BeerDeleteDTO delete(@PathVariable("beer_id") Long beerId) {
         return beerService.delete(beerId);
     }
 
     @Operation(
             summary = "Delete beer by object",
             description = "The beer should have been deleted years ago and now - even worse - you can't get its ID?<br>"
-                    + "Not a problem! Try to describe it just as you'd create it de novo.<br>" +
-                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default",
+                    + "Not a problem! Try to describe it just as you'd create it de novo.<br><br>" +
+                    "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
                             examples = {
@@ -327,7 +334,7 @@ public class BeerController {
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(
-                                            implementation = BeerDeleteResponseDTO.class
+                                            implementation = BeerDeleteDTO.class
                                     )
                             )
                     ),
@@ -348,7 +355,7 @@ public class BeerController {
             )
     )
     @DeleteMapping
-    public BeerDeleteResponseDTO delete(@RequestBody @Valid BeerDeleteRequestDTO requestDTO) {
+    public BeerDeleteDTO delete(@RequestBody @Valid BeerRequestDTO requestDTO) {
         return beerService.delete(requestDTO);
     }
 }
