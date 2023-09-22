@@ -301,7 +301,7 @@ public class BeerController {
     }
 
     @Operation(
-            summary = "Delete beer by JSON string",
+            summary = "Delete beer by object",
             description = "The beer should have been deleted years ago and now - even worse - you can't get its ID?<br>"
                     + "Not a problem! Try to describe it just as you'd create it de novo.<br>" +
                     "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default",
