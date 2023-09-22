@@ -3,6 +3,8 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.StoreService;
 import com.demo.alkolicznik.dto.store.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -49,10 +51,26 @@ public class StoreController {
     @Operation(
             summary = "Get a list of stores",
             description = "Average user is only enabled to get an array of stores from a " +
-                    "desired city. Accountants may retrieve all stores from database." +
+                    "desired city. Accountants may retrieve all stores from database " +
+                    "as well as query only for list of store brands " +
+                    "(with <b>brand_only</b> parameter as flag)." +
                     "<br><b>Options available:</b><br>" +
-                    "&bull; <b>/api/store</b> - lists all stores in database: for accountant roles only<br>" +
+                    "&bull; <b>/api/store</b> - lists all stores in database: <i>for accountant roles only</i><br>" +
+                    "&bull; <b>/api/store?brand_only</b> - lists all store brands in database: <i>for accountant roles only</i><br>" +
                     "&bull; <b>/api/store?city=${some_city}</b> - lists every entity in a given city",
+            parameters = {
+                    @Parameter(
+                            name = "city",
+                            in = ParameterIn.QUERY,
+                            required = false
+                    ),
+                    @Parameter(
+                            name = "brand_only",
+                            in = ParameterIn.QUERY,
+                            required = false,
+                            allowEmptyValue = true
+                    )
+            },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -72,14 +90,13 @@ public class StoreController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    @SecurityRequirement(name = "JWT Authentication")
     public List<StoreResponseDTO> getAll() {
         return storeService.getStores();
     }
 
     @GetMapping(params = "brand_only")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    public List<StoreNameDTO> getAllBrands(@RequestParam("brand_only") Object brandOnly) {
+    public List<StoreNameDTO> getAllBrands(@RequestParam(value = "brand_only", required = false) Boolean brandOnly) {
         return storeService.getAllBrands();
     }
 
