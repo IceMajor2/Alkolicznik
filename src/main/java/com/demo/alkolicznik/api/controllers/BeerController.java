@@ -3,8 +3,6 @@ package com.demo.alkolicznik.api.controllers;
 import com.demo.alkolicznik.api.services.BeerService;
 import com.demo.alkolicznik.dto.beer.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,7 +32,7 @@ public class BeerController {
 
     @GetMapping("/{beer_id}")
     @Operation(
-            summary = "Get beer object",
+            summary = "Get beer details",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -58,16 +56,11 @@ public class BeerController {
     @GetMapping(params = "city")
     @Operation(
             summary = "Get a list of all beers",
-            description = "Average user is only enabled to get an array of beers from a "
-                    + "desired city. Accountant roles may retrieve all beers from database."
-                    + "<br><b>Options available</b>:<br>"
-                    + "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant roles only</i><br>"
-                    + "&bull; <b>/api/beer?city=${some_city}</b> - lists every in a given city",
-            parameters = @Parameter(
-                    name = "city",
-                    in = ParameterIn.PATH,
-                    required = false
-            ),
+            description = "Average user is only enabled to get an array of beers from a " +
+                    "desired city. Accountants may retrieve all beers from database." +
+                    "<br><b>Options available:</b><br>" +
+                    "&bull; <b>/api/beer</b> - lists every beer in database: <i>for accountant roles only</i><br>" +
+                    "&bull; <b>/api/beer?city=${some_city}</b> - lists every entity in a given city",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -76,7 +69,7 @@ public class BeerController {
                     @ApiResponse(
                             responseCode = "404",
                             description = "&bull; Unauthorized (dummy response)<br>" +
-                                    "&bull; City not found ",
+                                    "&bull; City not found",
                             content = @Content
                     ),
             }
