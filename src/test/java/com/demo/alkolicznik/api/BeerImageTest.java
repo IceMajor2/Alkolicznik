@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerResponseDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
@@ -496,7 +495,7 @@ public class BeerImageTest {
                 // given
                 Beer beer = getBeer(beerId.longValue(), beers);
                 assertThat(beer.getImage()).isNotEmpty();
-                BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+                BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
                 // when
                 var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);

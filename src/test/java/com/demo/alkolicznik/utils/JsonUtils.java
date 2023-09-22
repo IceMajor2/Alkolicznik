@@ -116,14 +116,6 @@ public class JsonUtils {
         return request;
     }
 
-    public static BeerDeleteRequestDTO createBeerDeleteRequest(String brand, String type, Double volume) {
-        BeerDeleteRequestDTO request = new BeerDeleteRequestDTO();
-        request.setBrand(brand);
-        request.setType(type);
-        request.setVolume(volume);
-        return request;
-    }
-
     public static BeerPriceRequestDTO createBeerPriceRequest(String beerName, Double volume, Double price) {
         BeerPriceRequestDTO request = new BeerPriceRequestDTO();
         request.setBeerName(beerName);
@@ -151,8 +143,8 @@ public class JsonUtils {
         return request;
     }
 
-    public static BeerDeleteResponseDTO createBeerDeleteResponse(Beer beer, String status) {
-        return new BeerDeleteResponseDTO(beer, status);
+    public static BeerDeleteDTO createBeerDeleteResponse(Beer beer, String status) {
+        return new BeerDeleteDTO(beer, status);
     }
 
     public static StoreDeleteDTO createStoreDeleteResponse(Store store, String status) {

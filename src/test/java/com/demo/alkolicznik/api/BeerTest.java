@@ -997,10 +997,10 @@ public class BeerTest {
             var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/6");
             assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             String actualJson = deleteResponse.getBody();
-            BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
+            BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
 
             // then
-            BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+            BeerDeleteDTO expected = createBeerDeleteResponse(
                     getBeer(6L, beers),
                     "Beer was deleted successfully!"
             );
@@ -1034,10 +1034,10 @@ public class BeerTest {
             var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer/" + beerId);
             assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             String actualJson = deleteResponse.getBody();
-            BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
+            BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
 
             // then
-            BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+            BeerDeleteDTO expected = createBeerDeleteResponse(
                     getBeer(beerId, beers),
                     "Beer was deleted successfully!"
             );
@@ -1091,16 +1091,16 @@ public class BeerTest {
         @DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
         public void deleteByObjectTest(Long id, String brand, String type, Double volume) {
             // given
-            BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+            BeerRequestDTO request = createBeerRequest(brand, type, volume);
 
             // when
             var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
             assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             String actualJson = deleteResponse.getBody();
-            BeerDeleteResponseDTO actual = toModel(actualJson, BeerDeleteResponseDTO.class);
+            BeerDeleteDTO actual = toModel(actualJson, BeerDeleteDTO.class);
 
             // then
-            BeerDeleteResponseDTO expected = createBeerDeleteResponse(
+            BeerDeleteDTO expected = createBeerDeleteResponse(
                     getBeer(id, beers),
                     "Beer was deleted successfully!"
             );
@@ -1148,8 +1148,7 @@ public class BeerTest {
         @ValueSource(doubles = {-53.2, -0.5, 0d})
         @DisplayName("DELETE: '/api/beer' [VOLUME_NON_POSITIVE]")
         public void deleteBeerByObjectVolumeNonPositiveTest(Double volume) {
-            BeerDeleteRequestDTO request = createBeerDeleteRequest
-                    ("Komes", "Porter Malinowy", volume);
+            BeerRequestDTO request = createBeerRequest("Komes", "Porter Malinowy", volume);
             var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 
             String jsonResponse = deleteResponse.getBody();
@@ -1167,8 +1166,7 @@ public class BeerTest {
         @ValueSource(strings = {"   ", "", "\t"})
         @DisplayName("DELETE: '/api/beer' [BRAND_BLANK]")
         public void deleteBeerByObjectBrandBlankTest(String brand) {
-            BeerDeleteRequestDTO request = createBeerDeleteRequest
-                    (brand, null, 0.5);
+            BeerRequestDTO request = createBeerRequest(brand, null, 0.5);
             var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
 
             String jsonResponse = deleteResponse.getBody();

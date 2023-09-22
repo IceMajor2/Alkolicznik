@@ -1,6 +1,5 @@
 package com.demo.alkolicznik.api;
 
-import com.demo.alkolicznik.dto.beer.BeerDeleteRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerRequestDTO;
 import com.demo.alkolicznik.dto.beer.BeerUpdateDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
@@ -1215,7 +1214,7 @@ public class BeerPriceTest {
             @DirtiesContext
             public void deleteBeerByObjectRemovesPricesTest(Long beerId, String brand, String type, Double volume) {
                 // given
-                BeerDeleteRequestDTO request = createBeerDeleteRequest(brand, type, volume);
+                BeerRequestDTO request = createBeerRequest(brand, type, volume);
                 assertThat(getBeer(beerId.longValue(), beers).getPrices()).isNotEmpty();
                 // when
                 var deleteResponse = deleteRequestAuth("admin", "admin", "/api/beer", request);
