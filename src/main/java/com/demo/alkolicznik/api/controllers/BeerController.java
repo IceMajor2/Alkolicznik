@@ -232,12 +232,8 @@ public class BeerController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Replacement is the same as original entity: nothing changes",
-                            content = @Content
-                    ),
-                    @ApiResponse(
-                            responseCode = "201",
-                            description = "Beer successfully updated",
+                            description = "&bull; Beer successfully updated" +
+                                    "&bull; Replacement is the same as original entity: nothing changes",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(
