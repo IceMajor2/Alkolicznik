@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,13 +23,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/beer")
 @Tag(name = "Beer")
+@RequiredArgsConstructor
 public class BeerController {
 
-    private BeerService beerService;
-
-    public BeerController(BeerService beerService) {
-        this.beerService = beerService;
-    }
+    private final BeerService beerService;
 
     @GetMapping("/{beer_id}")
     @Operation(
