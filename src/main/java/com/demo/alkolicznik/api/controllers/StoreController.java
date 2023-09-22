@@ -30,7 +30,6 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    @GetMapping("/{store_id}")
     @Operation(
             summary = "Get store details",
             responses = {
@@ -51,11 +50,11 @@ public class StoreController {
                     )
             }
     )
+    @GetMapping("/{store_id}")
     public StoreResponseDTO get(@PathVariable("store_id") Long id) {
         return storeService.get(id);
     }
 
-    @GetMapping(params = "city")
     @Operation(
             summary = "Get a list of stores",
             description = "Average user is only enabled to get an array of stores from a " +
@@ -92,6 +91,7 @@ public class StoreController {
                     )
             }
     )
+    @GetMapping(params = "city")
     public List<StoreResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
         return storeService.getStores(city);
     }

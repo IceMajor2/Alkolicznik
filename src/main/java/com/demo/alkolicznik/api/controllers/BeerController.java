@@ -28,7 +28,6 @@ public class BeerController {
 
     private final BeerService beerService;
 
-    @GetMapping("/{beer_id}")
     @Operation(
             summary = "Get beer details",
             responses = {
@@ -47,11 +46,11 @@ public class BeerController {
                     )
             }
     )
+    @GetMapping("/{beer_id}")
     public BeerResponseDTO get(@PathVariable("beer_id") Long id) {
         return beerService.get(id);
     }
 
-    @GetMapping(params = "city")
     @Operation(
             summary = "Get a list of all beers",
             description = "Average user is only enabled to get an array of beers from a " +
@@ -72,6 +71,7 @@ public class BeerController {
                     ),
             }
     )
+    @GetMapping(params = "city")
     public List<BeerResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
         return beerService.getBeers(city);
     }
