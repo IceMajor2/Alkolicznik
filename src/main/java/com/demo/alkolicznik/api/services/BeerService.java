@@ -73,7 +73,8 @@ public class BeerService {
         // CONDITIONS: start
         Beer toOverwrite = checkForPutConditions(beerId, requestDTO);
         Beer overwritten = BeerRequestDTO.toOverwrittenModel(requestDTO, toOverwrite);
-        if (beerRepository.exists(overwritten)) throw new BeerAlreadyExistsException();
+        if (beerRepository.exists(overwritten))
+            throw new BeerAlreadyExistsException();
         // CONDITIONS: end
         overwritten.deleteAllPrices();
         toOverwrite.getImage().ifPresent(beerImage -> {
@@ -97,7 +98,7 @@ public class BeerService {
             // updating 'BRAND' or 'TYPE' should make all prices be deleted
             updated.deleteAllPrices();
             // same logic applies to image removal, but it additionally needs to exist first
-            if(toUpdate.getImage().isPresent()) {
+            if (toUpdate.getImage().isPresent()) {
                 imageService.delete(toUpdate.getImage().get());
                 updated.setImage(null);
             }
@@ -109,23 +110,28 @@ public class BeerService {
     }
 
     @Transactional(readOnly = false)
-    public BeerDeleteResponseDTO delete(Long beerId) {
+    public BeerDeleteDTO delete(Long beerId) {
         Beer toDelete = beerRepository.findById(beerId).orElseThrow(() ->
                 new BeerNotFoundException(beerId));
-        beerRepository.delete(toDelete);
-        if (toDelete.getImage().isPresent())
-            imageService.delete(toDelete.getImage().get());
-        BeerDeleteResponseDTO deleted = new BeerDeleteResponseDTO(toDelete);
+        return this.delete(toDelete);
+    }
+
+    @Transactional(readOnly = false)
+    public BeerDeleteDTO delete(Beer beer) {
+        BeerDeleteDTO deleted = new BeerDeleteDTO(beer);
+        beerRepository.delete(beer);
+        if (beer.getImage().isPresent())
+            imageService.delete(beer.getImage().get());
         log.info("Deleted: [{}]", deleted);
         return deleted;
     }
 
     @Transactional(readOnly = false)
-    public BeerDeleteResponseDTO delete(BeerDeleteRequestDTO request) {
-        Beer toDelete = beerRepository.findByFullnameAndVolume(request.getFullName(), request.getVolume())
-                .orElseThrow(() -> new BeerNotFoundException(request.getFullName(), request.getVolume()));
-        BeerDeleteResponseDTO deleted = this.delete(toDelete.getId());
-        return deleted;
+    public BeerDeleteDTO delete(BeerRequestDTO request) {
+        Beer toFind = BeerRequestDTO.toModel(request);
+        Beer toDelete = beerRepository.findByFullnameAndVolume(toFind.getFullName(), toFind.getVolume())
+                .orElseThrow(() -> new BeerNotFoundException(toFind.getFullName(), toFind.getVolume()));
+        return this.delete(toDelete);
     }
 
     private Beer checkForUpdateConditions(Long beerId, BeerUpdateDTO updateDTO) {
