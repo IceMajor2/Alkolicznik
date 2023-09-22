@@ -221,24 +221,65 @@ public class StoreController {
         return storeService.replace(storeId, requestDTO);
     }
 
-    @Operation(summary = "Update store",
-            description = "If you'd just like to tweak some store's properties, "
-                    + "without fully providing a new set of data, then here is "
-                    + "the right place to do so.<br>"
-                    + "<b>WARNING:</b> No matter what field you replace, "
-                    + "all of the store prices will, of course, be deleted!")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "store successfully updated"),
-            @ApiResponse(responseCode = "200 (2)", description = "replacement is the same as original entity - nothing happens", content = @Content),
-            @ApiResponse(responseCode = "400", description = "provided data violates constraints", content = @Content),
-            @ApiResponse(responseCode = "400 (2)", description = "there was not one single property to update specified in the request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content),
-            @ApiResponse(responseCode = "409", description = "such store already exists", content = @Content)
-    })
+    @Operation(
+            summary = "Update store",
+            description = "If you made a typo in - for instance - street number, then you are " +
+                    "welcome to fix it here without creating an entirely new object.<br>" +
+                    "<b>WARNING:</b> No matter what field you replace, " +
+                    "all of the store prices will, of course, be deleted! " +
+                    "Plus, the image may also be deleted if you replaced " +
+                    "the last appearance of store brand." +
+                    "<br><b>CONSTRAINTS:</b><br>" +
+                    "&bull; brand, city and street, if specified in the request body, must not be empty<br>",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Updating name",
+                                            value = "{\"name\":\"Walmart\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Updating name, city & street",
+                                            value = "{\"name\":\"Tesco\", \"city\":\"London\",\"street\":\"15 Great Suffolk St\"}"
+                                    )
+                            }
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "&bull; Store successfully updated<br>" +
+                                    "&bull; Replacement is the same as original entity: nothing changes",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = StoreResponseDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "&bull; Validation failed<br>" +
+                                    "&bull; Request body was empty",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Store not found",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Such store already exists",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @PatchMapping("/{store_id}")
-    @SecurityRequirement(name = "JWT Authentication")
     public StoreResponseDTO update(@PathVariable("store_id") Long storeId,
                                    @RequestBody @Valid StoreUpdateDTO updateDTO) {
         return storeService.update(storeId, updateDTO);
