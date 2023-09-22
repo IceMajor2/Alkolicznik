@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -285,24 +284,79 @@ public class StoreController {
         return storeService.update(storeId, updateDTO);
     }
 
-    @Operation(summary = "Delete store by id",
-            description = "You've just gone bankrupt... again, haven't you?"
-                    + " Well, what a shame...<br>"
-                    + "But please, do remember to delete it from <b>Alkolicznik</b>"
-                    + '\u2122' + "... Thanks!")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "store successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "resource not found - dummy response "
-                    + "(when unauthorized/unauthenticated user tries to fetch resources)", content = @Content),
-            @ApiResponse(responseCode = "404 (2)", description = "store not found", content = @Content)
-    })
+    @Operation(
+            summary = "Delete store by id",
+            description = "You've just gone bankrupt... again, haven't you?" +
+                    " Well, what a shame...<br> But please, " +
+                    "do remember to delete it from <b>Alkolicznik</b>" + '\u2122' + "... " +
+                    "Thanks!",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "store successfully deleted",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = StoreDeleteDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Store not found",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @DeleteMapping("/{store_id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    @SecurityRequirement(name = "JWT Authentication")
     public StoreDeleteDTO deleteByParam(@PathVariable("store_id") Long storeId) {
         return storeService.delete(storeId);
     }
 
+    @Operation(
+            summary = "Delete store by object",
+            description = "In case you've long forgotten the store's ID, then you still " +
+                    "are given the option to delete by store's properties.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            examples = @ExampleObject(
+                                    name = "Deleting store",
+                                    value = "{\"name\":\"Kaufland\",\"city\":\"Berlin\",\"street\":\"Storkower Str. 139\"}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Store successfully deleted",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(
+                                            implementation = StoreRequestDTO.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation failed",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "&bull; Unauthorized (dummy response)<br>" +
+                                    "&bull; Store not found",
+                            content = @Content
+                    )
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
+    )
     @DeleteMapping
     public StoreDeleteDTO deleteByObject(@RequestBody @Valid StoreRequestDTO request) {
         return storeService.delete(request);
