@@ -4,10 +4,7 @@ import com.demo.alkolicznik.models.image.StoreImage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
@@ -17,9 +14,7 @@ import java.util.*;
 @Entity(name = "Store")
 @JsonPropertyOrder({ "id", "name", "city", "street", "image" })
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class Store implements Cloneable {
 
 	@Id
@@ -47,6 +42,7 @@ public class Store implements Cloneable {
 			orphanRemoval = true,
 			fetch = FetchType.LAZY)
 	@JsonIgnore
+	@ToString.Exclude
 	private Set<BeerPrice> prices = new HashSet<>();
 
 	public Optional<StoreImage> getImage() {

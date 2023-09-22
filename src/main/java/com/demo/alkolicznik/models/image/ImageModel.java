@@ -4,17 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.component.html.Image;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 @MappedSuperclass
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public abstract class ImageModel {
 
     @Column(name = "remote_id")

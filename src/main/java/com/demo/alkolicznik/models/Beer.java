@@ -38,6 +38,7 @@ public class Beer implements Cloneable {
             orphanRemoval = true,
             fetch = FetchType.LAZY)
     @JsonIgnore
+    @ToString.Exclude
     private Set<BeerPrice> prices = new HashSet<>();
 
     public Beer(String brand) {
