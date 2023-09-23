@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
@@ -35,6 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles({"main", "no-security", "no-vaadin"})
 @TestClassOrder(ClassOrderer.Random.class)
 public class BeerPriceTest {
+
+    private final String EXPECTED_CURRENCY_UNIT;
+
+    @Autowired
+    public BeerPriceTest(@Value("${money.currency.unit:PLN}") String EXPECTED_CURRENCY_UNIT) {
+        this.EXPECTED_CURRENCY_UNIT = EXPECTED_CURRENCY_UNIT;
+    }
 
     @Nested
     @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
@@ -69,7 +77,7 @@ public class BeerPriceTest {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(getBeer(beerId, beers)),
                     createStoreResponse(getStore(storeId, stores)),
-                    "PLN " + price
+                    EXPECTED_CURRENCY_UNIT + " " + price
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -427,7 +435,7 @@ public class BeerPriceTest {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(getBeer(beerId.longValue(), beers)),
                     createStoreResponse(getStore(storeId.longValue(), stores)),
-                    "PLN " + price
+                    EXPECTED_CURRENCY_UNIT + " " + price
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -571,7 +579,7 @@ public class BeerPriceTest {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(getBeer(beerId.longValue(), beers)),
                     createStoreResponse(getStore(storeId.longValue(), stores)),
-                    "PLN " + price
+                    EXPECTED_CURRENCY_UNIT + " " + price
             );
             String expectedJson = toJsonString(expected);
             assertThat(actual).isEqualTo(expected);
@@ -794,7 +802,7 @@ public class BeerPriceTest {
             BeerPriceResponseDTO expected = createBeerPriceResponse(
                     createBeerResponse(getBeer(beerId.longValue(), beers)),
                     createStoreResponse(getStore(storeId.longValue(), stores)),
-                    "PLN " + price
+                    EXPECTED_CURRENCY_UNIT + " " + price
             );
 
             String expectedJson = toJsonString(expected);
@@ -854,7 +862,7 @@ public class BeerPriceTest {
             // then
             assertIsError(jsonResponse,
                     HttpStatus.CONFLICT,
-                    "The price is '%s' already".formatted("PLN " + price),
+                    "The price is '%s' already".formatted(EXPECTED_CURRENCY_UNIT + " " + price),
                     "/api/beer-price");
         }
 
