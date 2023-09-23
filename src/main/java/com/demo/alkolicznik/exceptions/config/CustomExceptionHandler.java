@@ -27,6 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.money.UnknownCurrencyException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +63,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         String path = getPath(request);
         ApiException error = new ApiException(HttpStatus.NOT_FOUND, message, path);
         return ResponseEntity.status(404).body(error);
+    }
+
+    @ExceptionHandler(UnknownCurrencyException.class)
+    public ResponseEntity<ApiException> handleUnknownCurrencyException(UnknownCurrencyException e, WebRequest request) {
+        String message = "You have left currency unit empty in application's properties";
+        String path = getPath(request);
+        ApiException error = new ApiException(HttpStatus.BAD_REQUEST, message, path);
+        return ResponseEntity.badRequest().body(error);
     }
 
     private String getPath(WebRequest request) {
