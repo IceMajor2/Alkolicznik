@@ -269,7 +269,7 @@ public class StoreImageTest {
                     "Carrefour, f_carrefour.jpg",
                     "Lubi, f_lubi.jpg"
             })
-            @DisplayName("PATCH: '/api/store/image?name=' successful replacement with image")
+            @DisplayName("PUT: '/api/store/image?name=' successful replacement with image")
             @DirtiesContext
             public void successfulReplacementOfImageEntityTest(String storeName, String imgFile) {
                 StoreImage prevImg = getStoreImage(storeName, storeImages);
