@@ -5,12 +5,14 @@ import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +22,27 @@ import java.util.List;
 @AnonymousAllowed
 public class WelcomeView extends VerticalLayout {
 
-    public WelcomeView() {
-        HorizontalLayout hl = getHorizontalLayout();
-        VerticalLayout vl = getMainLayout();
+    public WelcomeView(String baseUrl, @Value("${springdoc.swagger-ui.path:/swagger-ui/index.html}") String swaggerPath) {
+        setHeightFull();
 
-        add(hl, vl);
+        HorizontalLayout upper = getHorizontalLayout();
+        VerticalLayout vl = getMainLayout();
+        VerticalLayout anchor = getLinkToSwagger(baseUrl, swaggerPath);
+
+        add(upper, vl, anchor);
+    }
+
+    private VerticalLayout getLinkToSwagger(String baseUrl, String swaggerPath) {
+        VerticalLayout vl = new VerticalLayout();
+        vl.setHeightFull();
+        vl.setJustifyContentMode(JustifyContentMode.END);
+        vl.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
+        Anchor anchor = new Anchor(baseUrl + swaggerPath, "Swagger UI");
+        anchor.getStyle().setColor("#247f0f");
+
+        vl.add(anchor);
+        return vl;
     }
 
     private HorizontalLayout getHorizontalLayout() {
@@ -76,7 +94,6 @@ public class WelcomeView extends VerticalLayout {
         Button images = null;
         if (AuthenticatedUser.hasAccountantRole())
             images = new Button("Images", click -> UI.getCurrent().navigate("image"));
-
         components.add(header);
         components.add(beers);
         components.add(stores);
