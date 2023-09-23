@@ -4,19 +4,20 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.classes.EntitiesNotFoundException;
-import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
-import com.demo.alkolicznik.exceptions.classes.beerprice.PriceIsSameException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beerprice.BeerPriceNotFoundException;
+import com.demo.alkolicznik.exceptions.classes.beerprice.PriceIsSameException;
+import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.BeerPrice;
 import com.demo.alkolicznik.models.Store;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +26,22 @@ import javax.money.Monetary;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class BeerPriceService {
 
+    @Value("${money.currency.unit:PLN}")
+    private final String CURRENCY_UNIT;
+
     private final StoreRepository storeRepository;
     private final BeerRepository beerRepository;
+
+    @Autowired
+    public BeerPriceService(StoreRepository storeRepository, BeerRepository beerRepository,
+                            @Value("${money.currency.unit:PLN}") String currencyUnit) {
+        this.CURRENCY_UNIT = currencyUnit;
+        this.storeRepository = storeRepository;
+        this.beerRepository = beerRepository;
+    }
 
     @Transactional(readOnly = true)
     public List<BeerPriceResponseDTO> getAllByStoreId(Long storeId) {
@@ -116,7 +127,7 @@ public class BeerPriceService {
         }
         // CONDITIONS: end
         double price = beerPriceRequestDTO.getPrice();
-        store.saveBeer(beer, price);
+        store.saveBeer(beer, price, CURRENCY_UNIT);
         storeRepository.save(store);
         BeerPriceResponseDTO saved = new BeerPriceResponseDTO(store.findBeer(beer.getId()).get());
         log.info("Added: [{}]", saved);
@@ -133,7 +144,7 @@ public class BeerPriceService {
             throw new BeerPriceAlreadyExistsException();
         }
 
-        store.saveBeer(beer, price);
+        store.saveBeer(beer, price, CURRENCY_UNIT);
         storeRepository.save(store);
         BeerPriceResponseDTO saved = new BeerPriceResponseDTO(store.findBeer(beerId).get());
         log.info("Added: [{}]", saved);
@@ -233,7 +244,7 @@ public class BeerPriceService {
     private BeerPrice toUpdatedModel(BeerPrice toUpdate, Double withPrice) {
         BeerPrice updated = toUpdate.clone();
         updated.setPrice(Monetary.getDefaultAmountFactory()
-                .setCurrency("PLN")
+                .setCurrency(CURRENCY_UNIT)
                 .setNumber(withPrice)
                 .create());
         return updated;

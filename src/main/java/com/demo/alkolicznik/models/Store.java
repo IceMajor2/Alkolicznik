@@ -77,12 +77,12 @@ public class Store implements Cloneable {
 		}
 	}
 
-	public void saveBeer(Beer beer, double price) {
+	public void saveBeer(Beer beer, double price, String currencyUnit) {
 		saveBeer(beer, Monetary.getDefaultAmountFactory()
-				.setCurrency("PLN").setNumber(price).create());
+				.setCurrency(currencyUnit).setNumber(price).create());
 	}
 
-	public void saveBeer(Beer beer, MonetaryAmount price) {
+	private void saveBeer(Beer beer, MonetaryAmount price) {
 		BeerPrice beerPrice = new BeerPrice(this, beer, price);
 		this.prices.add(beerPrice);
 		beer.getPrices().add(beerPrice);
