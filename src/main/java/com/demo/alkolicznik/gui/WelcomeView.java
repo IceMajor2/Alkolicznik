@@ -7,6 +7,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -38,10 +39,19 @@ public class WelcomeView extends VerticalLayout {
         vl.setJustifyContentMode(JustifyContentMode.END);
         vl.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        Anchor anchor = new Anchor(baseUrl + swaggerPath, "Swagger UI");
-        anchor.getStyle().setColor("#247f0f");
+        HorizontalLayout hl = new HorizontalLayout();
+        hl.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        vl.add(anchor);
+        Image swaggerLogo = new Image("swagger-icon.png", "swagger-ui-logo-image");
+        swaggerLogo.setHeight("32px");
+        swaggerLogo.setWidth("32px");
+
+        Anchor swaggerLink = new Anchor(baseUrl + swaggerPath, "Swagger UI");
+        swaggerLink.getStyle().setColor("#247f0f");
+
+        hl.add(swaggerLogo, swaggerLink);
+
+        vl.add(hl);
         return vl;
     }
 
