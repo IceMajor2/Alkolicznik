@@ -94,14 +94,12 @@ public class LoginView extends VerticalLayout {
 
         H3 header = new H3("Example accounts");
 
-        String adminCode = "<p style=\"font-size:12px\"><b>[ROLE_ADMIN]</b>: <i>admin</i> : <i>admin</i></p>";
-        String accountantCode = "<p style=\"font-size:12px\"><b>[ROLE_ACCOUNTANT]</b>: <i>user1</i> : <i>abcdef</i></p>";
-        String userCode = "<p style=\"font-size:12px\"><b>[ROLE_USER]</b>: <i>user</i> : <i>user</i></p>";
+        String accounts = "<p style=\"font-size:12px\"><b>[ROLE_ADMIN]</b>: <i>admin</i> : <i>admin</i><br>" +
+                "<b>[ROLE_ACCOUNTANT]</b>: <i>user1</i> : <i>abcdef</i><br>" +
+                "<b>[ROLE_USER]</b>: <i>user</i> : <i>user</i></p>";
 
-        Html admin = new Html(Jsoup.clean(adminCode, Safelist.basic()));
-        Html accountant = new Html(Jsoup.clean(accountantCode, Safelist.basic()));
-        Html user = new Html(Jsoup.clean(userCode, Safelist.basic()));
-        layout.add(header, admin, accountant, user);
+        Html accountsCode = new Html(Jsoup.clean(accounts, Safelist.basic()));
+        layout.add(header, accountsCode);
         return layout;
     }
 }
