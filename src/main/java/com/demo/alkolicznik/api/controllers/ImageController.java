@@ -28,8 +28,7 @@ import java.util.Map;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(
-        name = "Image",
-        description = "Uses ImageKit external API"
+        name = "Image"
 )
 public class ImageController {
 
