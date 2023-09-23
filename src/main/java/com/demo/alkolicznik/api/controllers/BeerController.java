@@ -127,7 +127,7 @@ public class BeerController {
                     ),
                     @ApiResponse(
                             responseCode = "409",
-                            description = "Such beer already exists",
+                            description = "Beer already exists",
                             content = @Content
                     )
             },
@@ -209,7 +209,7 @@ public class BeerController {
                     "pieces of an item, you've come to the right place.<br><br>" +
                     "<b>NOTE:</b> if you do not specify beer's volume, then it will be set to 0.5 by default.<br>" +
                     "<b>NOTE #2:</b> to remove beer's type, put an empty string as a value of <b>type</b> key (see example).<br>" +
-                    "<b>WARNING:</b> If you update anything else than volume, " +
+                    "<b>WARNING:</b> If you replace anything else than volume, " +
                     "then all associated prices & an image will be deleted." +
                     "<br><br><b>CONSTRAINTS:</b><br>" +
                     "&bull; brand, if specified in the request body, must not be empty<br>" +

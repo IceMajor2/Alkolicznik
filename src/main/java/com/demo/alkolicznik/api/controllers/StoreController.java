@@ -142,7 +142,7 @@ public class StoreController {
                     ),
                     @ApiResponse(
                             responseCode = "409",
-                            description = "Such store already exists",
+                            description = "Store already exists",
                             content = @Content
                     )
             },
