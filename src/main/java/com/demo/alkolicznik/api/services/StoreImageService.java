@@ -41,16 +41,20 @@ public class StoreImageService {
     public StoreImageResponseDTO get(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreNotFoundException(storeId));
-        StoreImage image = store.getImage()
-                .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-        return new StoreImageResponseDTO(image);
+        return this.get(store);
     }
 
     @Transactional(readOnly = true)
     public StoreImageResponseDTO get(String storeName) {
-        if (!storeRepository.existsByName(storeName))
-            throw new StoreNotFoundException(storeName);
-        StoreImage image = storeImageRepository.findByStoreName(storeName)
+        Store store = storeRepository.findByNameIgnoreCase(storeName).stream()
+                .findFirst()
+                .orElseThrow(() -> new StoreNotFoundException(storeName));
+        return this.get(store);
+    }
+
+    @Transactional(readOnly = true)
+    private StoreImageResponseDTO get(Store store) {
+        StoreImage image = store.getImage()
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
         return new StoreImageResponseDTO(image);
     }
@@ -101,13 +105,16 @@ public class StoreImageService {
     }
 
     @Transactional
-    public StoreImageResponseDTO update(String storeName, ImageRequestDTO request) {
+    public StoreImageResponseDTO replace(String storeName, ImageRequestDTO request) {
         if (!storeRepository.existsByName(storeName))
             throw new StoreNotFoundException(storeName);
         StoreImage image = storeImageRepository.findByStoreName(storeName)
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
+        StoreImageResponseDTO previous = new StoreImageResponseDTO(image);
         this.delete(image);
-        return this.add(storeName, request);
+        StoreImageResponseDTO saved = new StoreImageResponseDTO(this.add(storeName, request.getImagePath()));
+        log.info("Replacing: [{}] with: [{}]", previous, saved);
+        return saved;
     }
 
     @Transactional
@@ -116,16 +123,15 @@ public class StoreImageService {
             throw new StoreNotFoundException(storeName);
         StoreImage image = storeImageRepository.findByStoreName(storeName)
                 .orElseThrow(() -> new ImageNotFoundException(StoreImage.class));
-        this.delete(image);
+        StoreImageResponseDTO deleted = this.delete(image);
+        log.info("Deleted: [{}]", deleted);
     }
 
     @Transactional
     public StoreImageResponseDTO delete(StoreImage image) {
         imageKitRepository.delete(image);
         storeImageRepository.delete(image);
-        StoreImageResponseDTO deleted = new StoreImageResponseDTO(image);
-        log.info("Deleted: [{}]", deleted);
-        return deleted;
+        return new StoreImageResponseDTO(image);
     }
 
     @Transactional(readOnly = true)
