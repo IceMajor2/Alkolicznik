@@ -17,8 +17,7 @@ import com.demo.alkolicznik.repositories.StoreRepository;
 import com.demo.alkolicznik.utils.Utils;
 import io.imagekit.sdk.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -48,15 +47,15 @@ import java.io.IOException;
         matchIfMissing = true)
 @RequiredArgsConstructor
 @PropertySource("classpath:imageKit.properties")
+@Slf4j
 public class ReloadScript implements CommandLineRunner {
+
+    private static boolean turnOn = false;
 
     public static void main(String[] args) {
         turnOn = true;
         SpringApplication.run(AlkolicznikApplication.class, args);
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReloadScript.class);
-    private static boolean turnOn = false;
 
     private final ImageKitRepository imageKitRepository;
     private final BeerRepository beerRepository;
@@ -74,7 +73,7 @@ public class ReloadScript implements CommandLineRunner {
     @ConditionalOnClass(ReloadScript.class)
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
         if (turnOn) {
-            LOGGER.info("Executing SQL scripts in resources folder...");
+            log.info("Executing SQL scripts in resources folder...");
             ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
             resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
             resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
@@ -91,14 +90,14 @@ public class ReloadScript implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (turnOn) {
-            LOGGER.info("Reloading ImageKit directory");
-            LOGGER.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
+            log.info("Reloading ImageKit directory");
+            log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
             deleteFolder("");
-            LOGGER.info("Reloading BEER images...");
+            log.info("Reloading BEER images...");
             sendAll("/images/beer", BeerImage.class);
-            LOGGER.info("Sending STORE images to remote...");
+            log.info("Sending STORE images to remote...");
             sendAll("/images/store", StoreImage.class);
-            LOGGER.info("Successfully reloaded ImageKit directory");
+            log.info("Successfully reloaded ImageKit directory");
         }
     }
 
@@ -111,15 +110,15 @@ public class ReloadScript implements CommandLineRunner {
             try {
                 model = getAssociatedModel(srcFilename, imgClass);
             } catch (BeerNotFoundException e) {
-                LOGGER.warn("Beer image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine beer ID " +
+                log.warn("Beer image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine beer ID " +
                                 "from filename: ID needs to be specified as first characters in the filename\n" +
                                 "2) There is no beer of specified id",
                         RELATIVE_TO_BEER, srcFilename);
             } catch (BeerAlreadyExistsException e) {
-                LOGGER.warn("You have duplicated IDs in '{}'. Image '{}' was not initialized",
+                log.warn("You have duplicated IDs in '{}'. Image '{}' was not initialized",
                         RELATIVE_TO_BEER, srcFilename);
             } catch (StoreNotFoundException e) {
-                LOGGER.warn("Store image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine store name " +
+                log.warn("Store image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine store name " +
                                 "from filename: filename should only consist of exact store name (case insensitive)\n" +
                                 "2) There is no store of specified name",
                         RELATIVE_TO_STORE, srcFilename);
