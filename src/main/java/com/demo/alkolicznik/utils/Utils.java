@@ -2,12 +2,14 @@ package com.demo.alkolicznik.utils;
 
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
@@ -16,8 +18,8 @@ public class Utils {
     public static Long getBeerIdFromFilename(String filename) {
         StringBuilder sb = new StringBuilder("");
         String trimmed = filename.trim();
-        for(char ch : trimmed.toCharArray()) {
-            if(Character.isDigit(ch))
+        for (char ch : trimmed.toCharArray()) {
+            if (Character.isDigit(ch))
                 sb.append((ch));
             else break;
         }
@@ -59,6 +61,14 @@ public class Utils {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static File createTempFile(String filename, InputStream content) throws IOException {
+        String filenameNoExtension = FilenameUtils.getExtension(filename);
+        String extension = FilenameUtils.getExtension(filename);
+        File tempFile = File.createTempFile(filenameNoExtension, extension);
+        FileUtils.copyInputStreamToFile(content, tempFile);
+        return tempFile;
     }
 
     public static boolean isStoreImage(Class<?> clazz) {

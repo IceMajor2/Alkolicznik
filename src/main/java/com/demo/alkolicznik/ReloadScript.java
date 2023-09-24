@@ -18,7 +18,6 @@ import com.demo.alkolicznik.utils.Utils;
 import io.imagekit.sdk.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -113,29 +112,26 @@ public class ReloadScript implements CommandLineRunner {
 
         for (Resource file : directory) {
             String srcFilename = FilenameUtils.getName(file.getURI().toString());
-            String filenameNoExtension = FilenameUtils.removeExtension(srcFilename);
-            String extension = FilenameUtils.getExtension(srcFilename);
             InputStream inputStream = file.getInputStream();
-            File tempFile = File.createTempFile(filenameNoExtension, '.' + extension);
-            FileUtils.copyInputStreamToFile(inputStream, tempFile);
+            File tempFile = Utils.createTempFile(srcFilename, inputStream);
             String absolutePath = tempFile.getAbsolutePath();
 
             Object model = null;
             try {
-                model = getAssociatedModel(filenameNoExtension, imgClass);
+                model = getAssociatedModel(srcFilename, imgClass);
             } catch (BeerNotFoundException e) {
                 log.warn("Beer image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine beer ID " +
                                 "from filename: ID needs to be specified as first characters in the filename\n" +
                                 "2) There is no beer of specified id",
-                        RELATIVE_TO_BEER, filenameNoExtension);
+                        RELATIVE_TO_BEER, srcFilename);
             } catch (BeerAlreadyExistsException e) {
                 log.warn("You have duplicated IDs in '{}'. Image '{}' was not initialized",
-                        RELATIVE_TO_BEER, filenameNoExtension);
+                        RELATIVE_TO_BEER, srcFilename);
             } catch (StoreNotFoundException e) {
                 log.warn("Store image ('{}/{}') was not loaded. Possible reasons:\n1) Failed to determine store name " +
                                 "from filename: filename should only consist of exact store name (case insensitive)\n" +
                                 "2) There is no store of specified name",
-                        RELATIVE_TO_STORE, filenameNoExtension);
+                        RELATIVE_TO_STORE, srcFilename);
             }
             if (model != null)
                 addImage(model, absolutePath);
