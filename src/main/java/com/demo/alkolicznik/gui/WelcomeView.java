@@ -5,7 +5,7 @@ import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -13,7 +13,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +22,17 @@ import java.util.List;
 @AnonymousAllowed
 public class WelcomeView extends VerticalLayout {
 
-    public WelcomeView(String baseUrl, @Value("${springdoc.swagger-ui.path:/swagger-ui/index.html}") String swaggerPath) {
+    public WelcomeView() {
         setHeightFull();
 
         HorizontalLayout upper = getHorizontalLayout();
         VerticalLayout vl = getMainLayout();
-        VerticalLayout anchor = getLinkToSwagger(baseUrl, swaggerPath);
+        VerticalLayout anchor = getLinkToSwagger();
 
         add(upper, vl, anchor);
     }
 
-    private VerticalLayout getLinkToSwagger(String baseUrl, String swaggerPath) {
+    private VerticalLayout getLinkToSwagger() {
         VerticalLayout vl = new VerticalLayout();
         vl.setHeightFull();
         vl.setJustifyContentMode(JustifyContentMode.END);
@@ -41,15 +40,17 @@ public class WelcomeView extends VerticalLayout {
 
         HorizontalLayout hl = new HorizontalLayout();
         hl.setJustifyContentMode(JustifyContentMode.CENTER);
+        hl.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         Image swaggerLogo = new Image("swagger-icon.png", "swagger-ui-logo-image");
         swaggerLogo.setHeight("32px");
         swaggerLogo.setWidth("32px");
 
-        Anchor swaggerLink = new Anchor(baseUrl + swaggerPath, "Swagger UI");
-        swaggerLink.getStyle().setColor("#247f0f");
+        Button linkButton = new Button("Swagger UI", event -> UI.getCurrent().getPage().setLocation("/swagger-ui/index.html"));
+        linkButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        linkButton.getStyle().setColor("#247f0f");
 
-        hl.add(swaggerLogo, swaggerLink);
+        hl.add(swaggerLogo, linkButton);
 
         vl.add(hl);
         return vl;
