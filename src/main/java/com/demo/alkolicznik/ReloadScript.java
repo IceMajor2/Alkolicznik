@@ -22,10 +22,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -33,7 +32,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -44,23 +42,17 @@ import java.io.InputStream;
  * Launching this class reloads database both from
  * this web application, and from remote ImageKit server.
  */
-@Component
+@Configuration
 @ConditionalOnProperty(
-        prefix = "command.line.runner",
-        value = "enabled",
+        prefix = "reload",
+        value = "data",
         havingValue = "true",
-        matchIfMissing = true)
+        matchIfMissing = false
+)
 @RequiredArgsConstructor
 @PropertySource("classpath:imageKit.properties")
 @Slf4j
 public class ReloadScript implements CommandLineRunner {
-
-    private static boolean turnOn = false;
-
-    public static void main(String[] args) {
-        turnOn = true;
-        SpringApplication.run(AlkolicznikApplication.class, args);
-    }
 
     private final ImageKitRepository imageKitRepository;
     private final BeerRepository beerRepository;
@@ -75,35 +67,29 @@ public class ReloadScript implements CommandLineRunner {
     private final String RELATIVE_TO_STORE = "/src" + imageKitPath + "/resources/images/store";
 
     @Bean
-    @ConditionalOnClass(ReloadScript.class)
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
-        if (turnOn) {
-            log.info("Executing SQL scripts in resources folder...");
-            ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-            resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
-            resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
-            resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
+        log.info("Executing SQL scripts in resources folder...");
+        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
+        resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
+        resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
 
-            DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-            dataSourceInitializer.setDataSource(dataSource);
-            dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-            return dataSourceInitializer;
-        }
-        return null;
+        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+        dataSourceInitializer.setDataSource(dataSource);
+        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+        return dataSourceInitializer;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        if (turnOn) {
-            log.info("Reloading ImageKit directory");
-            log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
-            deleteFolder("");
-            log.info("Reloading BEER images...");
-            sendAll("images/beer", BeerImage.class);
-            log.info("Sending STORE images to remote...");
-            sendAll("images/store", StoreImage.class);
-            log.info("Successfully reloaded ImageKit directory");
-        }
+        log.info("Reloading ImageKit directory");
+        log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
+        deleteFolder("");
+        log.info("Reloading BEER images...");
+        sendAll("images/beer", BeerImage.class);
+        log.info("Sending STORE images to remote...");
+        sendAll("images/store", StoreImage.class);
+        log.info("Successfully reloaded ImageKit directory");
     }
 
     private <T extends ImageModel> void sendAll(String srcPath, Class<T> imgClass) throws IOException {
