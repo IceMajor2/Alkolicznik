@@ -4,7 +4,6 @@ import com.demo.alkolicznik.dto.beerprice.BeerPriceDeleteDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceParamRequestDTO;
 import com.demo.alkolicznik.dto.beerprice.BeerPriceResponseDTO;
 import com.demo.alkolicznik.exceptions.ApiException;
-import com.demo.alkolicznik.exceptions.classes.city.NoSuchCityException;
 import com.demo.alkolicznik.gui.MainLayout;
 import com.demo.alkolicznik.gui.properties.ConfigProperties;
 import com.demo.alkolicznik.gui.templates.FormTemplate;
@@ -101,7 +100,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             List<BeerPriceResponseDTO> prices = RequestUtils.request(HttpMethod.GET,
                     "/api/beer-price", Map.of("city", city), authCookie, PRICES_DTO_REF);
             this.grid.setItems(prices);
-        } catch (NoSuchCityException e) {
+        } catch (ApiException e) {
             this.grid.setItems(Collections.EMPTY_LIST);
         }
         updateDisplayText(city);
