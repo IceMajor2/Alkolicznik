@@ -4,7 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-# src/main/resources/imageKit.properties <-- is "git update-index --assume-unchanged FILE_NAME"
+# src/main/resources/imageKit.properties <-- "git update-index --asume-unchanged FILENAME"
+# src/test/resources/profiles/image.properties <-- "git update-index --asume-unchanged FILENAME"
 
 ### STS ###
 .apt_generated
@@ -38,4 +39,4 @@ out/
 .vscode/
 
 ### Vaadin ###
-frontend/generated
+frontend/
