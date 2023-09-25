@@ -1,68 +1,90 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.1'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id 'com.vaadin' version '24.1.3'
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'com.vaadin' version '24.1.10'
 }
 
 group = 'com.demo'
 version = '1.0.0'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 repositories {
-	mavenCentral()
-	maven { url 'https://jitpack.io' }
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 ext {
-	set('vaadinVersion', "24.1.3")
-	set('jjwtVersion', "0.11.5")
+    set('vaadinVersion', "24.1.10")
+    set('jjwtVersion', "0.11.5")
+}
+
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+}
+
+vaadin {
+    def props = new Properties()
+    file("src\\main\\resources\\application.properties").withInputStream { props.load(it) }
+    pnpmEnable = true
+    productionMode = props.getProperty("vaadin.productionMode")
+    generateBundle(productionMode)
+    optimizeBundle(productionMode)
+    vaadinClean
+    vaadinBuildFrontend
 }
 
 dependencies {
-	// Spring
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.vaadin:vaadin-spring-boot-starter'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.vaadin:vaadin-spring-boot-starter'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-	implementation 'org.javamoney:moneta:1.4.2'
-	implementation 'org.jsoup:jsoup:1.16.1'
-	testImplementation 'org.hsqldb:hsqldb:2.7.2'
-	testImplementation 'org.awaitility:awaitility:4.2.0'
-	runtimeOnly 'org.postgresql:postgresql'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.javamoney:moneta:1.4.2'
+    implementation 'org.jsoup:jsoup:1.16.1'
+    testImplementation 'org.hsqldb:hsqldb:2.7.2'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
+    runtimeOnly 'org.postgresql:postgresql'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 
-	// required for TestRestTemplate to disable redirects
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    // required for TestRestTemplate to disable redirects
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 
-	// ImageKit API + enable handling of .webp images
-	implementation 'com.github.imagekit-developer:imagekit-java:2.0.0'
-	implementation group: 'org.sejda.imageio', name: 'webp-imageio', version: '0.1.6'
+    // ImageKit API + enable handling of .webp images
+    implementation 'com.github.imagekit-developer:imagekit-java:2.0.0'
+    implementation group: 'org.sejda.imageio', name: 'webp-imageio', version: '0.1.6'
 
-	// JWT
-	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
-	}
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
