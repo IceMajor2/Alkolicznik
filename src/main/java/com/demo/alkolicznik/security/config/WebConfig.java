@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.exceptions.config.CustomResponseStatusExceptionResolver;
+import com.demo.alkolicznik.exceptions.config.ResponseStatusExceptionResolverLogConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     private ResponseStatusExceptionResolver exceptionResolver;
 
     @Autowired
-    public WebConfig(CustomResponseStatusExceptionResolver exceptionResolver) {
+    public WebConfig(ResponseStatusExceptionResolverLogConfigurer exceptionResolver) {
         this.exceptionResolver = exceptionResolver;
     }
 
