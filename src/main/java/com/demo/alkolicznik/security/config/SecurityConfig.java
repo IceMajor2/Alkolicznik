@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.exceptions.config.CustomExceptionHandler;
+import com.demo.alkolicznik.exceptions.config.AuthExceptionHandler;
 import com.demo.alkolicznik.exceptions.config.RestAuthenticationEntryPoint;
 import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CookieAuthenticationFilter cookieAuthenticationFilter;
-    private final CustomExceptionHandler.ExceptionHandlerFilter exceptionHandlerFilter;
+    private final AuthExceptionHandler.ExceptionHandlerFilter exceptionHandlerFilter;
     private final AuthenticationProvider authenticationProvider;
 
     private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/beer/image/*").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.PUT, "/api/beer/image/*").hasAnyRole(ACCOUNTANT_AUTHORITIES)
                         .requestMatchers(HttpMethod.DELETE, "/api/store").hasAnyRole(ACCOUNTANT_AUTHORITIES)
-                     //   .requestMatchers("/api/**").denyAll()
+                        //   .requestMatchers("/api/**").denyAll()
                         .anyRequest().permitAll())
                 .sessionManagement(sessionManager -> sessionManager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
