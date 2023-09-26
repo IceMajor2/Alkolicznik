@@ -39,11 +39,11 @@ public class LoginView extends VerticalLayout {
 
         loginForm = configureLoginForm();
         loginWrapper = getLoginFormWrapped();
-        accountsList = getAccountInfoPanel();
+        //accountsList = getAccountInfoPanel();
 
         super.setAlignItems(Alignment.CENTER);
 
-        add(toolbar, loginWrapper, accountsList);
+        add(toolbar, loginWrapper/*, accountsList*/);
     }
 
     private VerticalLayout getLoginFormWrapped() {
