@@ -1,3 +1,8 @@
+ALTER SEQUENCE IF EXISTS users_id_seq RESTART WITH 4;
+ALTER SEQUENCE IF EXISTS store_img_id_seq RESTART WITH 4;
+ALTER SEQUENCE IF EXISTS beer_seq RESTART WITH 11;
+ALTER SEQUENCE IF EXISTS store_seq RESTART WITH 7;
+
 -- stores
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (1, 'Carrefour', 'Olsztyn', 'ul. Borkowskiego 13');
 INSERT INTO store (ID, NAME, CITY, STREET) VALUES (2, 'Biedronka', 'Olsztyn', 'ul. Krasickiego 8');
