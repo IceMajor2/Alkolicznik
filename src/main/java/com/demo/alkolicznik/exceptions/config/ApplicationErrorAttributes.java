@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Component
-public class CustomErrorAttributes extends DefaultErrorAttributes {
+public class ApplicationErrorAttributes extends DefaultErrorAttributes {
 
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {

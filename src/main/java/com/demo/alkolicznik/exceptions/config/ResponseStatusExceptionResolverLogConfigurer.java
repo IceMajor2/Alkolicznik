@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 
 @Component
-public class CustomResponseStatusExceptionResolver extends ResponseStatusExceptionResolver {
+public class ResponseStatusExceptionResolverLogConfigurer extends ResponseStatusExceptionResolver {
 
     @Override
     protected void logException(Exception ex, HttpServletRequest request) {
