@@ -40,4 +40,14 @@ out/
 .vscode/
 
 ### Vaadin ###
-frontend/
+frontend/generated
+frontend/index.html
+.npmrc
+.pnpmfile.cjs
+pnpm-lock.yaml
+node_modules/
+package.json
+tsconfig.json
+types.d.ts
+vite.config.ts
+vite.generated.ts
