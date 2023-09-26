@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -113,26 +114,31 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 handleExpiredJwtException(request, response);
             } catch (SignatureException e) {
                 handleSignatureException(request, response, e);
+            } catch (UsernameNotFoundException e) {
+                handleUsernameNotFoundException(request, response);
             }
         }
 
+        private void handleUsernameNotFoundException(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            removeJWTCookie(request, response);
+        }
+
         private void handleExpiredJwtException(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            removeJWTCookie(request, response);
+        }
+
+        private void handleSignatureException(HttpServletRequest request, HttpServletResponse response, SignatureException e) throws IOException {
+            removeJWTCookie(request, response);
+            log.warn("Suspicious JWT authentication request with invalid signature: %s".formatted(e.getMessage()));
+        }
+
+        private void removeJWTCookie(HttpServletRequest request, HttpServletResponse response) throws IOException {
             Cookie removeCookie = CookieUtils.createExpiredTokenCookie(request);
             response.addCookie(removeCookie);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             if (!isCallToAPI(request)) {
                 response.sendRedirect("/");
             }
-        }
-
-        private void handleSignatureException(HttpServletRequest request, HttpServletResponse response, SignatureException e) throws IOException {
-            Cookie invalidAuth = CookieUtils.createExpiredTokenCookie(request);
-            response.addCookie(invalidAuth);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            if (!isCallToAPI(request)) {
-                response.sendRedirect("/");
-            }
-            log.warn("Suspicious JWT authentication request with invalid signature: %s".formatted(e.getMessage()));
         }
 
         private boolean isCallToAPI(HttpServletRequest request) {
