@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.security.config;
 
-import com.demo.alkolicznik.exceptions.config.AuthExceptionHandler;
+import com.demo.alkolicznik.exceptions.config.GlobalExceptionHandler;
 import com.demo.alkolicznik.exceptions.config.RestAuthenticationEntryPoint;
 import com.demo.alkolicznik.security.filters.CookieAuthenticationFilter;
 import com.demo.alkolicznik.security.filters.JwtAuthenticationFilter;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CookieAuthenticationFilter cookieAuthenticationFilter;
-    private final AuthExceptionHandler.ExceptionHandlerFilter exceptionHandlerFilter;
+    private final GlobalExceptionHandler.ExceptionHandlerFilter exceptionHandlerFilter;
     private final AuthenticationProvider authenticationProvider;
 
     private static final String[] ACCOUNTANT_AUTHORITIES = new String[]{"ADMIN", "ACCOUNTANT"};
