@@ -32,7 +32,7 @@ public class ImageKitRepository {
     public ImageKitRepository(Environment env) {
         this.imageKitPath = env.getProperty("imageKit.path");
         validate(env);
-        log.info("Successful authentication of ImageKit account");
+        log.info("Successful authentication of ImageKit account (id: '{}')", env.getProperty("imageKit.id"));
     }
 
     private void validate(Environment env) {
