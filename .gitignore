@@ -4,7 +4,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-/src/main/resources/delete.sh
 # src/main/resources/imageKit.properties <-- "git update-index --asume-unchanged FILENAME"
 # src/test/resources/profiles/image.properties <-- "git update-index --asume-unchanged FILENAME"
 
