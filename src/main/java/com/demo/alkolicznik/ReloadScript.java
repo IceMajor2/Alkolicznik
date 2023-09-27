@@ -44,8 +44,8 @@ import java.io.InputStream;
  */
 @Configuration
 @ConditionalOnProperty(
-        prefix = "reload",
-        value = "data",
+        prefix = "data",
+        value = "reload",
         havingValue = "true",
         matchIfMissing = false
 )
@@ -68,11 +68,18 @@ public class ReloadScript implements CommandLineRunner {
 
     @Bean
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
-        log.info("Executing SQL scripts in resources folder...");
+        log.info("Reloading application's data to demonstration data...");
+        final String deleteScript = "delete.sql";
+        final String schemaScript = "schema.sql";
+        final String dataScript = "data.sql";
+
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-        resourceDatabasePopulator.addScript(new ClassPathResource("/delete.sql"));
-        resourceDatabasePopulator.addScript(new ClassPathResource("/schema.sql"));
-        resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));
+        log.info("Executing '{}' script...", deleteScript);
+        resourceDatabasePopulator.addScript(new ClassPathResource(deleteScript));
+        log.info("Executing '{}' script...", schemaScript);
+        resourceDatabasePopulator.addScript(new ClassPathResource(schemaScript));
+        log.info("Executing '{}' script...", dataScript);
+        resourceDatabasePopulator.addScript(new ClassPathResource(dataScript));
 
         DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
         dataSourceInitializer.setDataSource(dataSource);
@@ -82,7 +89,7 @@ public class ReloadScript implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Reloading ImageKit directory");
+        log.info("Reloading ImageKit directory...");
         log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
         deleteFolder("");
         log.info("Reloading BEER images...");
