@@ -4,11 +4,13 @@ import com.demo.alkolicznik.datascripts.workers.ImageKitReloader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -27,11 +29,15 @@ import javax.sql.DataSource;
         havingValue = "true",
         matchIfMissing = false
 )
+@PropertySource("classpath:imageKit.properties")
 @RequiredArgsConstructor
 @Slf4j
 public class ReloadScript implements CommandLineRunner {
 
     private final ImageKitReloader imageKitReloader;
+
+    @Value("${imageKit.path}")
+    private String imageKitPath;
 
     @Bean
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
@@ -57,7 +63,7 @@ public class ReloadScript implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("Reloading ImageKit directory...");
-        imageKitReloader.reload();
+        imageKitReloader.reload(imageKitPath);
         log.info("Successfully reloaded ImageKit directory");
     }
 }

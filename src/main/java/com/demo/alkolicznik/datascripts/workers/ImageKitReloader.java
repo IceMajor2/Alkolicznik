@@ -20,7 +20,6 @@ import io.imagekit.sdk.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -44,26 +43,23 @@ public class ImageKitReloader {
     private final BeerImageService beerImageService;
     private final StoreImageService storeImageService;
 
-    @Value("${imageKit.path}")
-    private String imageKitPath;
-
-    public void reload() throws IOException {
+    public void reload(String imageKitPath) throws IOException {
         log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
         deleteFolder("");
         log.info("Reloading BEER images...");
-        sendAll("images/beer", BeerImage.class);
+        sendAll("images/beer", imageKitPath, BeerImage.class);
         log.info("Sending STORE images to remote...");
-        sendAll("images/store", StoreImage.class);
+        sendAll("images/store", imageKitPath, StoreImage.class);
     }
 
-    public void delete() {
+    public void delete(String imageKitPath) {
         log.info("Deleting ImageKit directory: '%s'...".formatted(imageKitPath));
         deleteFolder("");
     }
 
-    private <T extends ImageModel> void sendAll(String srcPath, Class<T> imgClass) throws IOException {
-        final String RELATIVE_TO_BEER = "/src" + imageKitPath + "/resources/images/beer";
-        final String RELATIVE_TO_STORE = "/src" + imageKitPath + "/resources/images/store";
+    private <T extends ImageModel> void sendAll(String srcPath, String remotePath, Class<T> imgClass) throws IOException {
+        final String RELATIVE_TO_BEER = "/src" + remotePath + "/resources/images/beer";
+        final String RELATIVE_TO_STORE = "/src" + remotePath + "/resources/images/store";
 
         ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
         Resource[] directory = resourcePatResolver.getResources("classpath:" + srcPath + "/*");
