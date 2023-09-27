@@ -1,4 +1,4 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.datascripts;
 
 import com.demo.alkolicznik.api.services.BeerImageService;
 import com.demo.alkolicznik.api.services.StoreImageService;

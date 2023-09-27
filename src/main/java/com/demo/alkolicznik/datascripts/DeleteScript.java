@@ -1,4 +1,4 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.datascripts;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.demo.alkolicznik;
+package com.demo.alkolicznik.datascripts;
 
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -10,10 +10,10 @@ public class ConditionalOnDataScript extends AnyNestedCondition {
         super(ConfigurationPhase.REGISTER_BEAN);
     }
 
-    @ConditionalOnBean(com.demo.alkolicznik.DeleteScript.class)
+    @ConditionalOnBean(com.demo.alkolicznik.datascripts.DeleteScript.class)
     static class DeleteScript {}
 
-    @ConditionalOnBean(com.demo.alkolicznik.ReloadScript.class)
+    @ConditionalOnBean(com.demo.alkolicznik.datascripts.ReloadScript.class)
     static class ReloadScript {}
 
     @Profile("demo")
