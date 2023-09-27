@@ -69,9 +69,9 @@ public class ReloadScript implements CommandLineRunner {
     @Bean
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
         log.info("Reloading application's data to demonstration data...");
-        final String deleteScript = "delete.sql";
-        final String schemaScript = "schema.sql";
-        final String dataScript = "data.sql";
+        final String deleteScript = "data_sql/delete.sql";
+        final String schemaScript = "data_sql/schema.sql";
+        final String dataScript = "data_sql/data.sql";
 
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         log.info("Executing '{}' script...", deleteScript);
