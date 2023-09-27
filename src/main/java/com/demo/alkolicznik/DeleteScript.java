@@ -16,7 +16,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("!embedded-db")
+@Profile("!demo")
 @ConditionalOnProperty(
         prefix = "data",
         value = "delete",

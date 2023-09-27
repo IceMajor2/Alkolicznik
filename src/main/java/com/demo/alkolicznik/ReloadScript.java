@@ -19,7 +19,7 @@ import javax.sql.DataSource;
  * this web application, and from remote ImageKit server.
  */
 @Configuration
-@Profile("!embedded-db")
+@Profile("!demo")
 @ConditionalOnProperty(
         prefix = "data",
         value = "reload",

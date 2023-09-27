@@ -16,6 +16,6 @@ public class ConditionalOnDataScript extends AnyNestedCondition {
     @ConditionalOnBean(com.demo.alkolicznik.ReloadScript.class)
     static class ReloadScript {}
 
-    @Profile("embedded-db")
-    static class embeddedDbProfile {}
+    @Profile("demo")
+    static class demoProfile {}
 }
