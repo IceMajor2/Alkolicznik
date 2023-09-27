@@ -1,11 +1,10 @@
 version: '3'
 services:
     alkolicznik:
-        build: .
-        image: alkolicznik:1.0.0
+        image: 'icemajor/alkolicznik:latest'
         command: --data.reload=${RELOAD} --data.delete=${DELETE}
         container_name: alkolicznik
-        ports: 
+        ports:
             - 443:8443
         depends_on:
             - psql
