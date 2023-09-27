@@ -25,6 +25,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -43,6 +44,7 @@ import java.io.InputStream;
  * this web application, and from remote ImageKit server.
  */
 @Configuration
+@Profile("!embedded-db")
 @ConditionalOnProperty(
         prefix = "data",
         value = "reload",
