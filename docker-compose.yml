@@ -3,7 +3,7 @@ services:
     alkolicznik:
         build: .
         image: alkolicznik:1.0.0
-        command: --reload.data=${RELOAD}
+        command: --data.reload=${RELOAD} --data.delete=${DELETE}
         container_name: alkolicznik
         ports: 
             - 443:8443
