@@ -1,5 +1,6 @@
 package com.demo.alkolicznik.datascripts;
 
+import com.demo.alkolicznik.datascripts.workers.ImageKitReloader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

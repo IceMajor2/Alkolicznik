@@ -1,7 +1,8 @@
-package com.demo.alkolicznik.datascripts;
+package com.demo.alkolicznik.datascripts.workers;
 
 import com.demo.alkolicznik.api.services.BeerImageService;
 import com.demo.alkolicznik.api.services.StoreImageService;
+import com.demo.alkolicznik.datascripts.conditions.ConditionalOnDataScript;
 import com.demo.alkolicznik.dto.image.ImageRequestDTO;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerAlreadyExistsException;
 import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;

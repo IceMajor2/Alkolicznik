@@ -1,4 +1,4 @@
-package com.demo.alkolicznik.datascripts;
+package com.demo.alkolicznik.datascripts.conditions;
 
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
