@@ -104,7 +104,7 @@ public class ImageProfile {
         if (testImageKitPath == null || testImageKitPath.isBlank())
             throw new IllegalStateException("Property '%s' was missing from '%s'".formatted(property, testPath));
         if (Objects.equals(mainImageKitPath, testImageKitPath))
-            throw new IllegalStateException("Property '%s' has the same value in production ('%s') and tests ('%s'). " +
-                    "Please, make sure they differ".formatted(property, mainPath, testPath));
+            throw new IllegalStateException("Property '%s' has the same value in production ('%s') and tests ('%s'). "
+                    .formatted(property, mainPath, testPath) + "Please, make sure they differ");
     }
 }
