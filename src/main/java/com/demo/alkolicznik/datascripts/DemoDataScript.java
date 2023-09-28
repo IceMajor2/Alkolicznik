@@ -1,6 +1,8 @@
 package com.demo.alkolicznik.datascripts;
 
 import com.demo.alkolicznik.datascripts.workers.ImageKitReloader;
+import com.demo.alkolicznik.models.image.BeerImage;
+import com.demo.alkolicznik.models.image.StoreImage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,7 +55,11 @@ public class DemoDataScript implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("Reloading ImageKit directory...");
-        imageKitReloader.reload(imageKitPath);
+        imageKitReloader.delete(imageKitPath);
+        log.info("Reloading BEER images...");
+        imageKitReloader.upload(imageKitPath, "images/beer-demo", BeerImage.class);
+        log.info("Reloading STORE images...");
+        imageKitReloader.upload(imageKitPath, "images/store-demo", StoreImage.class);
         log.info("Successfully reloaded ImageKit directory");
     }
 

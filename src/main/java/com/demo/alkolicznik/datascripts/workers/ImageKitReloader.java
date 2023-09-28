@@ -9,9 +9,7 @@ import com.demo.alkolicznik.exceptions.classes.beer.BeerNotFoundException;
 import com.demo.alkolicznik.exceptions.classes.store.StoreNotFoundException;
 import com.demo.alkolicznik.models.Beer;
 import com.demo.alkolicznik.models.Store;
-import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.ImageModel;
-import com.demo.alkolicznik.models.image.StoreImage;
 import com.demo.alkolicznik.repositories.BeerRepository;
 import com.demo.alkolicznik.repositories.ImageKitRepository;
 import com.demo.alkolicznik.repositories.StoreRepository;
@@ -43,18 +41,22 @@ public class ImageKitReloader {
     private final BeerImageService beerImageService;
     private final StoreImageService storeImageService;
 
-    public void reload(String imageKitPath) throws IOException {
-        log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
-        deleteFolder("");
-        log.info("Reloading BEER images...");
-        sendAll("images/beer", imageKitPath, BeerImage.class);
-        log.info("Sending STORE images to remote...");
-        sendAll("images/store", imageKitPath, StoreImage.class);
-    }
+//    public void reload(String imageKitPath) throws IOException {
+//        log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
+//        deleteFolder("");
+//        log.info("Reloading BEER images...");
+//        sendAll("images/beer", imageKitPath, BeerImage.class);
+//        log.info("Sending STORE images to remote...");
+//        sendAll("images/store", imageKitPath, StoreImage.class);
+//    }
 
     public void delete(String imageKitPath) {
         log.info("Deleting ImageKit directory: '%s'...".formatted(imageKitPath));
         deleteFolder("");
+    }
+
+    public <T extends ImageModel> void upload(String imageKitPath, String srcDir, Class<T> imgClass) throws IOException {
+        sendAll(srcDir, imageKitPath, imgClass);
     }
 
     private <T extends ImageModel> void sendAll(String srcPath, String remotePath, Class<T> imgClass) throws IOException {
