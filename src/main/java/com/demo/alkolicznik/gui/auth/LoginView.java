@@ -21,7 +21,10 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+
+import java.util.Arrays;
 
 @PageTitle("Login | Alkolicznik")
 @Route(value = "login")
@@ -34,16 +37,20 @@ public class LoginView extends VerticalLayout {
 
     private HorizontalLayout toolbar;
 
-    public LoginView() {
+    public LoginView(Environment env) {
         toolbar = getToolbar();
 
         loginForm = configureLoginForm();
         loginWrapper = getLoginFormWrapped();
-        //accountsList = getAccountInfoPanel();
 
         super.setAlignItems(Alignment.CENTER);
 
-        add(toolbar, loginWrapper/*, accountsList*/);
+        add(toolbar, loginWrapper);
+
+        if (isDemoProfile(env.getActiveProfiles())) {
+            accountsList = getAccountInfoPanel();
+            add(accountsList);
+        }
     }
 
     private VerticalLayout getLoginFormWrapped() {
@@ -101,5 +108,11 @@ public class LoginView extends VerticalLayout {
         Html accountsCode = new Html(Jsoup.clean(accounts, Safelist.basic()));
         layout.add(header, accountsCode);
         return layout;
+    }
+
+    private boolean isDemoProfile(String[] activeProfiles) {
+        return Arrays.stream(activeProfiles)
+                .map("demo"::equals)
+                .count() == 1;
     }
 }
