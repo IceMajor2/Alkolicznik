@@ -57,22 +57,16 @@ public class DemoDataScript implements CommandLineRunner {
         log.info("Successfully reloaded ImageKit directory");
     }
 
-    private void checkRemotePathCollision() throws IOException {
+    private void checkRemotePathCollision() {
         final String property = "imageKit.path";
-        String mainPath = getAbsolutePathToClassPathResource("imageKit.properties");
-        String demoPath = getAbsolutePathToClassPathResource("application-demo.properties");
-        Properties mainImageKit = getProperties(mainPath);
-        Properties demoImageKit = getProperties(demoPath);
-        String mainImageKitPath = mainImageKit.getProperty(property);
-        String demoImageKitPath = demoImageKit.getProperty(property);
 
-        if (mainImageKitPath == null || mainImageKitPath.isBlank())
-            throw new IllegalStateException("Property '%s' was missing from '%s'".formatted(property, mainPath));
-        if (demoImageKitPath == null || demoImageKitPath.isBlank())
-            throw new IllegalStateException("Property '%s' was missing from '%s'".formatted(property, demoPath));
-        if (Objects.equals(mainImageKitPath, demoImageKitPath))
-            throw new IllegalStateException("Property '%s' has the same value in production ('%s') and demo ('%s'). "
-                    .formatted(property, mainPath, demoPath) + "Please, make sure they differ");
+        String mainPath = getAbsolutePathToClassPathResource("imageKit.properties");
+        Properties mainImageKit = getProperties(mainPath);
+        String mainImageKitPath = mainImageKit.getProperty(property);
+
+        if (Objects.equals(mainImageKitPath, imageKitPath))
+            throw new IllegalStateException("Property '%s' has the same value in production and 'demo' profile. "
+                    .formatted(property) + "Please, make sure they differ");
     }
 
     private Properties getProperties(String path) {
