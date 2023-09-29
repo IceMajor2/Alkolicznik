@@ -3,6 +3,8 @@ package com.demo.alkolicznik.security.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
@@ -11,13 +13,27 @@ import java.net.UnknownHostException;
 @Component
 public class ServerInfo {
 
-    @Bean
-    public String baseUrl(String schema, String ipAddress, int serverPort) {
-        return schema + "://" + ipAddress + ":" + serverPort;
+    @Bean("baseUrl")
+    @Profile("!alwaysdata")
+    public String baseUrl(String schema, String domain, int serverPort) {
+        return schema + "://" + domain + ":" + serverPort;
     }
 
-    @Bean
-    public String ipAddress() throws UnknownHostException {
+    @Bean("baseUrl")
+    @Profile("alwaysdata")
+    public String baseUrl2(Environment env, String schema) {
+        return "https://" + env.getProperty("alwaysdata.base-url");
+    }
+
+    @Bean("domain")
+    @Profile("alwaysdata")
+    public String domain(Environment env) {
+        return env.getProperty("alwaysdata.base-url");
+    }
+
+    @Bean("domain")
+    @Profile("!alwaysdata")
+    public String domain2() throws UnknownHostException {
         return InetAddress.getLocalHost().getHostAddress();
     }
 
