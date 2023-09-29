@@ -16,12 +16,12 @@ import java.util.Arrays;
 @Component
 public class CookieUtils {
 
-    private static String IP_ADDRESS;
+    private static String DOMAIN;
     private static String SCHEMA;
 
     @Autowired
-    public void setIpAddress(String ipAddress) {
-        CookieUtils.IP_ADDRESS = ipAddress;
+    public void setDomain(String domain) {
+        CookieUtils.DOMAIN = domain;
     }
 
     @Autowired
@@ -50,7 +50,7 @@ public class CookieUtils {
             cookie.setSecure(false);
         }
         cookie.setPath("/");
-        cookie.setDomain(IP_ADDRESS);
+        cookie.setDomain(DOMAIN);
         return cookie;
     }
 
@@ -95,16 +95,4 @@ public class CookieUtils {
         cookieStore.addCookie(clientCookie);
         return cookieStore;
     }
-
-//    private static void printCookie(Cookie cookie) {
-//        System.out.println("===");
-//        System.out.println("Name: " + cookie.getName());
-//        System.out.println("Value: " + cookie.getValue());
-//        System.out.println("Domain: " + cookie.getDomain());
-//        System.out.println("Path: " + cookie.getPath());
-//        System.out.println("Max-Age: " + cookie.getMaxAge());
-//        System.out.println("Secure: " + cookie.getSecure());
-//        System.out.println("HttpOnly: " + cookie.isHttpOnly());
-//        System.out.println("===");
-//    }
 }
