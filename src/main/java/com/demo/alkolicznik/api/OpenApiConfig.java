@@ -43,6 +43,7 @@ public class OpenApiConfig {
                                 )
                                 .description("API documentation for Alkolicznik")
                                 .title("Alkolicznik API")
+                                .version("1.0.0")
                 )
                 .tags(List.of(
                                 new Tag().name("Account"),
