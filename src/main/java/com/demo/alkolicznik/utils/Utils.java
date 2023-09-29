@@ -4,6 +4,9 @@ import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Properties;
 
 public class Utils {
 
@@ -69,6 +73,16 @@ public class Utils {
         File tempFile = File.createTempFile(filenameNoExtension, extension);
         FileUtils.copyInputStreamToFile(content, tempFile);
         return tempFile;
+    }
+
+    public static Properties getProperties(String classpathFile) throws IOException {
+        ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
+        Resource file = resourcePatResolver.getResource("classpath:" + classpathFile);
+
+        InputStream inputStream = file.getInputStream();
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        return properties;
     }
 
     public static boolean isStoreImage(Class<?> clazz) {
