@@ -41,15 +41,6 @@ public class ImageKitReloader {
     private final BeerImageService beerImageService;
     private final StoreImageService storeImageService;
 
-//    public void reload(String imageKitPath) throws IOException {
-//        log.info("Deleting remote directory: '%s'...".formatted(imageKitPath));
-//        deleteFolder("");
-//        log.info("Reloading BEER images...");
-//        sendAll("images/beer", imageKitPath, BeerImage.class);
-//        log.info("Sending STORE images to remote...");
-//        sendAll("images/store", imageKitPath, StoreImage.class);
-//    }
-
     public void delete(String imageKitPath) {
         log.info("Deleting ImageKit directory: '%s'...".formatted(imageKitPath));
         deleteFolder("");
