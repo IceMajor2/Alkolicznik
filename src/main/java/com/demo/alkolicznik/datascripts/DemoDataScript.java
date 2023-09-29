@@ -3,6 +3,7 @@ package com.demo.alkolicznik.datascripts;
 import com.demo.alkolicznik.datascripts.workers.ImageKitReloader;
 import com.demo.alkolicznik.models.image.BeerImage;
 import com.demo.alkolicznik.models.image.StoreImage;
+import com.demo.alkolicznik.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,9 +17,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -63,33 +62,14 @@ public class DemoDataScript implements CommandLineRunner {
         log.info("Successfully reloaded ImageKit directory");
     }
 
-    private void checkRemotePathCollision() {
+    private void checkRemotePathCollision() throws IOException {
         final String property = "imageKit.path";
 
-        String mainPath = getAbsolutePathToClassPathResource("imageKit.properties");
-        Properties mainImageKit = getProperties(mainPath);
+        Properties mainImageKit = Utils.getProperties("imageKit.properties");
         String mainImageKitPath = mainImageKit.getProperty(property);
 
         if (Objects.equals(mainImageKitPath, imageKitPath))
             throw new IllegalStateException("Property '%s' has the same value in production and 'demo' profile. "
                     .formatted(property) + "Please, make sure they differ");
-    }
-
-    private Properties getProperties(String path) {
-        try {
-            Properties properties = new Properties();
-            properties.load(new FileInputStream(path));
-            return properties;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    private String getAbsolutePathToClassPathResource(String file) {
-        try {
-            return Paths.get(new ClassPathResource(file).getURI()).toAbsolutePath().toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
