@@ -112,7 +112,7 @@ public class LoginView extends VerticalLayout {
 
     private boolean isDemoProfile(String[] activeProfiles) {
         return Arrays.stream(activeProfiles)
-                .map("demo"::equals)
+                .filter("demo"::equals)
                 .count() == 1;
     }
 }
