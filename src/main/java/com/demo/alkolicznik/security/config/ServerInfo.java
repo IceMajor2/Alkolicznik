@@ -22,13 +22,13 @@ public class ServerInfo {
     @Bean("baseUrl")
     @Profile("alwaysdata")
     public String baseUrl2(Environment env, String schema) {
-        return "https://" + env.getProperty("alwaysdata.base-url");
+        return "https://" + env.getProperty("server.domain");
     }
 
     @Bean("domain")
     @Profile("alwaysdata")
     public String domain(Environment env) {
-        return env.getProperty("alwaysdata.base-url");
+        return env.getProperty("server.domain");
     }
 
     @Bean("domain")
