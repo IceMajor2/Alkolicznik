@@ -97,7 +97,10 @@ public class BeerPriceController {
                                     "&bull; Store not found",
                             content = @Content
                     )
-            }
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
     )
     @GetMapping("/store/{store_id}/beer-price")
     public List<BeerPriceResponseDTO> getAllByStoreId(@PathVariable("store_id") Long storeId) {

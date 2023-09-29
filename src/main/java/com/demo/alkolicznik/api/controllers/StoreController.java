@@ -87,7 +87,10 @@ public class StoreController {
                                     "&bull; City not found",
                             content = @Content
                     )
-            }
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
     )
     @GetMapping(params = "city")
     public List<StoreResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {

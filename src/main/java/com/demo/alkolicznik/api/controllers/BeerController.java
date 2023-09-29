@@ -68,7 +68,10 @@ public class BeerController {
                                     "&bull; City not found",
                             content = @Content
                     ),
-            }
+            },
+            security = @SecurityRequirement(
+                    name = "JWT Authentication"
+            )
     )
     @GetMapping(params = "city")
     public List<BeerResponseDTO> getAllInCity(@RequestParam(value = "city", required = false) String city) {
