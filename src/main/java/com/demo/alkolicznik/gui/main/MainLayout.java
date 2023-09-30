@@ -12,8 +12,8 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
@@ -27,13 +27,12 @@ public class MainLayout extends AppLayout {
     }
 
     private void createHeader() {
-        H1 logo = new H1("Alkolicznik");
+        Image textLogo = new Logo.TextLogo();
+        HorizontalLayout authButtonWrapper = getAuthButtonWrapped();
 
-        logo.addClassName("logo");
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, getAuthButton());
-
-        header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-        header.expand(logo);
+        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), textLogo, authButtonWrapper);
+        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER, textLogo);
         header.setWidth(99, Unit.PERCENTAGE);
 
         addToNavbar(header);
@@ -53,6 +52,14 @@ public class MainLayout extends AppLayout {
         drawerLayout.add(homeView, beerView, storeView, pricesView);
         if (imagesView != null) drawerLayout.add(imagesView);
         addToDrawer(drawerLayout);
+    }
+
+    private HorizontalLayout getAuthButtonWrapped() {
+        Button authButton = getAuthButton();
+        HorizontalLayout wrapper = new HorizontalLayout(authButton);
+        wrapper.setSizeFull();
+        wrapper.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        return wrapper;
     }
 
     private Button getAuthButton() {
