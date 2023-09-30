@@ -1,6 +1,6 @@
 package com.demo.alkolicznik.gui.image;
 
-import com.demo.alkolicznik.gui.MainLayout;
+import com.demo.alkolicznik.gui.main.MainLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;

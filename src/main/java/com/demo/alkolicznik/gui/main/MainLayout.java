@@ -1,5 +1,6 @@
-package com.demo.alkolicznik.gui;
+package com.demo.alkolicznik.gui.main;
 
+import com.demo.alkolicznik.gui.WelcomeView;
 import com.demo.alkolicznik.gui.auth.LogoutButton;
 import com.demo.alkolicznik.gui.beer.BeerView;
 import com.demo.alkolicznik.gui.beerprice.BeerPriceView;
