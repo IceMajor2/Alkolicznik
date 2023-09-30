@@ -85,6 +85,11 @@ public class Utils {
         return properties;
     }
 
+    public static Resource getSpringResource(String file) {
+        ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
+        return resourcePatResolver.getResource("classpath:" + file);
+    }
+
     public static boolean isStoreImage(Class<?> clazz) {
         return Objects.equals(clazz, StoreImage.class);
     }
