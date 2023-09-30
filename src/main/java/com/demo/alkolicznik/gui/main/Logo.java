@@ -50,4 +50,20 @@ public class Logo extends Image {
         int newWidth = orgWidth / 7;
         return new int[]{newHeight, newWidth};
     }
+
+    static class TextLogo extends Image {
+
+        private static final String DEFAULT_FILENAME = "logo-text.png";
+
+        public TextLogo() {
+            this(DEFAULT_FILENAME);
+        }
+
+        public TextLogo(String filename) {
+            super("logo-text.png", "Text");
+            setHeight("25%");
+            setWidth("25%");
+            getStyle().setPadding("10px 5px 10px 0px");
+        }
+    }
 }
