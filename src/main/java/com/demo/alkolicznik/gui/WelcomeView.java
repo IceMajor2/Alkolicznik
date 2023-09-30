@@ -1,12 +1,12 @@
 package com.demo.alkolicznik.gui;
 
 import com.demo.alkolicznik.gui.auth.LogoutButton;
+import com.demo.alkolicznik.gui.main.Logo;
 import com.demo.alkolicznik.security.AuthenticatedUser;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -98,17 +98,16 @@ public class WelcomeView extends VerticalLayout {
     private List<Component> getMainComponents() {
         List<Component> components = new ArrayList<>();
 
-        H1 header = new H1("Alkolicznik");
+        Logo logo = new Logo();
         Button beers = new Button("Beers", click -> UI.getCurrent().navigate("beer"));
         Button stores = new Button("Stores", click -> UI.getCurrent().navigate("store"));
         Button prices = new Button("Prices", click -> UI.getCurrent().navigate("beer-price"));
         Button images = null;
         if (AuthenticatedUser.hasAccountantRole())
             images = new Button("Images", click -> UI.getCurrent().navigate("image"));
-        components.add(header);
-        components.add(beers);
-        components.add(stores);
-        components.add(prices);
+        if (logo != null)
+            components.add(logo);
+        components.addAll(List.of(beers, stores, prices));
         if (images != null)
             components.add(images);
         return components;
