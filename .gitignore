@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 # src/main/resources/imageKit.properties <-- "git update-index --asume-unchanged FILENAME"
 # src/test/resources/profiles/image.properties <-- "git update-index --asume-unchanged FILENAME"
+.env
 
 ### STS ###
 .apt_generated
