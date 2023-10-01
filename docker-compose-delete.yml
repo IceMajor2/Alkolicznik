@@ -1,0 +1,4 @@
+version: '3'
+services:
+    alkolicznik:
+        command: --data.delete=true
