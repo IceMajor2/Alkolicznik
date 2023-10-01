@@ -2,16 +2,17 @@ version: '3'
 services:
     alkolicznik:
         image: 'icemajor/alkolicznik:latest'
-        command: --data.reload=${RELOAD} --data.delete=${DELETE}
         container_name: alkolicznik
         ports:
             - 443:8443
         depends_on:
             - psql
+        env_file:
+            - example.env
         environment:
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://psql:5432/alkolicznik
-            - SPRING_DATASOURCE_USERNAME=postgres
-            - SPRING_DATASOURCE_PASSWORD=1111
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+            - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+            - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
             - GUI_DEFAULT-CITY=${GUI_DEFAULT_CITY}
             - GUI_COUNTRY=${GUI_COUNTRY}
             - MONEY_CURRENCY_UNIT=${MONEY_CURRENCY_UNIT}
@@ -23,14 +24,14 @@ services:
     psql:
         image: 'postgres:alpine'
         ports:
-            - 32:5432
+            - 32:${DB_PORT}
         restart: always
         volumes:
             - psql-data:/var/lib/postgresql/data
         environment:
-            - POSTGRES_DB=alkolicznik
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=1111
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
 volumes:
     psql-data:
         driver: local
