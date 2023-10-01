@@ -72,4 +72,23 @@ public class DemoDataScript implements CommandLineRunner {
             throw new IllegalStateException("Property '%s' has the same value in production and 'demo' profile. "
                     .formatted(property) + "Please, make sure they differ");
     }
+
+//    @Component
+//    @DependsOn("dataSourceInitializer")
+//    class DemoImageKitInitializer {
+//
+//        private final ImageKitReloader imageKitReloader;
+//
+//        public DemoImageKitInitializer(ImageKitReloader imageKitReloader) throws IOException {
+//            this.imageKitReloader = imageKitReloader;
+//
+//            log.info("Reloading ImageKit directory...");
+//            imageKitReloader.delete(imageKitPath);
+//            log.info("Reloading BEER images...");
+//            imageKitReloader.upload(imageKitPath, "images/beer-demo", BeerImage.class);
+//            log.info("Reloading STORE images...");
+//            imageKitReloader.upload(imageKitPath, "images/store-demo", StoreImage.class);
+//            log.info("Successfully reloaded ImageKit directory");
+//        }
+//    }
 }
