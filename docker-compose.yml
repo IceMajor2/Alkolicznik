@@ -18,7 +18,6 @@ services:
             - IMAGEKIT_ID=${IMAGEKIT_ID}
             - IMAGEKIT_PUBLIC-KEY=${IMAGEKIT_PUBLIC_KEY}
             - IMAGEKIT_PRIVATE-KEY=${IMAGEKIT_PRIVATE_KEY}
-            - IMAGEKIT_PATH=${IMAGEKIT_PATH}
     psql:
         image: 'postgres:alpine'
         ports:
