@@ -20,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -53,9 +51,7 @@ public class ImageKitReloader {
     private <T extends ImageModel> void sendAll(String srcPath, String remotePath, Class<T> imgClass) throws IOException {
         final String RELATIVE_TO_BEER = "/src" + remotePath + "/resources/images/beer";
         final String RELATIVE_TO_STORE = "/src" + remotePath + "/resources/images/store";
-
-        ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
-        Resource[] directory = resourcePatResolver.getResources("classpath:" + srcPath + "/*");
+        Resource[] directory = Utils.getResources(srcPath);
 
         for (Resource file : directory) {
             String srcFilename = FilenameUtils.getName(file.getURI().toString());

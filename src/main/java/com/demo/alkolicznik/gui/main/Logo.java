@@ -24,7 +24,7 @@ public class Logo extends Image {
     public Logo(String filename) {
         super(new StreamResource("logo_str", () -> {
             try {
-                return Utils.getSpringResource(filename).getInputStream();
+                return Utils.getResource(filename).getInputStream();
             } catch (IOException e) {
                 return null;
             }
@@ -33,7 +33,7 @@ public class Logo extends Image {
     }
 
     private void configure(String filename) {
-        Resource resource = Utils.getSpringResource(filename);
+        Resource resource = Utils.getResource(filename);
         try {
             InputStream inputStream = resource.getInputStream();
             int[] displayDimensions = getLogoDimensions(ImageIO.read(inputStream));

@@ -85,9 +85,14 @@ public class Utils {
         return properties;
     }
 
-    public static Resource getSpringResource(String file) {
+    public static Resource getResource(String file) {
         ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
         return resourcePatResolver.getResource("classpath:" + file);
+    }
+
+    public static Resource[] getResources(String directory) throws IOException {
+        ResourcePatternResolver resourcePatResolver = new PathMatchingResourcePatternResolver();
+        return resourcePatResolver.getResources("classpath:" + directory + "/*");
     }
 
     public static boolean isStoreImage(Class<?> clazz) {
