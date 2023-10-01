@@ -60,6 +60,7 @@ dependencies {
     implementation 'org.javamoney:moneta:1.4.2'
     implementation 'org.jsoup:jsoup:1.16.1'
     implementation 'org.hsqldb:hsqldb:2.7.2'
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     testImplementation 'org.awaitility:awaitility:4.2.0'
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'
