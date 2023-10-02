@@ -72,12 +72,6 @@ public class HttpClientConfig {
 		catch (KeyManagementException | NoSuchAlgorithmException e) {
 			LOGGER.error("Pooling Connection Manager Initialization failure: " + e.getMessage());
 		}
-
-		Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-				.<ConnectionSocketFactory>create().register("https", socketFactory)
-				.register("http", new PlainConnectionSocketFactory())
-				.build();
-
 		PoolingHttpClientConnectionManager poolingConnectionManager =
 				new PoolingHttpClientConnectionManager(socketFactoryRegistry());
 		poolingConnectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
