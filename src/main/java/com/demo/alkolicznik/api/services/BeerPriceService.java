@@ -54,7 +54,7 @@ public class BeerPriceService {
 
     @Transactional(readOnly = true)
     public BeerPriceResponseDTO get(Long storeId, Long beerId) {
-        throwIfNotFoundAll(storeId, beerId);
+        throwIfNotFoundAllConstraints(storeId, beerId);
         Store store = storeRepository.findById(storeId).get();
         return new BeerPriceResponseDTO(store.findBeer(beerId).orElseThrow(
                 () -> new BeerPriceNotFoundException()
@@ -136,7 +136,7 @@ public class BeerPriceService {
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
     public BeerPriceResponseDTO addByParam(Long storeId, Long beerId, Double price) {
-        throwIfNotFoundAll(storeId, beerId);
+        throwIfNotFoundAllConstraints(storeId, beerId);
         Store store = storeRepository.findById(storeId).get();
         Beer beer = beerRepository.findById(beerId).get();
 
@@ -153,7 +153,7 @@ public class BeerPriceService {
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public BeerPriceResponseDTO update(Long storeId, Long beerId, Double price) {
-        throwIfNotFoundAll(storeId, beerId);
+        throwIfNotFoundAllConstraints(storeId, beerId);
         Store store = storeRepository.findById(storeId).get();
         BeerPrice toUpdate = store.findBeer(beerId).orElseThrow(() ->
                 new BeerPriceNotFoundException());
@@ -173,7 +173,7 @@ public class BeerPriceService {
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false, noRollbackFor = Exception.class)
     public BeerPriceDeleteDTO delete(Long storeId, Long beerId) {
-        throwIfNotFoundAll(storeId, beerId);
+        throwIfNotFoundAllConstraints(storeId, beerId);
         Store store = storeRepository.findById(storeId).get();
         Beer beer = beerRepository.findById(beerId).get();
 
@@ -217,7 +217,7 @@ public class BeerPriceService {
                 .thenComparing(p -> ((BeerPrice) p).getStore().getId());
     }
 
-    private void throwIfNotFoundAll(Long storeId, Long beerId) {
+    private void throwIfNotFoundAllConstraints(Long storeId, Long beerId) {
         throwExceptionIfBothStoreAndBeerNotFound(storeId, beerId);
         throwExceptionIfBeerNotFound(beerId);
         throwExceptionIfStoreNotFound(storeId);
