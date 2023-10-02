@@ -149,7 +149,7 @@ public class BeerPriceController {
                     "<b>/api/store/{store_id}/beer-price?beer_id={beer_id}&beer_price={cost}</b><br><br>" +
                     "<b>CONSTRAINTS:</b><br>" +
                     "&bull; beer price must not be left empty and must be a positive number<br>" +
-                    "&bull; adding by object: beer name must not be left empty<br>" +
+                    "&bull; adding by object: beer name is a combination of beer brand & type + must not be left empty<br>" +
                     "&bull; adding by object: beer volume must not be negative",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
