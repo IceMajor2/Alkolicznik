@@ -113,7 +113,7 @@ public class BeerView extends ViewTemplate<BeerRequestDTO, BeerResponseDTO> {
             Cookie authCookie = CookieUtils.getAuthCookie(VaadinRequest.getCurrent());
             var beers = RequestUtils.request(HttpMethod.GET, "/api/beer", authCookie, BEERS_DTO_REF);
             this.grid.setItems(beers);
-            updateDisplayText("entire " + COUNTRY);
+            updateDisplayText(EVERYWHERE_TEXT);
         } else {
             updateList(DEFAULT_CITY);
             updateDisplayText(DEFAULT_CITY);

@@ -113,7 +113,7 @@ public class BeerPriceView extends ViewTemplate<BeerPriceParamRequestDTO, BeerPr
             List<BeerPriceResponseDTO> prices = RequestUtils.request(HttpMethod.GET,
                     "/api/beer-price", authCookie, PRICES_DTO_REF);
             this.grid.setItems(prices);
-            updateDisplayText("entire " + COUNTRY);
+            updateDisplayText(EVERYWHERE_TEXT);
         } else {
             updateList(DEFAULT_CITY);
             updateDisplayText(DEFAULT_CITY);

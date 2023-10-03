@@ -21,9 +21,6 @@ import java.util.List;
 
 public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
-    private static final TypeReference<List<CityDTO>> CITIES_DTO_REF =
-            new TypeReference<>() {};
-
     protected ComboBox<CityDTO> cityBox;
     protected H2 displayText;
     protected Grid<RESPONSE> grid;
@@ -31,12 +28,11 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
 
     protected String textModel;
     protected static String DEFAULT_CITY;
-    protected static String COUNTRY;
+    protected static String EVERYWHERE_TEXT = "everywhere ;)";
 
     public ViewTemplate(String textModel, ConfigProperties configProperties) {
         this.textModel = textModel;
         ViewTemplate.DEFAULT_CITY = configProperties.getDefaultCity();
-        ViewTemplate.COUNTRY = configProperties.getCountry();
     }
 
     protected Component getSearchText() {
@@ -126,7 +122,7 @@ public abstract class ViewTemplate<REQUEST, RESPONSE> extends VerticalLayout {
         if (AuthenticatedUser.isUser()) {
             updateDisplayText(DEFAULT_CITY);
         } else {
-            updateDisplayText("entire " + COUNTRY);
+            updateDisplayText(EVERYWHERE_TEXT);
         }
     }
 

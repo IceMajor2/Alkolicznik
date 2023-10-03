@@ -58,7 +58,7 @@ public class StoreView extends ViewTemplate<StoreRequestDTO, StoreResponseDTO> {
             List<StoreResponseDTO> stores = RequestUtils.request(HttpMethod.GET,
                     "/api/store", authCookie, STORES_DTO_REF);
             this.grid.setItems(stores);
-            updateDisplayText("entire " + COUNTRY);
+            updateDisplayText(EVERYWHERE_TEXT);
         } else {
             updateList(DEFAULT_CITY);
             updateDisplayText(DEFAULT_CITY);
