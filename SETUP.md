@@ -8,7 +8,8 @@ Once you're done with Docker setup, next steps are the following:
 
 1. Download `docker-compose.yml` and `.env` files from this repository and put them in a directory of your choice.
 2. If `.env` file was downloaded as `env`, then rename it to `.env` manually. (`.env` is a *hidden* file. It may help to enable visibility of hidden files for future use. If you don't know how to do that, just google: *show hidden files ${YOUR_OPERATING_SYSTEM}*).
-3. Open command-line interface, move to the directory with both files and run `docker-compose up` command.
+3 (**Recommended** but optional). [Create ImageKit account](https://imagekit.io/registration/), go into `imageKit.properties` and use replace your credentials with the exemplary ones.
+4. Open command-line interface, move to the directory with both files and run `docker-compose up` command.
 
 That's it! You should be able to access the application on `localhost`.
 
@@ -27,7 +28,8 @@ Then, follow these steps:
 1. Create a database in PostgreSQL.
 2. Download a release from this repository and unzip the archive somewhere on your drive.
 3. Move to the directory with the app and open `./src/main/resources/.env.example`. Set the value of `PROD_DB_NAME` to the database name that you've created in the 1st step. Fill `PROD_DB_USERNAME` & `PROD_DB_PASSWORD` with the PostgreSQL user's credentials.
-4. Make use of Gradle wrapper (`gradlew`) in order to execute `bootJar` task:
+4 (**Recommended** but optional). [Create ImageKit account](https://imagekit.io/registration/), go into `./src/main/resources/.env.example` and replace exemplary account's credentials with yours.
+5. Make use of Gradle wrapper (`gradlew`) in order to execute `bootJar` task:
    * Windows: `gradlew bootJar`
    * Linux:
       * set execution flag first: `chmod +x gradlew`
