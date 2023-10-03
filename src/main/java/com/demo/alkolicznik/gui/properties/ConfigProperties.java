@@ -12,8 +12,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ConfigProperties {
 
-    @NotBlank
+    @NotBlank(message = "Default city was not specified in the .properties file")
     private String defaultCity;
-    @NotBlank
-    private String country;
 }
