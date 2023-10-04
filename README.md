@@ -40,9 +40,10 @@ Have fun!
     * SQL scripts (database schema is purely created using them)
     * custom "OR" conditional
     * DTOs
-* External API ([ImageKit](https://imagekit.io/)) as image repository (included in integration tests)
+* External API: [ImageKit](https://imagekit.io/) as image repository
 * Tests
     * 192 integration tests (477 if including parameterization)
+    * communication with external API included
     * various test profiles like 'no-vaadin' or 'image' to improve performance
     * custom assertions
     * a few utility methods for clearer requests to API
@@ -54,7 +55,7 @@ Have fun!
     * roles
 * Exceptions
     * custom exception model
-    * multiple custom exception classes
+    * multiple exception classes
     * custom validating annotation
     * configuration (`ExceptionHandler`s, error attributes, exception handler for filters, etc.)
 * Docker
@@ -64,7 +65,7 @@ Have fun!
     * simple frontend built with Vaadin
     * templates for increasing abstraction
     * uploading images via drag-and-drop
-    * Extensive REST API documentation ([Swagger UI](https://swagger.io/tools/swagger-ui/))
+    * extensive REST API documentation ([Swagger UI](https://swagger.io/tools/swagger-ui/))
 * Basic logging
 
 ## Technologies
@@ -80,7 +81,7 @@ Have fun!
 * Vaadin 24.1.10
 * Gradle 8.2
 * Docker
-* springdoc-openapi 2.1.0 (generates Swagger UI documentation)
+* springdoc-openapi 2.1.0 (Swagger UI)
 
 ## REST API documentation
 As stated before, API documentation was created with the help of Swagger UI.
@@ -94,19 +95,19 @@ See [SETUP.md](SETUP.md) for installation guidelines.
 
 ### Properties
 There are three main properties files in the `./src/main/resources` folder:
-* `application.properties` - general settings (database, logs, GUI custom properties, etc.)
+* `application.properties` - general settings (database, logs, GUI config, etc.)
 * `imageKit.properties` - configuration of ImageKit
-* `jwt.properties` - properties related to JWT
+* `jwt.properties` - JWT-related
 
-`.env.properties` is just a file that specifies the `.env` filename to be used in Spring Boot application.
+`.env.properties` defines only the `.env` file which is used as "storage" for environment variables that are then accessible in the Spring Boot application.
 
-You'll notice that some of the `.properties` files contain a suffix like `demo` or `alwaysdata`. These are overridors of the "normal" properties and used in a given environment.
+You'll notice that some of the `.properties` files contain a suffix like `demo` or `alwaysdata`. These are overridors of the "normal" properties and they are used in a given setting.
 
-Most of the settings are strictly configured so that the application may be run swiftly. However, there are still some customizable properties and some of them are even recommended to be changed.
+Most of the settings are strictly configured so that the application may be run smoothly. However, there are still properties to be customized and some are recommended to be replaced.
 #### Docker Compose
-`.env` file is a conglomerate of properties. They are pretty self-explanatory and you will find comments in the file as well!
+`.env` file is a conglomerate of properties. Most of them are quite self-explanatory, but you'll still find more information inside the actual file.
 
-However, one thing should be noted. The "sensitive" data should be changed and kept secret by you. This includes credentials to ImageKit account (`IMAGEKIT_` prefix), database connection configuration (`DB_` prefix) and JWT key.
+However, one thing should be noted: the "sensitive" data should be changed and kept secret by you. This includes credentials to ImageKit account (`IMAGEKIT_` prefix), database connection configuration (`DB_` prefix) and JWT key.
 
 #### Build
 * **`application.properties`**
@@ -116,17 +117,17 @@ However, one thing should be noted. The "sensitive" data should be changed and k
     * (**CHANGE & KEEP SECRET**) `imageKit.id`, `imageKit.public-key` & `imageKit.private-key`: credentials for your ImageKit account; they are to be specified in the `.env.example` file which is not to be publicized
     * `imageKit.path`: specifies a root directory path (must be unique across all profiles & tests)
 * **`jwt.properties`**
-    * (**CHANGE & KEEP SECRET**) `jwt.key`: a secret key used to encode & decode tokens used for authentication & authorization; generate a key (at least 256 bits) yourself [here](https://asecuritysite.com/encryption/plain) and put it in `.env.example` file
+    * (**CHANGE & KEEP SECRET**) `jwt.key`: a secret key used to sign the tokens which are used for authentication & authorization; generate a key (at least 256-bit) yourself [here](https://asecuritysite.com/encryption/plain), then put it in `.env.example` file
 
-Even more information is provided in the actual `.properties` files.
+Find even more details in the `.properties` files.
 
 ### Scripts / profiles
 Alkolicznik comes in with a few options to manipulate the data. **DEMO**, **RELOAD** and **DELETE** "profiles" are supported. Take a minute learning about them, because they might turn out helpful. In [DATASCRIPTS.md](DATASCRIPTS.md) you will find basic informations about each of the "profiles" as well as the instructions needed to perform in order to use them. (It is assumed that the [Setup](#setup) was already performed).
 
 ## Issues
-* **Using default ImageKit account may result in ImageKit's repository becoming out-of-sync, if someone else touches it.**
-* GUI ocassionally refreshes a couple of times out of nothing.
-* **Drag-and-drop upload very often "fails" on the frontend (feedback stating a fail & page refresh), while actually the image was sent.**
+* **Using default ImageKit account may result in ImageKit's repository becoming out of sync if someone else touches it.**
+* GUI may ocassionally refresh when interacting with it.
+* **Drag-and-drop upload very often "fails" on the frontend (feedback stating a fail & page refresh) while the truth is that the image was sent and is being processed.**
 * Tests that perform calls to ImageKit API may ocasionally fail when the third-party service takes longer than specified to respond.
 * Tests that perform calls to ImageKit API require internet connection.
 * SQL scripts (so, also the "profiles") support only "PLN" as currency now.
