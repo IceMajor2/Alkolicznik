@@ -9,9 +9,8 @@ Note that if you've **built** the application, then you may customize the "data 
 This profile uses **HSQL** in-memory database that you do not have to set up. The database will be reloaded at every app launch. Plus - obviously - it won't collide with the production database keeping previous data (i.e. outside the `demo` profile) untouched.
 
 ### Docker Compose
-* Download `docker-compose-demo.yml` and move it to the directory with the `.env` file.
-* Run it with `docker-compose -f docker-compose-demo.yml up`.
-* `docker-compose down` to stop.
+* Run with `docker-compose -f docker-compose-demo.yml up`.
+* Stop with `docker-compose down`.
 
 ### Build
 * Add arguments `--spring.profiles.active=demo --spring.config.name=application,imageKit,jwt` to `java` command at launch.
@@ -38,9 +37,8 @@ If you don't change **user** entities, then there are three users created by def
 |     user     |     user     |    USER    |
 
 ### Docker Compose
-* Download `docker-compose-reload.yml` and move it to the directory with the `.env` & `docker-compose.yml` files.
-* Run it with `docker-compose -f docker-compose.yml -f docker-compose-reload.yml up`.
-* `docker-compose down` to stop.
+* Run with `docker-compose -f docker-compose.yml -f docker-compose-reload.yml up`.
+* Stop with `docker-compose down`.
 
 ### Build
 * Add argument `--data.reload=true` to `java` command at launch. Example:
@@ -56,9 +54,8 @@ The approach is pretty much the same as [with the `demo` profile](#demo). The di
 Title says it all. Erase everything... as simple as that. Don't expect to customize anything here!
 
 ### Docker Compose
-* Download `docker-compose-delete.yml` and move it to the directory with the `.env` & `docker-compose.yml` files.
-* Run it with `docker-compose -f docker-compose.yml -f docker-compose-delete.yml up`.
-* `docker-compose down` to stop.
+* Run with `docker-compose -f docker-compose.yml -f docker-compose-delete.yml up`.
+* Run with `docker-compose down`.
 
 ### Build
 * Add argument `--data.delete=true` to `java` command at launch. Example:
