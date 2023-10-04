@@ -10,6 +10,8 @@ The reason the application was created was - first and foremost - to consolidate
 4. [REST API documentation](#rest-api-documentation)
 5. [Setup](#setup)
    * [Properties](#properties)
+       * [Docker Compose](#docker-compose)
+       * [Build](#build)
    * [Scripts / profiles](#scripts--profiles)
 7. [Issues](#issues)
 8. [Contact](#contact)
@@ -101,6 +103,12 @@ There are three main properties files in the `./src/main/resources` folder:
 You'll notice that some of the `.properties` files contain a suffix like `demo` or `alwaysdata`. These are overridors of the "normal" properties and used in a given environment.
 
 Most of the settings are strictly configured so that the application may be run swiftly. However, there are still some customizable properties and some of them are even recommended to be changed.
+#### Docker Compose
+`.env` file is a conglomerate of properties. They are pretty self-explanatory and you will find comments in the file as well!
+
+However, one thing should be noted. The "sensitive" data should be changed and kept secret by you. This includes credentials to ImageKit account (`IMAGEKIT_` prefix), database connection configuration (`DB_` prefix) and JWT key.
+
+#### Build
 * **`application.properties`**
     * `money.currency.unit`: defines a currency unit used throughout the application
     * `gui.default-city`: in the GUI, average user has beers, stores & prices displayed only for a specified city; if they do not select a city, the default one is shown - that is where you can set it
