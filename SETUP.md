@@ -1,15 +1,14 @@
 # ![Logo](src/main/resources/META-INF/resources/beer-mug-icon.png) Installation
-Below are presented two different ways to set up *Alkolicznik*. **Docker Compose** is recommended if you fancy a quick, more-automated installation. **Build**, however, allows you to get the Java application directly granting you the possibility to modify and customize it further.
+Below are presented two different ways to set up *Alkolicznik*. **Docker Compose** is recommended if you fancy a quick, more-automated installation. **Build**, however, allows you to get the Java application directly what grants you the possibility to modify and customize it further.
 
 ## Docker Compose
 Using Docker Compose will most likely be the easiest and fastest way to get the application running on your machine. The only thing you'll need to manually install is the Docker itself. [Follow this guide to do so](https://docs.docker.com/get-docker/).
 
 Once you're done with Docker setup, next steps are the following:
 
-1. Download `docker-compose.yml` and `.env` files from this repository and put them in a directory of your choice.
-2. If `.env` file was downloaded as `env`, then rename it to `.env` manually. (`.env` is a *hidden* file. It may help to enable visibility of hidden files for future use. If you don't know how to do that, just google: *show hidden files ${YOUR_OPERATING_SYSTEM}*).
-3 (**Recommended** but optional). [Create ImageKit account](https://imagekit.io/registration/), go into `imageKit.properties` and use replace your credentials with the exemplary ones.
-4. Open command-line interface, move to the directory with both files and run `docker-compose up` command.
+1. Download a [release](https://github.com/IceMajor2/Alkolicznik/releases) with `docker` suffix.
+2. (**Recommended**) [Create ImageKit account](https://imagekit.io/registration/), go into `.env` file and replace ImageKit default settings with your credentials.
+3. Open command-line interface, move to the directory with both files and run `docker-compose up` command.
 
 That's it! You should be able to access the application on `localhost`.
 
@@ -26,9 +25,9 @@ Prerequisites:
 
 Then, follow these steps:
 1. Create a database in PostgreSQL.
-2. Download a release from this repository and unzip the archive somewhere on your drive.
+2. Download a [release](https://github.com/IceMajor2/Alkolicznik/releases) from this repository and unzip the archive somewhere on your drive.
 3. Move to the directory with the app and open `./src/main/resources/.env.example`. Set the value of `PROD_DB_NAME` to the database name that you've created in the 1st step. Fill `PROD_DB_USERNAME` & `PROD_DB_PASSWORD` with the PostgreSQL user's credentials.
-4 (**Recommended** but optional). [Create ImageKit account](https://imagekit.io/registration/), go into `./src/main/resources/.env.example` and replace exemplary account's credentials with yours.
+4. (**Recommended**) [Create ImageKit account](https://imagekit.io/registration/), go into `./src/main/resources/.env.example` and replace exemplary account's credentials with yours.
 5. Make use of Gradle wrapper (`gradlew`) in order to execute `bootJar` task:
    * Windows: `gradlew bootJar`
    * Linux:
