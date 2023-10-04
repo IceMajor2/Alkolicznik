@@ -125,6 +125,8 @@ Alkolicznik comes in with a few options to manipulate the data. **DEMO**, **RELO
 
 ## Issues
 * **Using default ImageKit account may result in ImageKit's repository becoming out-of-sync, if someone else touches it.**
+* GUI ocassionally refreshes a couple of times out of nothing.
+* **Drag-and-drop upload very often "fails" on the frontend (feedback stating a fail & page refresh), while actually the image was sent.**
 * Tests that perform calls to ImageKit API may ocasionally fail when the third-party service takes longer than specified to respond.
 * Tests that perform calls to ImageKit API require internet connection.
 * SQL scripts (so, also the "profiles") support only "PLN" as currency now.
