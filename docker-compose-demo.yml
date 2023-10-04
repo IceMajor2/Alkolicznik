@@ -7,7 +7,7 @@ services:
           - 443:8443
         command: --spring.profiles.active=demo --spring.config.name=application,imageKit,jwt
         environment:
-          - GUI_COUNTRY=${GUI_COUNTRY}
+          - GUI_DEFAULT_CITY=${GUI_DEFAULT_CITY}
           - MONEY_CURRENCY_UNIT=${MONEY_CURRENCY_UNIT}
           - JWT_KEY=${JWT_KEY}
           - IMAGEKIT_ID=${IMAGEKIT_ID}
