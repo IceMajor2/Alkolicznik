@@ -28,10 +28,17 @@ The `demo` profile's data is provided with the application. However, that doesn'
         * if adding a *store image*, then the filename must match almost exactly (case-insensitive) the store name.
 
 ## Reload data
-Reloading is nothing other than deleting everything from the database and then loading exemplary data that is provided with the application. It is quite similiar to `demo` profile, but it differs in that it operates on a production database (+ the data provided with the app is different).
+Reloading is nothing other than deleting everything from the database and then loading exemplary data that comes with the application. It is quite similiar to `demo` profile, but it differs in that it operates on a production database (+ the data sample is different here).
+
+If you don't change **user** entities, then there are three users created by default:
+| **username** | **password** |  **role**  |
+|:------------:|:------------:|:----------:|
+|     admin    |     admin    |    ADMIN   |
+|     user1    |    abcdef    | ACCOUNTANT |
+|     user     |     user     |    USER    |
 
 ### Docker Compose
-* Download `docker-compose-reload.yml` and move it to the directory with the `.env` file.
+* Download `docker-compose-reload.yml` and move it to the directory with the `.env` & `docker-compose.yml` files.
 * Run it with `docker-compose -f docker-compose.yml -f docker-compose-reload.yml up`.
 * `docker-compose down` to stop.
 
@@ -43,20 +50,13 @@ Reloading is nothing other than deleting everything from the database and then l
 #### Customize
 If you want different data to be loaded with this "data script", then by all means adjust it.
 
-The approach is pretty much the same as [with the `demo` profile](#customize-1). The difference is that the files with the `demo` string are not of interest here. For example, `data-demo-hsql.sql` should be replaced with `data.sql`.
-
-If you haven't changed **user** entities, then there are three users created by default:
-| **username** | **password** |  **role**  |
-|:------------:|:------------:|:----------:|
-|     admin    |     admin    |    ADMIN   |
-|     user1    |    abcdef    | ACCOUNTANT |
-|     user     |     user     |    USER    |
+The approach is pretty much the same as [with the `demo` profile](#demo). The difference is that the files with the `demo` string are not of interest here. For example, `data-demo-hsql.sql` should be replaced with `data.sql`.
 
 ## Delete data
 Title says it all. Erase everything... as simple as that. Don't expect to customize anything here!
 
 ### Docker Compose
-* Download `docker-compose-delete.yml` and move it to the directory with the `.env` file.
+* Download `docker-compose-delete.yml` and move it to the directory with the `.env` & `docker-compose.yml` files.
 * Run it with `docker-compose -f docker-compose.yml -f docker-compose-delete.yml up`.
 * `docker-compose down` to stop.
 
