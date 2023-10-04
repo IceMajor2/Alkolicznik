@@ -11,7 +11,6 @@ services:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
             - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
             - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-            - GUI_DEFAULT-CITY=${GUI_DEFAULT_CITY}
             - GUI_COUNTRY=${GUI_COUNTRY}
             - MONEY_CURRENCY_UNIT=${MONEY_CURRENCY_UNIT}
             - JWT_KEY=${JWT_KEY}
