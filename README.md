@@ -78,9 +78,11 @@ Have fun!
 * Relational databases
     * PostgreSQL 15 (for production)
     * HSQL 2.7.2 (for tests & demo)
+* JUnit 5
 * Vaadin 24.1.10
 * Gradle 8.2
 * Docker
+    * Docker Compose
 * springdoc-openapi 2.1.0 (Swagger UI)
 
 ## REST API documentation
