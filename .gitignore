@@ -9,7 +9,7 @@ build/
 # /src/main/resources/.env.example <-- "git update-index --assume-unchanged FILENAME"
 # /src/main/resources/.env.properties <-- "git update-index --assume-unchanged FILENAME"
 src/main/resources/imageKit-alwaysdata.properties
-src/main/resources/.env
+src/main/resources/.env.main
 
 ### STS ###
 .apt_generated
